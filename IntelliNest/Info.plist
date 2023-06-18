@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EXTERNAL_URL</key>
+	<string>$(EXTERNAL_URL)</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>ToggleMonitorIntent</string>
+		<string>UnlockStoreHouseIntent</string>
+	</array>
+	<key>SECRET_HASS_TOKEN</key>
+	<string>$(SECRET_HASS_TOKEN)</string>
+	<key>SECRET_RTSP_STREAM_CAMERA_BACK</key>
+	<string>$(SECRET_RTSP_STREAM_CAMERA_BACK)</string>
+	<key>SECRET_RTSP_STREAM_CAMERA_CARPORT</key>
+	<string>$(SECRET_RTSP_STREAM_CAMERA_CARPORT)</string>
+	<key>SECRET_RTSP_STREAM_CAMERA_FRONT</key>
+	<string>$(SECRET_RTSP_STREAM_CAMERA_FRONT)</string>
+	<key>SECRET_RTSP_STREAM_CAMERA_VINCE</key>
+	<string>$(SECRET_RTSP_STREAM_CAMERA_VINCE)</string>
+	<key>SECRET_SHIP_BOOK_APP_ID</key>
+	<string>$(SECRET_SHIP_BOOK_APP_ID)</string>
+	<key>SECRET_SHIP_BOOK_APP_KEY</key>
+	<string>$(SECRET_SHIP_BOOK_APP_KEY)</string>
+	<key>SECRET_YALE_API_KEY</key>
+	<string>$(SECRET_YALE_API_KEY)</string>
+	<key>SECRET_YALE_API_URL</key>
+	<string>$(SECRET_YALE_API_URL)</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict/>
+	</dict>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>thermometer</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Starta bilens klimat</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>CarHeater</string>
+		</dict>
+	</array>
+</dict>
+</plist>

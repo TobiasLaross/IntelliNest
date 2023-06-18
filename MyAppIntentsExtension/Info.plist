@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EXTERNAL_URL</key>
+	<string>$(EXTERNAL_URL)</string>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>IntentsRestrictedWhileLocked</key>
+			<array/>
+			<key>IntentsRestrictedWhileProtectedDataUnavailable</key>
+			<array/>
+			<key>IntentsSupported</key>
+			<array>
+				<string>INSearchForMessagesIntent</string>
+				<string>INSendMessageIntent</string>
+				<string>INSetMessageAttributeIntent</string>
+				<string>ToggleMonitorIntent</string>
+				<string>UnlockStoreHouseIntent</string>
+			</array>
+		</dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.intents-service</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>$(PRODUCT_MODULE_NAME).IntentHandler</string>
+	</dict>
+	<key>SECRET_HASS_TOKEN</key>
+	<string>$(SECRET_HASS_TOKEN)</string>
+</dict>
+</plist>

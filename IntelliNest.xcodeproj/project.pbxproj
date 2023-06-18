@@ -1,0 +1,1627 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F60345C127A7F33700212D04 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C027A7F33700212D04 /* Entity.swift */; };
+		F60345C427A933D700212D04 /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C327A933D700212D04 /* GlobalConstants.swift */; };
+		F60345C927A9379200212D04 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C827A9379200212D04 /* HomeView.swift */; };
+		F60345CC27A93BD700212D04 /* URLCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345CB27A93BD700212D04 /* URLCreator.swift */; };
+		F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345CD27AAF84E00212D04 /* HeatersView.swift */; };
+		F60345D027ABB46900212D04 /* EniroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345CF27ABB46900212D04 /* EniroView.swift */; };
+		F60345D427ABE49100212D04 /* LightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D327ABE49100212D04 /* LightsView.swift */; };
+		F60345D627ABE49700212D04 /* RoborockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D527ABE49700212D04 /* RoborockView.swift */; };
+		F6035045287F5DB10028DA57 /* SingleRoomLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6035044287F5DB10028DA57 /* SingleRoomLight.swift */; };
+		F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99B2A1653E600C1802E /* YaleApiService.swift */; };
+		F61BF99E2A1655E900C1802E /* StorageKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99D2A1655E900C1802E /* StorageKeys.swift */; };
+		F61BF9A02A166B2700C1802E /* LockID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99F2A166B2700C1802E /* LockID.swift */; };
+		F61BF9A22A166C4900C1802E /* YaleLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A12A166C4900C1802E /* YaleLock.swift */; };
+		F61BF9A42A166E0D00C1802E /* LockState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A32A166E0D00C1802E /* LockState.swift */; };
+		F61BF9A62A166F9A00C1802E /* Lockable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A52A166F9A00C1802E /* Lockable.swift */; };
+		F61BF9A82A1672C300C1802E /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A72A1672C300C1802E /* HTTPMethod.swift */; };
+		F61BF9AA2A16749D00C1802E /* JSONKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A92A16749D00C1802E /* JSONKey.swift */; };
+		F61BF9AC2A167AC600C1802E /* DoorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9AB2A167AC600C1802E /* DoorState.swift */; };
+		F61BF9AE2A167D0E00C1802E /* YaleLockResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9AD2A167D0E00C1802E /* YaleLockResponse.swift */; };
+		F61BF9B22A16A01D00C1802E /* DashboardButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */; };
+		F624EF662A2B0234004AC6BA /* NavigatorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */; };
+		F624EF682A2B4AAB004AC6BA /* CamerasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF672A2B4AAB004AC6BA /* CamerasView.swift */; };
+		F627509B29F9619100C1253F /* ToggleMonitorIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */; };
+		F627509D29F9625F00C1253F /* RequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509C29F9625F00C1253F /* RequestHandler.swift */; };
+		F627509F29FD120F00C1253F /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509E29FD120F00C1253F /* Navigator.swift */; };
+		F62750A129FE39B100C1253F /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A029FE39B100C1253F /* Destination.swift */; };
+		F62750A329FE756800C1253F /* HassViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A229FE756800C1253F /* HassViewModelProtocol.swift */; };
+		F62750A92A00ED9500C1253F /* UINavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A82A00ED9500C1253F /* UINavigationController.swift */; };
+		F62750AB2A00EE8800C1253F /* ToolbarBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */; };
+		F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AE2A01123500C1253F /* ToolbarItems.swift */; };
+		F62750B12A066A7D00C1253F /* URLCreatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750B02A066A7D00C1253F /* URLCreatorTests.swift */; };
+		F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750B22A066B4500C1253F /* URLProtocolStub.swift */; };
+		F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2DF286D950A00462092 /* LightEntity.swift */; };
+		F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E228770D5500462092 /* LightsViewModel.swift */; };
+		F62CD2E528770F3B00462092 /* HassApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E428770F3B00462092 /* HassApiService.swift */; };
+		F62CD2E82877140800462092 /* EntityError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E72877140800462092 /* EntityError.swift */; };
+		F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */; };
+		F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D2B5B280E9EE000517746 /* LockEntity.swift */; };
+		F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64D2693283E8FAB0073A7BF /* NetworkTask.swift */; };
+		F6552705281678740035DC72 /* RoborockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6552704281678740035DC72 /* RoborockEntity.swift */; };
+		F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */; };
+		F662999027B3AA5A00121C14 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662998F27B3AA5A00121C14 /* Helpers.swift */; };
+		F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */; };
+		F662999627B4185D00121C14 /* BatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999527B4185D00121C14 /* BatteryView.swift */; };
+		F662999A27B7D8DA00121C14 /* HeaterEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999927B7D8DA00121C14 /* HeaterEntity.swift */; };
+		F6633F23285DF8E6004D0B76 /* CameraEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F22285DF8E6004D0B76 /* CameraEntity.swift */; };
+		F6633F272860B90C004D0B76 /* QuickActionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F262860B90C004D0B76 /* QuickActionService.swift */; };
+		F6633F292860C16E004D0B76 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F282860C16E004D0B76 /* AppDelegate.swift */; };
+		F6633F2C286324EB004D0B76 /* DetailedHeaterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F2B286324EB004D0B76 /* DetailedHeaterView.swift */; };
+		F6633F2E2863260B004D0B76 /* SimpleHeaterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F2D2863260B004D0B76 /* SimpleHeaterView.swift */; };
+		F6633F30286326FC004D0B76 /* ThermometerGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F2F286326FC004D0B76 /* ThermometerGroupView.swift */; };
+		F6633F322863275D004D0B76 /* ThermometerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F312863275D004D0B76 /* ThermometerView.swift */; };
+		F6633F34286327F9004D0B76 /* NumberTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F33286327F9004D0B76 /* NumberTextView.swift */; };
+		F6633F3628632884004D0B76 /* HeaterVerticalPositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3528632884004D0B76 /* HeaterVerticalPositionView.swift */; };
+		F6633F38286328E8004D0B76 /* HorizontalModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F37286328E8004D0B76 /* HorizontalModeView.swift */; };
+		F6633F3A28632954004D0B76 /* FanModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3928632954004D0B76 /* FanModeView.swift */; };
+		F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */; };
+		F6633F3F28632C81004D0B76 /* RoborockInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */; };
+		F6633F4328632EED004D0B76 /* RoborockRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */; };
+		F6633F4528632F5E004D0B76 /* RoborockRoomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4428632F5E004D0B76 /* RoborockRoomButton.swift */; };
+		F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4628633122004D0B76 /* RoborockMainButtons.swift */; };
+		F664BA7229B48AF80092CB2E /* EntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7129B48AF80092CB2E /* EntityTest.swift */; };
+		F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7329B48C510092CB2E /* DateExtension.swift */; };
+		F664BA7629B48F860092CB2E /* InputNumberEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */; };
+		F669C72C2A23C06200458165 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F669C72B2A23C06200458165 /* CameraView.swift */; };
+		F669C72E2A23C08000458165 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F669C72D2A23C08000458165 /* CameraViewModel.swift */; };
+		F669C7312A23D6DA00458165 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = F669C7302A23D6DA00458165 /* Starscream */; };
+		F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */; };
+		F66F061727AEFC2300270E71 /* VerticalSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66F061627AEFC2300270E71 /* VerticalSlider.swift */; };
+		F67023FB27A177320070FFBB /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67023FA27A177320070FFBB /* AppMain.swift */; };
+		F67023FF27A177330070FFBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F67023FE27A177330070FFBB /* Assets.xcassets */; };
+		F670240227A177330070FFBB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F670240127A177330070FFBB /* Preview Assets.xcassets */; };
+		F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C0B6C298D07E50096AE49 /* DeviceID.swift */; };
+		F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */; };
+		F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */; };
+		F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */; };
+		F67FA88B28A16E9A00BE4CBD /* EntityProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */; };
+		F6830DE22904534200BBE36C /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6830DE12904534200BBE36C /* CollectionExtension.swift */; };
+		F68DA61228AE35F300601726 /* BulbButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61128AE35F300601726 /* BulbButton.swift */; };
+		F68DA61628B0D12B00601726 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61528B0D12B00601726 /* HomeViewModel.swift */; };
+		F68DA61828B4B89C00601726 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61728B4B89C00601726 /* Actions.swift */; };
+		F68DA61B28B4C0C100601726 /* EntityId.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61A28B4C0C100601726 /* EntityId.swift */; };
+		F68DA61E28B4C11600601726 /* Heater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61D28B4C11600601726 /* Heater.swift */; };
+		F68DA62028B4C13000601726 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61F28B4C13000601726 /* Domain.swift */; };
+		F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */; };
+		F6BB7DF0284A29A4007F44D0 /* RoborockMapImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */; };
+		F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */; };
+		F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */; };
+		F6D167CC27C1287700DCC155 /* HvacModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CB27C1287700DCC155 /* HvacModeView.swift */; };
+		F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */; };
+		F6DBA4D028E82D6A001BA1C0 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4CF28E82D6A001BA1C0 /* Task.swift */; };
+		F6DBA4D428F09C7F001BA1C0 /* Closures.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4D328F09C7F001BA1C0 /* Closures.swift */; };
+		F6DE841D29F2A5BC002132A2 /* MyAppIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */; };
+		F6DE842529F2A696002132A2 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6DE842429F2A696002132A2 /* Intents.framework */; };
+		F6DE842829F2A696002132A2 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE842729F2A696002132A2 /* IntentHandler.swift */; };
+		F6DE843D29F2A696002132A2 /* MyAppIntentsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F6DE844829F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE844729F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift */; };
+		F6DE844929F2AA3E002132A2 /* MyAppIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */; };
+		F6DE844A29F2AD01002132A2 /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C327A933D700212D04 /* GlobalConstants.swift */; };
+		F6DE990929BD13B500B8AABB /* ShipBookSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F6DE990829BD13B500B8AABB /* ShipBookSDK */; };
+		F6DE990B29BD18FB00B8AABB /* LogExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE990A29BD18FB00B8AABB /* LogExtension.swift */; };
+		F6EF35AF2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35AE2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift */; };
+		F6EF35B12A3CA96E00895250 /* ScriptVariableKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */; };
+		F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */; };
+		F6EF35B52A3E1BB500895250 /* LightEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B42A3E1BB500895250 /* LightEntityTests.swift */; };
+		F6EF35B72A3E20B100895250 /* SelectUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B62A3E20B100895250 /* SelectUserView.swift */; };
+		F6EF35B92A3EC47200895250 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B82A3EC47200895250 /* UserManager.swift */; };
+		F6F118192827A15500251350 /* EniroGeoEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F118182827A15500251350 /* EniroGeoEntity.swift */; };
+		F6F1D078299104CD00A3292E /* NordPoolEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D077299104CD00A3292E /* NordPoolEntity.swift */; };
+		F6F1D07A299110EC00A3292E /* NordPoolHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */; };
+		F6F1D07C2992686E00A3292E /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D07B2992686E00A3292E /* Color.swift */; };
+		F6F1D07E299390C500A3292E /* CalendarExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D07D299390C500A3292E /* CalendarExtension.swift */; };
+		F6F1D08029A2174000A3292E /* EniroChargingLimitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D07F29A2174000A3292E /* EniroChargingLimitView.swift */; };
+		F6F1D08229A27A6100A3292E /* ImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D08129A27A6100A3292E /* ImageExtension.swift */; };
+		F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D08329A67B3200A3292E /* FullScreenBackgroundOverlay.swift */; };
+		F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D08529A94E8900A3292E /* LimitPickerView.swift */; };
+		F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */; };
+		F6F8555B28DCB0F1004B9517 /* EniroUpdaters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8555A28DCB0F1004B9517 /* EniroUpdaters.swift */; };
+		F6F8555D28DCF93E004B9517 /* EniroDoorLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8555C28DCF93E004B9517 /* EniroDoorLock.swift */; };
+		F6F8555F28DF755D004B9517 /* EniroCharging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8555E28DF755D004B9517 /* EniroCharging.swift */; };
+		F6F8556128DF9EE8004B9517 /* HeatersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */; };
+		F6F94B5E28B60DED006B1F12 /* EniroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */; };
+		F6FAD81A2A2A472000C0B364 /* CamerasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */; };
+		F6FAD81C2A2A654900C0B364 /* WebsocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FAD81B2A2A654900C0B364 /* WebsocketService.swift */; };
+		F6FAD81E2A2A695600C0B364 /* WebsocketServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FAD81D2A2A695600C0B364 /* WebsocketServiceDelegate.swift */; };
+		F6FDBE2D2A1A2F970081BC3D /* URLRequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */; };
+		F6FDBE2F2A1CD7980081BC3D /* LockServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */; };
+		F6FDBE312A1CDA850081BC3D /* HomeViewModelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FDBE302A1CDA850081BC3D /* HomeViewModelExtension.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F670240827A177340070FFBB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F67023EF27A177320070FFBB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F67023F627A177320070FFBB;
+			remoteInfo = "IntelliNest";
+		};
+		F670241227A177340070FFBB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F67023EF27A177320070FFBB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F67023F627A177320070FFBB;
+			remoteInfo = "IntelliNest";
+		};
+		F6DE843B29F2A696002132A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F67023EF27A177320070FFBB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F6DE842129F2A696002132A2;
+			remoteInfo = MyAppIntentsExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F6DE844629F2A696002132A2 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F6DE843D29F2A696002132A2 /* MyAppIntentsExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F60345C027A7F33700212D04 /* Entity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
+		F60345C327A933D700212D04 /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
+		F60345C827A9379200212D04 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		F60345CB27A93BD700212D04 /* URLCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreator.swift; sourceTree = "<group>"; };
+		F60345CD27AAF84E00212D04 /* HeatersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersView.swift; sourceTree = "<group>"; };
+		F60345CF27ABB46900212D04 /* EniroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroView.swift; sourceTree = "<group>"; };
+		F60345D327ABE49100212D04 /* LightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsView.swift; sourceTree = "<group>"; };
+		F60345D527ABE49700212D04 /* RoborockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockView.swift; sourceTree = "<group>"; };
+		F6035044287F5DB10028DA57 /* SingleRoomLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleRoomLight.swift; sourceTree = "<group>"; };
+		F617062527C3CA9100183250 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F61BF99B2A1653E600C1802E /* YaleApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleApiService.swift; sourceTree = "<group>"; };
+		F61BF99D2A1655E900C1802E /* StorageKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageKeys.swift; sourceTree = "<group>"; };
+		F61BF99F2A166B2700C1802E /* LockID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockID.swift; sourceTree = "<group>"; };
+		F61BF9A12A166C4900C1802E /* YaleLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleLock.swift; sourceTree = "<group>"; };
+		F61BF9A32A166E0D00C1802E /* LockState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockState.swift; sourceTree = "<group>"; };
+		F61BF9A52A166F9A00C1802E /* Lockable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lockable.swift; sourceTree = "<group>"; };
+		F61BF9A72A1672C300C1802E /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		F61BF9A92A16749D00C1802E /* JSONKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONKey.swift; sourceTree = "<group>"; };
+		F61BF9AB2A167AC600C1802E /* DoorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoorState.swift; sourceTree = "<group>"; };
+		F61BF9AD2A167D0E00C1802E /* YaleLockResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleLockResponse.swift; sourceTree = "<group>"; };
+		F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardButtonView.swift; sourceTree = "<group>"; };
+		F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigatorExtension.swift; sourceTree = "<group>"; };
+		F624EF672A2B4AAB004AC6BA /* CamerasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CamerasView.swift; sourceTree = "<group>"; };
+		F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleMonitorIntentHandler.swift; sourceTree = "<group>"; };
+		F627509C29F9625F00C1253F /* RequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestHandler.swift; sourceTree = "<group>"; };
+		F627509E29FD120F00C1253F /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		F62750A029FE39B100C1253F /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
+		F62750A229FE756800C1253F /* HassViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HassViewModelProtocol.swift; sourceTree = "<group>"; };
+		F62750A82A00ED9500C1253F /* UINavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UINavigationController.swift; sourceTree = "<group>"; };
+		F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarBackButton.swift; sourceTree = "<group>"; };
+		F62750AE2A01123500C1253F /* ToolbarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarItems.swift; sourceTree = "<group>"; };
+		F62750B02A066A7D00C1253F /* URLCreatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreatorTests.swift; sourceTree = "<group>"; };
+		F62750B22A066B4500C1253F /* URLProtocolStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolStub.swift; sourceTree = "<group>"; };
+		F62CD2DF286D950A00462092 /* LightEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightEntity.swift; sourceTree = "<group>"; };
+		F62CD2E228770D5500462092 /* LightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModel.swift; sourceTree = "<group>"; };
+		F62CD2E428770F3B00462092 /* HassApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HassApiService.swift; sourceTree = "<group>"; };
+		F62CD2E72877140800462092 /* EntityError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityError.swift; sourceTree = "<group>"; };
+		F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualBulbRoomView.swift; sourceTree = "<group>"; };
+		F63D2B5B280E9EE000517746 /* LockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntity.swift; sourceTree = "<group>"; };
+		F64D2693283E8FAB0073A7BF /* NetworkTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTask.swift; sourceTree = "<group>"; };
+		F6552704281678740035DC72 /* RoborockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockEntity.swift; sourceTree = "<group>"; };
+		F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
+		F662998F27B3AA5A00121C14 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleView.swift; sourceTree = "<group>"; };
+		F662999527B4185D00121C14 /* BatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryView.swift; sourceTree = "<group>"; };
+		F662999927B7D8DA00121C14 /* HeaterEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterEntity.swift; sourceTree = "<group>"; };
+		F6633F22285DF8E6004D0B76 /* CameraEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraEntity.swift; sourceTree = "<group>"; };
+		F6633F262860B90C004D0B76 /* QuickActionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionService.swift; sourceTree = "<group>"; };
+		F6633F282860C16E004D0B76 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F6633F2B286324EB004D0B76 /* DetailedHeaterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedHeaterView.swift; sourceTree = "<group>"; };
+		F6633F2D2863260B004D0B76 /* SimpleHeaterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleHeaterView.swift; sourceTree = "<group>"; };
+		F6633F2F286326FC004D0B76 /* ThermometerGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermometerGroupView.swift; sourceTree = "<group>"; };
+		F6633F312863275D004D0B76 /* ThermometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermometerView.swift; sourceTree = "<group>"; };
+		F6633F33286327F9004D0B76 /* NumberTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberTextView.swift; sourceTree = "<group>"; };
+		F6633F3528632884004D0B76 /* HeaterVerticalPositionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterVerticalPositionView.swift; sourceTree = "<group>"; };
+		F6633F37286328E8004D0B76 /* HorizontalModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalModeView.swift; sourceTree = "<group>"; };
+		F6633F3928632954004D0B76 /* FanModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanModeView.swift; sourceTree = "<group>"; };
+		F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinceEmptiedView.swift; sourceTree = "<group>"; };
+		F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockInfoView.swift; sourceTree = "<group>"; };
+		F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockRoomsView.swift; sourceTree = "<group>"; };
+		F6633F4428632F5E004D0B76 /* RoborockRoomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockRoomButton.swift; sourceTree = "<group>"; };
+		F6633F4628633122004D0B76 /* RoborockMainButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockMainButtons.swift; sourceTree = "<group>"; };
+		F664BA7129B48AF80092CB2E /* EntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityTest.swift; sourceTree = "<group>"; };
+		F664BA7329B48C510092CB2E /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
+		F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputNumberEntityTest.swift; sourceTree = "<group>"; };
+		F669C72B2A23C06200458165 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		F669C72D2A23C08000458165 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLCMediaplayerMock.swift; sourceTree = "<group>"; };
+		F66F061627AEFC2300270E71 /* VerticalSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalSlider.swift; sourceTree = "<group>"; };
+		F67023F727A177320070FFBB /* IntelliNest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IntelliNest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F67023FA27A177320070FFBB /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
+		F67023FE27A177330070FFBB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F670240127A177330070FFBB /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F670240727A177340070FFBB /* IntelliNestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntelliNestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F670241127A177340070FFBB /* IntelliNestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntelliNestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F67C0B6C298D07E50096AE49 /* DeviceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceID.swift; sourceTree = "<group>"; };
+		F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleViewModel.swift; sourceTree = "<group>"; };
+		F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroInfoView.swift; sourceTree = "<group>"; };
+		F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateView.swift; sourceTree = "<group>"; };
+		F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityProtocol.swift; sourceTree = "<group>"; };
+		F6830DE12904534200BBE36C /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
+		F68DA61128AE35F300601726 /* BulbButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulbButton.swift; sourceTree = "<group>"; };
+		F68DA61528B0D12B00601726 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		F68DA61728B4B89C00601726 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
+		F68DA61A28B4C0C100601726 /* EntityId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityId.swift; sourceTree = "<group>"; };
+		F68DA61D28B4C11600601726 /* Heater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Heater.swift; sourceTree = "<group>"; };
+		F68DA61F28B4C13000601726 /* Domain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
+		F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockViewModel.swift; sourceTree = "<group>"; };
+		F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockMapImageView.swift; sourceTree = "<group>"; };
+		F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "IntelliNest-Info.xcconfig"; sourceTree = "<group>"; };
+		F6C2BF3C283A34E9002EE9F9 /* Github-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Github-Info.xcconfig"; sourceTree = "<group>"; };
+		F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntityTest.swift; sourceTree = "<group>"; };
+		F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterGroupLabels.swift; sourceTree = "<group>"; };
+		F6D167CB27C1287700DCC155 /* HvacModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HvacModeView.swift; sourceTree = "<group>"; };
+		F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPickerScrollView.swift; sourceTree = "<group>"; };
+		F6DBA4CF28E82D6A001BA1C0 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		F6DBA4D328F09C7F001BA1C0 /* Closures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Closures.swift; sourceTree = "<group>"; };
+		F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = MyAppIntents.intentdefinition; sourceTree = "<group>"; };
+		F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MyAppIntentsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F6DE842429F2A696002132A2 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
+		F6DE842729F2A696002132A2 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
+		F6DE842929F2A696002132A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F6DE842F29F2A696002132A2 /* IntentsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IntentsUI.framework; path = System/Library/Frameworks/IntentsUI.framework; sourceTree = SDKROOT; };
+		F6DE844729F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockStoreHouseIntentHandler.swift; sourceTree = "<group>"; };
+		F6DE990A29BD18FB00B8AABB /* LogExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExtension.swift; sourceTree = "<group>"; };
+		F6EF35AE2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateSchedulePickerView.swift; sourceTree = "<group>"; };
+		F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptVariableKeys.swift; sourceTree = "<group>"; };
+		F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModelExtension.swift; sourceTree = "<group>"; };
+		F6EF35B42A3E1BB500895250 /* LightEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightEntityTests.swift; sourceTree = "<group>"; };
+		F6EF35B62A3E20B100895250 /* SelectUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectUserView.swift; sourceTree = "<group>"; };
+		F6EF35B82A3EC47200895250 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
+		F6F118182827A15500251350 /* EniroGeoEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroGeoEntity.swift; sourceTree = "<group>"; };
+		F6F1D077299104CD00A3292E /* NordPoolEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NordPoolEntity.swift; sourceTree = "<group>"; };
+		F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NordPoolHistoryView.swift; sourceTree = "<group>"; };
+		F6F1D07B2992686E00A3292E /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		F6F1D07D299390C500A3292E /* CalendarExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarExtension.swift; sourceTree = "<group>"; };
+		F6F1D07F29A2174000A3292E /* EniroChargingLimitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroChargingLimitView.swift; sourceTree = "<group>"; };
+		F6F1D08129A27A6100A3292E /* ImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageExtension.swift; sourceTree = "<group>"; };
+		F6F1D08329A67B3200A3292E /* FullScreenBackgroundOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenBackgroundOverlay.swift; sourceTree = "<group>"; };
+		F6F1D08529A94E8900A3292E /* LimitPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitPickerView.swift; sourceTree = "<group>"; };
+		F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputNumberEntity.swift; sourceTree = "<group>"; };
+		F6F8555A28DCB0F1004B9517 /* EniroUpdaters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroUpdaters.swift; sourceTree = "<group>"; };
+		F6F8555C28DCF93E004B9517 /* EniroDoorLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroDoorLock.swift; sourceTree = "<group>"; };
+		F6F8555E28DF755D004B9517 /* EniroCharging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroCharging.swift; sourceTree = "<group>"; };
+		F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModel.swift; sourceTree = "<group>"; };
+		F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroViewModel.swift; sourceTree = "<group>"; };
+		F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CamerasViewModel.swift; sourceTree = "<group>"; };
+		F6FAD81B2A2A654900C0B364 /* WebsocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketService.swift; sourceTree = "<group>"; };
+		F6FAD81D2A2A695600C0B364 /* WebsocketServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketServiceDelegate.swift; sourceTree = "<group>"; };
+		F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestBuilder.swift; sourceTree = "<group>"; };
+		F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockServiceProtocol.swift; sourceTree = "<group>"; };
+		F6FDBE302A1CDA850081BC3D /* HomeViewModelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelExtension.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F67023F427A177320070FFBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6DE990929BD13B500B8AABB /* ShipBookSDK in Frameworks */,
+				F669C7312A23D6DA00458165 /* Starscream in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F670240427A177340070FFBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F670240E27A177340070FFBB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6DE841F29F2A696002132A2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6DE842529F2A696002132A2 /* Intents.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F60345C227A933C500212D04 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				F6DBA4CE28E82D62001BA1C0 /* Extensions */,
+				F68DA61C28B4C0F500601726 /* Constants */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		F60345C527A9344600212D04 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				F60345C027A7F33700212D04 /* Entity.swift */,
+				F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */,
+				F62CD2DF286D950A00462092 /* LightEntity.swift */,
+				F6F1D077299104CD00A3292E /* NordPoolEntity.swift */,
+				F6F118182827A15500251350 /* EniroGeoEntity.swift */,
+				F63D2B5B280E9EE000517746 /* LockEntity.swift */,
+				F61BF9A12A166C4900C1802E /* YaleLock.swift */,
+				F61BF9AD2A167D0E00C1802E /* YaleLockResponse.swift */,
+				F61BF9A52A166F9A00C1802E /* Lockable.swift */,
+				F662999927B7D8DA00121C14 /* HeaterEntity.swift */,
+				F6633F22285DF8E6004D0B76 /* CameraEntity.swift */,
+				F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */,
+				F6552704281678740035DC72 /* RoborockEntity.swift */,
+				F6633F262860B90C004D0B76 /* QuickActionService.swift */,
+				F61BF9A32A166E0D00C1802E /* LockState.swift */,
+				F61BF9AB2A167AC600C1802E /* DoorState.swift */,
+				F6EF35B82A3EC47200895250 /* UserManager.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		F60345C627A934F200212D04 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				F6D167C827C1282500DCC155 /* Labels */,
+				F66F061527AEFC0F00270E71 /* Views */,
+				F60345C727A9378300212D04 /* Dashboards */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		F60345C727A9378300212D04 /* Dashboards */ = {
+			isa = PBXGroup;
+			children = (
+				F669C72B2A23C06200458165 /* CameraView.swift */,
+				F624EF672A2B4AAB004AC6BA /* CamerasView.swift */,
+				F60345C827A9379200212D04 /* HomeView.swift */,
+				F60345D327ABE49100212D04 /* LightsView.swift */,
+				F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */,
+				F60345D527ABE49700212D04 /* RoborockView.swift */,
+				F60345CD27AAF84E00212D04 /* HeatersView.swift */,
+				F60345CF27ABB46900212D04 /* EniroView.swift */,
+			);
+			path = Dashboards;
+			sourceTree = "<group>";
+		};
+		F60345CA27A93BB400212D04 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F62CD2E428770F3B00462092 /* HassApiService.swift */,
+				F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */,
+				F60345CB27A93BD700212D04 /* URLCreator.swift */,
+				F64D2693283E8FAB0073A7BF /* NetworkTask.swift */,
+				F61BF99B2A1653E600C1802E /* YaleApiService.swift */,
+				F6FAD81B2A2A654900C0B364 /* WebsocketService.swift */,
+				F6FAD81D2A2A695600C0B364 /* WebsocketServiceDelegate.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		F6260EF5283280D200B87614 /* IntelliNestTests */ = {
+			isa = PBXGroup;
+			children = (
+				F664BA7129B48AF80092CB2E /* EntityTest.swift */,
+				F6EF35B42A3E1BB500895250 /* LightEntityTests.swift */,
+				F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */,
+				F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */,
+				F62750B02A066A7D00C1253F /* URLCreatorTests.swift */,
+				F62750B22A066B4500C1253F /* URLProtocolStub.swift */,
+			);
+			path = IntelliNestTests;
+			sourceTree = "<group>";
+		};
+		F62750AD2A01119000C1253F /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */,
+				F627509E29FD120F00C1253F /* Navigator.swift */,
+				F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */,
+				F62750A029FE39B100C1253F /* Destination.swift */,
+				F62750AE2A01123500C1253F /* ToolbarItems.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		F62CD2E128770D4900462092 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F68DA61528B0D12B00601726 /* HomeViewModel.swift */,
+				F62CD2E228770D5500462092 /* LightsViewModel.swift */,
+				F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */,
+				F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */,
+				F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */,
+				F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */,
+				F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */,
+				F62750A229FE756800C1253F /* HassViewModelProtocol.swift */,
+				F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */,
+				F6FDBE302A1CDA850081BC3D /* HomeViewModelExtension.swift */,
+				F669C72D2A23C08000458165 /* CameraViewModel.swift */,
+				F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */,
+				F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		F62CD2E6287713F900462092 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				F62CD2E72877140800462092 /* EntityError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		F62CD2E92877275400462092 /* Light */ = {
+			isa = PBXGroup;
+			children = (
+				F66F061627AEFC2300270E71 /* VerticalSlider.swift */,
+				F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */,
+				F6035044287F5DB10028DA57 /* SingleRoomLight.swift */,
+				F68DA61128AE35F300601726 /* BulbButton.swift */,
+			);
+			path = Light;
+			sourceTree = "<group>";
+		};
+		F6633F2A286324DE004D0B76 /* Heater */ = {
+			isa = PBXGroup;
+			children = (
+				F6D167CB27C1287700DCC155 /* HvacModeView.swift */,
+				F6633F2B286324EB004D0B76 /* DetailedHeaterView.swift */,
+				F6633F2D2863260B004D0B76 /* SimpleHeaterView.swift */,
+				F6633F2F286326FC004D0B76 /* ThermometerGroupView.swift */,
+				F6633F312863275D004D0B76 /* ThermometerView.swift */,
+				F6633F33286327F9004D0B76 /* NumberTextView.swift */,
+				F6633F3528632884004D0B76 /* HeaterVerticalPositionView.swift */,
+				F6633F37286328E8004D0B76 /* HorizontalModeView.swift */,
+				F6633F3928632954004D0B76 /* FanModeView.swift */,
+			);
+			path = Heater;
+			sourceTree = "<group>";
+		};
+		F6633F3B28632BF1004D0B76 /* Roborock */ = {
+			isa = PBXGroup;
+			children = (
+				F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */,
+				F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */,
+				F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */,
+				F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */,
+				F6633F4428632F5E004D0B76 /* RoborockRoomButton.swift */,
+				F6633F4628633122004D0B76 /* RoborockMainButtons.swift */,
+			);
+			path = Roborock;
+			sourceTree = "<group>";
+		};
+		F66F061527AEFC0F00270E71 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F67F6B4928D8FB780003CE9F /* Eniro */,
+				F62CD2E92877275400462092 /* Light */,
+				F6633F2A286324DE004D0B76 /* Heater */,
+				F6633F3B28632BF1004D0B76 /* Roborock */,
+				F662998F27B3AA5A00121C14 /* Helpers.swift */,
+				F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */,
+				F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */,
+				F662999527B4185D00121C14 /* BatteryView.swift */,
+				F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */,
+				F6EF35B62A3E20B100895250 /* SelectUserView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F67023EE27A177320070FFBB = {
+			isa = PBXGroup;
+			children = (
+				F6C2BF3C283A34E9002EE9F9 /* Github-Info.xcconfig */,
+				F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */,
+				F67023F927A177320070FFBB /* IntelliNest */,
+				F6260EF5283280D200B87614 /* IntelliNestTests */,
+				F6DE842629F2A696002132A2 /* MyAppIntentsExtension */,
+				F6DE842329F2A696002132A2 /* Frameworks */,
+				F67023F827A177320070FFBB /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F67023F827A177320070FFBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F67023F727A177320070FFBB /* IntelliNest.app */,
+				F670240727A177340070FFBB /* IntelliNestTests.xctest */,
+				F670241127A177340070FFBB /* IntelliNestUITests.xctest */,
+				F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F67023F927A177320070FFBB /* IntelliNest */ = {
+			isa = PBXGroup;
+			children = (
+				F62750AD2A01119000C1253F /* Navigation */,
+				F62CD2E6287713F900462092 /* Errors */,
+				F62CD2E128770D4900462092 /* ViewModel */,
+				F617062527C3CA9100183250 /* Info.plist */,
+				F60345C627A934F200212D04 /* Scenes */,
+				F60345CA27A93BB400212D04 /* Services */,
+				F60345C527A9344600212D04 /* Model */,
+				F60345C227A933C500212D04 /* Utils */,
+				F67023FA27A177320070FFBB /* AppMain.swift */,
+				F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */,
+				F6633F282860C16E004D0B76 /* AppDelegate.swift */,
+				F67023FE27A177330070FFBB /* Assets.xcassets */,
+				F670240027A177330070FFBB /* Preview Content */,
+			);
+			path = IntelliNest;
+			sourceTree = "<group>";
+		};
+		F670240027A177330070FFBB /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				F670240127A177330070FFBB /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F67F6B4928D8FB780003CE9F /* Eniro */ = {
+			isa = PBXGroup;
+			children = (
+				F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */,
+				F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */,
+				F6F8555A28DCB0F1004B9517 /* EniroUpdaters.swift */,
+				F6F8555C28DCF93E004B9517 /* EniroDoorLock.swift */,
+				F6F1D07F29A2174000A3292E /* EniroChargingLimitView.swift */,
+				F6EF35AE2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift */,
+				F6F8555E28DF755D004B9517 /* EniroCharging.swift */,
+				F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */,
+				F6F1D08529A94E8900A3292E /* LimitPickerView.swift */,
+			);
+			path = Eniro;
+			sourceTree = "<group>";
+		};
+		F68DA61C28B4C0F500601726 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				F68DA61728B4B89C00601726 /* Actions.swift */,
+				F60345C327A933D700212D04 /* GlobalConstants.swift */,
+				F61BF9A92A16749D00C1802E /* JSONKey.swift */,
+				F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */,
+				F61BF99D2A1655E900C1802E /* StorageKeys.swift */,
+				F6F1D08329A67B3200A3292E /* FullScreenBackgroundOverlay.swift */,
+				F6DBA4D328F09C7F001BA1C0 /* Closures.swift */,
+				F68DA61F28B4C13000601726 /* Domain.swift */,
+				F68DA61A28B4C0C100601726 /* EntityId.swift */,
+				F61BF99F2A166B2700C1802E /* LockID.swift */,
+				F67C0B6C298D07E50096AE49 /* DeviceID.swift */,
+				F68DA61D28B4C11600601726 /* Heater.swift */,
+				F61BF9A72A1672C300C1802E /* HTTPMethod.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		F6D167C827C1282500DCC155 /* Labels */ = {
+			isa = PBXGroup;
+			children = (
+				F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */,
+			);
+			path = Labels;
+			sourceTree = "<group>";
+		};
+		F6DBA4CE28E82D62001BA1C0 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F6830DE12904534200BBE36C /* CollectionExtension.swift */,
+				F6DBA4CF28E82D6A001BA1C0 /* Task.swift */,
+				F6F1D07B2992686E00A3292E /* Color.swift */,
+				F6F1D07D299390C500A3292E /* CalendarExtension.swift */,
+				F6F1D08129A27A6100A3292E /* ImageExtension.swift */,
+				F62750A82A00ED9500C1253F /* UINavigationController.swift */,
+				F6DE990A29BD18FB00B8AABB /* LogExtension.swift */,
+				F664BA7329B48C510092CB2E /* DateExtension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		F6DE842329F2A696002132A2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F6DE842429F2A696002132A2 /* Intents.framework */,
+				F6DE842F29F2A696002132A2 /* IntentsUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F6DE842629F2A696002132A2 /* MyAppIntentsExtension */ = {
+			isa = PBXGroup;
+			children = (
+				F6DE842729F2A696002132A2 /* IntentHandler.swift */,
+				F6DE842929F2A696002132A2 /* Info.plist */,
+				F6DE844729F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift */,
+				F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */,
+				F627509C29F9625F00C1253F /* RequestHandler.swift */,
+			);
+			path = MyAppIntentsExtension;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F67023F627A177320070FFBB /* IntelliNest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F670241B27A177340070FFBB /* Build configuration list for PBXNativeTarget "IntelliNest" */;
+			buildPhases = (
+				F66F061A27B16F1D00270E71 /* Swiftlint */,
+				F67023F327A177320070FFBB /* Sources */,
+				F67023F427A177320070FFBB /* Frameworks */,
+				F67023F527A177320070FFBB /* Resources */,
+				F6DE844629F2A696002132A2 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F6DE843C29F2A696002132A2 /* PBXTargetDependency */,
+			);
+			name = IntelliNest;
+			packageProductDependencies = (
+				F6DE990829BD13B500B8AABB /* ShipBookSDK */,
+				F669C7302A23D6DA00458165 /* Starscream */,
+			);
+			productName = "IntelliNest";
+			productReference = F67023F727A177320070FFBB /* IntelliNest.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F670240627A177340070FFBB /* IntelliNestTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F670241E27A177340070FFBB /* Build configuration list for PBXNativeTarget "IntelliNestTests" */;
+			buildPhases = (
+				F670240327A177340070FFBB /* Sources */,
+				F670240427A177340070FFBB /* Frameworks */,
+				F670240527A177340070FFBB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F670240927A177340070FFBB /* PBXTargetDependency */,
+			);
+			name = IntelliNestTests;
+			productName = "IntelliNest";
+			productReference = F670240727A177340070FFBB /* IntelliNestTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		F670241027A177340070FFBB /* IntelliNestUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F670242127A177340070FFBB /* Build configuration list for PBXNativeTarget "IntelliNestUITests" */;
+			buildPhases = (
+				F670240D27A177340070FFBB /* Sources */,
+				F670240E27A177340070FFBB /* Frameworks */,
+				F670240F27A177340070FFBB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F670241327A177340070FFBB /* PBXTargetDependency */,
+			);
+			name = IntelliNestUITests;
+			productName = "IntelliNest";
+			productReference = F670241127A177340070FFBB /* IntelliNestUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		F6DE842129F2A696002132A2 /* MyAppIntentsExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F6DE844229F2A696002132A2 /* Build configuration list for PBXNativeTarget "MyAppIntentsExtension" */;
+			buildPhases = (
+				F61BF9B52A19E9AB00C1802E /* SwiftFormat */,
+				F6DE841E29F2A696002132A2 /* Sources */,
+				F6DE841F29F2A696002132A2 /* Frameworks */,
+				F6DE842029F2A696002132A2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MyAppIntentsExtension;
+			productName = MyAppIntentsExtension;
+			productReference = F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F67023EF27A177320070FFBB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1320;
+				TargetAttributes = {
+					F67023F627A177320070FFBB = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+					F670240627A177340070FFBB = {
+						CreatedOnToolsVersion = 13.2.1;
+						LastSwiftMigration = 1330;
+						TestTargetID = F67023F627A177320070FFBB;
+					};
+					F670241027A177340070FFBB = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = F67023F627A177320070FFBB;
+					};
+					F6DE842129F2A696002132A2 = {
+						CreatedOnToolsVersion = 14.3;
+					};
+				};
+			};
+			buildConfigurationList = F67023F227A177320070FFBB /* Build configuration list for PBXProject "IntelliNest" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F67023EE27A177320070FFBB;
+			packageReferences = (
+				F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */,
+				F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */,
+			);
+			productRefGroup = F67023F827A177320070FFBB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F67023F627A177320070FFBB /* IntelliNest */,
+				F670240627A177340070FFBB /* IntelliNestTests */,
+				F670241027A177340070FFBB /* IntelliNestUITests */,
+				F6DE842129F2A696002132A2 /* MyAppIntentsExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F67023F527A177320070FFBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F670240227A177330070FFBB /* Preview Assets.xcassets in Resources */,
+				F67023FF27A177330070FFBB /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F670240527A177340070FFBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F670240F27A177340070FFBB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6DE842029F2A696002132A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F61BF9B52A19E9AB00C1802E /* SwiftFormat */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftFormat;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\n\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --swiftversion 5 --indent 4 --rules indent,linebreaks,trailingSpace,consecutiveBlankLines,blankLinesAtEndOfScope,blankLinesAtStartOfScope,blankLinesBetweenScopes,consecutiveSpaces,duplicateImports,elseOnSameLine,emptyBraces,redundantBreak,redundantInit,redundantLetError,redundantNilInit,redundantType,redundantVoidReturnType,spaceAroundBraces,spaceAroundBrackets,spaceAroundComments,spaceAroundGenerics,spaceAroundOperators,spaceAroundParens,spaceInsideBraces,spaceInsideBrackets,spaceInsideGenerics,spaceInsideParens,void --quiet\n";
+		};
+		F66F061A27B16F1D00270E71 /* Swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Swiftlint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/swiftlint",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\n\nif which swiftlint > /dev/null; then\n  swiftlint --config \"$SRCROOT/.swiftlint.yml\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F67023F327A177320070FFBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6FDBE2F2A1CD7980081BC3D /* LockServiceProtocol.swift in Sources */,
+				F6FAD81C2A2A654900C0B364 /* WebsocketService.swift in Sources */,
+				F68DA61E28B4C11600601726 /* Heater.swift in Sources */,
+				F6F1D07A299110EC00A3292E /* NordPoolHistoryView.swift in Sources */,
+				F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */,
+				F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */,
+				F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */,
+				F6633F3628632884004D0B76 /* HeaterVerticalPositionView.swift in Sources */,
+				F6F1D07C2992686E00A3292E /* Color.swift in Sources */,
+				F6DBA4D028E82D6A001BA1C0 /* Task.swift in Sources */,
+				F6EF35B72A3E20B100895250 /* SelectUserView.swift in Sources */,
+				F6633F292860C16E004D0B76 /* AppDelegate.swift in Sources */,
+				F6FDBE312A1CDA850081BC3D /* HomeViewModelExtension.swift in Sources */,
+				F61BF9A22A166C4900C1802E /* YaleLock.swift in Sources */,
+				F61BF9AE2A167D0E00C1802E /* YaleLockResponse.swift in Sources */,
+				F6F118192827A15500251350 /* EniroGeoEntity.swift in Sources */,
+				F6633F34286327F9004D0B76 /* NumberTextView.swift in Sources */,
+				F60345D627ABE49700212D04 /* RoborockView.swift in Sources */,
+				F6FAD81E2A2A695600C0B364 /* WebsocketServiceDelegate.swift in Sources */,
+				F60345C127A7F33700212D04 /* Entity.swift in Sources */,
+				F68DA62028B4C13000601726 /* Domain.swift in Sources */,
+				F6552705281678740035DC72 /* RoborockEntity.swift in Sources */,
+				F61BF9AA2A16749D00C1802E /* JSONKey.swift in Sources */,
+				F6633F30286326FC004D0B76 /* ThermometerGroupView.swift in Sources */,
+				F6EF35B12A3CA96E00895250 /* ScriptVariableKeys.swift in Sources */,
+				F68DA61228AE35F300601726 /* BulbButton.swift in Sources */,
+				F662999627B4185D00121C14 /* BatteryView.swift in Sources */,
+				F6633F2E2863260B004D0B76 /* SimpleHeaterView.swift in Sources */,
+				F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */,
+				F61BF9A42A166E0D00C1802E /* LockState.swift in Sources */,
+				F6F8556128DF9EE8004B9517 /* HeatersViewModel.swift in Sources */,
+				F627509F29FD120F00C1253F /* Navigator.swift in Sources */,
+				F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */,
+				F624EF662A2B0234004AC6BA /* NavigatorExtension.swift in Sources */,
+				F67023FB27A177320070FFBB /* AppMain.swift in Sources */,
+				F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */,
+				F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */,
+				F6633F23285DF8E6004D0B76 /* CameraEntity.swift in Sources */,
+				F61BF9AC2A167AC600C1802E /* DoorState.swift in Sources */,
+				F6633F272860B90C004D0B76 /* QuickActionService.swift in Sources */,
+				F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */,
+				F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */,
+				F662999A27B7D8DA00121C14 /* HeaterEntity.swift in Sources */,
+				F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */,
+				F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */,
+				F66F061727AEFC2300270E71 /* VerticalSlider.swift in Sources */,
+				F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */,
+				F68DA61B28B4C0C100601726 /* EntityId.swift in Sources */,
+				F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */,
+				F6DE841D29F2A5BC002132A2 /* MyAppIntents.intentdefinition in Sources */,
+				F6035045287F5DB10028DA57 /* SingleRoomLight.swift in Sources */,
+				F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */,
+				F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */,
+				F61BF9A62A166F9A00C1802E /* Lockable.swift in Sources */,
+				F6F1D08029A2174000A3292E /* EniroChargingLimitView.swift in Sources */,
+				F6633F38286328E8004D0B76 /* HorizontalModeView.swift in Sources */,
+				F6F1D08229A27A6100A3292E /* ImageExtension.swift in Sources */,
+				F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */,
+				F6BB7DF0284A29A4007F44D0 /* RoborockMapImageView.swift in Sources */,
+				F62750A92A00ED9500C1253F /* UINavigationController.swift in Sources */,
+				F6FDBE2D2A1A2F970081BC3D /* URLRequestBuilder.swift in Sources */,
+				F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */,
+				F60345D027ABB46900212D04 /* EniroView.swift in Sources */,
+				F6FAD81A2A2A472000C0B364 /* CamerasViewModel.swift in Sources */,
+				F6633F3F28632C81004D0B76 /* RoborockInfoView.swift in Sources */,
+				F6633F4328632EED004D0B76 /* RoborockRoomsView.swift in Sources */,
+				F6830DE22904534200BBE36C /* CollectionExtension.swift in Sources */,
+				F6633F2C286324EB004D0B76 /* DetailedHeaterView.swift in Sources */,
+				F62CD2E528770F3B00462092 /* HassApiService.swift in Sources */,
+				F62CD2E82877140800462092 /* EntityError.swift in Sources */,
+				F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */,
+				F6F8555D28DCF93E004B9517 /* EniroDoorLock.swift in Sources */,
+				F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */,
+				F6633F322863275D004D0B76 /* ThermometerView.swift in Sources */,
+				F68DA61828B4B89C00601726 /* Actions.swift in Sources */,
+				F6633F4528632F5E004D0B76 /* RoborockRoomButton.swift in Sources */,
+				F6DE990B29BD18FB00B8AABB /* LogExtension.swift in Sources */,
+				F62750AB2A00EE8800C1253F /* ToolbarBackButton.swift in Sources */,
+				F669C72C2A23C06200458165 /* CameraView.swift in Sources */,
+				F6633F3A28632954004D0B76 /* FanModeView.swift in Sources */,
+				F6EF35B92A3EC47200895250 /* UserManager.swift in Sources */,
+				F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */,
+				F61BF9A02A166B2700C1802E /* LockID.swift in Sources */,
+				F6F8555B28DCB0F1004B9517 /* EniroUpdaters.swift in Sources */,
+				F61BF9A82A1672C300C1802E /* HTTPMethod.swift in Sources */,
+				F60345D427ABE49100212D04 /* LightsView.swift in Sources */,
+				F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */,
+				F62750A329FE756800C1253F /* HassViewModelProtocol.swift in Sources */,
+				F624EF682A2B4AAB004AC6BA /* CamerasView.swift in Sources */,
+				F6D167CC27C1287700DCC155 /* HvacModeView.swift in Sources */,
+				F6DBA4D428F09C7F001BA1C0 /* Closures.swift in Sources */,
+				F61BF9B22A16A01D00C1802E /* DashboardButtonView.swift in Sources */,
+				F61BF99E2A1655E900C1802E /* StorageKeys.swift in Sources */,
+				F60345CC27A93BD700212D04 /* URLCreator.swift in Sources */,
+				F60345C427A933D700212D04 /* GlobalConstants.swift in Sources */,
+				F67FA88B28A16E9A00BE4CBD /* EntityProtocol.swift in Sources */,
+				F6F8555F28DF755D004B9517 /* EniroCharging.swift in Sources */,
+				F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */,
+				F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */,
+				F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */,
+				F68DA61628B0D12B00601726 /* HomeViewModel.swift in Sources */,
+				F6F1D07E299390C500A3292E /* CalendarExtension.swift in Sources */,
+				F60345C927A9379200212D04 /* HomeView.swift in Sources */,
+				F662999027B3AA5A00121C14 /* Helpers.swift in Sources */,
+				F6F1D078299104CD00A3292E /* NordPoolEntity.swift in Sources */,
+				F669C72E2A23C08000458165 /* CameraViewModel.swift in Sources */,
+				F62750A129FE39B100C1253F /* Destination.swift in Sources */,
+				F6F94B5E28B60DED006B1F12 /* EniroViewModel.swift in Sources */,
+				F6EF35AF2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift in Sources */,
+				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F670240327A177340070FFBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F664BA7229B48AF80092CB2E /* EntityTest.swift in Sources */,
+				F664BA7629B48F860092CB2E /* InputNumberEntityTest.swift in Sources */,
+				F62750B12A066A7D00C1253F /* URLCreatorTests.swift in Sources */,
+				F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */,
+				F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */,
+				F6EF35B52A3E1BB500895250 /* LightEntityTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F670240D27A177340070FFBB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F6DE841E29F2A696002132A2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6DE844929F2AA3E002132A2 /* MyAppIntents.intentdefinition in Sources */,
+				F6DE842829F2A696002132A2 /* IntentHandler.swift in Sources */,
+				F627509D29F9625F00C1253F /* RequestHandler.swift in Sources */,
+				F6DE844829F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift in Sources */,
+				F627509B29F9619100C1253F /* ToggleMonitorIntentHandler.swift in Sources */,
+				F6DE844A29F2AD01002132A2 /* GlobalConstants.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F670240927A177340070FFBB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F67023F627A177320070FFBB /* IntelliNest */;
+			targetProxy = F670240827A177340070FFBB /* PBXContainerItemProxy */;
+		};
+		F670241327A177340070FFBB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F67023F627A177320070FFBB /* IntelliNest */;
+			targetProxy = F670241227A177340070FFBB /* PBXContainerItemProxy */;
+		};
+		F6DE843C29F2A696002132A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F6DE842129F2A696002132A2 /* MyAppIntentsExtension */;
+			targetProxy = F6DE843B29F2A696002132A2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F670241927A177340070FFBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F670241A27A177340070FFBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F670241C27A177340070FFBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F670241D27A177340070FFBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F670241F27A177340070FFBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IntelliNest.app/IntelliNest";
+			};
+			name = Debug;
+		};
+		F670242027A177340070FFBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IntelliNest.app/IntelliNest";
+			};
+			name = Release;
+		};
+		F670242227A177340070FFBB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "IntelliNest";
+			};
+			name = Debug;
+		};
+		F670242327A177340070FFBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "IntelliNest";
+			};
+			name = Release;
+		};
+		F6C2BF38283A34AE002EE9F9 /* Github actions */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F6C2BF3C283A34E9002EE9F9 /* Github-Info.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Github actions";
+		};
+		F6C2BF39283A34AE002EE9F9 /* Github actions */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Github actions";
+		};
+		F6C2BF3A283A34AE002EE9F9 /* Github actions */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IntelliNest.app/IntelliNest";
+			};
+			name = "Github actions";
+		};
+		F6C2BF3B283A34AE002EE9F9 /* Github actions */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "IntelliNest";
+			};
+			name = "Github actions";
+		};
+		F6DE844329F2A696002132A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F6DE844429F2A696002132A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F6DE844529F2A696002132A2 /* Github actions */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Github actions";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F67023F227A177320070FFBB /* Build configuration list for PBXProject "IntelliNest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F670241927A177340070FFBB /* Debug */,
+				F670241A27A177340070FFBB /* Release */,
+				F6C2BF38283A34AE002EE9F9 /* Github actions */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F670241B27A177340070FFBB /* Build configuration list for PBXNativeTarget "IntelliNest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F670241C27A177340070FFBB /* Debug */,
+				F670241D27A177340070FFBB /* Release */,
+				F6C2BF39283A34AE002EE9F9 /* Github actions */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F670241E27A177340070FFBB /* Build configuration list for PBXNativeTarget "IntelliNestTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F670241F27A177340070FFBB /* Debug */,
+				F670242027A177340070FFBB /* Release */,
+				F6C2BF3A283A34AE002EE9F9 /* Github actions */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F670242127A177340070FFBB /* Build configuration list for PBXNativeTarget "IntelliNestUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F670242227A177340070FFBB /* Debug */,
+				F670242327A177340070FFBB /* Release */,
+				F6C2BF3B283A34AE002EE9F9 /* Github actions */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F6DE844229F2A696002132A2 /* Build configuration list for PBXNativeTarget "MyAppIntentsExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F6DE844329F2A696002132A2 /* Debug */,
+				F6DE844429F2A696002132A2 /* Release */,
+				F6DE844529F2A696002132A2 /* Github actions */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ShipBook/ShipBookSDK-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F669C7302A23D6DA00458165 /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+		F6DE990829BD13B500B8AABB /* ShipBookSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
+			productName = ShipBookSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = F67023EF27A177320070FFBB /* Project object */;
+}
