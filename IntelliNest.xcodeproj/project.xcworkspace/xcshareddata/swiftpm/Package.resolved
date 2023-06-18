@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "shipbooksdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ShipBook/ShipBookSDK-iOS.git",
+      "state" : {
+        "revision" : "20864a7f61064c541d73b5adaa781e5029e56bc7",
+        "version" : "1.1.20"
+      }
+    },
+    {
+      "identity" : "starscream",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/daltoniam/Starscream",
+      "state" : {
+        "revision" : "df8d82047f6654d8e4b655d1b1525c64e1059d21",
+        "version" : "4.0.4"
+      }
+    }
+  ],
+  "version" : 2
+}

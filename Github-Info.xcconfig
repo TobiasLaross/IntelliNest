@@ -1,0 +1,19 @@
+//
+//  Github-Info.xcconfig
+//  IntelliNest
+//
+//  Created by Tobias on 2022-05-22.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+SECRET_HASS_TOKEN = default_token
+EXTERNAL_URL = 192.218.223.123/
+SECRET_SHIP_BOOK_APP_ID = appID
+SECRET_SHIP_BOOK_APP_KEY = appKey
+SECRET_YALE_API_KEY = abc
+SECRET_YALE_API_URL = abc.com
+SECRET_RTSP_STREAM_CAMERA_BACK = 192.168.5.12
+SECRET_RTSP_STREAM_CAMERA_FRONT = 192.168.5.12
+SECRET_RTSP_STREAM_CAMERA_CARPORT = 192.168.5.12
+SECRET_RTSP_STREAM_CAMERA_VINCE = 192.168.5.12
