@@ -11,6 +11,12 @@ Will probably replace some views to only use websocket instead of the rest api.
 Changing between local and remote connection depending on if counter.test88338833 is accessible or not using the local url
 ### Heaters
  Controlling heaters functionality - Temperature, mode, fan, vertical and horisontal direction and timer functionality.
+ <div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Heater.PNG" alt="Heater Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Heater2.PNG" alt="Heater Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Heater3.PNG" alt="Heater Image" width="120" height="280"/>
+ </div>
+ 
 ### Car
 Climate handling and scheduling, refresh data, start/stop charging, lock/unlock doors and charger limit and battery info.
 ### Door locks
