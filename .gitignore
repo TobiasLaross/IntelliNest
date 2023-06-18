@@ -1,0 +1,8 @@
+IntelliNest.xcodeproj/project.xcworkspace/xcuserdata/*
+.xcbkptlist
+xcdebugger
+.DS_Store
+IntelliNest-Info.xcconfig
+# CocoaPods
+Pods/
+
