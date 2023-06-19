@@ -31,12 +31,14 @@ Climate handling and scheduling, refresh data, start/stop charging, lock/unlock 
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car2.PNG" alt="Car Image" width="120" height="280"/>
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car3.PNG" alt="Car Image" width="120" height="280"/>
  </div>
+ 
 ### Roborock
 Info since the trash was emptied, map view start/paus, dock, locate and send to bin. Also buttons for each room (organized by floor plan)
  <div style="display: flex; justify-content: space-around;">
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Vacuum.PNG" alt="Vacuum Image" width="120" height="280"/>
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Vacuum2.PNG" alt="Vacuum Image" width="120" height="280"/>
  </div>
+ 
 ### CCTV
 Using snapshot images 4 fps. Tap to fullscreen and zoomable.
 
@@ -45,11 +47,13 @@ Note: Fully implemented support to use VLCMediaKit but the loading times were to
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/CCTV.PNG" alt="CCTV Image" width="120" height="280"/>
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/CCTV2.PNG" alt="CCTV Image" width="120" height="280"/>
  </div>
+ 
 ### Lights
 Sliders to set the brightness, tappable sliders, and bulb button above each room.
  <div style="display: flex; justify-content: space-around;">
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Lights.PNG" alt="Lights Image" width="120" height="280"/>
  </div>
+ 
 ### NFC tags
 Set up automation in Shortcuts that call the intent in app (Storage lock and toggle monitor)
 ### User management
