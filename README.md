@@ -9,6 +9,13 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 Will probably replace some views to only use websocket instead of the rest api.
 ### Dynamic connection
 Changing between local and remote connection depending on if counter.test88338833 is accessible or not using the local url
+### Door locks & smart outlet
+Toggle door locks with loading animation and toggle smart outlets.
+ <div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Home.PNG" alt="Home Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Home2.PNG" alt="Home Image" width="120" height="280"/>
+ </div>
+
 ### Heaters
  Controlling heaters functionality - Temperature, mode, fan, vertical and horisontal direction and timer functionality.
  <div style="display: flex; justify-content: space-around;">
@@ -19,17 +26,35 @@ Changing between local and remote connection depending on if counter.test8833883
  
 ### Car
 Climate handling and scheduling, refresh data, start/stop charging, lock/unlock doors and charger limit and battery info.
-### Door locks
+ <div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car.PNG" alt="Car Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car2.PNG" alt="Car Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car3.PNG" alt="Car Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car4.PNG" alt="Car Image" width="120" height="280"/>
+ </div>
 ### Roborock
 Info since the trash was emptied, map view start/paus, dock, locate and send to bin. Also buttons for each room (organized by floor plan)
+ <div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Vacuum.PNG" alt="Vacuum Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Vacuum2.PNG" alt="Vacuum Image" width="120" height="280"/>
+ </div>
 ### CCTV
-Using snapshot images 4 fps. Fully implemented support to use VLCMediaKit but the loading times were too long and Pod file not installed. It support rtsp while using local connection and HLS through home assistant remote connection otherwise.
+Using snapshot images 4 fps. Tap to fullscreen and zoomable.
+
+Note: Fully implemented support to use VLCMediaKit but the loading times were too long and Pod is currently not installed. It supports rtsp while using the local connection and HLS through home assistant remote connection otherwise.
+ <div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/CCTV.PNG" alt="CCTV Image" width="120" height="280"/>
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/CCTV2.PNG" alt="CCTV Image" width="120" height="280"/>
+ </div>
 ### Lights
-Sliders to set the brightness, tappable sliders and bulb button above each room.
+Sliders to set the brightness, tappable sliders, and bulb button above each room.
+ <div style="display: flex; justify-content: space-around;">
+  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/lights.PNG" alt="Lights Image" width="120" height="280"/>
+ </div>
 ### NFC tags
 Set up automation in Shortcuts that call the intent in app (Storage lock and toggle monitor)
 ### User management
-Used for logging and custom HomeView
+Used for logging and custom views
 ### Remote logging
 ShipBookSDK log function extended to always include which user it was that logged
 
@@ -45,7 +70,7 @@ ShipBookSDK log function extended to always include which user it was that logge
 
 ## Contributions
 IntelliNest is an open-source project and welcomes contributions. Please feel free to fork the repository and submit pull requests for any enhancements or features you think are useful. Try to make contribution generic enough or specific for this project that others might find useful.
-A thank you to @alexEkdahl for suggesting the name 'IntelliNest'.
+A thank you to [@alexEkdahl](https://github.com/alexEkdahl) for suggesting the name 'IntelliNest'.
 
 ## Licensing
 IntelliNest is licensed under the terms of the MIT license. This license grants permission for the software to be used, copied, modified, merged, published, distributed, sublicensed, and/or sold.
