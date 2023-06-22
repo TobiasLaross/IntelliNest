@@ -44,6 +44,29 @@ class EntityTests: XCTestCase {
         XCTAssertEqual(entity.date, .distantPast)
     }
 
+    func testDecodeWithStateAsDateTime() throws {
+        let json = """
+        {
+            "entity_id": "input_datetime.kia_climate3",
+            "state": "2023-06-22 19:25:00",
+            "last_changed": "2023-06-21T22:00:00.300355+00:00",
+            "last_updated": "2023-06-21T22:00:00.300355+00:00"
+        }
+        """.data(using: .utf8)!
+        let decoder = JSONDecoder()
+        let entity = try decoder.decode(Entity.self, from: json)
+
+        // Convert the entity.date to a string format to compare
+        let localDateFormatter = DateFormatter()
+        localDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+
+        let dateString = localDateFormatter.string(from: entity.date)
+
+        let expectedDateString = "2023-06-22 19:25:00"
+
+        XCTAssertEqual(dateString, expectedDateString)
+    }
+
     func testRecentlyUpdated() {
         var entity = Entity(entityId: .kaffemaskinen)
         let now = Date()

@@ -27,7 +27,8 @@ struct HeatersView: View {
                              isTimerModeEnabled: viewModel.isCorridorTimerModeEnabled.isActive,
                              setTargetTemperatureClosure: viewModel.setTargetTemperature,
                              setHvacModeClosure: viewModel.setHvacMode,
-                             toggleTimerModeAction: viewModel.toggleCorridorTimerMode, setClimateScheduleTime: viewModel.setClimateSchedule)
+                             toggleTimerModeAction: viewModel.toggleCorridorTimerMode,
+                             setClimateScheduleTime: viewModel.setClimateSchedule)
                 .padding(.top)
             Divider()
             SimpleHeaterView(roomName: "Lekrummet",
