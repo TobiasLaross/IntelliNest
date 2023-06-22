@@ -130,8 +130,6 @@ class HeatersViewModel: HassViewModelProtocol {
                 }
                 await apiService.callScript(entityId: .saveClimateState, variables: [.entityID: EntityId.heaterCorridor.rawValue])
             }
-            try? await Task.sleep(seconds: 0.5)
-            isCorridorTimerModeEnabled = await self.reload(entity: isCorridorTimerModeEnabled)
         }
     }
 
@@ -142,15 +140,13 @@ class HeatersViewModel: HassViewModelProtocol {
             isPlayroomTimerModeEnabled.isActive.toggle()
             if isPlayroomTimerModeEnabled.isActive {
                 let calendar = Calendar.current
-                if let newDate = calendar.date(byAdding: .minute, value: 15, to: resetPlayroomHeaterTime.date) {
+                let now = Date()
+                if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
                     resetPlayroomHeaterTime.date = newDate
                     await setClimateSchedule(dateEntity: resetPlayroomHeaterTime)
                 }
                 await apiService.callScript(entityId: .saveClimateState, variables: [.entityID: EntityId.heaterPlayroom.rawValue])
             }
-
-            try? await Task.sleep(seconds: 0.5)
-            isPlayroomTimerModeEnabled = await self.reload(entity: isPlayroomTimerModeEnabled)
         }
     }
 }

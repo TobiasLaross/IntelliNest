@@ -37,33 +37,32 @@ struct Entity: EntityProtocol {
         self.entityId = entityId ?? EntityId.unknown
         state = (try container.decodeIfPresent(String.self, forKey: .state)) ?? "Loading"
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-        if self.state.count == 8 {
-            dateFormatter.dateFormat = "HH:mm:ss"
-        } else {
-            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        let localDateFormatter = DateFormatter()
+
+        let utcDateFormatter = DateFormatter()
+        utcDateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+
+        // Detect if the state contains only time or both date and time
+        if state.count == 8 { // Only time (HH:mm:ss)
+            localDateFormatter.dateFormat = "HH:mm:ss"
+        } else { // Date and time
+            localDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         }
 
-        let optionalDate = dateFormatter.date(from: state)
+        date = localDateFormatter.date(from: state) ?? Date.distantPast
 
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        if let optionalDate = optionalDate {
-            date = optionalDate
-        } else {
-            date = dateFormatter.date(from: state) ?? Date.distantPast
-        }
+        // Parsing lastChanged and lastUpdated in UTC
+        utcDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
 
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
         if let lastChangedString = try container.decodeIfPresent(String.self, forKey: .lastChanged),
-           let lastChangedDate = dateFormatter.date(from: lastChangedString) {
+           let lastChangedDate = utcDateFormatter.date(from: lastChangedString) {
             self.lastChanged = lastChangedDate
         } else {
             self.lastChanged = .distantPast
         }
 
         if let lastUpdatedString = try container.decodeIfPresent(String.self, forKey: .lastUpdated),
-           let lastUpdatedDate = dateFormatter.date(from: lastUpdatedString) {
+           let lastUpdatedDate = utcDateFormatter.date(from: lastUpdatedString) {
             self.lastUpdated = lastUpdatedDate
         } else {
             self.lastUpdated = .distantPast
