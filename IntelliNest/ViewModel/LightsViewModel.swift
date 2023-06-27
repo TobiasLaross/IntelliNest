@@ -8,18 +8,21 @@
 import Foundation
 import ShipBookSDK
 
-class LightsViewModel: HassViewModelProtocol {
-    @Published var sofa = LightEntity(entityId: EntityId.soffbordet)
-    @Published var cozy = LightEntity(entityId: EntityId.myshornan)
-    @Published var livingRoom = LightEntity(entityId: EntityId.lamporIVardagsrummet)
-    //    @Published var vince = LightEntity(entityId: EntityId.panel)
-    //    @Published var vitrin = LightEntity(entityId: EntityId.vitrinskapet)
-    @Published var corridor = LightEntity(entityId: EntityId.lamporIKorridoren)
-    @Published var corridorN = LightEntity(entityId: EntityId.korridorenN)
-    @Published var corridorS = LightEntity(entityId: EntityId.korridorenS)
-    @Published var playroom = LightEntity(entityId: EntityId.lamporILekrummet)
-    @Published var guestroom = LightEntity(entityId: EntityId.lamporIGastrummet)
-    @Published var laundryRoom = LightEntity(entityId: EntityId.tvattstugan)
+class LightsViewModel: ObservableObject {
+    @Published var lightEntities: [EntityId: LightEntity] = [
+        .sofa: LightEntity(entityId: .sofa),
+        .cozyCorner: LightEntity(entityId: .cozyCorner),
+        .lightsInLivingRoom: LightEntity(entityId: .lightsInLivingRoom),
+        .lamporIKorridoren: LightEntity(entityId: .lamporIKorridoren),
+        .korridorenN: LightEntity(entityId: .korridorenN),
+        .korridorenS: LightEntity(entityId: .korridorenS),
+        .lightsInPlayroom: LightEntity(entityId: .lightsInPlayroom,
+                                       groupedLightIDs: [.playroomCeiling1, .playroomCeiling2, .playroomCeiling3]),
+        .lightsInGuestRoom: LightEntity(entityId: .lightsInGuestRoom,
+                                        groupedLightIDs: [.guestRoomCeiling1, .guestRoomCeiling2, .guestRoomCeiling3]),
+        .laundryRoom: LightEntity(entityId: .laundryRoom)
+    ]
+    var updateTasks: [EntityId: DispatchWorkItem] = [:]
 
     let corridorName = "Korridoren"
     let corridorSouthName = "Södra"
@@ -33,83 +36,112 @@ class LightsViewModel: HassViewModelProtocol {
     let guestroomName = "Gästrummet"
     let laundryRoomName = "Tvättstugan"
 
-    private var apiService: HassApiService
+    private var websocketService: WebSocketService
     let appearedAction: DestinationClosure
-    init(apiService: HassApiService,
+    init(websocketService: WebSocketService,
          appearedAction: @escaping DestinationClosure) {
-        self.apiService = apiService
+        self.websocketService = websocketService
         self.appearedAction = appearedAction
     }
 
     @MainActor
-    func reload() async {
-        async let tmpSofa = reload(light: sofa)
-        async let tmpCozy = reload(light: cozy)
-        async let tmpLivingRoom = reload(light: livingRoom)
-        //            async let tmpVince = reload(light: vince)
-        //            async let tmpVitrin = reload(light: vitrin)
-        async let tmpCorridor = reload(light: corridor)
-        async let tmpCorridorN = reload(light: corridorN)
-        async let tmpCorridorS = reload(light: corridorS)
-        async let tmpPlayroom = reload(light: playroom)
-        async let tmpGuestroom = reload(light: guestroom)
-        async let tmpLaundryRoom = reload(light: laundryRoom)
-        sofa = await tmpSofa
-        cozy = await tmpCozy
-        livingRoom = await tmpLivingRoom
-        //            vince = await tmpVince
-        //            vitrin = await tmpVitrin
-        corridor = await tmpCorridor
-        corridorN = await tmpCorridorN
-        corridorS = await tmpCorridorS
-        playroom = await tmpPlayroom
-        guestroom = await tmpGuestroom
-        laundryRoom = await tmpLaundryRoom
-    }
+    func reload(lightID: EntityId, state: String, brightness: Int?) {
+        guard lightEntities[lightID] != nil else {
+            Log.error("Light: \(lightID) not in lightEntities")
+            return
+        }
 
-    private func reload(light: LightEntity) async -> LightEntity {
-        return await apiService.reload(hassEntity: light, entityType: LightEntity.self)
-    }
-
-    func onSliderRelease(light: LightEntity) {
-        Task { @MainActor in
-            var action = Action.turnOn
-            if light.brightness <= 0 {
-                action = .turnOff
+        let noStateChange = lightEntities[lightID]?.state != state
+        lightEntities[lightID]?.state = state
+        if let brightness {
+            if lightEntities.keys.contains(lightID) {
+                updateTasks[lightID]?.cancel()
+                let task = DispatchWorkItem { [weak self] in
+                    self?.lightEntities[lightID]?.brightness = brightness
+                    self?.updateTasks[lightID] = nil
+                }
+                updateTasks[lightID] = task
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: task)
             }
-
-            await apiService.setState(light: light, action: action)
-            await apiService.setState(light: light, action: action)
-            await reloadUntilLightIsUpdated(light: light)
         }
     }
 
-    func onToggle(light: LightEntity) {
-        Task { @MainActor in
-            var action = Action.turnOn
-            if light.isActive {
-                action = .turnOff
-            }
-
-            await apiService.setState(light: light, action: action)
-            await apiService.setState(light: light, action: action)
-            await reloadUntilLightIsUpdated(light: light)
+    func onSliderChange(slideable: Slideable, brightness: Int) {
+        if let light = slideable as? LightEntity {
+            var updatedLight = light
+            updatedLight.brightness = brightness
+            lightEntities[light.entityId] = updatedLight
         }
     }
 
-    @MainActor
-    private func reloadUntilLightIsUpdated(light: LightEntity) async {
-        var updatedLight: LightEntity
-        var count = 0
-        repeat {
-            try? await Task.sleep(seconds: 0.1)
-            await updatedLight = reload(light: light)
-            if light.state != updatedLight.state || light.brightness == updatedLight.brightness {
-                break
-            }
-            count += 1
-        } while count < 10
+    func onSliderRelease(slideable: Slideable) {
+        Task { @MainActor in
+            if let slideableLight = slideable as? LightEntity,
+               let light = lightEntities[slideableLight.entityId] {
+                var action = Action.turnOn
+                if light.brightness <= 0 {
+                    action = .turnOff
+                }
 
-        await reload()
+                var lightIDs = [light.entityId]
+                if let groupedLightIDs = light.groupedLightIDs {
+                    lightIDs.insert(contentsOf: groupedLightIDs, at: 0)
+                }
+
+                websocketService.updateLights(lightIDs: lightIDs, action: action, brightness: light.brightness)
+            }
+        }
+    }
+
+    func onToggle(slideable: Slideable) {
+        Task { @MainActor in
+            if let slideableLight = slideable as? LightEntity,
+               let light = lightEntities[slideableLight.entityId] {
+                var action = Action.turnOn
+                if light.isActive {
+                    action = .turnOff
+                }
+
+                websocketService.updateLights(lightIDs: [light.entityId], action: action, brightness: light.brightness)
+            }
+        }
+    }
+}
+
+extension LightsViewModel {
+    var corridor: LightEntity {
+        lightEntities[.lamporIKorridoren] ?? .init(entityId: .lamporIKorridoren)
+    }
+
+    var corridorNorth: LightEntity {
+        lightEntities[.korridorenN] ?? .init(entityId: .korridorenN)
+    }
+
+    var corridorSouth: LightEntity {
+        lightEntities[.korridorenS] ?? .init(entityId: .korridorenS)
+    }
+
+    var sofa: LightEntity {
+        lightEntities[.sofa] ?? .init(entityId: .sofa)
+    }
+
+    var cozy: LightEntity {
+        lightEntities[.cozyCorner] ?? .init(entityId: .cozyCorner)
+    }
+
+    var livingRoom: LightEntity {
+        lightEntities[.lightsInLivingRoom] ?? .init(entityId: .lightsInLivingRoom)
+    }
+
+    var playroom: LightEntity {
+        lightEntities[.lightsInPlayroom] ?? .init(entityId: .lightsInPlayroom)
+    }
+
+    var guestroom: LightEntity {
+        lightEntities[.lightsInGuestRoom] ?? .init(entityId: .lightsInGuestRoom)
+    }
+
+    var laundryRoom: LightEntity {
+        lightEntities[.laundryRoom] ?? .init(entityId: .laundryRoom)
     }
 }

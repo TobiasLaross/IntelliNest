@@ -10,14 +10,13 @@ import SwiftUI
 struct BulbButton: View {
     private let buttonImageSIze: CGFloat = 24
 
-    @Binding var light: LightEntity
-    let reloadLights: MainActorAsyncVoidClosure
-    let onTap: LightClosure
+    var light: LightEntity
+    let onTapAction: LightClosure
 
     var body: some View {
         Button {
             Task { @MainActor in
-                onTap(light)
+                onTapAction(light)
             }
         } label: {
             if light.isActive {

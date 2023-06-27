@@ -9,10 +9,10 @@ import SwiftUI
 
 struct SingleRoomLight: View {
     let roomName: String
-    @Binding var light: LightEntity
-    let reloadLights: MainActorAsyncVoidClosure
-    let onTap: LightClosure
-    let onSliderRelease: LightClosure
+    var light: LightEntity
+    let onTapAction: SlideableClosure
+    let onSliderChangeAction: SlideableIntClosure
+    let onSliderReleaseAction: SlideableClosure
     let roomTitleSize: CGFloat
     let sliderWidth: CGFloat
     let sliderHeight: CGFloat
@@ -22,11 +22,14 @@ struct SingleRoomLight: View {
             VStack {
                 Text(roomName)
                     .font(.system(size: roomTitleSize))
-                BulbButton(light: $light, reloadLights: reloadLights, onTap: onTap)
+                BulbButton(light: light, onTapAction: onTapAction)
             }
 
             HStack {
-                VerticalSlider(light: $light, onSliderRelease: onSliderRelease, onTap: onTap)
+                VerticalSlider(slideable: light,
+                               onSliderChangeAction: onSliderChangeAction,
+                               onSliderReleaseAction: onSliderReleaseAction,
+                               onTapAction: onTapAction)
                     .frame(width: sliderWidth, height: sliderHeight, alignment: .center)
             }
         }

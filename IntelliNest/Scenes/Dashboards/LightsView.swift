@@ -24,28 +24,28 @@ struct LightsView: View {
             HStack {
                 Spacer()
                 DualBulbRoomView(roomName: viewModel.corridorName,
-                                 lightGroup: $viewModel.corridor,
-                                 light1: $viewModel.corridorS,
-                                 light2: $viewModel.corridorN,
+                                 lightGroup: viewModel.corridor,
+                                 light1: viewModel.corridorSouth,
+                                 light2: viewModel.corridorNorth,
                                  light1Name: viewModel.corridorSouthName,
                                  light2Name: viewModel.corridorNorthName,
-                                 reloadLights: viewModel.reload,
-                                 onTap: viewModel.onToggle,
-                                 onSliderRelease: viewModel.onSliderRelease,
+                                 onTapAction: viewModel.onToggle,
+                                 onSliderChangeAction: viewModel.onSliderChange,
+                                 onSliderReleaseAction: viewModel.onSliderRelease,
                                  sliderWidth: sliderWidth,
                                  sliderHeight: sliderHeight,
                                  bulbTitleSize: bulbTitleSize,
                                  roomTitleSize: roomTitleSize)
                 Spacer()
                 DualBulbRoomView(roomName: viewModel.livingroomName,
-                                 lightGroup: $viewModel.livingRoom,
-                                 light1: $viewModel.sofa,
-                                 light2: $viewModel.cozy,
+                                 lightGroup: viewModel.livingRoom,
+                                 light1: viewModel.sofa,
+                                 light2: viewModel.cozy,
                                  light1Name: viewModel.sofaName,
                                  light2Name: viewModel.cozyName,
-                                 reloadLights: viewModel.reload,
-                                 onTap: viewModel.onToggle,
-                                 onSliderRelease: viewModel.onSliderRelease,
+                                 onTapAction: viewModel.onToggle,
+                                 onSliderChangeAction: viewModel.onSliderChange,
+                                 onSliderReleaseAction: viewModel.onSliderRelease,
                                  sliderWidth: sliderWidth,
                                  sliderHeight: sliderHeight,
                                  bulbTitleSize: bulbTitleSize,
@@ -57,26 +57,26 @@ struct LightsView: View {
             VStack {
                 HStack {
                     SingleRoomLight(roomName: viewModel.guestroomName,
-                                    light: $viewModel.guestroom,
-                                    reloadLights: viewModel.reload,
-                                    onTap: viewModel.onToggle,
-                                    onSliderRelease: viewModel.onSliderRelease,
+                                    light: viewModel.guestroom,
+                                    onTapAction: viewModel.onToggle,
+                                    onSliderChangeAction: viewModel.onSliderChange,
+                                    onSliderReleaseAction: viewModel.onSliderRelease,
                                     roomTitleSize: roomTitleSize,
                                     sliderWidth: sliderWidth,
                                     sliderHeight: sliderHeight)
                     SingleRoomLight(roomName: viewModel.playroomName,
-                                    light: $viewModel.playroom,
-                                    reloadLights: viewModel.reload,
-                                    onTap: viewModel.onToggle,
-                                    onSliderRelease: viewModel.onSliderRelease,
+                                    light: viewModel.playroom,
+                                    onTapAction: viewModel.onToggle,
+                                    onSliderChangeAction: viewModel.onSliderChange,
+                                    onSliderReleaseAction: viewModel.onSliderRelease,
                                     roomTitleSize: roomTitleSize,
                                     sliderWidth: sliderWidth,
                                     sliderHeight: sliderHeight)
                     SingleRoomLight(roomName: viewModel.laundryRoomName,
-                                    light: $viewModel.laundryRoom,
-                                    reloadLights: viewModel.reload,
-                                    onTap: viewModel.onToggle,
-                                    onSliderRelease: viewModel.onSliderRelease,
+                                    light: viewModel.laundryRoom,
+                                    onTapAction: viewModel.onToggle,
+                                    onSliderChangeAction: viewModel.onSliderChange,
+                                    onSliderReleaseAction: viewModel.onSliderRelease,
                                     roomTitleSize: roomTitleSize,
                                     sliderWidth: sliderWidth,
                                     sliderHeight: sliderHeight)
@@ -94,6 +94,7 @@ struct LightsView: View {
 
 struct Lights_Previews: PreviewProvider {
     static var previews: some View {
-        LightsView(viewModel: LightsViewModel(apiService: HassApiService(urlCreator: URLCreator()), appearedAction: { _ in }))
+        LightsView(viewModel: .init(websocketService:
+            .init(), appearedAction: { _ in }))
     }
 }

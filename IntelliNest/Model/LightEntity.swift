@@ -9,10 +9,13 @@ import Foundation
 
 struct LightEntity: EntityProtocol {
     var entityId: EntityId
-    var state: String
+    var state: String { didSet {
+        updateIsActive()
+    }}
     var nextUpdate = NSDate().addingTimeInterval(-1)
     var isActive: Bool = false
     var brightness: Int
+    let groupedLightIDs: [EntityId]?
 
     enum CodingKeys: String, CodingKey {
         case entityId = "entity_id"
@@ -20,22 +23,17 @@ struct LightEntity: EntityProtocol {
         case attributes
     }
 
-    init(entityId: EntityId, state: String = "Loading") {
+    init(entityId: EntityId, state: String = "Loading", groupedLightIDs: [EntityId]? = nil) {
         self.entityId = entityId
         self.state = state
         self.brightness = -1
+        self.groupedLightIDs = groupedLightIDs
+
         updateIsActive()
     }
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let entityId = try EntityId(rawValue: container.decode(String.self, forKey: .entityId))
-        self.entityId = entityId ?? EntityId.unknown
-        state = try container.decode(String.self, forKey: .state)
-
-        let attributes = try container.decode(Attributes.self, forKey: .attributes)
-        brightness = attributes.brightness
-        updateIsActive()
+        fatalError("Not implemented decoder for LightEntity")
     }
 
     mutating func updateIsActive() {

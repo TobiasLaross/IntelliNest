@@ -14,7 +14,7 @@ class HomeViewModel: HassViewModelProtocol {
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
     @Published var storageLock = LockEntity(entityId: EntityId.forradet)
-    @Published var allLights = LightEntity(entityId: EntityId.allaLampor)
+    @Published var allLights = LightEntity(entityId: EntityId.allLights)
     @Published var coffeeMachine = Entity(entityId: EntityId.kaffemaskinen)
     @Published var sarahsIphone = Entity(entityId: EntityId.hittaSarahsIphone)
 
@@ -52,14 +52,12 @@ class HomeViewModel: HassViewModelProtocol {
             async let tmpSideDoorState = await reload(lockID: sideDoor.id)
             async let tmpFrontDoorState = await reload(lockID: frontDoor.id)
             async let tmpStorageLock = await reload(entity: storageLock)
-            async let tmpAllLights = await reload(entity: allLights)
             async let tmpCoffeeMachine = await reload(entity: coffeeMachine)
             async let tmpSarahsIphone = await reload(entity: sarahsIphone)
 
-            (allLights, coffeeMachine, sarahsIphone) = await(tmpAllLights, tmpCoffeeMachine, tmpSarahsIphone)
-            sideDoor.lockState = await tmpSideDoorState
-            frontDoor.lockState = await tmpFrontDoorState
-            storageLock.state = await tmpStorageLock.state
+            (coffeeMachine, sarahsIphone, sideDoor.lockState,
+             frontDoor.lockState, storageLock.state) = await(tmpCoffeeMachine, tmpSarahsIphone, tmpSideDoorState,
+                                                             tmpFrontDoorState, tmpStorageLock.state)
             isReloading = false
         }
     }
@@ -113,6 +111,12 @@ class HomeViewModel: HassViewModelProtocol {
         }
     }
 
+    func reload(entityID: EntityId, state: String) {
+        if entityID == .allLights {
+            allLights.state = state
+        }
+    }
+
     @MainActor
     func reloadLockUntilExpectedState(lockID: LockID) async {
         var isLoading = true
@@ -127,7 +131,6 @@ class HomeViewModel: HassViewModelProtocol {
                 isLoading = sideDoor.isLoading
             } else if lockID == .storageDoor {
                 storageLock.state = await reload(entity: storageLock).state
-                print("storageLock \(storageLock.state) \(storageLock.lockState.rawValue), \(storageLock.expectedState)")
                 isLoading = storageLock.isLoading
             } else {
                 Log.error("Tried to reload unhandled lock: \(lockID)")

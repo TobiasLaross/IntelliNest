@@ -10,7 +10,7 @@ import ShipBookSDK
 
 extension Log {
     static var user: String {
-        return UserDefaults.standard.string(forKey: "UserShort") ?? "Unknown user"
+        return UserDefaults.standard.string(forKey: UserManager.storageKey) ?? "Unknown user"
     }
 
     static func info(_ message: String,

@@ -204,11 +204,9 @@ class HassApiService: URLRequestBuilder {
 
     func sendRequest(request: URLRequest) async {
         do {
-            let (data, response) = try await session.data(for: request)
+            let (_, response) = try await session.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse else {
                 Log.error("Response was not httpResponse, for \(request.url?.absoluteString ?? "")")
-                let responseDataString = String(decoding: data, as: UTF8.self)
-                print("Response data: \(responseDataString)")
                 return
             }
 

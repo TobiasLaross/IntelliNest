@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Action: String, Decodable {
+enum Action: String, Codable {
     case kiaUpdate = "update"
     case kiaForceUpdate = "force_update"
     case kiaStopCharge = "stop_charge"

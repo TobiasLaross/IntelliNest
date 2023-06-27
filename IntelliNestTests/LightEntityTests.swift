@@ -14,18 +14,8 @@ final class LightEntityTests: XCTestCase {
     override func setUpWithError() throws {
         try? super.setUpWithError()
 
-        let json = """
-        {
-            "entity_id": "light.soffbordet",
-            "state": "off",
-            "attributes": {
-                "brightness": 103
-            }
-        }
-        """.data(using: .utf8)!
-
-        let decoder = JSONDecoder()
-        light = try decoder.decode(LightEntity.self, from: json)
+        light = LightEntity(entityId: .sofa, state: "off")
+        light.brightness = 103
     }
 
     override func tearDownWithError() throws {
@@ -34,7 +24,7 @@ final class LightEntityTests: XCTestCase {
     }
 
     func testDecode() throws {
-        XCTAssertEqual(light.entityId, .soffbordet, "Failed to decode 'entityId'")
+        XCTAssertEqual(light.entityId, .sofa, "Failed to decode 'entityId'")
         XCTAssertEqual(light.state, "off", "Failed to decode 'state'")
         XCTAssertEqual(light.brightness, 103, "Failed to decode 'brightness'")
         XCTAssertEqual(light.isActive, false, "Failed to decode 'isActive'")

@@ -11,7 +11,7 @@ import SwiftUI
 class Navigator {
     @ObservedObject var urlCreator = URLCreator()
     var currentDestination: Destination = .home
-    lazy var webSocketService = WebSocketService(baseURLString: GlobalConstants.baseExternalUrlString, delegate: self)
+    var webSocketService = WebSocketService()
     lazy var hassApiService = HassApiService(urlCreator: urlCreator)
     lazy var yaleApiService = YaleApiService(hassApiService: hassApiService)
     lazy var homeViewModel = HomeViewModel(hassApiService: hassApiService,
@@ -24,9 +24,11 @@ class Navigator {
     lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: hassApiService,
                                                                            appearedAction: setCurrentDestination)
     lazy var roborockViewModel = RoborockViewModel(apiService: hassApiService, appearedAction: setCurrentDestination)
-    lazy var lightsViewModel = LightsViewModel(apiService: hassApiService, appearedAction: setCurrentDestination)
+    lazy var lightsViewModel = LightsViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
 
     init() {
+        urlCreator.delegate = self
+        webSocketService.delegate = self
         Task { @MainActor in
             await urlCreator.updateConnectionState()
         }
@@ -88,14 +90,22 @@ class Navigator {
         case .roborock:
             await roborockViewModel.reload()
         case .lights:
-            await lightsViewModel.reload()
+//            await lightsViewModel.reload()
+            break
+        }
+    }
+
+    func didEnterForeground() {
+        webSocketService.connect()
+        Task {
+            await reloadCurrentModel()
         }
     }
 
     @MainActor
-    func reloadCurrentModel() {
-        Task { await updateConnectionState() }
-        Task { await reload(for: currentDestination) }
+    func reloadCurrentModel() async {
+        await updateConnectionState()
+        await reload(for: currentDestination)
     }
 
     @MainActor

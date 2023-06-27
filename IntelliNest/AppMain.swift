@@ -55,11 +55,8 @@ struct AppMain: App {
                 .navigationBarTitleDisplayMode(.inline)
                 .onChange(of: scenePhase) { newPhase in
                     if newPhase == .active {
-                        Task { @MainActor in
-                            Task { await navigator.updateConnectionState() }
-                            navigator.reloadCurrentModel()
-                            performActionIfNeeded()
-                        }
+                        navigator.didEnterForeground()
+                        performActionIfNeeded()
                     }
                 }
                 .onAppear {
@@ -71,7 +68,9 @@ struct AppMain: App {
                     ActionSheet(title: Text("Välj användare"), buttons: User.allCases.map { user in
                         .default(Text(user.name)) {
                             UserManager.shared.setUser(user)
-                            navigator.reloadCurrentModel()
+                            Task {
+                                await navigator.reloadCurrentModel()
+                            }
                         }
                     } + [.cancel()])
                 }

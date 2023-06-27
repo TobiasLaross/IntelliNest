@@ -22,4 +22,6 @@ typealias AsyncEntityClosure = (Entity) async -> Void
 typealias EntityIdClosure = (EntityId) -> Void
 typealias EntityIdDoubleClosure = (EntityId, Double) -> Void
 typealias LightClosure = (LightEntity) -> Void
+typealias SlideableClosure = (Slideable) -> Void
+typealias SlideableIntClosure = (Slideable, Int) -> Void
 typealias DestinationClosure = (Destination) -> Void
