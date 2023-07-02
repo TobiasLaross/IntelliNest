@@ -9,4 +9,10 @@ import Foundation
 
 protocol URLCreatorDelegate: AnyObject {
     func baseURLChanged(urlString: String)
+    func connectionStateChanged(state: ConnectionState)
+}
+
+extension URLCreatorDelegate {
+    // Function only needed for tests
+    func connectionStateChanged(state: ConnectionState) {}
 }

@@ -17,7 +17,9 @@ enum ConnectionState {
 }
 
 class URLCreator: ObservableObject, URLRequestBuilder {
-    @Published var connectionState = ConnectionState.unset
+    @Published var connectionState = ConnectionState.unset { didSet {
+        delegate?.connectionStateChanged(state: connectionState)
+    }}
     weak var delegate: URLCreatorDelegate?
 
     var nextUpdate = Date().addingTimeInterval(-1)
@@ -78,7 +80,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
                                                         path: apiPath,
                                                         method: .get,
                                                         timeout: 3)
-        delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
+        delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString) // TODO: This fails the test, state is not determined
         let remoteRequest = createURLRequest(urlRequestParameters: urlRequestParameters)
         if let remoteRequest {
             do {

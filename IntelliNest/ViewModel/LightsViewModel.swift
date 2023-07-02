@@ -51,7 +51,6 @@ class LightsViewModel: ObservableObject {
             return
         }
 
-        let noStateChange = lightEntities[lightID]?.state != state
         lightEntities[lightID]?.state = state
         if let brightness {
             if lightEntities.keys.contains(lightID) {
