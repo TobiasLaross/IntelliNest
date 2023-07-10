@@ -45,6 +45,11 @@
 		F62CD2E82877140800462092 /* EntityError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E72877140800462092 /* EntityError.swift */; };
 		F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */; };
 		F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D2B5B280E9EE000517746 /* LockEntity.swift */; };
+		F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */; };
+		F63F502E2A4862BB003A7100 /* UpdateLightRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502D2A4862BB003A7100 /* UpdateLightRequest.swift */; };
+		F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502F2A486650003A7100 /* EncodableExtension.swift */; };
+		F63F50322A4CADEB003A7100 /* URLCreatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */; };
+		F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */; };
 		F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64D2693283E8FAB0073A7BF /* NetworkTask.swift */; };
 		F6552705281678740035DC72 /* RoborockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6552704281678740035DC72 /* RoborockEntity.swift */; };
 		F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */; };
@@ -143,14 +148,14 @@
 			containerPortal = F67023EF27A177320070FFBB /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F67023F627A177320070FFBB;
-			remoteInfo = "IntelliNest";
+			remoteInfo = IntelliNest;
 		};
 		F670241227A177340070FFBB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F67023EF27A177320070FFBB /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F67023F627A177320070FFBB;
-			remoteInfo = "IntelliNest";
+			remoteInfo = IntelliNest;
 		};
 		F6DE843B29F2A696002132A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -215,6 +220,11 @@
 		F62CD2E72877140800462092 /* EntityError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityError.swift; sourceTree = "<group>"; };
 		F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualBulbRoomView.swift; sourceTree = "<group>"; };
 		F63D2B5B280E9EE000517746 /* LockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntity.swift; sourceTree = "<group>"; };
+		F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideableProtocol.swift; sourceTree = "<group>"; };
+		F63F502D2A4862BB003A7100 /* UpdateLightRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateLightRequest.swift; sourceTree = "<group>"; };
+		F63F502F2A486650003A7100 /* EncodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableExtension.swift; sourceTree = "<group>"; };
+		F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreatorDelegate.swift; sourceTree = "<group>"; };
+		F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribeRequest.swift; sourceTree = "<group>"; };
 		F64D2693283E8FAB0073A7BF /* NetworkTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTask.swift; sourceTree = "<group>"; };
 		F6552704281678740035DC72 /* RoborockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockEntity.swift; sourceTree = "<group>"; };
 		F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
@@ -357,9 +367,11 @@
 		F60345C527A9344600212D04 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				F63F502C2A4862AB003A7100 /* Websocket */,
 				F60345C027A7F33700212D04 /* Entity.swift */,
 				F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */,
 				F62CD2DF286D950A00462092 /* LightEntity.swift */,
+				F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */,
 				F6F1D077299104CD00A3292E /* NordPoolEntity.swift */,
 				F6F118182827A15500251350 /* EniroGeoEntity.swift */,
 				F63D2B5B280E9EE000517746 /* LockEntity.swift */,
@@ -408,6 +420,7 @@
 			children = (
 				F62CD2E428770F3B00462092 /* HassApiService.swift */,
 				F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */,
+				F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */,
 				F60345CB27A93BD700212D04 /* URLCreator.swift */,
 				F64D2693283E8FAB0073A7BF /* NetworkTask.swift */,
 				F61BF99B2A1653E600C1802E /* YaleApiService.swift */,
@@ -479,6 +492,15 @@
 				F68DA61128AE35F300601726 /* BulbButton.swift */,
 			);
 			path = Light;
+			sourceTree = "<group>";
+		};
+		F63F502C2A4862AB003A7100 /* Websocket */ = {
+			isa = PBXGroup;
+			children = (
+				F63F502D2A4862BB003A7100 /* UpdateLightRequest.swift */,
+				F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */,
+			);
+			path = Websocket;
 			sourceTree = "<group>";
 		};
 		F6633F2A286324DE004D0B76 /* Heater */ = {
@@ -633,6 +655,7 @@
 				F6F1D08129A27A6100A3292E /* ImageExtension.swift */,
 				F62750A82A00ED9500C1253F /* UINavigationController.swift */,
 				F6DE990A29BD18FB00B8AABB /* LogExtension.swift */,
+				F63F502F2A486650003A7100 /* EncodableExtension.swift */,
 				F664BA7329B48C510092CB2E /* DateExtension.swift */,
 			);
 			path = Extensions;
@@ -682,7 +705,7 @@
 				F6DE990829BD13B500B8AABB /* ShipBookSDK */,
 				F669C7302A23D6DA00458165 /* Starscream */,
 			);
-			productName = "IntelliNest";
+			productName = IntelliNest;
 			productReference = F67023F727A177320070FFBB /* IntelliNest.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -700,7 +723,7 @@
 				F670240927A177340070FFBB /* PBXTargetDependency */,
 			);
 			name = IntelliNestTests;
-			productName = "IntelliNest";
+			productName = IntelliNest;
 			productReference = F670240727A177340070FFBB /* IntelliNestTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
@@ -718,7 +741,7 @@
 				F670241327A177340070FFBB /* PBXTargetDependency */,
 			);
 			name = IntelliNestUITests;
-			productName = "IntelliNest";
+			productName = IntelliNest;
 			productReference = F670241127A177340070FFBB /* IntelliNestUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
@@ -876,11 +899,13 @@
 				F6FAD81C2A2A654900C0B364 /* WebsocketService.swift in Sources */,
 				F68DA61E28B4C11600601726 /* Heater.swift in Sources */,
 				F6F1D07A299110EC00A3292E /* NordPoolHistoryView.swift in Sources */,
+				F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */,
 				F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */,
 				F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */,
 				F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */,
 				F6633F3628632884004D0B76 /* HeaterVerticalPositionView.swift in Sources */,
 				F6F1D07C2992686E00A3292E /* Color.swift in Sources */,
+				F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */,
 				F6DBA4D028E82D6A001BA1C0 /* Task.swift in Sources */,
 				F6EF35B72A3E20B100895250 /* SelectUserView.swift in Sources */,
 				F6633F292860C16E004D0B76 /* AppDelegate.swift in Sources */,
@@ -906,6 +931,7 @@
 				F627509F29FD120F00C1253F /* Navigator.swift in Sources */,
 				F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */,
 				F624EF662A2B0234004AC6BA /* NavigatorExtension.swift in Sources */,
+				F63F50322A4CADEB003A7100 /* URLCreatorDelegate.swift in Sources */,
 				F67023FB27A177320070FFBB /* AppMain.swift in Sources */,
 				F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */,
 				F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */,
@@ -955,6 +981,7 @@
 				F6EF35B92A3EC47200895250 /* UserManager.swift in Sources */,
 				F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */,
 				F61BF9A02A166B2700C1802E /* LockID.swift in Sources */,
+				F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */,
 				F6F8555B28DCB0F1004B9517 /* EniroUpdaters.swift in Sources */,
 				F61BF9A82A1672C300C1802E /* HTTPMethod.swift in Sources */,
 				F60345D427ABE49100212D04 /* LightsView.swift in Sources */,
@@ -974,6 +1001,7 @@
 				F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */,
 				F68DA61628B0D12B00601726 /* HomeViewModel.swift in Sources */,
 				F6F1D07E299390C500A3292E /* CalendarExtension.swift in Sources */,
+				F63F502E2A4862BB003A7100 /* UpdateLightRequest.swift in Sources */,
 				F60345C927A9379200212D04 /* HomeView.swift in Sources */,
 				F662999027B3AA5A00121C14 /* Helpers.swift in Sources */,
 				F6F1D078299104CD00A3292E /* NordPoolEntity.swift in Sources */,
@@ -1296,7 +1324,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "IntelliNest";
+				TEST_TARGET_NAME = IntelliNest;
 			};
 			name = Debug;
 		};
@@ -1314,7 +1342,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "IntelliNest";
+				TEST_TARGET_NAME = IntelliNest;
 			};
 			name = Release;
 		};
@@ -1451,7 +1479,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "IntelliNest";
+				TEST_TARGET_NAME = IntelliNest;
 			};
 			name = "Github actions";
 		};

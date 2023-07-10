@@ -9,4 +9,5 @@ import Foundation
 
 protocol WebSocketServiceDelegate: AnyObject {
     func webSocketService(didReceiveURL urlString: String, for resultID: Int)
+    func webSocketService(didReceiveEntity entityID: EntityId, state: String, brightness: Int?)
 }

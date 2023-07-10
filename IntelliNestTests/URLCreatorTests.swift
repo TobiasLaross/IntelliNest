@@ -8,10 +8,28 @@
 import XCTest
 @testable import IntelliNest
 
+class URLCreatorTestDelegate: URLCreatorDelegate {
+    var expectation: XCTestExpectation?
+    var expectedURL: String?
+    var expectedState: ConnectionState?
+
+    func baseURLChanged(urlString: String) {
+        if urlString == expectedURL {
+            expectation?.fulfill()
+        }
+    }
+
+    func connectionStateChanged(state: ConnectionState) {
+        if state == expectedState {
+            expectation?.fulfill()
+        }
+    }
+}
+
 class URLCreatorTests: XCTestCase {
     private var stubbedSession: URLSession!
     private var urlCreator: URLCreator!
-    private let counterPath = "api/states/counter.test88338833"
+    private let apiPath = "api"
 
     override func setUp() {
         super.setUp()
@@ -37,7 +55,7 @@ class URLCreatorTests: XCTestCase {
                                                statusCode: 200,
                                                httpVersion: nil,
                                                headerFields: nil)!
-        let internalUrl = URL(string: GlobalConstants.baseInternalUrlString + counterPath)!
+        let internalUrl = URL(string: GlobalConstants.baseInternalUrlString + apiPath)!
         URLProtocolStub.setStub(for: internalUrl, data: internalData, response: internalResponse, error: nil)
 
         // Test the connection state
@@ -48,7 +66,7 @@ class URLCreatorTests: XCTestCase {
     func test_updateConnectionState_whenInternalRequestFailesAndExternalRequestSucceeds_shouldSetStateToInternet() async {
         // Set the stub data, response, and error for the internal URL
         let internalError = NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, userInfo: nil)
-        let internalUrl = URL(string: GlobalConstants.baseInternalUrlString + counterPath)!
+        let internalUrl = URL(string: GlobalConstants.baseInternalUrlString + apiPath)!
         URLProtocolStub.setStub(for: internalUrl, data: nil, response: nil, error: internalError)
 
         // Set the stub data, response, and error for the external URL
@@ -57,24 +75,37 @@ class URLCreatorTests: XCTestCase {
                                                statusCode: 200,
                                                httpVersion: nil,
                                                headerFields: nil)!
-        let externalUrl = URL(string: GlobalConstants.baseExternalUrlString + counterPath)!
+        let externalUrl = URL(string: GlobalConstants.baseExternalUrlString + apiPath)!
         URLProtocolStub.setStub(for: externalUrl, data: externalData, response: externalResponse, error: nil)
 
-        // Test the connection state
+        let testDelegate = URLCreatorTestDelegate()
+        urlCreator.delegate = testDelegate
+        let expectation = XCTestExpectation(description: "Connection state updates to .internet")
+        testDelegate.expectation = expectation
+        testDelegate.expectedState = .internet
+
         await urlCreator.updateConnectionState()
+        await fulfillment(of: [expectation], timeout: 0.2)
         XCTAssertEqual(urlCreator.connectionState, .internet)
     }
 
     func test_updateConnectionState_whenBothInternalAndExternalFailes_shouldSetStateToDisconnected() async {
         // Set the stub data, response, and error for the internal URL
         let error = NSError(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, userInfo: nil)
-        let internalUrl = URL(string: GlobalConstants.baseInternalUrlString + counterPath)!
+        let internalUrl = URL(string: GlobalConstants.baseInternalUrlString + apiPath)!
         URLProtocolStub.setStub(for: internalUrl, data: nil, response: nil, error: error)
-        let externalUrl = URL(string: GlobalConstants.baseExternalUrlString + counterPath)!
+        let externalUrl = URL(string: GlobalConstants.baseExternalUrlString + apiPath)!
         URLProtocolStub.setStub(for: externalUrl, data: nil, response: nil, error: error)
+
+        let testDelegate = URLCreatorTestDelegate()
+        urlCreator.delegate = testDelegate
+        let expectation = XCTestExpectation(description: "Connection state updates to .disconnected")
+        testDelegate.expectation = expectation
+        testDelegate.expectedState = .disconnected
 
         // Test the connection state
         await urlCreator.updateConnectionState()
+        await fulfillment(of: [expectation], timeout: 0.2)
         XCTAssertEqual(urlCreator.connectionState, .disconnected)
     }
 

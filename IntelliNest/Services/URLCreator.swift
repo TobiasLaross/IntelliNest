@@ -17,14 +17,17 @@ enum ConnectionState {
 }
 
 class URLCreator: ObservableObject, URLRequestBuilder {
-    @Published var connectionState = ConnectionState.unset
+    @Published var connectionState = ConnectionState.unset { didSet {
+        delegate?.connectionStateChanged(state: connectionState)
+    }}
+    weak var delegate: URLCreatorDelegate?
 
     var nextUpdate = Date().addingTimeInterval(-1)
     var urlString: String {
         connectionState == .local ? GlobalConstants.baseInternalUrlString : GlobalConstants.baseExternalUrlString
     }
 
-    private let counterPath = "/api/states/counter.test88338833"
+    private let apiPath = "/api"
     private var shouldRetryOnFailure = true
 
     private let session: URLSession
@@ -34,36 +37,30 @@ class URLCreator: ObservableObject, URLRequestBuilder {
 
     @MainActor
     func updateConnectionState() async {
+        guard connectionState != .loading else {
+            return
+        }
         if nextUpdate.timeIntervalSinceNow > 0 {
             return
         }
 
         connectionState = .loading
-        nextUpdate = Date().addingTimeInterval(3)
-        var urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseInternalUrlString,
-                                                        path: counterPath,
+        nextUpdate = Date().addingTimeInterval(1)
+        let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseInternalUrlString,
+                                                        path: apiPath,
                                                         method: .get,
                                                         timeout: 0.8)
         let request = createURLRequest(urlRequestParameters: urlRequestParameters)
         if let request {
             do {
-                let (_, _) = try await session.data(for: request)
+                _ = try await async(timeoutAfter: 0.8) {
+                    return try await self.session.data(for: request)
+                }
                 connectionState = .local
+                delegate?.baseURLChanged(urlString: GlobalConstants.baseInternalUrlString)
             } catch {
-                urlRequestParameters.forceURLString = GlobalConstants.baseExternalUrlString
-                urlRequestParameters.timeout = 4
-                let remoteRequest = createURLRequest(urlRequestParameters: urlRequestParameters)
-                if let remoteRequest {
-                    do {
-                        (_, _) = try await session.data(for: remoteRequest)
-                        connectionState = .internet
-                    } catch {
-                        connectionState = .disconnected
-                        if shouldRetryOnFailure {
-                            shouldRetryOnFailure = false
-                            retryAfterSleep()
-                        }
-                    }
+                Task {
+                    await retryWithExternalURL()
                 }
             }
         }
@@ -77,10 +74,67 @@ class URLCreator: ObservableObject, URLRequestBuilder {
         ]
     }
 
-    private func retryAfterSleep() {
+    @MainActor
+    private func retryWithExternalURL() async {
+        let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
+                                                        path: apiPath,
+                                                        method: .get,
+                                                        timeout: 3)
+        delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
+        let remoteRequest = createURLRequest(urlRequestParameters: urlRequestParameters)
+        if let remoteRequest {
+            do {
+                (_, _) = try await session.data(for: remoteRequest)
+                connectionState = .internet
+            } catch {
+                connectionState = .disconnected
+                if shouldRetryOnFailure {
+                    shouldRetryOnFailure = false
+                    retryUpdateConnectionAfterSleep()
+                }
+            }
+        }
+    }
+
+    private func retryUpdateConnectionAfterSleep() {
         Task { @MainActor in
             try? await Task.sleep(seconds: 2)
             await updateConnectionState()
+        }
+    }
+
+    enum TimeoutError: Error {
+        case timedOut
+    }
+
+    private func async<R>(timeoutAfter maxDuration: TimeInterval,
+                          do work: @escaping () async throws -> R) async throws -> R {
+        return try await withThrowingTaskGroup(of: Result<R, Error>.self) { group in
+            // Start actual work.
+            group.addTask {
+                do {
+                    let result = try await work()
+                    return .success(result)
+                } catch {
+                    return .failure(error)
+                }
+            }
+            // Start timeout child task.
+            group.addTask {
+                try? await Task.sleep(seconds: maxDuration)
+                return .failure(TimeoutError.timedOut)
+            }
+            // First finished child task wins, cancel the other task.
+            guard let result = try await group.next() else {
+                throw TimeoutError.timedOut
+            }
+            group.cancelAll()
+            switch result {
+            case .success(let value):
+                return value
+            case .failure(let error):
+                throw error
+            }
         }
     }
 }

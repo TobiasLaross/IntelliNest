@@ -14,9 +14,9 @@ struct DualBulbRoomView: View {
     @Binding var light2: LightEntity
     let light1Name: String
     let light2Name: String
-    let reloadLights: MainActorAsyncVoidClosure
-    let onTap: LightClosure
-    let onSliderRelease: LightClosure
+    let onTapAction: AsyncSlideableClosure
+    let onSliderChangeAction: SlideableIntClosure
+    let onSliderReleaseAction: AsyncSlideableClosure
     let sliderWidth: CGFloat
     let sliderHeight: CGFloat
     let bulbTitleSize: CGFloat
@@ -27,25 +27,25 @@ struct DualBulbRoomView: View {
             VStack {
                 Text(roomName)
                     .font(.system(size: roomTitleSize))
-                BulbButton(light: $lightGroup,
-                           reloadLights: reloadLights,
-                           onTap: onTap)
+                BulbButton(light: lightGroup, onTapAction: onTapAction)
             }
 
             HStack {
                 VStack {
-                    VerticalSlider(light: $light1,
-                                   onSliderRelease: onSliderRelease,
-                                   onTap: onTap)
+                    VerticalSlider(slideable: light1,
+                                   onSliderChangeAction: onSliderChangeAction,
+                                   onSliderReleaseAction: onSliderReleaseAction,
+                                   onTapAction: onTapAction)
                         .frame(width: sliderWidth, height: sliderHeight, alignment: .center)
                     Text(light1Name)
                         .font(.system(size: bulbTitleSize))
                 }
 
                 VStack {
-                    VerticalSlider(light: $light2,
-                                   onSliderRelease: onSliderRelease,
-                                   onTap: onTap)
+                    VerticalSlider(slideable: light2,
+                                   onSliderChangeAction: onSliderChangeAction,
+                                   onSliderReleaseAction: onSliderReleaseAction,
+                                   onTapAction: onTapAction)
                         .frame(width: sliderWidth, height: sliderHeight, alignment: .center)
                     Text(light2Name)
                         .font(.system(size: bulbTitleSize))

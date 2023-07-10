@@ -7,6 +7,14 @@
 
 import Foundation
 
+enum EntityType: String {
+    case light
+    case lock
+    case powerSwitch = "switch"
+    case sensor
+    case unknown
+}
+
 enum EntityId: String, Decodable, CaseIterable {
     case unknown
     case kaffemaskinen = "switch.kaffemaskinen"
@@ -16,19 +24,25 @@ enum EntityId: String, Decodable, CaseIterable {
     case hittaSarahsIphone = "script.hitta_sarahs_iphone"
     case nordPool = "sensor.nordpool_kwh_se4_sek_0_10_0"
     /* Lights */
-    case soffbordet = "light.soffbordet"
-    case myshornan = "light.myshornan"
+    case sofa = "light.soffbordet"
+    case cozyCorner = "light.myshornan"
     case panel = "light.tradfri_panel"
-    case korridorenN = "light.korridoren_n"
-    case korridorenS = "light.korridoren_s"
+    case corridorN = "light.korridoren_n"
+    case corridorS = "light.korridoren_s"
     case vitrinskapet = "light.vitrinskapet"
-    case lamporILekrummet = "light.lampor_i_lekrummet"
-    case lamporIGastrummet = "light.lampor_i_gastrummet"
-    case tvattstugan = "light.tvattstugan"
-    case lamporIVardagsrummet = "light.lampor_i_vardagsrummet"
-    case lamporIKorridoren = "light.lampor_i_korridoren"
+    case lightsInPlayroom = "light.lampor_i_lekrummet"
+    case playroomCeiling1 = "light.lekrummet_tak1"
+    case playroomCeiling2 = "light.lekrummet_tak2"
+    case playroomCeiling3 = "light.lekrummet_tak3"
+    case lightsInGuestRoom = "light.lampor_i_gastrummet"
+    case guestRoomCeiling1 = "light.gastrummet_tak1"
+    case guestRoomCeiling2 = "light.gastrummet_tak2"
+    case guestRoomCeiling3 = "light.gastrummet_tak3"
+    case laundryRoom = "light.tvattstugan"
+    case lightsInLivingRoom = "light.lampor_i_vardagsrummet"
+    case lightsInCorridor = "light.lampor_i_korridoren"
     case lamporIKoket = "light.lampor_i_koket"
-    case allaLampor = "light.alla_lampor"
+    case allLights = "light.alla_lampor"
     /* Eniro */
     case eniroClimate = "input_boolean.car_heater"
     case eniroClimateTemperature = "input_number.kia_climate_temperature"
@@ -120,6 +134,18 @@ enum EntityId: String, Decodable, CaseIterable {
     case yaleAccessTokenPart3 = "input_text.yale_access_token_part3"
     case yaleAccessTokenPart4 = "input_text.yale_access_token_part4"
     case yaleAccessTokenPart5 = "input_text.yale_access_token_part5"
+
+    var type: EntityType {
+        if let rawType = self.rawValue.components(separatedBy: ".").first {
+            switch rawType.lowercased() {
+            case "light":
+                return .light
+            default:
+                break
+            }
+        }
+        return .unknown
+    }
 
     func domain() -> Domain {
         return Domain(rawValue: self.rawValue.components(separatedBy: ".").first!) ?? .unknown
