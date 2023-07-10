@@ -11,12 +11,12 @@ struct BulbButton: View {
     private let buttonImageSIze: CGFloat = 24
 
     var light: LightEntity
-    let onTapAction: LightClosure
+    let onTapAction: AsyncLightClosure
 
     var body: some View {
         Button {
             Task { @MainActor in
-                onTapAction(light)
+                await onTapAction(light)
             }
         } label: {
             if light.isActive {

@@ -15,8 +15,11 @@ struct LightsView: View {
 
     @ObservedObject var viewModel: LightsViewModel
 
-    init(viewModel: LightsViewModel) {
-        self.viewModel = viewModel
+    private func lightBinding(for entityId: EntityId) -> Binding<LightEntity> {
+        Binding<LightEntity>(
+            get: { viewModel.lightEntities[entityId] ?? LightEntity(entityId: entityId) },
+            set: { viewModel.lightEntities[entityId] = $0 }
+        )
     }
 
     var body: some View {
@@ -24,9 +27,9 @@ struct LightsView: View {
             HStack {
                 Spacer()
                 DualBulbRoomView(roomName: viewModel.corridorName,
-                                 lightGroup: viewModel.corridor,
-                                 light1: viewModel.corridorSouth,
-                                 light2: viewModel.corridorNorth,
+                                 lightGroup: lightBinding(for: .lightsInCorridor),
+                                 light1: lightBinding(for: .corridorS),
+                                 light2: lightBinding(for: .corridorN),
                                  light1Name: viewModel.corridorSouthName,
                                  light2Name: viewModel.corridorNorthName,
                                  onTapAction: viewModel.onToggle,
@@ -38,9 +41,9 @@ struct LightsView: View {
                                  roomTitleSize: roomTitleSize)
                 Spacer()
                 DualBulbRoomView(roomName: viewModel.livingroomName,
-                                 lightGroup: viewModel.livingRoom,
-                                 light1: viewModel.sofa,
-                                 light2: viewModel.cozy,
+                                 lightGroup: lightBinding(for: .lightsInLivingRoom),
+                                 light1: lightBinding(for: .sofa),
+                                 light2: lightBinding(for: .cozyCorner),
                                  light1Name: viewModel.sofaName,
                                  light2Name: viewModel.cozyName,
                                  onTapAction: viewModel.onToggle,
@@ -57,7 +60,7 @@ struct LightsView: View {
             VStack {
                 HStack {
                     SingleRoomLight(roomName: viewModel.guestroomName,
-                                    light: viewModel.guestroom,
+                                    light: lightBinding(for: .lightsInGuestRoom),
                                     onTapAction: viewModel.onToggle,
                                     onSliderChangeAction: viewModel.onSliderChange,
                                     onSliderReleaseAction: viewModel.onSliderRelease,
@@ -65,7 +68,7 @@ struct LightsView: View {
                                     sliderWidth: sliderWidth,
                                     sliderHeight: sliderHeight)
                     SingleRoomLight(roomName: viewModel.playroomName,
-                                    light: viewModel.playroom,
+                                    light: lightBinding(for: .lightsInPlayroom),
                                     onTapAction: viewModel.onToggle,
                                     onSliderChangeAction: viewModel.onSliderChange,
                                     onSliderReleaseAction: viewModel.onSliderRelease,
@@ -73,7 +76,7 @@ struct LightsView: View {
                                     sliderWidth: sliderWidth,
                                     sliderHeight: sliderHeight)
                     SingleRoomLight(roomName: viewModel.laundryRoomName,
-                                    light: viewModel.laundryRoom,
+                                    light: lightBinding(for: .laundryRoom),
                                     onTapAction: viewModel.onToggle,
                                     onSliderChangeAction: viewModel.onSliderChange,
                                     onSliderReleaseAction: viewModel.onSliderRelease,

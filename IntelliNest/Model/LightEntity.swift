@@ -13,7 +13,10 @@ struct LightEntity: EntityProtocol {
         updateIsActive()
     }}
     var nextUpdate = NSDate().addingTimeInterval(-1)
-    var isActive: Bool = false
+    var isActive = false
+    var isSliding = false
+    var isUpdating = false
+
     var brightness: Int
     let groupedLightIDs: [EntityId]?
 

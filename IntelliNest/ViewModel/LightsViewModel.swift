@@ -13,9 +13,9 @@ class LightsViewModel: ObservableObject {
         .sofa: LightEntity(entityId: .sofa),
         .cozyCorner: LightEntity(entityId: .cozyCorner),
         .lightsInLivingRoom: LightEntity(entityId: .lightsInLivingRoom),
-        .lamporIKorridoren: LightEntity(entityId: .lamporIKorridoren),
-        .korridorenN: LightEntity(entityId: .korridorenN),
-        .korridorenS: LightEntity(entityId: .korridorenS),
+        .lightsInCorridor: LightEntity(entityId: .lightsInCorridor),
+        .corridorN: LightEntity(entityId: .corridorN),
+        .corridorS: LightEntity(entityId: .corridorS),
         .lightsInPlayroom: LightEntity(entityId: .lightsInPlayroom,
                                        groupedLightIDs: [.playroomCeiling1, .playroomCeiling2, .playroomCeiling3]),
         .lightsInGuestRoom: LightEntity(entityId: .lightsInGuestRoom,
@@ -57,11 +57,16 @@ class LightsViewModel: ObservableObject {
                 updateTasks[lightID]?.cancel()
                 let task = DispatchWorkItem { [weak self] in
                     self?.lightEntities[lightID]?.brightness = brightness
+                    self?.lightEntities[lightID]?.isUpdating = false
                     self?.updateTasks[lightID] = nil
                 }
                 updateTasks[lightID] = task
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: task)
             }
+        }
+
+        if brightness == nil || !lightEntities.keys.contains(lightID) {
+            lightEntities[lightID]?.isUpdating = false
         }
     }
 
@@ -73,74 +78,37 @@ class LightsViewModel: ObservableObject {
         }
     }
 
-    func onSliderRelease(slideable: Slideable) {
-        Task { @MainActor in
-            if let slideableLight = slideable as? LightEntity,
-               let light = lightEntities[slideableLight.entityId] {
-                var action = Action.turnOn
-                if light.brightness <= 0 {
-                    action = .turnOff
-                }
-
-                var lightIDs = [light.entityId]
-                if let groupedLightIDs = light.groupedLightIDs {
-                    lightIDs.insert(contentsOf: groupedLightIDs, at: 0)
-                }
-
-                websocketService.updateLights(lightIDs: lightIDs, action: action, brightness: light.brightness)
+    @MainActor
+    func onSliderRelease(slideable: Slideable) async {
+        if let slideableLight = slideable as? LightEntity,
+           let light = lightEntities[slideableLight.entityId] {
+            lightEntities[slideableLight.entityId]?.isUpdating = true
+            var action = Action.turnOn
+            if light.brightness <= 0 {
+                action = .turnOff
             }
+
+            var lightIDs = [light.entityId]
+            if let groupedLightIDs = light.groupedLightIDs {
+                lightIDs.insert(contentsOf: groupedLightIDs, at: 0)
+            }
+
+            websocketService.updateLights(lightIDs: lightIDs, action: action, brightness: light.brightness)
         }
     }
 
-    func onToggle(slideable: Slideable) {
-        Task { @MainActor in
-            if let slideableLight = slideable as? LightEntity,
-               let light = lightEntities[slideableLight.entityId] {
-                var action = Action.turnOn
-                if light.isActive {
-                    action = .turnOff
-                }
-
-                websocketService.updateLights(lightIDs: [light.entityId], action: action, brightness: light.brightness)
+    @MainActor
+    func onToggle(slideable: Slideable) async {
+        if let slideableLight = slideable as? LightEntity,
+           let light = lightEntities[slideableLight.entityId] {
+            print("will set isupdating true sliderrelase")
+            lightEntities[slideableLight.entityId]?.isUpdating = true
+            var action = Action.turnOn
+            if light.isActive {
+                action = .turnOff
             }
+
+            websocketService.updateLights(lightIDs: [light.entityId], action: action, brightness: light.brightness)
         }
-    }
-}
-
-extension LightsViewModel {
-    var corridor: LightEntity {
-        lightEntities[.lamporIKorridoren] ?? .init(entityId: .lamporIKorridoren)
-    }
-
-    var corridorNorth: LightEntity {
-        lightEntities[.korridorenN] ?? .init(entityId: .korridorenN)
-    }
-
-    var corridorSouth: LightEntity {
-        lightEntities[.korridorenS] ?? .init(entityId: .korridorenS)
-    }
-
-    var sofa: LightEntity {
-        lightEntities[.sofa] ?? .init(entityId: .sofa)
-    }
-
-    var cozy: LightEntity {
-        lightEntities[.cozyCorner] ?? .init(entityId: .cozyCorner)
-    }
-
-    var livingRoom: LightEntity {
-        lightEntities[.lightsInLivingRoom] ?? .init(entityId: .lightsInLivingRoom)
-    }
-
-    var playroom: LightEntity {
-        lightEntities[.lightsInPlayroom] ?? .init(entityId: .lightsInPlayroom)
-    }
-
-    var guestroom: LightEntity {
-        lightEntities[.lightsInGuestRoom] ?? .init(entityId: .lightsInGuestRoom)
-    }
-
-    var laundryRoom: LightEntity {
-        lightEntities[.laundryRoom] ?? .init(entityId: .laundryRoom)
     }
 }

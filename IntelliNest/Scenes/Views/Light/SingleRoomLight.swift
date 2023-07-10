@@ -9,10 +9,10 @@ import SwiftUI
 
 struct SingleRoomLight: View {
     let roomName: String
-    var light: LightEntity
-    let onTapAction: SlideableClosure
+    @Binding var light: LightEntity
+    let onTapAction: AsyncSlideableClosure
     let onSliderChangeAction: SlideableIntClosure
-    let onSliderReleaseAction: SlideableClosure
+    let onSliderReleaseAction: AsyncSlideableClosure
     let roomTitleSize: CGFloat
     let sliderWidth: CGFloat
     let sliderHeight: CGFloat

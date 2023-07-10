@@ -9,14 +9,14 @@ import SwiftUI
 
 struct DualBulbRoomView: View {
     let roomName: String
-    var lightGroup: LightEntity
-    var light1: LightEntity
-    var light2: LightEntity
+    @Binding var lightGroup: LightEntity
+    @Binding var light1: LightEntity
+    @Binding var light2: LightEntity
     let light1Name: String
     let light2Name: String
-    let onTapAction: SlideableClosure
+    let onTapAction: AsyncSlideableClosure
     let onSliderChangeAction: SlideableIntClosure
-    let onSliderReleaseAction: SlideableClosure
+    let onSliderReleaseAction: AsyncSlideableClosure
     let sliderWidth: CGFloat
     let sliderHeight: CGFloat
     let bulbTitleSize: CGFloat

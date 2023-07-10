@@ -77,8 +77,6 @@ class Navigator {
     @MainActor
     func reload(for destination: Destination) async {
         switch destination {
-        case .cameras:
-            break
         case .home:
             await homeViewModel.reload()
         case .heaters:
@@ -89,8 +87,9 @@ class Navigator {
             await eniroClimateScheduleViewModel.reload()
         case .roborock:
             await roborockViewModel.reload()
+        case .cameras:
+            break
         case .lights:
-//            await lightsViewModel.reload()
             break
         }
     }

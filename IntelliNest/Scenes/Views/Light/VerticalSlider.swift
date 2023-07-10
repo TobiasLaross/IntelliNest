@@ -25,38 +25,29 @@ struct VerticalSlider<T: Slideable>: View {
 
     var slideable: T
     let onSliderChangeAction: SlideableIntClosure
-    let onSliderReleaseAction: SlideableClosure
-    let onTapAction: SlideableClosure
+    let onSliderReleaseAction: AsyncSlideableClosure
+    let onTapAction: AsyncSlideableClosure
 
     @State private var startingValue = 0
+    @State private var isSliding = false
 
-    func swipeGesture(geometry: GeometryProxy) -> some Gesture {
-        let longPress = longPressGesture()
-        let swipe = swipeDragGesture()
-        let endGesture = endDragGesture()
-
-        return longPress.sequenced(before: swipe).sequenced(before: endGesture)
-    }
-
-    func longPressGesture() -> _EndedGesture<LongPressGesture> {
-        LongPressGesture(minimumDuration: 0)
-            .onEnded { _ in
-                startingValue = slideable.value
-            }
-    }
-
-    func swipeDragGesture() -> _ChangedGesture<DragGesture> {
+    func swipeDragGesture(geometry: GeometryProxy) -> some Gesture {
         DragGesture(minimumDistance: 0)
-            .onChanged {
-                let delta = startingValue - Int(($0.location.y - $0.startLocation.y) * dragCoefficient)
+            .onChanged { value in
+                if !isSliding {
+                    isSliding = true
+                    let touchPosition = value.startLocation.y
+                    let sliderHeight = geometry.size.height
+                    startingValue = Int((1 - touchPosition / sliderHeight) * CGFloat(maxValue))
+                }
+                let delta = startingValue - Int((value.location.y - value.startLocation.y) * dragCoefficient)
                 onSliderChangeAction(slideable, min(max(0, delta), maxValue))
             }
-    }
-
-    func endDragGesture() -> _EndedGesture<DragGesture> {
-        DragGesture(minimumDistance: 0)
             .onEnded { _ in
-                onSliderReleaseAction(slideable)
+                Task { @MainActor in
+                    await onSliderReleaseAction(slideable)
+                    isSliding = false
+                }
             }
     }
 
@@ -67,16 +58,19 @@ struct VerticalSlider<T: Slideable>: View {
                     .frame(width: geometry.size.width, height: geometry.size.height)
                 lightGrayColor
                     .frame(width: geometry.size.width,
-                           height: geometry.size.height * max(CGFloat(slideable.value), 0) / CGFloat(maxValue))
+                           height: geometry.size.height * max(CGFloat(slideable.value(isSliding: isSliding)),
+                                                              0) / CGFloat(maxValue))
                     .cornerRadius(0)
             }
             .foregroundColor(Color.gray)
             .onTapGesture {
-                onTapAction(slideable)
+                Task { @MainActor in
+                    await onTapAction(slideable)
+                }
             }
             .cornerRadius(geometry.size.width / 3.3)
             .gesture(
-                AnyGesture(swipeGesture(geometry: geometry).map { _ in () })
+                AnyGesture(swipeDragGesture(geometry: geometry).map { _ in () })
             )
         }
     }

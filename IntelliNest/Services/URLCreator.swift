@@ -80,7 +80,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
                                                         path: apiPath,
                                                         method: .get,
                                                         timeout: 3)
-        delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString) // TODO: This fails the test, state is not determined
+        delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
         let remoteRequest = createURLRequest(urlRequestParameters: urlRequestParameters)
         if let remoteRequest {
             do {

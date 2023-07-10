@@ -12,7 +12,9 @@ import SwiftUI
 class CamerasViewModel: ObservableObject {
     private let urlCreator: URLCreator
     var cameraViewModels: [CameraViewModel] = []
-    var isActiveScreen = false
+    var isActiveScreen = false { didSet {
+        snapshotTask?.cancel()
+    }}
     var snapshotTask: Task<Void, Error>?
     let websocketService: WebsocketServiceProtocol
     let apiService: HassApiService

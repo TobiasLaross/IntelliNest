@@ -8,13 +8,18 @@
 import Foundation
 
 protocol Slideable {
-    var value: Int { get }
+    func value(isSliding: Bool) -> Int
     var isOn: Bool { get }
+    var isUpdating: Bool { get set }
 }
 
 extension LightEntity: Slideable {
-    var value: Int {
-        isOn ? brightness : 0
+    func value(isSliding: Bool) -> Int {
+        if isOn || isSliding || isUpdating {
+            return brightness
+        }
+
+        return 0
     }
 
     var isOn: Bool {
