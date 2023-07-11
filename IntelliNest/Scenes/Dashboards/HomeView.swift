@@ -185,8 +185,9 @@ private struct StorageDoorButtonView: View {
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
         let hassApiService = HassApiService(urlCreator: URLCreator())
-        HomeView(viewModel: HomeViewModel(hassApiService: hassApiService,
+        HomeView(viewModel: HomeViewModel(websocketService: .init(),
                                           yaleApiService: YaleApiService(hassApiService: hassApiService),
+                                          urlCreator: URLCreator(),
                                           toolbarReloadAction: {},
                                           appearedAction: { _ in }))
     }

@@ -29,6 +29,7 @@
 		F61BF9B22A16A01D00C1802E /* DashboardButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */; };
 		F624EF662A2B0234004AC6BA /* NavigatorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */; };
 		F624EF682A2B4AAB004AC6BA /* CamerasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF672A2B4AAB004AC6BA /* CamerasView.swift */; };
+		F62542E62A5C5C7600B4DDD4 /* ServiceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */; };
 		F627509B29F9619100C1253F /* ToggleMonitorIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */; };
 		F627509D29F9625F00C1253F /* RequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509C29F9625F00C1253F /* RequestHandler.swift */; };
 		F627509F29FD120F00C1253F /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509E29FD120F00C1253F /* Navigator.swift */; };
@@ -46,7 +47,7 @@
 		F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */; };
 		F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D2B5B280E9EE000517746 /* LockEntity.swift */; };
 		F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */; };
-		F63F502E2A4862BB003A7100 /* UpdateLightRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502D2A4862BB003A7100 /* UpdateLightRequest.swift */; };
+		F63F502E2A4862BB003A7100 /* UpdateEntityRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */; };
 		F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502F2A486650003A7100 /* EncodableExtension.swift */; };
 		F63F50322A4CADEB003A7100 /* URLCreatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */; };
 		F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */; };
@@ -204,6 +205,7 @@
 		F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardButtonView.swift; sourceTree = "<group>"; };
 		F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigatorExtension.swift; sourceTree = "<group>"; };
 		F624EF672A2B4AAB004AC6BA /* CamerasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CamerasView.swift; sourceTree = "<group>"; };
+		F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceData.swift; sourceTree = "<group>"; };
 		F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleMonitorIntentHandler.swift; sourceTree = "<group>"; };
 		F627509C29F9625F00C1253F /* RequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestHandler.swift; sourceTree = "<group>"; };
 		F627509E29FD120F00C1253F /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
@@ -221,7 +223,7 @@
 		F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualBulbRoomView.swift; sourceTree = "<group>"; };
 		F63D2B5B280E9EE000517746 /* LockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntity.swift; sourceTree = "<group>"; };
 		F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideableProtocol.swift; sourceTree = "<group>"; };
-		F63F502D2A4862BB003A7100 /* UpdateLightRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateLightRequest.swift; sourceTree = "<group>"; };
+		F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateEntityRequest.swift; sourceTree = "<group>"; };
 		F63F502F2A486650003A7100 /* EncodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableExtension.swift; sourceTree = "<group>"; };
 		F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreatorDelegate.swift; sourceTree = "<group>"; };
 		F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribeRequest.swift; sourceTree = "<group>"; };
@@ -459,15 +461,15 @@
 			isa = PBXGroup;
 			children = (
 				F68DA61528B0D12B00601726 /* HomeViewModel.swift */,
+				F6FDBE302A1CDA850081BC3D /* HomeViewModelExtension.swift */,
 				F62CD2E228770D5500462092 /* LightsViewModel.swift */,
-				F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */,
 				F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */,
+				F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */,
 				F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */,
 				F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */,
 				F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */,
 				F62750A229FE756800C1253F /* HassViewModelProtocol.swift */,
 				F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */,
-				F6FDBE302A1CDA850081BC3D /* HomeViewModelExtension.swift */,
 				F669C72D2A23C08000458165 /* CameraViewModel.swift */,
 				F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */,
 				F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */,
@@ -497,7 +499,8 @@
 		F63F502C2A4862AB003A7100 /* Websocket */ = {
 			isa = PBXGroup;
 			children = (
-				F63F502D2A4862BB003A7100 /* UpdateLightRequest.swift */,
+				F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */,
+				F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */,
 				F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */,
 			);
 			path = Websocket;
@@ -979,6 +982,7 @@
 				F669C72C2A23C06200458165 /* CameraView.swift in Sources */,
 				F6633F3A28632954004D0B76 /* FanModeView.swift in Sources */,
 				F6EF35B92A3EC47200895250 /* UserManager.swift in Sources */,
+				F62542E62A5C5C7600B4DDD4 /* ServiceData.swift in Sources */,
 				F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */,
 				F61BF9A02A166B2700C1802E /* LockID.swift in Sources */,
 				F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */,
@@ -1001,7 +1005,7 @@
 				F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */,
 				F68DA61628B0D12B00601726 /* HomeViewModel.swift in Sources */,
 				F6F1D07E299390C500A3292E /* CalendarExtension.swift in Sources */,
-				F63F502E2A4862BB003A7100 /* UpdateLightRequest.swift in Sources */,
+				F63F502E2A4862BB003A7100 /* UpdateEntityRequest.swift in Sources */,
 				F60345C927A9379200212D04 /* HomeView.swift in Sources */,
 				F662999027B3AA5A00121C14 /* Helpers.swift in Sources */,
 				F6F1D078299104CD00A3292E /* NordPoolEntity.swift in Sources */,

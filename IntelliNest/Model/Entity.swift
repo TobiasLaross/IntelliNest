@@ -9,7 +9,9 @@ import Foundation
 
 struct Entity: EntityProtocol {
     var entityId: EntityId
-    var state: String
+    var state: String { didSet {
+        updateIsActive()
+    }}
     var lastUpdated: Date
     var lastChanged: Date
     var nextUpdate = NSDate().addingTimeInterval(-1)
