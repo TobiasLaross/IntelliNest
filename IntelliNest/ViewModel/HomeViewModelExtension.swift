@@ -39,38 +39,6 @@ extension HomeViewModel: LockServiceProtocol {
         }
     }
 
-    func toggleStateForStorageLock() {
-        guard let capturedLock = getUpdatedLock(storageLock) else {
-            return
-        }
-        Task { @MainActor in
-            let action: Action = storageLock.lockState == .unlocked ? .lock : .unlock
-            storageLock.expectedState = capturedLock.expectedState
-            await hassApiService.setStateFor(lock: storageLock, action: action)
-            await reloadLockUntilExpectedState(lockID: storageLock.id)
-        }
-    }
-
-    func lock(lockEntity: inout LockEntity) {
-        let action = Action.lock
-        lockEntity.expectedState = .locked
-        let lockToUpdate = lockEntity
-        Task { @MainActor in
-            await hassApiService.setStateFor(lock: lockToUpdate, action: action)
-            await reloadLockUntilExpectedState(lockID: lockToUpdate.id)
-        }
-    }
-
-    func unlock(lockEntity: inout LockEntity) {
-        let action = Action.unlock
-        lockEntity.expectedState = .unlocked
-        let lockToUpdate = lockEntity
-        Task { @MainActor in
-            await hassApiService.setStateFor(lock: lockToUpdate, action: action)
-            await reloadLockUntilExpectedState(lockID: lockToUpdate.id)
-        }
-    }
-
     private func getUpdatedLock(_ lock: Lockable) -> Lockable? {
         var lockToUpdate = lock
         switch lock.lockState {

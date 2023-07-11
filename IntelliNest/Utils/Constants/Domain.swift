@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum Domain: String, Decodable {
+enum Domain: String, Encodable {
     case camera
     case climate
     case melcloud

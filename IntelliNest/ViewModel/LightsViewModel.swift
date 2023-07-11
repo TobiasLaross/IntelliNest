@@ -101,7 +101,6 @@ class LightsViewModel: ObservableObject {
     func onToggle(slideable: Slideable) async {
         if let slideableLight = slideable as? LightEntity,
            let light = lightEntities[slideableLight.entityId] {
-            print("will set isupdating true sliderrelase")
             lightEntities[slideableLight.entityId]?.isUpdating = true
             var action = Action.turnOn
             if light.isActive {

@@ -14,16 +14,15 @@ extension Navigator: WebSocketServiceDelegate {
     }
 
     func webSocketService(didReceiveEntity entityID: EntityId, state: String, brightness: Int?) {
-        switch entityID.type {
-        case .light:
-            if entityID == .allLights {
-                homeViewModel.reload(entityID: entityID, state: state)
-            } else if lightsViewModel.lightEntities.keys.contains(entityID) {
-                lightsViewModel.reload(lightID: entityID, state: state, brightness: brightness)
-            }
+        switch entityID {
+        case .allLights, .hittaSarahsIphone, .coffeeMachine, .storageLock:
+            homeViewModel.reload(entityID: entityID, state: state)
         default:
-//            Log.warning("Web socket delegate not implemented get state for \(entityID.rawValue)")
             break
+        }
+
+        if lightsViewModel.lightEntities.keys.contains(entityID) {
+            lightsViewModel.reload(lightID: entityID, state: state, brightness: brightness)
         }
     }
 }

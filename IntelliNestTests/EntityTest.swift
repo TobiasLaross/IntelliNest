@@ -3,7 +3,7 @@ import XCTest
 
 class EntityTests: XCTestCase {
     func testInit() {
-        let entityId = EntityId.kaffemaskinen
+        let entityId = EntityId.coffeeMachine
         let entity = Entity(entityId: entityId)
 
         XCTAssertEqual(entity.entityId, entityId)
@@ -36,7 +36,7 @@ class EntityTests: XCTestCase {
         let date = try XCTUnwrap(Date.fromISO8601("2023-06-17T13:30:00.215607+00:00"))
         let entity = try decoder.decode(Entity.self, from: json)
 
-        XCTAssertEqual(entity.entityId, EntityId.kaffemaskinen)
+        XCTAssertEqual(entity.entityId, EntityId.coffeeMachine)
         XCTAssertEqual(entity.state, "off")
         XCTAssertEqual(entity.lastChanged, date)
         XCTAssertEqual(entity.lastUpdated, date)
@@ -68,7 +68,7 @@ class EntityTests: XCTestCase {
     }
 
     func testRecentlyUpdated() {
-        var entity = Entity(entityId: .kaffemaskinen)
+        var entity = Entity(entityId: .coffeeMachine)
         let now = Date()
         entity.lastUpdated = now
         XCTAssertTrue(entity.recentlyUpdated())
@@ -83,7 +83,7 @@ class EntityTests: XCTestCase {
     }
 
     func testUpdateIsActive() {
-        var entity = Entity(entityId: .kaffemaskinen)
+        var entity = Entity(entityId: .coffeeMachine)
         entity.state = "On"
         entity.updateIsActive()
         XCTAssertTrue(entity.isActive)
@@ -94,13 +94,13 @@ class EntityTests: XCTestCase {
     }
 
     func testSetNextUpdateTime() {
-        var entity = Entity(entityId: .kaffemaskinen)
+        var entity = Entity(entityId: .coffeeMachine)
         entity.setNextUpdateTime()
         XCTAssertGreaterThan(entity.nextUpdate.timeIntervalSinceNow, 0.0)
     }
 
     func testInitWithDifferentStates() {
-        let entityId = EntityId.kaffemaskinen
+        let entityId = EntityId.coffeeMachine
         let entity = Entity(entityId: entityId, state: "On")
 
         XCTAssertEqual(entity.entityId, entityId)
@@ -144,7 +144,7 @@ class EntityTests: XCTestCase {
         let decoder = JSONDecoder()
         let entity = try decoder.decode(Entity.self, from: json)
 
-        XCTAssertEqual(entity.entityId, EntityId.kaffemaskinen)
+        XCTAssertEqual(entity.entityId, EntityId.coffeeMachine)
         XCTAssertEqual(entity.state, "Loading")
         XCTAssertEqual(entity.lastChanged, .distantPast)
         XCTAssertEqual(entity.lastUpdated, .distantPast)
@@ -153,9 +153,9 @@ class EntityTests: XCTestCase {
     }
 
     func testEqualityOperator() {
-        let entity1 = Entity(entityId: .kaffemaskinen, state: "On")
-        let entity2 = Entity(entityId: .kaffemaskinen, state: "On")
-        let entity3 = Entity(entityId: .kaffemaskinen, state: "Off")
+        let entity1 = Entity(entityId: .coffeeMachine, state: "On")
+        let entity2 = Entity(entityId: .coffeeMachine, state: "On")
+        let entity3 = Entity(entityId: .coffeeMachine, state: "Off")
 
         XCTAssertTrue(entity1 == entity2)
         XCTAssertFalse(entity1 == entity3)

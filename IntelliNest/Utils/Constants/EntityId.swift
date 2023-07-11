@@ -11,16 +11,17 @@ enum EntityType: String {
     case light
     case lock
     case powerSwitch = "switch"
+    case script
     case sensor
     case unknown
 }
 
 enum EntityId: String, Decodable, CaseIterable {
     case unknown
-    case kaffemaskinen = "switch.kaffemaskinen"
+    case coffeeMachine = "switch.kaffemaskinen"
     case sidodorren = "lock.sidodorren"
     case framdorren = "lock.framdorren"
-    case forradet = "lock.forradet"
+    case storageLock = "lock.forradet"
     case hittaSarahsIphone = "script.hitta_sarahs_iphone"
     case nordPool = "sensor.nordpool_kwh_se4_sek_0_10_0"
     /* Lights */
@@ -126,8 +127,6 @@ enum EntityId: String, Decodable, CaseIterable {
     case cameraCarport = "camera.carporten_frigate"
     case cameraBack = "camera.baksidan_frigate"
 
-    /* Camera lights */
-    case cameraVinceLight = "light.camera_vince_light"
     /* Yale Access token */
     case yaleAccessTokenPart1 = "input_text.yale_access_token_part1"
     case yaleAccessTokenPart2 = "input_text.yale_access_token_part2"

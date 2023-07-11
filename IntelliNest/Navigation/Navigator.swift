@@ -14,8 +14,9 @@ class Navigator {
     var webSocketService = WebSocketService()
     lazy var hassApiService = HassApiService(urlCreator: urlCreator)
     lazy var yaleApiService = YaleApiService(hassApiService: hassApiService)
-    lazy var homeViewModel = HomeViewModel(hassApiService: hassApiService,
+    lazy var homeViewModel = HomeViewModel(websocketService: webSocketService,
                                            yaleApiService: yaleApiService,
+                                           urlCreator: urlCreator,
                                            toolbarReloadAction: reloadCurrentModel,
                                            appearedAction: setCurrentDestination)
     lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: hassApiService)

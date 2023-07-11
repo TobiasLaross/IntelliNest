@@ -164,9 +164,23 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     func updateLights(lightIDs: [EntityId], action: Action, brightness: Int) {
-        let updateLightRequest = UpdateLightRequest(action: action, brightness: brightness, lightIDs: lightIDs)
+        var updateEntityRequest = UpdateEntityRequest(domain: .light,
+                                                      action: action,
+                                                      serviceData: nil,
+                                                      entityIds: lightIDs)
+        if action == .turnOn {
+            let lightData = LightServiceData(brightness: brightness)
+            updateEntityRequest.serviceData = lightData
+        }
+
         let requestID = getNextRequestID()
-        sendJSONCommand(updateLightRequest, requestID: requestID)
+        sendJSONCommand(updateEntityRequest, requestID: requestID)
+    }
+
+    func updateEntity(entityID: EntityId, domain: Domain, action: Action) {
+        let updateEntityRequest = UpdateEntityRequest(domain: domain, action: action, entityIds: [entityID])
+        let requestID = getNextRequestID()
+        sendJSONCommand(updateEntityRequest, requestID: requestID)
     }
 
     private func subscribe() {
