@@ -9,11 +9,12 @@ import Foundation
 
 struct LightEntity: EntityProtocol {
     var entityId: EntityId
-    var state: String { didSet {
-        updateIsActive()
-    }}
+    var state: String
     var nextUpdate = NSDate().addingTimeInterval(-1)
-    var isActive = false
+    var isActive: Bool {
+        state == "on" ? true : false
+    }
+
     var isSliding = false
     var isUpdating = false
 
@@ -31,17 +32,13 @@ struct LightEntity: EntityProtocol {
         self.state = state
         self.brightness = -1
         self.groupedLightIDs = groupedLightIDs
-
-        updateIsActive()
     }
 
     init(from decoder: Decoder) throws {
         fatalError("Not implemented decoder for LightEntity")
     }
 
-    mutating func updateIsActive() {
-        isActive = state == "on" ? true : false
-    }
+    mutating func updateIsActive() {}
 
     private enum AttributesCodingKeys: String, CodingKey {
         case brightness

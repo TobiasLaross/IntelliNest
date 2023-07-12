@@ -33,7 +33,7 @@ struct RoborockView: View {
                     }
 
                     SinceEmptiedView(emptiedAtDate: viewModel.roborockEmptiedAtDate.state,
-                                     areaSinceEmpty: viewModel.roborockAreaSinceEmpty.state)
+                                     areaSinceEmpty: viewModel.roborockAreaSinceEmptied.state)
                         .padding([.top])
                     HStack {
                         RoborockInfoView(lastCleanArea: viewModel.roborockLastCleanArea.state,
@@ -46,8 +46,7 @@ struct RoborockView: View {
                         Toggle("Automation", isOn: $viewModel.roborockAutomation.isActive)
                             .frame(width: 150, height: 30, alignment: .leading)
                             .onTapGesture {
-                                viewModel.roborockAutomation.isActive.toggle()
-                                viewModel.setState(for: viewModel.roborockAutomation)
+                                viewModel.toggleRoborockAutomation()
                             }
                         Spacer()
                     }
@@ -74,7 +73,7 @@ struct RoborockView: View {
             }
 
             if viewModel.showingMapView {
-                RoborockMapImageView(urlCreator: viewModel.urlCreator)
+                RoborockMapImageView(baseURLString: viewModel.baseURLString)
             }
         }
         .gesture(
@@ -89,6 +88,6 @@ struct RoborockView: View {
 
 struct Roborock_Previews: PreviewProvider {
     static var previews: some View {
-        RoborockView(viewModel: RoborockViewModel(apiService: HassApiService(urlCreator: URLCreator()), appearedAction: { _ in }))
+        RoborockView(viewModel: .init(websocketService: .init(), appearedAction: { _ in }))
     }
 }

@@ -13,17 +13,28 @@ extension Navigator: WebSocketServiceDelegate {
         camerasViewModel.setRTSPURL(urlString: urlString, for: resultID)
     }
 
-    func webSocketService(didReceiveEntity entityID: EntityId, state: String, brightness: Int?) {
-        switch entityID {
-        case .allLights, .hittaSarahsIphone, .coffeeMachine, .storageLock:
+    func webSocketService(didReceiveEntity entityID: EntityId, state: String) {
+        if homeViewModel.entityIDs.contains(entityID) {
             homeViewModel.reload(entityID: entityID, state: state)
-        default:
-            break
         }
 
+        if roborockViewModel.entityIDs.contains(entityID) {
+            roborockViewModel.reload(entityID: entityID, state: state)
+        }
+    }
+
+    func webSocketService(didReceiveLight entityID: EntityId, state: String, brightness: Int?) {
         if lightsViewModel.lightEntities.keys.contains(entityID) {
             lightsViewModel.reload(lightID: entityID, state: state, brightness: brightness)
         }
+
+        if entityID == .allLights {
+            homeViewModel.reload(entityID: entityID, state: state)
+        }
+    }
+
+    func webSocketService(didReceiveRoborock entityID: EntityId, state: String, status: String?, batteryLevel: Int?) {
+        roborockViewModel.reloadRoborock(state: state, status: status, batteryLevel: batteryLevel)
     }
 }
 

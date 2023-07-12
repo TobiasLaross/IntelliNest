@@ -123,13 +123,6 @@ class HassApiService: URLRequestBuilder {
         await sendPostRequest(json: json, domain: Domain.light, action: action)
     }
 
-    func setState(roborock: RoborockEntity, action: Action) async {
-        var json = [JSONKey: Any]()
-        json[JSONKey.entityID] = roborock.entityId.rawValue
-
-        await sendPostRequest(json: json, domain: Domain.vacuum, action: action)
-    }
-
     func setStateFor(lock: LockEntity, action: Action) async {
         guard let action = Action(rawValue: action.rawValue) else {
             Log.error("Bad action: \(action.rawValue)")

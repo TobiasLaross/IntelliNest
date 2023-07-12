@@ -10,7 +10,7 @@ import ShipBookSDK
 import SwiftUI
 
 // swiftlint:disable type_body_length
-class EniroViewModel: HassViewModelProtocol {
+class EniroViewModel: HassAPIViewModelProtocol {
     @Published var doorLock = LockEntity(entityId: EntityId.eniroDoorLock)
     @Published var climateTemperature = InputNumberEntity(entityId: EntityId.eniroClimateTemperature)
     @Published var climateHeating = Entity(entityId: EntityId.eniroClimateHeating)

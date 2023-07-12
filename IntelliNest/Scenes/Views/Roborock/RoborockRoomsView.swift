@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RoborockRoomsView: View {
-    let callScriptClosure: EntityIdClosure
+    let callScriptClosure: ScriptIDClosure
 
     var body: some View {
         HStack(alignment: .top) {

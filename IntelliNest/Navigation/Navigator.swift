@@ -24,7 +24,7 @@ class Navigator {
     lazy var eniroViewModel = EniroViewModel(apiService: hassApiService, appearedAction: setCurrentDestination)
     lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: hassApiService,
                                                                            appearedAction: setCurrentDestination)
-    lazy var roborockViewModel = RoborockViewModel(apiService: hassApiService, appearedAction: setCurrentDestination)
+    lazy var roborockViewModel = RoborockViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
     lazy var lightsViewModel = LightsViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
 
     init() {
@@ -87,7 +87,7 @@ class Navigator {
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
         case .roborock:
-            await roborockViewModel.reload()
+            break
         case .cameras:
             break
         case .lights:
