@@ -7,7 +7,7 @@
 
 import Foundation
 
-class HeatersViewModel: HassViewModelProtocol {
+class HeatersViewModel: HassAPIViewModelProtocol {
     @Published var heaterCorridor = HeaterEntity(entityId: .heaterCorridor)
     @Published var heaterPlayroom = HeaterEntity(entityId: .heaterPlayroom)
     @Published var thermCorridor = Entity(entityId: .thermCorridor)

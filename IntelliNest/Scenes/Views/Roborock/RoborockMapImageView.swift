@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RoborockMapImageView: View {
-    var urlCreator: URLCreator
+    var baseURLString: String
     private let urlPath = "local/roborock/map_image_roborock.vacuum.a15.png"
     @State var scale: CGFloat = 1.0
 
@@ -17,7 +17,7 @@ struct RoborockMapImageView: View {
             ZStack {
                 FullScreenBackgroundOverlay()
                 ScrollView([.horizontal, .vertical], showsIndicators: false) {
-                    if let url = URL(string: urlCreator.urlString + urlPath) {
+                    if let url = URL(string: baseURLString + urlPath) {
                         AsyncImage(url: url) { phase in
                             if let image = phase.image {
                                 image
@@ -46,6 +46,6 @@ struct RoborockMapImageView: View {
 
 struct RoborockMapImage_Previews: PreviewProvider {
     static var previews: some View {
-        RoborockMapImageView(urlCreator: URLCreator())
+        RoborockMapImageView(baseURLString: "")
     }
 }

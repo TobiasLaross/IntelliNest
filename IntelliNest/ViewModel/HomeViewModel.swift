@@ -10,7 +10,7 @@ import ShipBookSDK
 import SwiftUI
 import UIKit
 
-class HomeViewModel: HassViewModelProtocol {
+class HomeViewModel: HassAPIViewModelProtocol {
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
     @Published var storageLock = LockEntity(entityId: EntityId.storageLock)
@@ -19,6 +19,7 @@ class HomeViewModel: HassViewModelProtocol {
     @Published var sarahsIphone = Entity(entityId: EntityId.hittaSarahsIphone)
 
     var isReloading = false
+    let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock]
 
     var sarahIphoneimage: Image {
         if sarahsIphone.isActive {

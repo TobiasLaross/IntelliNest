@@ -9,140 +9,94 @@ import Foundation
 import ShipBookSDK
 import UIKit
 
-class RoborockViewModel: HassViewModelProtocol {
+class RoborockViewModel: ObservableObject {
     @Published var roborock = RoborockEntity(entityId: .roborock)
     @Published var roborockAutomation = Entity(entityId: .roborockAutomation)
     @Published var roborockLastCleanArea = Entity(entityId: .roborockLastCleanArea)
-    @Published var roborockAreaSinceEmpty = Entity(entityId: .roborockAreaSinceEmptied)
+    @Published var roborockAreaSinceEmptied = Entity(entityId: .roborockAreaSinceEmptied)
     @Published var roborockEmptiedAtDate = Entity(entityId: .roborockEmptiedAtDate)
     @Published var roborockWaterShortage = Entity(entityId: .roborockWaterShortage, state: "off")
     @Published var showingMapView = false
-    @Published var mapImage: UIImage?
-    @Published var mapImage2: UIImage?
 
-    var roborockSendToBin = Entity(entityId: .roborockSendToBin)
-    var roborockKitchen = Entity(entityId: .roborockKitchen)
-    var roborockKitchenTable = Entity(entityId: .roborockKitchenTable)
-    var roborockKitchenStove = Entity(entityId: .roborockKitchenStove)
-    var roborockLaundry = Entity(entityId: .roborockLaundry)
-    var roborockHallway = Entity(entityId: .roborockHallway)
-    var roborockCorridor = Entity(entityId: .roborockCorridor)
-    var roborockLivingroom = Entity(entityId: .roborockLivingroom)
-    var roborockGym = Entity(entityId: .roborockGym)
-    var roborockVinceRoom = Entity(entityId: .roborockVinceRoom)
-    var roborockBedroom = Entity(entityId: .roborockBedroom)
-    private var isReloading = false
-    var urlCreator: URLCreator {
-        apiService.urlCreator
+    var baseURLString: String {
+        websocketService.baseURLString
     }
 
-    private var apiService: HassApiService
+    let entityIDs: [EntityId] = [.roborock,
+                                 .roborockAutomation,
+                                 .roborockWaterShortage,
+                                 .roborockEmptiedAtDate,
+                                 .roborockLastCleanArea,
+                                 .roborockAreaSinceEmptied]
+    private var websocketService: WebSocketService
     let appearedAction: DestinationClosure
 
-    init(apiService: HassApiService, appearedAction: @escaping DestinationClosure) {
-        self.apiService = apiService
+    init(websocketService: WebSocketService, appearedAction: @escaping DestinationClosure) {
+        self.websocketService = websocketService
         self.appearedAction = appearedAction
     }
 
-    @MainActor
-    func reload() async {
-        if !isReloading {
-            isReloading = true
-            async let tmpRoborock = reload(roborock: roborock)
-            async let tmpRoborockAutomation = reload(entity: roborockAutomation)
-            async let tmpRoborockLastCleanArea = reload(entity: roborockLastCleanArea)
-            async let tmpRoborockAreaSinceEmpty = reload(entity: roborockAreaSinceEmpty)
-            async let tmpRoborockEmptiedAtDate = reload(entity: roborockEmptiedAtDate)
-            async let tmpRoborockWaterShortage = reload(entity: roborockWaterShortage)
-            roborock = await tmpRoborock
-            roborockAutomation = await tmpRoborockAutomation
-            roborockLastCleanArea = await tmpRoborockLastCleanArea
-            roborockAreaSinceEmpty = await tmpRoborockAreaSinceEmpty
-            roborockEmptiedAtDate = await tmpRoborockEmptiedAtDate
-            roborockWaterShortage = await tmpRoborockWaterShortage
-            isReloading = false
+    func reload(entityID: EntityId, state: String) {
+        switch entityID {
+        case .roborockAutomation:
+            roborockAutomation.state = state
+        case .roborockLastCleanArea:
+            roborockLastCleanArea.state = state
+        case .roborockAreaSinceEmptied:
+            roborockAreaSinceEmptied.state = state
+        case .roborockEmptiedAtDate:
+            roborockEmptiedAtDate.state = state
+        case .roborockWaterShortage:
+            roborockWaterShortage.state = state
+
+        default:
+            Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }
+    }
+
+    func reloadRoborock(state: String, status: String?, batteryLevel: Int?) {
+        roborock.state = state
+        roborock.status = status ?? ""
+        roborock.batteryLevel = batteryLevel ?? -1
     }
 
     func locateRoborock() {
-        Task {
-            await apiService.setState(roborock: roborock, action: .locate)
-        }
+        websocketService.updateEntity(entityID: .roborock, domain: .vacuum, action: .locate)
     }
 
     func manualEmpty() {
-        Task { @MainActor in
-            await apiService.callScript(entityId: .roborockManualEmpty)
-            await reloadAfterSleep()
-        }
+        websocketService.callScript(scriptID: .roborockManualEmpty)
     }
 
     func toggleCleaning() {
-        Task { @MainActor in
-            let action: Action = roborock.isActive ? .stop : .start
-            await apiService.setState(roborock: roborock, action: action)
-            await reloadUntilUpdated(roborock: roborock)
-        }
+        let action: Action = roborock.isActive ? .stop : .start
+        websocketService.updateEntity(entityID: .roborock, domain: .vacuum, action: action)
     }
 
     func dockRoborock() {
-        callScript(entityID: .roborockDock)
+        websocketService.callScript(scriptID: .roborockDock)
     }
 
     func sendRoborockToBin() {
-        callScript(entityID: .roborockSendToBin)
+        websocketService.callScript(scriptID: .roborockSendToBin)
     }
 
-    func callScript(entityID: EntityId) {
-        Task { @MainActor in
-            await apiService.callScript(entityId: entityID)
-            await reloadUntilUpdated(roborock: roborock)
-        }
+    func callScript(scriptID: ScriptID) {
+        websocketService.callScript(scriptID: scriptID)
     }
 
-    func setState(for entity: Entity) {
-        Task { @MainActor in
-            let action = entity.isActive ? Action.turnOn : Action.turnOff
-            await apiService.setState(for: entity.entityId, in: entity.entityId.domain(), using: action)
-            await reloadAfterSleep()
-        }
+    func toggleRoborockAutomation() {
+        let action: Action = roborockAutomation.isActive ? .turnOff : .turnOn
+        roborockAutomation.isActive.toggle()
+        websocketService.updateEntity(entityID: .roborockAutomation, domain: .automation, action: action)
     }
 
     func getStatus() -> String {
-        if roborock.status.contains(roborock.state) {
+        if roborock.status.lowercased() == roborock.state.lowercased() ||
+            roborock.status.lowercased().contains(roborock.state.lowercased()) {
             return "\(roborock.status.capitalized)"
         } else {
             return "\(roborock.state.capitalized) - \(roborock.status)"
         }
-    }
-
-    @MainActor
-    private func reloadUntilUpdated(roborock: RoborockEntity) async {
-        var updatedRoborock: RoborockEntity
-        var count = 0
-        repeat {
-            try? await Task.sleep(seconds: 0.8)
-            await updatedRoborock = reload(roborock: roborock)
-            count += 1
-            if roborock.state != updatedRoborock.state {
-                break
-            }
-        } while count < 40
-
-        await reload()
-    }
-
-    @MainActor
-    private func reloadAfterSleep() async {
-        try? await Task.sleep(seconds: 0.3)
-        await reload()
-    }
-
-    private func reload(roborock: RoborockEntity) async -> RoborockEntity {
-        return await apiService.reload(hassEntity: roborock, entityType: RoborockEntity.self)
-    }
-
-    private func reload(entity: Entity) async -> Entity {
-        return await apiService.reload(hassEntity: entity, entityType: Entity.self)
     }
 }

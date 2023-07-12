@@ -27,10 +27,12 @@ class WebSocketService {
     var requestID = 0
     var requests: [String] = []
     var isAuthenticated = false
+    var baseURLString = ""
 
     init() {}
 
     func baseURLChanged(urlString: String) {
+        baseURLString = urlString
         let wsURLString: String
         if urlString == GlobalConstants.baseInternalUrlString {
             wsURLString = "ws://\(urlString.removingHTTPSchemeAndTrailingSlash)/api/websocket"
@@ -183,6 +185,12 @@ extension WebSocketService: WebSocketDelegate {
         sendJSONCommand(updateEntityRequest, requestID: requestID)
     }
 
+    func callScript(scriptID: ScriptID) {
+        let callScriptRequest = CallScriptRequest(scriptID: scriptID)
+        let requestID = getNextRequestID()
+        sendJSONCommand(callScriptRequest, requestID: requestID)
+    }
+
     private func subscribe() {
         let requestID = getNextRequestID()
         let subscribeRequest = SubscribeRequest(eventType: .stateChange)
@@ -198,13 +206,7 @@ extension WebSocketService: WebSocketDelegate {
 
     private func parseResultsArray(result: [[String: Any]]) {
         for dictionary in result {
-            if let entityIDString = dictionary["entity_id"] as? String,
-               let entityID = EntityId(rawValue: entityIDString),
-               let state = dictionary["state"] as? String {
-                let attributes = dictionary["attributes"] as? [String: Any]
-                let brightness = attributes?["brightness"] as? Int
-                delegate?.webSocketService(didReceiveEntity: entityID, state: state, brightness: brightness)
-            }
+            parseStateChange(newState: dictionary)
         }
     }
 
@@ -213,11 +215,21 @@ extension WebSocketService: WebSocketDelegate {
            let entityID = EntityId(rawValue: entityIDString),
            let state = newState["state"] as? String {
             var brightness: Int?
+            var status: String?
+            var batteryLevel: Int?
             if let attributes = newState["attributes"] as? [String: Any] {
                 brightness = attributes["brightness"] as? Int
+                status = attributes["status"] as? String
+                batteryLevel = attributes["battery_level"] as? Int
             }
 
-            delegate?.webSocketService(didReceiveEntity: entityID, state: state, brightness: brightness)
+            if entityID == .roborock {
+                delegate?.webSocketService(didReceiveRoborock: entityID, state: state, status: status, batteryLevel: batteryLevel)
+            } else if entityID.type == .light {
+                delegate?.webSocketService(didReceiveLight: entityID, state: state, brightness: brightness)
+            } else {
+                delegate?.webSocketService(didReceiveEntity: entityID, state: state)
+            }
         }
     }
 

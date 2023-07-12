@@ -30,11 +30,13 @@
 		F624EF662A2B0234004AC6BA /* NavigatorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */; };
 		F624EF682A2B4AAB004AC6BA /* CamerasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF672A2B4AAB004AC6BA /* CamerasView.swift */; };
 		F62542E62A5C5C7600B4DDD4 /* ServiceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */; };
+		F62542E82A5DD27600B4DDD4 /* ScriptID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E72A5DD27600B4DDD4 /* ScriptID.swift */; };
+		F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */; };
 		F627509B29F9619100C1253F /* ToggleMonitorIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */; };
 		F627509D29F9625F00C1253F /* RequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509C29F9625F00C1253F /* RequestHandler.swift */; };
 		F627509F29FD120F00C1253F /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509E29FD120F00C1253F /* Navigator.swift */; };
 		F62750A129FE39B100C1253F /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A029FE39B100C1253F /* Destination.swift */; };
-		F62750A329FE756800C1253F /* HassViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A229FE756800C1253F /* HassViewModelProtocol.swift */; };
+		F62750A329FE756800C1253F /* HassAPIViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A229FE756800C1253F /* HassAPIViewModelProtocol.swift */; };
 		F62750A92A00ED9500C1253F /* UINavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A82A00ED9500C1253F /* UINavigationController.swift */; };
 		F62750AB2A00EE8800C1253F /* ToolbarBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */; };
 		F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AE2A01123500C1253F /* ToolbarItems.swift */; };
@@ -206,11 +208,13 @@
 		F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigatorExtension.swift; sourceTree = "<group>"; };
 		F624EF672A2B4AAB004AC6BA /* CamerasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CamerasView.swift; sourceTree = "<group>"; };
 		F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceData.swift; sourceTree = "<group>"; };
+		F62542E72A5DD27600B4DDD4 /* ScriptID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptID.swift; sourceTree = "<group>"; };
+		F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallScriptRequest.swift; sourceTree = "<group>"; };
 		F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleMonitorIntentHandler.swift; sourceTree = "<group>"; };
 		F627509C29F9625F00C1253F /* RequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestHandler.swift; sourceTree = "<group>"; };
 		F627509E29FD120F00C1253F /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		F62750A029FE39B100C1253F /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
-		F62750A229FE756800C1253F /* HassViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HassViewModelProtocol.swift; sourceTree = "<group>"; };
+		F62750A229FE756800C1253F /* HassAPIViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HassAPIViewModelProtocol.swift; sourceTree = "<group>"; };
 		F62750A82A00ED9500C1253F /* UINavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UINavigationController.swift; sourceTree = "<group>"; };
 		F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarBackButton.swift; sourceTree = "<group>"; };
 		F62750AE2A01123500C1253F /* ToolbarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarItems.swift; sourceTree = "<group>"; };
@@ -468,7 +472,7 @@
 				F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */,
 				F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */,
 				F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */,
-				F62750A229FE756800C1253F /* HassViewModelProtocol.swift */,
+				F62750A229FE756800C1253F /* HassAPIViewModelProtocol.swift */,
 				F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */,
 				F669C72D2A23C08000458165 /* CameraViewModel.swift */,
 				F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */,
@@ -500,6 +504,7 @@
 			isa = PBXGroup;
 			children = (
 				F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */,
+				F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */,
 				F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */,
 				F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */,
 			);
@@ -632,6 +637,7 @@
 				F6DBA4D328F09C7F001BA1C0 /* Closures.swift */,
 				F68DA61F28B4C13000601726 /* Domain.swift */,
 				F68DA61A28B4C0C100601726 /* EntityId.swift */,
+				F62542E72A5DD27600B4DDD4 /* ScriptID.swift */,
 				F61BF99F2A166B2700C1802E /* LockID.swift */,
 				F67C0B6C298D07E50096AE49 /* DeviceID.swift */,
 				F68DA61D28B4C11600601726 /* Heater.swift */,
@@ -990,7 +996,7 @@
 				F61BF9A82A1672C300C1802E /* HTTPMethod.swift in Sources */,
 				F60345D427ABE49100212D04 /* LightsView.swift in Sources */,
 				F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */,
-				F62750A329FE756800C1253F /* HassViewModelProtocol.swift in Sources */,
+				F62750A329FE756800C1253F /* HassAPIViewModelProtocol.swift in Sources */,
 				F624EF682A2B4AAB004AC6BA /* CamerasView.swift in Sources */,
 				F6D167CC27C1287700DCC155 /* HvacModeView.swift in Sources */,
 				F6DBA4D428F09C7F001BA1C0 /* Closures.swift in Sources */,
@@ -1000,9 +1006,11 @@
 				F60345C427A933D700212D04 /* GlobalConstants.swift in Sources */,
 				F67FA88B28A16E9A00BE4CBD /* EntityProtocol.swift in Sources */,
 				F6F8555F28DF755D004B9517 /* EniroCharging.swift in Sources */,
+				F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */,
 				F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */,
 				F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */,
 				F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */,
+				F62542E82A5DD27600B4DDD4 /* ScriptID.swift in Sources */,
 				F68DA61628B0D12B00601726 /* HomeViewModel.swift in Sources */,
 				F6F1D07E299390C500A3292E /* CalendarExtension.swift in Sources */,
 				F63F502E2A4862BB003A7100 /* UpdateEntityRequest.swift in Sources */,

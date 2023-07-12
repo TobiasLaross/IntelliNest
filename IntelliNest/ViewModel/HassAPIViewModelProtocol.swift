@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol HassViewModelProtocol: ObservableObject {
+protocol HassAPIViewModelProtocol: ObservableObject {
     @MainActor
     func reload() async
 }

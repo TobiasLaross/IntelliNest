@@ -11,7 +11,15 @@ struct RoborockEntity: EntityProtocol {
     var entityId: EntityId
     var state: String
     var nextUpdate = NSDate().addingTimeInterval(-1)
-    var isActive: Bool = false
+    var isActive: Bool {
+        if status.lowercased() == "cleaning" ||
+            ["cleaning", "segment cleaning", "returning home"].contains(status.lowercased()) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     var status: String = ""
     var batteryLevel: Int = -1
     var error: String = ""
@@ -25,7 +33,6 @@ struct RoborockEntity: EntityProtocol {
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
         self.state = state
-        updateIsActive()
     }
 
     init(from decoder: Decoder) throws {
@@ -37,18 +44,6 @@ struct RoborockEntity: EntityProtocol {
         status = attributes.status
         batteryLevel = attributes.batteryLevel
         error = attributes.error
-
-        updateIsActive()
-    }
-
-    mutating func updateIsActive() {
-        if state.lowercased() == "cleaning" ||
-            status.lowercased() == "segment cleaning" ||
-            status.lowercased() == "returning home" {
-            isActive = true
-        } else {
-            isActive = false
-        }
     }
 
     mutating func setNextUpdateTime() {

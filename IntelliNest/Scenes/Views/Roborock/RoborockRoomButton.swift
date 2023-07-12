@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RoborockRoomButton: View {
-    let roborockRoom: EntityId
+    let roborockRoom: ScriptID
     var roomName: String
     var imageName: String
     var isSystemName: Bool = true
@@ -16,7 +16,7 @@ struct RoborockRoomButton: View {
     var buttonWidth: CGFloat = 90
     var buttonHeight: CGFloat = 55
     var buttonCornerRadius: CGFloat = 10
-    var callScriptClosure: (EntityId) -> Void
+    var callScriptClosure: ScriptIDClosure
 
     var body: some View {
         let roomButton = ServiceButton(buttonTitle: roomName, imageName: imageName, isSystemName: isSystemName,
