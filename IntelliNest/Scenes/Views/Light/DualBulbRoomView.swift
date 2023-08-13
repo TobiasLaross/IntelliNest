@@ -27,6 +27,7 @@ struct DualBulbRoomView: View {
             VStack {
                 Text(roomName)
                     .font(.system(size: roomTitleSize))
+                    .foregroundColor(.white)
                 BulbButton(light: lightGroup, onTapAction: onTapAction)
             }
 
@@ -39,6 +40,7 @@ struct DualBulbRoomView: View {
                         .frame(width: sliderWidth, height: sliderHeight, alignment: .center)
                     Text(light1Name)
                         .font(.system(size: bulbTitleSize))
+                        .foregroundColor(.white)
                 }
 
                 VStack {
@@ -49,6 +51,7 @@ struct DualBulbRoomView: View {
                         .frame(width: sliderWidth, height: sliderHeight, alignment: .center)
                     Text(light2Name)
                         .font(.system(size: bulbTitleSize))
+                        .foregroundColor(.white)
                 }
             }
         }

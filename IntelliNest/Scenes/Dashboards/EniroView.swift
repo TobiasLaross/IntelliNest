@@ -20,6 +20,8 @@ struct EniroView: View {
             VStack {
                 VStack {
                     Text("Klimathantering")
+                        .font(.headline)
+                        .foregroundColor(.white)
                     EniroClimateView(viewModel: viewModel)
                 }
                 .padding()
@@ -49,6 +51,7 @@ struct EniroView: View {
                 Spacer()
                 Text("Senast uppdaterad: \(viewModel.lastUpdated())")
                     .font(Font.system(size: 12).italic())
+                    .foregroundColor(.white)
                     .padding(.bottom)
             }
             if viewModel.nordPoolHistoryIsVisible {

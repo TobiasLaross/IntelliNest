@@ -45,7 +45,9 @@ struct BatteryView: View {
                 if isCharging {
                     Image(systemName: "bolt").foregroundColor(.yellow)
                 }
-                Text("\(level)%").font(Font.headline.weight(.semibold))
+                Text("\(level)%")
+                    .font(Font.headline.weight(.semibold))
+                    .foregroundColor(.white)
             }
         }
     }

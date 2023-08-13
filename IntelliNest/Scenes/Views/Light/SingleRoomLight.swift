@@ -22,6 +22,7 @@ struct SingleRoomLight: View {
             VStack {
                 Text(roomName)
                     .font(.system(size: roomTitleSize))
+                    .foregroundColor(.white)
                 BulbButton(light: light, onTapAction: onTapAction)
             }
 

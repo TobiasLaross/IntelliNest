@@ -20,6 +20,7 @@ struct RoborockView: View {
                 Group {
                     Text("Status: \(viewModel.getStatus())")
                         .font(.title2)
+                        .foregroundColor(.white)
                         .multilineTextAlignment(.center)
 
                     if viewModel.roborock.error != "" {
@@ -28,6 +29,7 @@ struct RoborockView: View {
                             Text("Error: \(viewModel.roborock.error)")
                                 .bold()
                                 .font(.title3)
+                                .foregroundColor(.white)
                             Spacer()
                         }
                     }
@@ -44,6 +46,7 @@ struct RoborockView: View {
 
                     HStack {
                         Toggle("Automation", isOn: $viewModel.roborockAutomation.isActive)
+                            .foregroundColor(.white)
                             .frame(width: 150, height: 30, alignment: .leading)
                             .onTapGesture {
                                 viewModel.toggleRoborockAutomation()
