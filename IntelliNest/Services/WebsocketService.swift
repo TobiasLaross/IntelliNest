@@ -28,6 +28,7 @@ class WebSocketService {
     var requests: [String] = []
     var isAuthenticated = false
     var baseURLString = ""
+    private let ignoredErrorMessages = ["The network connection was lost", "abort", "Socket is not connected"]
 
     init() {}
 
@@ -103,7 +104,7 @@ extension WebSocketService: WebSocketDelegate {
             socket?.connect()
         case .error(let error):
             let errorMessage = String(describing: error)
-            if !errorMessage.contains("abort") {
+            if !ignoredErrorMessages.contains(errorMessage) {
                 Log.error("Websocket error: \(String(describing: error))")
             }
         default:

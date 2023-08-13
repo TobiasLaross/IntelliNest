@@ -18,6 +18,7 @@ struct EniroInfoView: View {
                                                buttonImageSize: 20)
         VStack {
             Text("Bilen är \(viewModel.doorLock.stateToString()) på: \(viewModel.getAddress())")
+                .foregroundColor(.white)
             Spacer()
                 .frame(height: 20)
             HStack {
