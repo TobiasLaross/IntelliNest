@@ -14,6 +14,15 @@ class LightServiceData: ServiceData {
     init(brightness: Int) {
         self.brightness = brightness
     }
+
+    override func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(brightness, forKey: .brightness)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case brightness
+    }
 }
 
 class EmptyServiceData: ServiceData {}
