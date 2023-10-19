@@ -112,16 +112,12 @@ private struct CoffeeMachineButtonView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     var body: some View {
-        let coffeeMachineButton = SwitchButton(entity: $viewModel.coffeeMachine,
-                                               buttonTitle: "Kaffemaskinen",
-                                               activeImageName: "bolt.fill",
-                                               defaultImageName: "bolt.slash")
-
-        return Button {
-            viewModel.toggleCoffeeMachine()
-        } label: {
-            HassButtonLabel(button: AnyView(coffeeMachineButton))
-        }
+        DashboardButtonView(text: "Kaffemaskinen",
+                            isActive: viewModel.coffeeMachine.isActive,
+                            icon: viewModel.coffeeMachine.image,
+                            isLoading: false,
+                            isCircle: false,
+                            action: viewModel.toggleCoffeeMachine)
     }
 }
 

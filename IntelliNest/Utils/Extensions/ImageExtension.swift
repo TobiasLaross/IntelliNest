@@ -33,4 +33,7 @@ enum SystemImageName: String {
     case clock
     case iPhone = "iphone"
     case iPhoneActive = "iphone.radiowaves.left.and.right"
+    case bolt = "bolt.fill"
+    case boltSlash = "bolt.slash"
+    case unknown = "questionmark.circle"
 }

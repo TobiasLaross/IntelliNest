@@ -13,10 +13,10 @@ import UIKit
 class HomeViewModel: HassAPIViewModelProtocol {
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
-    @Published var storageLock = LockEntity(entityId: EntityId.storageLock)
-    @Published var allLights = LightEntity(entityId: EntityId.allLights)
-    @Published var coffeeMachine = Entity(entityId: EntityId.coffeeMachine)
-    @Published var sarahsIphone = Entity(entityId: EntityId.hittaSarahsIphone)
+    @Published var storageLock = LockEntity(entityId: .storageLock)
+    @Published var allLights = LightEntity(entityId: .allLights)
+    @Published var coffeeMachine = SwitchEntity(entityId: .coffeeMachine)
+    @Published var sarahsIphone = Entity(entityId: .hittaSarahsIphone)
 
     var isReloading = false
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock]

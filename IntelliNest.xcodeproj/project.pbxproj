@@ -88,6 +88,7 @@
 		F67023FF27A177330070FFBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F67023FE27A177330070FFBB /* Assets.xcassets */; };
 		F670240227A177330070FFBB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F670240127A177330070FFBB /* Preview Assets.xcassets */; };
 		F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C0B6C298D07E50096AE49 /* DeviceID.swift */; };
+		F67C263D2AE118A100C22ADB /* SwitchEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C263C2AE118A100C22ADB /* SwitchEntity.swift */; };
 		F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */; };
 		F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */; };
 		F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */; };
@@ -268,6 +269,7 @@
 		F670240727A177340070FFBB /* IntelliNestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntelliNestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F670241127A177340070FFBB /* IntelliNestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntelliNestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F67C0B6C298D07E50096AE49 /* DeviceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceID.swift; sourceTree = "<group>"; };
+		F67C263C2AE118A100C22ADB /* SwitchEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchEntity.swift; sourceTree = "<group>"; };
 		F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleViewModel.swift; sourceTree = "<group>"; };
 		F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroInfoView.swift; sourceTree = "<group>"; };
 		F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateView.swift; sourceTree = "<group>"; };
@@ -375,6 +377,7 @@
 			children = (
 				F63F502C2A4862AB003A7100 /* Websocket */,
 				F60345C027A7F33700212D04 /* Entity.swift */,
+				F67C263C2AE118A100C22ADB /* SwitchEntity.swift */,
 				F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */,
 				F62CD2DF286D950A00462092 /* LightEntity.swift */,
 				F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */,
@@ -953,6 +956,7 @@
 				F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */,
 				F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */,
 				F66F061727AEFC2300270E71 /* VerticalSlider.swift in Sources */,
+				F67C263D2AE118A100C22ADB /* SwitchEntity.swift in Sources */,
 				F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */,
 				F68DA61B28B4C0C100601726 /* EntityId.swift in Sources */,
 				F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */,
@@ -1212,6 +1216,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
@@ -1247,6 +1252,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
@@ -1429,6 +1435,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;

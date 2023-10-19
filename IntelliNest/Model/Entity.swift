@@ -5,13 +5,9 @@
 //  Created by Tobias on 2022-01-31.
 //
 
-import Foundation
+import SwiftUI
 
 struct Entity: EntityProtocol {
-    var entityId: EntityId
-    var state: String { didSet {
-        updateIsActive()
-    }}
     var lastUpdated: Date
     var lastChanged: Date
     var nextUpdate = NSDate().addingTimeInterval(-1)
@@ -24,6 +20,11 @@ struct Entity: EntityProtocol {
         case lastChanged = "last_changed"
         case lastUpdated = "last_updated"
     }
+
+    var entityId: EntityId
+    var state: String { didSet {
+        updateIsActive()
+    }}
 
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
