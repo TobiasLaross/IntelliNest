@@ -28,7 +28,7 @@ struct HeatersView: View {
                              setTargetTemperatureClosure: viewModel.setTargetTemperature,
                              setHvacModeClosure: viewModel.setHvacMode,
                              toggleTimerModeAction: viewModel.toggleCorridorTimerMode,
-                             setClimateScheduleTime: viewModel.setClimateSchedule)
+                             setClimateScheduleTime: viewModel.setClimateScheduleTask)
                 .padding(.top)
             Divider()
             SimpleHeaterView(roomName: "Lekrummet",
@@ -43,7 +43,7 @@ struct HeatersView: View {
                              setTargetTemperatureClosure: viewModel.setTargetTemperature,
                              setHvacModeClosure: viewModel.setHvacMode,
                              toggleTimerModeAction: viewModel.togglePlayroomTimerMode,
-                             setClimateScheduleTime: viewModel.setClimateSchedule)
+                             setClimateScheduleTime: viewModel.setClimateScheduleTask)
                 .padding(.bottom)
             Spacer()
                 .onAppear {

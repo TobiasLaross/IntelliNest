@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SimpleHeaterView: View {
-    let lightBlue = Color(red: 0.2, green: 0.6, blue: 1.0)
     let width = 400.0
     let height = 300.0
 
@@ -25,13 +24,13 @@ struct SimpleHeaterView: View {
     let setTargetTemperatureClosure: EntityIdDoubleClosure
     let setHvacModeClosure: HeaterStringClosure
     let toggleTimerModeAction: VoidClosure
-    let setClimateScheduleTime: AsyncEntityClosure
+    let setClimateScheduleTime: EntityClosure
 
     var body: some View {
         ZStack {
             if isTimerModeEnabled {
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(lightBlue.opacity(0.3), lineWidth: 4)
+                    .stroke(Color.lightBlue.opacity(0.3), lineWidth: 4)
                     .frame(height: height * 1.05)
                     .padding(.horizontal, 4)
             }
@@ -75,16 +74,14 @@ struct SimpleHeaterView: View {
                                 Image(systemImageName: .clock)
                                     .resizable()
                                     .frame(width: 40, height: 40)
-                                    .foregroundColor(isTimerModeEnabled ? lightBlue : .white)
+                                    .foregroundColor(isTimerModeEnabled ? .lightBlue : .white)
                             }
                             if isTimerModeEnabled {
                                 DatePicker("", selection: $resetClimateTime.date, displayedComponents: .hourAndMinute)
                                     .labelsHidden()
                                     .colorScheme(.dark)
                                     .onChange(of: resetClimateTime.date, perform: { _ in
-                                        Task {
-                                            await setClimateScheduleTime(resetClimateTime)
-                                        }
+                                        setClimateScheduleTime(resetClimateTime)
                                     })
                             }
                         }

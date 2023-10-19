@@ -37,7 +37,7 @@ struct EniroInfoView: View {
                                     icon: nil,
                                     isLoading: false,
                                     isCircle: true,
-                                    action: viewModel.nordPoolWasTapped)
+                                    action: viewModel.showNordPoolPrices)
                     .padding(.horizontal)
             }
         }

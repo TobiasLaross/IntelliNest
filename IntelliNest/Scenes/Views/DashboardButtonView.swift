@@ -17,6 +17,7 @@ struct DashboardButtonView: View {
     var backgroundColor: Color
     var circleSize: CGFloat
     var isLoading: Bool
+    let indicatorIcon: Image?
     var isCircle: Bool
     let buttonFrameWidth: CGFloat
     let buttonFrameHeight: CGFloat
@@ -32,6 +33,7 @@ struct DashboardButtonView: View {
          backgroundColor: Color = topGrayColor,
          circleSize: CGFloat = dashboardCircleButtonFrameSize,
          isLoading: Bool,
+         indicatorIcon: Image? = nil,
          isCircle: Bool,
          buttonFrameWidth: CGFloat = dashboardButtonFrameWidth,
          buttonFrameHeight: CGFloat = dashboardButtonFrameHeight,
@@ -46,6 +48,7 @@ struct DashboardButtonView: View {
         self.backgroundColor = backgroundColor
         self.circleSize = circleSize
         self.isLoading = isLoading
+        self.indicatorIcon = indicatorIcon
         self.isCircle = isCircle
         self.buttonFrameWidth = buttonFrameWidth
         self.buttonFrameHeight = buttonFrameHeight
@@ -82,7 +85,17 @@ struct DashboardButtonView: View {
                         .foregroundColor(.white)
                 }
 
-                if isLoading {
+                if let indicatorIcon {
+                    VStack {
+                        HStack {
+                            indicatorIcon
+                                .foregroundColor(.lightBlue)
+                                .padding()
+                            Spacer()
+                        }
+                        Spacer()
+                    }
+                } else if isLoading {
                     VStack {
                         HStack {
                             ProgressView()

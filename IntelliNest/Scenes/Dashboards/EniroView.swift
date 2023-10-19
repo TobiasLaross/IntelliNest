@@ -54,8 +54,8 @@ struct EniroView: View {
                     .foregroundColor(.white)
                     .padding(.bottom)
             }
-            if viewModel.nordPoolHistoryIsVisible {
-                NordPoolHistoryView(isVisible: $viewModel.nordPoolHistoryIsVisible,
+            if viewModel.shouldShowNordpoolPrices {
+                NordPoolHistoryView(isVisible: $viewModel.shouldShowNordpoolPrices,
                                     nordPool: viewModel.nordPool)
             } else if let limitPickerEntity = viewModel.limitPickerEntity {
                 LimitPickerView(limitEntity: limitPickerEntity,

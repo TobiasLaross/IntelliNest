@@ -112,7 +112,13 @@ class HeatersViewModel: HassAPIViewModelProtocol {
         }
     }
 
-    func setClimateSchedule(dateEntity: Entity) async {
+    func setClimateScheduleTask(dateEntity: Entity) {
+        Task {
+            await setClimateSchedule(dateEntity: dateEntity)
+        }
+    }
+
+    private func setClimateSchedule(dateEntity: Entity) async {
         await apiService.setDateTimeEntity(dateEntity: dateEntity)
     }
 

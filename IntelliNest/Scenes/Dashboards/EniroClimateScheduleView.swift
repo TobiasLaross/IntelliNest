@@ -17,21 +17,21 @@ struct EniroClimateScheduleView: View {
                     .frame(height: 100)
                 VStack {
                     Text("Anpassningsbara").font(.title3).padding(.top)
-                    EniroClimateSchedulePickerView(title: "Klimat1", displayComponents: .hourAndMinute,
-                                                   climate: $viewModel.climate1,
-                                                   climateBool: $viewModel.climate1Bool,
-                                                   updateToggle: viewModel.updateToggle,
-                                                   setClimateScheduleDate: viewModel.setClimateSchedule)
-                    EniroClimateSchedulePickerView(title: "Klimat2", displayComponents: .hourAndMinute,
-                                                   climate: $viewModel.climate2,
-                                                   climateBool: $viewModel.climate2Bool,
-                                                   updateToggle: viewModel.updateToggle,
-                                                   setClimateScheduleDate: viewModel.setClimateSchedule)
-                    EniroClimateSchedulePickerView(title: "Klimat3", displayComponents: [.date, .hourAndMinute],
-                                                   climate: $viewModel.climate3,
-                                                   climateBool: $viewModel.climate3Bool,
-                                                   updateToggle: viewModel.updateToggle,
-                                                   setClimateScheduleDate: viewModel.setClimateSchedule)
+                    DateTimePickerView(title: "Klimat1", displayComponents: .hourAndMinute,
+                                       dateTime: $viewModel.climate1,
+                                       dateTimeEnabled: $viewModel.climate1Bool,
+                                       updateToggle: viewModel.updateToggle,
+                                       setDateTimeClosure: viewModel.setClimateSchedule)
+                    DateTimePickerView(title: "Klimat2", displayComponents: .hourAndMinute,
+                                       dateTime: $viewModel.climate2,
+                                       dateTimeEnabled: $viewModel.climate2Bool,
+                                       updateToggle: viewModel.updateToggle,
+                                       setDateTimeClosure: viewModel.setClimateSchedule)
+                    DateTimePickerView(title: "Klimat3", displayComponents: [.date, .hourAndMinute],
+                                       dateTime: $viewModel.climate3,
+                                       dateTimeEnabled: $viewModel.climate3Bool,
+                                       updateToggle: viewModel.updateToggle,
+                                       setDateTimeClosure: viewModel.setClimateSchedule)
                 }
                 .background(topGrayColor).cornerRadius(dashboardButtonCornerRadius)
                 .padding()

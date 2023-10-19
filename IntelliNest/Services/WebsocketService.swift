@@ -167,10 +167,7 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     func updateLights(lightIDs: [EntityId], action: Action, brightness: Int) {
-        var updateEntityRequest = UpdateEntityRequest(domain: .light,
-                                                      action: action,
-                                                      serviceData: nil,
-                                                      entityIds: lightIDs)
+        var updateEntityRequest = UpdateEntityRequest(domain: .light, action: action, entityIds: lightIDs)
         if action == .turnOn {
             let lightData = LightServiceData(brightness: brightness)
             updateEntityRequest.serviceData = lightData
@@ -182,6 +179,15 @@ extension WebSocketService: WebSocketDelegate {
 
     func updateEntity(entityID: EntityId, domain: Domain, action: Action) {
         let updateEntityRequest = UpdateEntityRequest(domain: domain, action: action, entityIds: [entityID])
+        let requestID = getNextRequestID()
+        sendJSONCommand(updateEntityRequest, requestID: requestID)
+    }
+
+    func updateDateTimeEntity(entity: Entity) {
+        var updateEntityRequest = UpdateEntityRequest(domain: .inputDateTime, action: .setDateTime, entityIds: [entity.entityId])
+        let serviceData = DateTimeServiceData(date: entity.date)
+        updateEntityRequest.serviceData = serviceData
+
         let requestID = getNextRequestID()
         sendJSONCommand(updateEntityRequest, requestID: requestID)
     }

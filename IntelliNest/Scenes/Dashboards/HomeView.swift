@@ -62,6 +62,15 @@ struct HomeView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 10)
+
+            if viewModel.shouldShowCoffeeMachineScheduling {
+                CoffeeMachineSchedulingView(isVisible: $viewModel.shouldShowCoffeeMachineScheduling,
+                                            title: viewModel.coffeeMachine.title,
+                                            coffeeMachineStartTime: $viewModel.coffeeMachineStartTime,
+                                            coffeeMachineStartTimeEnabled: viewModel.coffeeMachineStartTimeEnabled,
+                                            setCoffeeMachineStartTime: viewModel.updateDateTimeEntity,
+                                            toggleStartTimeEnabledAction: viewModel.toggleCoffeeMachineStarTimeEnabled)
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -112,12 +121,21 @@ private struct CoffeeMachineButtonView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     var body: some View {
-        DashboardButtonView(text: "Kaffemaskinen",
+        DashboardButtonView(text: viewModel.coffeeMachine.title,
                             isActive: viewModel.coffeeMachine.isActive,
                             icon: viewModel.coffeeMachine.image,
+                            iconWidth: 30,
                             isLoading: false,
+                            indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
                             isCircle: false,
                             action: viewModel.toggleCoffeeMachine)
+            .contextMenu {
+                Button(action: {
+                    viewModel.showCoffeeMachineScheduling()
+                }, label: {
+                    Text("Schemalägg nästa start")
+                })
+            }
     }
 }
 

@@ -17,13 +17,22 @@ struct SwitchEntity: EntityProtocol {
         state.lowercased() == "on"
     }
 
-    let entityId: EntityId
-    var state: String
+    var title: String {
+        switch entityId {
+        case .coffeeMachine:
+            return "Kaffemaskinen"
+        default:
+            return ""
+        }
+    }
 
     enum CodingKeys: String, CodingKey {
         case entityId = "entity_id"
         case state
     }
+
+    let entityId: EntityId
+    var state: String
 
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
