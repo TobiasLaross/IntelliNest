@@ -28,7 +28,7 @@ class EniroViewModel: HassAPIViewModelProtocol {
     @Published var eniroGeoLocation = EniroGeoEntity(entityId: EntityId.eniroGeoLocation)
     @Published var nordPool = NordPoolEntity(entityId: .nordPool)
     @Published var lastUpdateInitialDate: Date = .distantPast.addingTimeInterval(3600)
-    @Published var nordPoolHistoryIsVisible = false
+    @Published var shouldShowNordpoolPrices = false
     @Published var updateIsloading = false
     @Published var forceUpdateIsLoading = false
     @Published var limitPickerEntity: InputNumberEntity?
@@ -337,8 +337,8 @@ class EniroViewModel: HassAPIViewModelProtocol {
         return eniroGeoLocation.address
     }
 
-    func nordPoolWasTapped() {
-        nordPoolHistoryIsVisible = true
+    func showNordPoolPrices() {
+        shouldShowNordpoolPrices = true
     }
 
     func showACLimitPicker() {

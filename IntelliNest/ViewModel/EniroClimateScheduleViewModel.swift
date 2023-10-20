@@ -27,8 +27,10 @@ class EniroClimateScheduleViewModel: HassAPIViewModelProtocol {
         self.appearedAction = appearedAction
     }
 
-    func setClimateSchedule(dateEntity: Entity) async {
-        await apiService.setDateTimeEntity(dateEntity: dateEntity)
+    func setClimateSchedule(dateEntity: Entity) {
+        Task {
+            await apiService.setDateTimeEntity(dateEntity: dateEntity)
+        }
     }
 
     func updateToggle(entity: Entity) async {

@@ -8,7 +8,7 @@
 import Foundation
 
 struct RoborockEntity: EntityProtocol {
-    var entityId: EntityId
+    let entityId: EntityId
     var state: String
     var nextUpdate = NSDate().addingTimeInterval(-1)
     var isActive: Bool {
@@ -46,12 +46,8 @@ struct RoborockEntity: EntityProtocol {
         error = attributes.error
     }
 
-    mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.5)
-    }
-
     static func == (lhs: RoborockEntity, rhs: RoborockEntity) -> Bool {
-        return (lhs.entityId == rhs.entityId &&
+        (lhs.entityId == rhs.entityId &&
             lhs.isActive == rhs.isActive &&
             lhs.state == rhs.state &&
             lhs.status == rhs.status)

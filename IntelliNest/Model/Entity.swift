@@ -5,13 +5,9 @@
 //  Created by Tobias on 2022-01-31.
 //
 
-import Foundation
+import SwiftUI
 
 struct Entity: EntityProtocol {
-    var entityId: EntityId
-    var state: String { didSet {
-        updateIsActive()
-    }}
     var lastUpdated: Date
     var lastChanged: Date
     var nextUpdate = NSDate().addingTimeInterval(-1)
@@ -25,11 +21,21 @@ struct Entity: EntityProtocol {
         case lastUpdated = "last_updated"
     }
 
+    var entityId: EntityId
+    var state: String { didSet {
+        updateDate()
+        updateIsActive()
+    }}
+    var timerEnabledIcon: Image? {
+        isActive ? Image(systemImageName: .clock) : nil
+    }
+
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
         self.state = state
         self.lastChanged = .distantPast
         self.lastUpdated = .distantPast
+        updateDate()
         updateIsActive()
     }
 
@@ -39,21 +45,8 @@ struct Entity: EntityProtocol {
         self.entityId = entityId ?? EntityId.unknown
         state = (try container.decodeIfPresent(String.self, forKey: .state)) ?? "Loading"
 
-        let localDateFormatter = DateFormatter()
-
-        let utcDateFormatter = DateFormatter()
-        utcDateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-
-        // Detect if the state contains only time or both date and time
-        if state.count == 8 { // Only time (HH:mm:ss)
-            localDateFormatter.dateFormat = "HH:mm:ss"
-        } else { // Date and time
-            localDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        }
-
-        date = localDateFormatter.date(from: state) ?? Date.distantPast
-
         // Parsing lastChanged and lastUpdated in UTC
+        let utcDateFormatter = DateFormatter()
         utcDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
 
         if let lastChangedString = try container.decodeIfPresent(String.self, forKey: .lastChanged),
@@ -70,6 +63,7 @@ struct Entity: EntityProtocol {
             self.lastUpdated = .distantPast
         }
 
+        updateDate()
         updateIsActive()
     }
 
@@ -87,5 +81,20 @@ struct Entity: EntityProtocol {
 
     static func == (lhs: Entity, rhs: Entity) -> Bool {
         return lhs.entityId == rhs.entityId && lhs.state == rhs.state
+    }
+
+    private mutating func updateDate() {
+        let localDateFormatter = DateFormatter()
+        let utcDateFormatter = DateFormatter()
+        utcDateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+
+        // Detect if the state contains only time or both date and time
+        if state.count == 8 { // Only time (HH:mm:ss)
+            localDateFormatter.dateFormat = "HH:mm:ss"
+        } else { // Date and time
+            localDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        }
+
+        date = localDateFormatter.date(from: state) ?? Date.distantPast
     }
 }

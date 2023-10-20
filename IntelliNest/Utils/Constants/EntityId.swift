@@ -19,6 +19,8 @@ enum EntityType: String {
 enum EntityId: String, Decodable, CaseIterable {
     case unknown
     case coffeeMachine = "switch.kaffemaskinen"
+    case coffeeMachineStartTime = "input_datetime.kaffemaskinen_starta"
+    case coffeeMachineStartTimeEnabled = "input_boolean.kaffemaskinen_starta"
     case sidodorren = "lock.sidodorren"
     case framdorren = "lock.framdorren"
     case storageLock = "lock.forradet"

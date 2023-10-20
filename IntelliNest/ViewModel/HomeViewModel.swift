@@ -13,13 +13,16 @@ import UIKit
 class HomeViewModel: HassAPIViewModelProtocol {
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
-    @Published var storageLock = LockEntity(entityId: EntityId.storageLock)
-    @Published var allLights = LightEntity(entityId: EntityId.allLights)
-    @Published var coffeeMachine = Entity(entityId: EntityId.coffeeMachine)
-    @Published var sarahsIphone = Entity(entityId: EntityId.hittaSarahsIphone)
+    @Published var storageLock = LockEntity(entityId: .storageLock)
+    @Published var allLights = LightEntity(entityId: .allLights)
+    @Published var coffeeMachine = SwitchEntity(entityId: .coffeeMachine)
+    @Published var sarahsIphone = Entity(entityId: .hittaSarahsIphone)
+    @Published var shouldShowCoffeeMachineScheduling = false
+    @Published var coffeeMachineStartTime = Entity(entityId: .coffeeMachineStartTime)
+    @Published var coffeeMachineStartTimeEnabled = Entity(entityId: .coffeeMachineStartTimeEnabled)
 
     var isReloading = false
-    let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock]
+    let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled]
 
     var sarahIphoneimage: Image {
         if sarahsIphone.isActive {
@@ -74,6 +77,33 @@ class HomeViewModel: HassAPIViewModelProtocol {
         websocketService.updateEntity(entityID: .coffeeMachine, domain: .switchDomain, action: action)
     }
 
+    func showCoffeeMachineScheduling() {
+        if !coffeeMachineStartTimeEnabled.isActive {
+            let calendar = Calendar.current
+            let now = Date()
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "HH:mm:ss" // Set the format to hours:minutes:seconds
+            if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
+                let formattedDate = dateFormatter.string(from: newDate)
+                coffeeMachineStartTime.state = formattedDate
+                updateDateTimeEntity(entity: coffeeMachineStartTime)
+            }
+
+            toggleCoffeeMachineStarTimeEnabled()
+        }
+
+        shouldShowCoffeeMachineScheduling = true
+    }
+
+    func updateDateTimeEntity(entity: Entity) {
+        websocketService.updateDateTimeEntity(entity: entity)
+    }
+
+    func toggleCoffeeMachineStarTimeEnabled() {
+        let action: Action = coffeeMachineStartTimeEnabled.isActive ? .turnOff : .turnOn
+        websocketService.updateEntity(entityID: .coffeeMachineStartTimeEnabled, domain: .inputBoolean, action: action)
+    }
+
     func toggleStateForStorageLock() {
         let action: Action = storageLock.lockState == .unlocked ? .lock : .unlock
         storageLock.expectedState = action == .lock ? .locked : .unlocked
@@ -102,6 +132,10 @@ class HomeViewModel: HassAPIViewModelProtocol {
             coffeeMachine.state = state
         case .storageLock:
             storageLock.state = state
+        case .coffeeMachineStartTime:
+            coffeeMachineStartTime.state = state
+        case .coffeeMachineStartTimeEnabled:
+            coffeeMachineStartTimeEnabled.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }

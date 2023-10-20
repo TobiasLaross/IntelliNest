@@ -27,6 +27,8 @@
 		F61BF9AC2A167AC600C1802E /* DoorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9AB2A167AC600C1802E /* DoorState.swift */; };
 		F61BF9AE2A167D0E00C1802E /* YaleLockResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9AD2A167D0E00C1802E /* YaleLockResponse.swift */; };
 		F61BF9B22A16A01D00C1802E /* DashboardButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */; };
+		F6225E2C2AE1354700D32EF4 /* CoffeeMachineSchedulingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6225E2B2AE1354700D32EF4 /* CoffeeMachineSchedulingView.swift */; };
+		F6225E2E2AE265D600D32EF4 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6225E2D2AE265D600D32EF4 /* ColorExtension.swift */; };
 		F624EF662A2B0234004AC6BA /* NavigatorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */; };
 		F624EF682A2B4AAB004AC6BA /* CamerasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F624EF672A2B4AAB004AC6BA /* CamerasView.swift */; };
 		F62542E62A5C5C7600B4DDD4 /* ServiceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */; };
@@ -88,6 +90,7 @@
 		F67023FF27A177330070FFBB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F67023FE27A177330070FFBB /* Assets.xcassets */; };
 		F670240227A177330070FFBB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F670240127A177330070FFBB /* Preview Assets.xcassets */; };
 		F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C0B6C298D07E50096AE49 /* DeviceID.swift */; };
+		F67C263D2AE118A100C22ADB /* SwitchEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C263C2AE118A100C22ADB /* SwitchEntity.swift */; };
 		F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */; };
 		F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */; };
 		F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */; };
@@ -116,7 +119,7 @@
 		F6DE844A29F2AD01002132A2 /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C327A933D700212D04 /* GlobalConstants.swift */; };
 		F6DE990929BD13B500B8AABB /* ShipBookSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F6DE990829BD13B500B8AABB /* ShipBookSDK */; };
 		F6DE990B29BD18FB00B8AABB /* LogExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE990A29BD18FB00B8AABB /* LogExtension.swift */; };
-		F6EF35AF2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35AE2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift */; };
+		F6EF35AF2A3A33BE00895250 /* DateTimePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35AE2A3A33BE00895250 /* DateTimePickerView.swift */; };
 		F6EF35B12A3CA96E00895250 /* ScriptVariableKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */; };
 		F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */; };
 		F6EF35B52A3E1BB500895250 /* LightEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B42A3E1BB500895250 /* LightEntityTests.swift */; };
@@ -205,6 +208,8 @@
 		F61BF9AB2A167AC600C1802E /* DoorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoorState.swift; sourceTree = "<group>"; };
 		F61BF9AD2A167D0E00C1802E /* YaleLockResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleLockResponse.swift; sourceTree = "<group>"; };
 		F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardButtonView.swift; sourceTree = "<group>"; };
+		F6225E2B2AE1354700D32EF4 /* CoffeeMachineSchedulingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoffeeMachineSchedulingView.swift; sourceTree = "<group>"; };
+		F6225E2D2AE265D600D32EF4 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
 		F624EF652A2B0234004AC6BA /* NavigatorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigatorExtension.swift; sourceTree = "<group>"; };
 		F624EF672A2B4AAB004AC6BA /* CamerasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CamerasView.swift; sourceTree = "<group>"; };
 		F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceData.swift; sourceTree = "<group>"; };
@@ -268,6 +273,7 @@
 		F670240727A177340070FFBB /* IntelliNestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntelliNestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F670241127A177340070FFBB /* IntelliNestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntelliNestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F67C0B6C298D07E50096AE49 /* DeviceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceID.swift; sourceTree = "<group>"; };
+		F67C263C2AE118A100C22ADB /* SwitchEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchEntity.swift; sourceTree = "<group>"; };
 		F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleViewModel.swift; sourceTree = "<group>"; };
 		F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroInfoView.swift; sourceTree = "<group>"; };
 		F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateView.swift; sourceTree = "<group>"; };
@@ -297,7 +303,7 @@
 		F6DE842F29F2A696002132A2 /* IntentsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IntentsUI.framework; path = System/Library/Frameworks/IntentsUI.framework; sourceTree = SDKROOT; };
 		F6DE844729F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockStoreHouseIntentHandler.swift; sourceTree = "<group>"; };
 		F6DE990A29BD18FB00B8AABB /* LogExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExtension.swift; sourceTree = "<group>"; };
-		F6EF35AE2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateSchedulePickerView.swift; sourceTree = "<group>"; };
+		F6EF35AE2A3A33BE00895250 /* DateTimePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTimePickerView.swift; sourceTree = "<group>"; };
 		F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptVariableKeys.swift; sourceTree = "<group>"; };
 		F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModelExtension.swift; sourceTree = "<group>"; };
 		F6EF35B42A3E1BB500895250 /* LightEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightEntityTests.swift; sourceTree = "<group>"; };
@@ -375,6 +381,7 @@
 			children = (
 				F63F502C2A4862AB003A7100 /* Websocket */,
 				F60345C027A7F33700212D04 /* Entity.swift */,
+				F67C263C2AE118A100C22ADB /* SwitchEntity.swift */,
 				F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */,
 				F62CD2DF286D950A00462092 /* LightEntity.swift */,
 				F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */,
@@ -434,6 +441,14 @@
 				F6FAD81D2A2A695600C0B364 /* WebsocketServiceDelegate.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		F6225E2A2AE1351D00D32EF4 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				F6225E2B2AE1354700D32EF4 /* CoffeeMachineSchedulingView.swift */,
+			);
+			path = Home;
 			sourceTree = "<group>";
 		};
 		F6260EF5283280D200B87614 /* IntelliNestTests */ = {
@@ -543,6 +558,7 @@
 		F66F061527AEFC0F00270E71 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F6225E2A2AE1351D00D32EF4 /* Home */,
 				F67F6B4928D8FB780003CE9F /* Eniro */,
 				F62CD2E92877275400462092 /* Light */,
 				F6633F2A286324DE004D0B76 /* Heater */,
@@ -617,7 +633,7 @@
 				F6F8555A28DCB0F1004B9517 /* EniroUpdaters.swift */,
 				F6F8555C28DCF93E004B9517 /* EniroDoorLock.swift */,
 				F6F1D07F29A2174000A3292E /* EniroChargingLimitView.swift */,
-				F6EF35AE2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift */,
+				F6EF35AE2A3A33BE00895250 /* DateTimePickerView.swift */,
 				F6F8555E28DF755D004B9517 /* EniroCharging.swift */,
 				F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */,
 				F6F1D08529A94E8900A3292E /* LimitPickerView.swift */,
@@ -662,6 +678,7 @@
 				F6F1D07B2992686E00A3292E /* Color.swift */,
 				F6F1D07D299390C500A3292E /* CalendarExtension.swift */,
 				F6F1D08129A27A6100A3292E /* ImageExtension.swift */,
+				F6225E2D2AE265D600D32EF4 /* ColorExtension.swift */,
 				F62750A82A00ED9500C1253F /* UINavigationController.swift */,
 				F6DE990A29BD18FB00B8AABB /* LogExtension.swift */,
 				F63F502F2A486650003A7100 /* EncodableExtension.swift */,
@@ -698,6 +715,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F670241B27A177340070FFBB /* Build configuration list for PBXNativeTarget "IntelliNest" */;
 			buildPhases = (
+				F6225E2F2AE2946000D32EF4 /* Swiftformat */,
 				F66F061A27B16F1D00270E71 /* Swiftlint */,
 				F67023F327A177320070FFBB /* Sources */,
 				F67023F427A177320070FFBB /* Frameworks */,
@@ -780,7 +798,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1320;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					F67023F627A177320070FFBB = {
 						CreatedOnToolsVersion = 13.2.1;
@@ -877,6 +895,25 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\n\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --swiftversion 5 --indent 4 --rules indent,linebreaks,trailingSpace,consecutiveBlankLines,blankLinesAtEndOfScope,blankLinesAtStartOfScope,blankLinesBetweenScopes,consecutiveSpaces,duplicateImports,elseOnSameLine,emptyBraces,redundantBreak,redundantInit,redundantLetError,redundantNilInit,redundantType,redundantVoidReturnType,spaceAroundBraces,spaceAroundBrackets,spaceAroundComments,spaceAroundGenerics,spaceAroundOperators,spaceAroundParens,spaceInsideBraces,spaceInsideBrackets,spaceInsideGenerics,spaceInsideParens,void --quiet\n";
 		};
+		F6225E2F2AE2946000D32EF4 /* Swiftformat */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = Swiftformat;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\n\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --swiftversion 5 --indent 4 --rules indent,linebreaks,trailingSpace,consecutiveBlankLines,blankLinesAtEndOfScope,blankLinesAtStartOfScope,blankLinesBetweenScopes,consecutiveSpaces,duplicateImports,elseOnSameLine,emptyBraces,redundantBreak,redundantInit,redundantLetError,redundantNilInit,redundantType,redundantVoidReturnType,spaceAroundBraces,spaceAroundBrackets,spaceAroundComments,spaceAroundGenerics,spaceAroundOperators,spaceAroundParens,spaceInsideBraces,spaceInsideBrackets,spaceInsideGenerics,spaceInsideParens,void --quiet\n";
+		};
 		F66F061A27B16F1D00270E71 /* Swiftlint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -946,6 +983,7 @@
 				F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */,
 				F6633F23285DF8E6004D0B76 /* CameraEntity.swift in Sources */,
 				F61BF9AC2A167AC600C1802E /* DoorState.swift in Sources */,
+				F6225E2E2AE265D600D32EF4 /* ColorExtension.swift in Sources */,
 				F6633F272860B90C004D0B76 /* QuickActionService.swift in Sources */,
 				F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */,
 				F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */,
@@ -953,6 +991,7 @@
 				F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */,
 				F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */,
 				F66F061727AEFC2300270E71 /* VerticalSlider.swift in Sources */,
+				F67C263D2AE118A100C22ADB /* SwitchEntity.swift in Sources */,
 				F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */,
 				F68DA61B28B4C0C100601726 /* EntityId.swift in Sources */,
 				F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */,
@@ -975,6 +1014,7 @@
 				F6633F4328632EED004D0B76 /* RoborockRoomsView.swift in Sources */,
 				F6830DE22904534200BBE36C /* CollectionExtension.swift in Sources */,
 				F6633F2C286324EB004D0B76 /* DetailedHeaterView.swift in Sources */,
+				F6225E2C2AE1354700D32EF4 /* CoffeeMachineSchedulingView.swift in Sources */,
 				F62CD2E528770F3B00462092 /* HassApiService.swift in Sources */,
 				F62CD2E82877140800462092 /* EntityError.swift in Sources */,
 				F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */,
@@ -1020,7 +1060,7 @@
 				F669C72E2A23C08000458165 /* CameraViewModel.swift in Sources */,
 				F62750A129FE39B100C1253F /* Destination.swift in Sources */,
 				F6F94B5E28B60DED006B1F12 /* EniroViewModel.swift in Sources */,
-				F6EF35AF2A3A33BE00895250 /* EniroClimateSchedulePickerView.swift in Sources */,
+				F6EF35AF2A3A33BE00895250 /* DateTimePickerView.swift in Sources */,
 				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1085,6 +1125,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -1118,6 +1159,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1148,6 +1190,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -1181,6 +1224,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1212,6 +1256,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
@@ -1247,6 +1292,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
@@ -1364,6 +1410,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -1398,6 +1445,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1429,6 +1477,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
