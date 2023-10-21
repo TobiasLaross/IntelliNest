@@ -11,7 +11,11 @@ struct Entity: EntityProtocol {
     var lastUpdated: Date
     var lastChanged: Date
     var nextUpdate = NSDate().addingTimeInterval(-1)
-    var isActive: Bool = false
+    var isActive: Bool {
+        get { state.lowercased() == "on" }
+        set { state = newValue ? "on" : "off" }
+    }
+
     var date = Date.distantPast
 
     enum CodingKeys: String, CodingKey {
@@ -24,7 +28,6 @@ struct Entity: EntityProtocol {
     var entityId: EntityId
     var state: String { didSet {
         updateDate()
-        updateIsActive()
     }}
     var timerEnabledIcon: Image? {
         isActive ? Image(systemImageName: .clock) : nil
@@ -36,7 +39,6 @@ struct Entity: EntityProtocol {
         self.lastChanged = .distantPast
         self.lastUpdated = .distantPast
         updateDate()
-        updateIsActive()
     }
 
     init(from decoder: Decoder) throws {
@@ -64,15 +66,10 @@ struct Entity: EntityProtocol {
         }
 
         updateDate()
-        updateIsActive()
     }
 
     func recentlyUpdated() -> Bool {
         return -lastUpdated.timeIntervalSinceNow < 20 * 60
-    }
-
-    mutating func updateIsActive() {
-        isActive = state.lowercased() == "on"
     }
 
     mutating func setNextUpdateTime() {

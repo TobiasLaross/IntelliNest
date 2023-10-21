@@ -85,11 +85,9 @@ class EntityTests: XCTestCase {
     func testUpdateIsActive() {
         var entity = Entity(entityId: .coffeeMachine)
         entity.state = "On"
-        entity.updateIsActive()
         XCTAssertTrue(entity.isActive)
 
         entity.state = "Off"
-        entity.updateIsActive()
         XCTAssertFalse(entity.isActive)
     }
 
