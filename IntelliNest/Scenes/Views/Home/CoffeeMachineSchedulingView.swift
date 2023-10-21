@@ -35,7 +35,8 @@ struct CoffeeMachineSchedulingView: View {
                 .frame(width: 220, height: 150)
             VStack(spacing: 16) {
                 Text(title)
-                    .font(.headline)
+                    .font(.title2)
+                    .foregroundStyle(.white)
                 HStack(spacing: 16) {
                     DatePicker("", selection: dateProxy, displayedComponents: .hourAndMinute)
                         .labelsHidden()

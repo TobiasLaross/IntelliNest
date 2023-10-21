@@ -90,7 +90,7 @@ struct HomeView: View {
 }
 
 private struct SarahsIphoneButton: View {
-    var viewModel: HomeViewModel
+    @ObservedObject var viewModel: HomeViewModel
     @State private var isShowingAlert = false
 
     var body: some View {
