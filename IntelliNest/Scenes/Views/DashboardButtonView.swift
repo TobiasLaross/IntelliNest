@@ -10,6 +10,7 @@ import SwiftUI
 struct DashboardButtonView: View {
     var text: String
     var isActive: Bool
+    var activeColor: Color
     var icon: Image?
     var iconWidth: CGFloat
     var iconHeight: CGFloat
@@ -26,6 +27,7 @@ struct DashboardButtonView: View {
 
     init(text: String,
          isActive: Bool = false,
+         activeColor: Color = .yellow,
          icon: Image? = nil,
          iconWidth: CGFloat = dashboardButtonImageSize,
          iconHeight: CGFloat = dashboardButtonImageSize,
@@ -41,6 +43,7 @@ struct DashboardButtonView: View {
          action: @escaping VoidClosure) {
         self.text = text
         self.isActive = isActive
+        self.activeColor = activeColor
         self.icon = icon
         self.iconWidth = iconWidth
         self.iconHeight = iconHeight
@@ -77,7 +80,7 @@ struct DashboardButtonView: View {
                             .resizable()
                             .frame(width: iconWidth, height: iconHeight)
                             .font(.system(size: iconWidth))
-                            .foregroundColor(isActive ? .yellow : iconForegroundColor)
+                            .foregroundColor(isActive ? activeColor : iconForegroundColor)
                     }
                     Text(text)
                         .font(.system(size: dashboardButtonTitleSize))
