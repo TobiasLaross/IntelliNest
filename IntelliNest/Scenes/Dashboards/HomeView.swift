@@ -123,6 +123,7 @@ private struct CoffeeMachineButtonView: View {
     var body: some View {
         DashboardButtonView(text: viewModel.coffeeMachine.title,
                             isActive: viewModel.coffeeMachine.isActive,
+                            activeColor: viewModel.coffeeMachine.activeColor,
                             icon: viewModel.coffeeMachine.image,
                             iconWidth: 30,
                             isLoading: false,
