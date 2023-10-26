@@ -8,7 +8,11 @@
 import Foundation
 
 extension Date {
-    static func fromISO8601(_ dateString: String) -> Date? {
+    static func fromISO8601(_ dateString: String?) -> Date? {
+        guard let dateString else {
+            return nil
+        }
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
         return dateFormatter.date(from: dateString)

@@ -13,9 +13,9 @@ extension Navigator: WebSocketServiceDelegate {
         camerasViewModel.setRTSPURL(urlString: urlString, for: resultID)
     }
 
-    func webSocketService(didReceiveEntity entityID: EntityId, state: String) {
+    func webSocketService(didReceiveEntity entityID: EntityId, state: String, lastChanged: Date?) {
         if homeViewModel.entityIDs.contains(entityID) {
-            homeViewModel.reload(entityID: entityID, state: state)
+            homeViewModel.reload(entityID: entityID, state: state, lastChanged: lastChanged)
         }
 
         if roborockViewModel.entityIDs.contains(entityID) {

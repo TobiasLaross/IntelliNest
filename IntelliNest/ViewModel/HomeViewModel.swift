@@ -122,7 +122,7 @@ class HomeViewModel: HassAPIViewModelProtocol {
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
     }
 
-    func reload(entityID: EntityId, state: String) {
+    func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         switch entityID {
         case .allLights:
             allLights.state = state
@@ -130,7 +130,9 @@ class HomeViewModel: HassAPIViewModelProtocol {
             sarahsIphone.state = state
         case .coffeeMachine:
             coffeeMachine.state = state
-            coffeeMachine.lastChanged = Date()
+            if let lastChanged {
+                coffeeMachine.lastChanged = lastChanged
+            }
         case .storageLock:
             storageLock.state = state
         case .coffeeMachineStartTime:
