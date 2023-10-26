@@ -15,20 +15,20 @@ struct SwitchEntity: EntityProtocol {
 
     var activeColor: Color {
         guard isActive else {
-            return .orange
+            return .red
         }
 
         let now = Date()
         let elapsed = now.timeIntervalSince(lastChanged) / 60.0
-        let minutesBeforeBlending = 2.0
+        let minutesBeforeBlending = 1.0
         let minutesUntilPowered = 15.0
         if elapsed < minutesBeforeBlending {
-            return .orange
+            return .red
         } else if elapsed >= minutesUntilPowered {
             return .yellow
         } else {
             let ratio = (elapsed - minutesBeforeBlending) / (minutesUntilPowered - minutesBeforeBlending)
-            return .blend(Color.orange, with: Color.yellow, ratio: CGFloat(ratio))
+            return .blend(Color.red, with: Color.orange, ratio: CGFloat(ratio))
         }
     }
 
