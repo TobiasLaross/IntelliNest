@@ -130,6 +130,7 @@ class HomeViewModel: HassAPIViewModelProtocol {
             sarahsIphone.state = state
         case .coffeeMachine:
             coffeeMachine.state = state
+            coffeeMachine.lastChanged = Date()
         case .storageLock:
             storageLock.state = state
         case .coffeeMachineStartTime:
