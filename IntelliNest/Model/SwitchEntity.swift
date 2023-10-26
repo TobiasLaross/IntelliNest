@@ -54,7 +54,7 @@ struct SwitchEntity: EntityProtocol {
 
     let entityId: EntityId
     var state: String
-    let lastChanged: Date
+    var lastChanged: Date
 
     init(entityId: EntityId, state: String = "Loading", lastChanged: Date = .now) {
         self.entityId = entityId
@@ -71,9 +71,9 @@ struct SwitchEntity: EntityProtocol {
         let dateFormatter = ISO8601DateFormatter()
         if let lastChangedString = try? container.decode(String.self, forKey: .lastChanged),
            let date = dateFormatter.date(from: lastChangedString) {
-            self.lastChanged = date
+            lastChanged = date
         } else {
-            self.lastChanged = .distantFuture
+            lastChanged = .distantFuture
             Log.error("Failed to parse last_changed in SwitchEntity")
         }
     }
