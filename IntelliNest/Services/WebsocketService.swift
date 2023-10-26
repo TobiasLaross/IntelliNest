@@ -224,6 +224,9 @@ extension WebSocketService: WebSocketDelegate {
             var brightness: Int?
             var status: String?
             var batteryLevel: Int?
+            let lastChangedString = newState["last_changed"] as? String
+            let lastChanged = Date.fromISO8601(lastChangedString)
+
             if let attributes = newState["attributes"] as? [String: Any] {
                 brightness = attributes["brightness"] as? Int
                 status = attributes["status"] as? String
@@ -235,7 +238,7 @@ extension WebSocketService: WebSocketDelegate {
             } else if entityID.type == .light {
                 delegate?.webSocketService(didReceiveLight: entityID, state: state, brightness: brightness)
             } else {
-                delegate?.webSocketService(didReceiveEntity: entityID, state: state)
+                delegate?.webSocketService(didReceiveEntity: entityID, state: state, lastChanged: lastChanged)
             }
         }
     }
