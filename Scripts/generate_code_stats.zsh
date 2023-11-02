@@ -18,6 +18,8 @@ fileCounts=(
 )
 totalLOC=0
 swiftFileCount=0
+# Get current date in YYYY-MM-DD format
+currentDate=$(date "+%Y-%m-%d")
 
 # Git metrics
 commitCount=$(git rev-list --count HEAD)
@@ -70,6 +72,9 @@ tableContent="| Indicators                          | Now  | Desired |
 | Commit count in main                | $commitCount | N/A |
 | Total deleted lines                 | $totalDeletedLines | N/A |
 | Total added lines                   | $totalAddedLines | N/A |"
+
+# Append the last update date after the table (outside the Markdown table formatting)
+tableContent+="\n\nLast Updated: $currentDate"
 
 # Save the table content to a temporary file
 tableFile=$(mktemp)
