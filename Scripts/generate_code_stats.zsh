@@ -22,7 +22,7 @@ swiftFileCount=0
 currentDate=$(date "+%Y-%m-%d")
 
 # Git metrics
-commitCount=$(git rev-list --count HEAD)
+commitCount=$(( $(git rev-list --count main) + 1 ))
 totalDeletedLines=$(git log --pretty=tformat: --numstat | awk '{deletions+=$2} END {print deletions}')
 totalAddedLines=$(git log --pretty=tformat: --numstat | awk '{additions+=$1} END {print additions}')
 
