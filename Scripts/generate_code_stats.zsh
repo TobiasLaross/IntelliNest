@@ -19,6 +19,11 @@ fileCounts=(
 totalLOC=0
 swiftFileCount=0
 
+# Git metrics
+commitCount=$(git rev-list --count HEAD)
+totalDeletedLines=$(git log --pretty=tformat: --numstat | awk '{deletions+=$2} END {print deletions}')
+totalAddedLines=$(git log --pretty=tformat: --numstat | awk '{additions+=$1} END {print additions}')
+
 # Helper function to add a file to the metric
 add_file_to_metric() {
     local metric=$1
@@ -61,7 +66,10 @@ tableContent="| Indicators                          | Now  | Desired |
 | Average LOC per file                | $averageLOCPerFile | <100 |
 | TODO comment count                  | $fileCounts[todoFiles] | 0 |
 | FIX comment count                   | $fileCounts[fixFiles] | 0 |
-| unowned reference count             | $fileCounts[unownedFiles] | 0 |"
+| unowned reference count             | $fileCounts[unownedFiles] | 0 |
+| Commit count in main                | $commitCount | N/A |
+| Total deleted lines                 | $totalDeletedLines | N/A |
+| Total added lines                   | $totalAddedLines | N/A |"
 
 # Save the table content to a temporary file
 tableFile=$(mktemp)
