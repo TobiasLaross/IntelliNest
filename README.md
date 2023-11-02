@@ -5,17 +5,14 @@ IntelliNest is a native iOS application that leverages the power of the popular 
 With chatGPT I think this would be doable even if you are not a iOS developer but you will need some experience in software development.
 
 ## Code statistics
-| Indicators                          | Now  | Desired | Triggering Files |
-|-------------------------------------|------|---------|------------------|
-| Total LOC                           | 9015 | N/A | N/A |
-| Swift file count                    | 131 | N/A | N/A |
-| Average LOC per file                | 68 | <100 | N/A |
-| TODO comment count                  | 0 | 0 |  |
-| FIX comment count                   | 0 | 0 |  |
-| Optional force unwrap (!) count     | 3 | 0 | IntelliNest/Model/EniroGeoEntity.swift, IntelliNest/Model/Lockable.swift, IntelliNest/Navigation/Navigator.swift |
-| unowned reference count             | 0 | 0 |  |
-| Max indentation level               | 21 | <=5 | IntelliNest/ViewModel/EniroViewModel.swift, IntelliNest/ViewModel/EniroViewModel.swift |
-| Assignable var declaration count    | 3 | 0 | IntelliNest/AppMain.swift, IntelliNest/Model/CameraEntity.swift, IntelliNest/Model/EniroGeoEntity.swift |
+| Indicators                          | Now  | Desired |
+|-------------------------------------|------|---------|
+| Total LOC                           | 9015 | N/A |
+| Swift file count                    | 131 | N/A |
+| Average LOC per file                | 68 | <100 |
+| TODO comment count                  | 0 | 0 |
+| FIX comment count                   | 0 | 0 |
+| unowned reference count             | 0 | 0 |
 ## Supported features
 ### Rest API and Websocket support
 Will probably replace some views to only use websocket instead of the rest api.
@@ -89,3 +86,13 @@ A thank you to [@alexEkdahl](https://github.com/alexEkdahl) for suggesting the n
 
 ## Licensing
 IntelliNest is licensed under the terms of the MIT license. This license grants permission for the software to be used, copied, modified, merged, published, distributed, sublicensed, and/or sold.
+| Indicators                          | Now  | Desired |
+|-------------------------------------|------|---------|
+| Total LOC                           | 9015 | N/A |
+| Swift file count                    | 131 | N/A |
+| Average LOC per file                | 68 | <100 |
+| TODO comment count                  | 0 | 0 |
+| FIX comment count                   | 0 | 0 |
+| Optional force unwrap (!) count     | 3 | 0 |
+| unowned reference count             | 0 | 0 |
+| Max indentation level               | 21 | <=5 |
