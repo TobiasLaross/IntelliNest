@@ -717,6 +717,7 @@
 			buildPhases = (
 				F6225E2F2AE2946000D32EF4 /* Swiftformat */,
 				F66F061A27B16F1D00270E71 /* Swiftlint */,
+				F6D0B5322AF3C15400E4373A /* CodeStats */,
 				F67023F327A177320070FFBB /* Sources */,
 				F67023F427A177320070FFBB /* Frameworks */,
 				F67023F527A177320070FFBB /* Resources */,
@@ -933,6 +934,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\n\nif which swiftlint > /dev/null; then\n  swiftlint --config \"$SRCROOT/.swiftlint.yml\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		F6D0B5322AF3C15400E4373A /* CodeStats */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = CodeStats;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/zsh;
+			shellScript = "Scripts/generate_code_stats.zsh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
