@@ -20,7 +20,9 @@ class Navigator {
                                            toolbarReloadAction: reloadCurrentModel,
                                            appearedAction: setCurrentDestination)
     lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: hassApiService)
-    lazy var heatersViewModel = HeatersViewModel(apiService: hassApiService, appearedAction: setCurrentDestination)
+    lazy var heatersViewModel = HeatersViewModel(websocketService: webSocketService,
+                                                 apiService: hassApiService,
+                                                 appearedAction: setCurrentDestination)
     lazy var eniroViewModel = EniroViewModel(apiService: hassApiService, appearedAction: setCurrentDestination)
     lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: hassApiService,
                                                                            appearedAction: setCurrentDestination)

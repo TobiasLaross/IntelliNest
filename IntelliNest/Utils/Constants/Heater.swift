@@ -13,16 +13,17 @@ enum HvacMode: String {
     case cool
 }
 
-enum FanMode: String, Decodable {
+enum HeaterFanMode: String, Decodable {
     case auto
     case one = "1"
     case two = "2"
     case three = "3"
     case four = "4"
     case five = "5"
+    case unknown
 }
 
-enum HorizontalMode: String, Decodable {
+enum HeaterHorizontalMode: String, Encodable {
     case auto
     case oneLeft = "1_left"
     case two = "2"
@@ -34,7 +35,7 @@ enum HorizontalMode: String, Decodable {
     case unknown
 }
 
-enum HeaterVerticalPosition: String, Decodable {
+enum HeaterVerticalMode: String, Encodable {
     case auto
     case highest = "1_up"
     case position2 = "2"

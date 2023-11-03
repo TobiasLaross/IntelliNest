@@ -6,12 +6,20 @@
 //
 
 import Foundation
+import ShipBookSDK
 
 struct HeaterEntity: EntityProtocol {
     var entityId: EntityId
     var state: String
+    var hvacMode: HvacMode {
+        HvacMode(rawValue: state) ?? .off
+    }
+
     var nextUpdate = NSDate().addingTimeInterval(-1)
-    var isActive: Bool = false
+    var isActive: Bool {
+        state.lowercased() == "on"
+    }
+
     var heaterName = ""
     var leftVaneTitle = ""
     var rightVaneTitle = ""
@@ -22,10 +30,10 @@ struct HeaterEntity: EntityProtocol {
     }
 
     var targetTemperature: Double = 0
-    var fanMode: FanMode = .auto
+    var fanMode: HeaterFanMode = .auto
     var swingMode: String = ""
-    var vaneHorizontal = HorizontalMode.unknown
-    var vaneVertical = HeaterVerticalPosition.unknown
+    var vaneHorizontal = HeaterHorizontalMode.unknown
+    var vaneVertical = HeaterVerticalMode.unknown
 
     enum CodingKeys: String, CodingKey {
         case entityId = "entity_id"
@@ -36,17 +44,7 @@ struct HeaterEntity: EntityProtocol {
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
         self.state = state
-        if entityId == .heaterCorridor {
-            heaterName = "Korridoren"
-            leftVaneTitle = "Vardagsrummet"
-            rightVaneTitle = "Sovrummet"
-        } else { // .heaterPlayroom
-            heaterName = "Lekrummet"
-            leftVaneTitle = "Gästrummet"
-            rightVaneTitle = "Förrådet"
-        }
         setTitles()
-        updateIsActive()
     }
 
     init(from decoder: Decoder) throws {
@@ -55,14 +53,13 @@ struct HeaterEntity: EntityProtocol {
         self.entityId = entityId ?? EntityId.unknown
         state = try container.decode(String.self, forKey: .state)
         let attributes = try container.decode(HeaterAttributes.self, forKey: .attributes)
-        currentTemperature = attributes.currentTemperature
-        targetTemperature = attributes.targetTemperature
-        fanMode = attributes.fanMode
-        swingMode = attributes.swingMode
-        vaneHorizontal = HorizontalMode(rawValue: attributes.vaneHorizontal) ?? .unknown
-        vaneVertical = HeaterVerticalPosition(rawValue: attributes.vaneVertical) ?? HeaterVerticalPosition.unknown
+        configureWith(heaterAttributes: attributes)
         setTitles()
-        updateIsActive()
+    }
+
+    init(entityID: EntityId, state: String, attributes: [String: Any]) {
+        self.init(entityId: entityID, state: state)
+        configureWith(attributes: attributes)
     }
 
     mutating func setTitles() {
@@ -77,14 +74,6 @@ struct HeaterEntity: EntityProtocol {
         }
     }
 
-    mutating func updateIsActive() {
-        if state.lowercased() == "on" {
-            isActive = true
-        } else {
-            isActive = false
-        }
-    }
-
     mutating func setNextUpdateTime() {
         nextUpdate = NSDate().addingTimeInterval(0.5)
     }
@@ -93,12 +82,36 @@ struct HeaterEntity: EntityProtocol {
         return (lhs.entityId == rhs.entityId &&
             lhs.state == rhs.state)
     }
+
+    private mutating func configureWith(attributes: [String: Any]) {
+        do {
+            guard let nestedAttributes = attributes["attributes"] as? [String: Any] else {
+                Log.error("HeaterEntity failed to find nested attributes.")
+                return
+            }
+
+            let jsonData = try JSONSerialization.data(withJSONObject: nestedAttributes, options: [])
+            let heaterAttributes = try JSONDecoder().decode(HeaterAttributes.self, from: jsonData)
+            configureWith(heaterAttributes: heaterAttributes)
+        } catch {
+            Log.error("HeaterEntity failed to configure attributes: \(error)")
+        }
+    }
+
+    private mutating func configureWith(heaterAttributes: HeaterAttributes) {
+        currentTemperature = heaterAttributes.currentTemperature
+        targetTemperature = heaterAttributes.targetTemperature
+        fanMode = heaterAttributes.fanMode
+        swingMode = heaterAttributes.swingMode
+        vaneHorizontal = HeaterHorizontalMode(rawValue: heaterAttributes.vaneHorizontal) ?? .unknown
+        vaneVertical = HeaterVerticalMode(rawValue: heaterAttributes.vaneVertical) ?? HeaterVerticalMode.unknown
+    }
 }
 
 private struct HeaterAttributes: Decodable {
     var currentTemperature: Double
     var targetTemperature: Double
-    var fanMode: FanMode
+    var fanMode: HeaterFanMode
     var swingMode: String
     var vaneHorizontal: String
     var vaneVertical: String
@@ -116,7 +129,7 @@ private struct HeaterAttributes: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         currentTemperature = try container.decode(Double.self, forKey: .currentTemperature)
         targetTemperature = try container.decode(Double.self, forKey: .targetTemperature)
-        fanMode = try container.decode(FanMode.self, forKey: .fanMode)
+        fanMode = try container.decode(HeaterFanMode.self, forKey: .fanMode)
         swingMode = try container.decode(String.self, forKey: .swingMode)
         vaneHorizontal = try container.decode(String.self, forKey: .vaneHorizontal)
         vaneVertical = try container.decode(String.self, forKey: .vaneVertical)

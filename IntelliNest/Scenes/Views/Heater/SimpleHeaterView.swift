@@ -23,8 +23,8 @@ struct SimpleHeaterView: View {
     var isTimerModeEnabled: Bool
     let setTargetTemperatureClosure: EntityIdDoubleClosure
     let setHvacModeClosure: HeaterStringClosure
-    let toggleTimerModeAction: VoidClosure
-    let setClimateScheduleTime: EntityClosure
+    let toggleTimerModeAction: MainActorVoidClosure
+    let setClimateScheduleTime: MainActorEntityClosure
 
     var body: some View {
         ZStack {
@@ -53,7 +53,7 @@ struct SimpleHeaterView: View {
                                                numberSelectedCallback: setTargetTemperatureClosure)
                             .padding(.vertical)
                         HvacModeView(heater: heater,
-                                     mode: heater.state,
+                                     mode: heater.hvacMode,
                                      hvacModeSelectedCallback: setHvacModeClosure)
                     }
 

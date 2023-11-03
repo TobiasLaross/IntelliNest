@@ -8,11 +8,7 @@
 import SwiftUI
 
 struct HeatersView: View {
-    @ObservedObject private var viewModel: HeatersViewModel
-
-    init(viewModel: HeatersViewModel) {
-        self.viewModel = viewModel
-    }
+    @ObservedObject var viewModel: HeatersViewModel
 
     var body: some View {
         VStack {
@@ -24,11 +20,11 @@ struct HeatersView: View {
                              heater: $viewModel.heaterCorridor,
                              showDetails: $viewModel.showCorridorDetails,
                              resetClimateTime: $viewModel.resetCorridorHeaterTime,
-                             isTimerModeEnabled: viewModel.isCorridorTimerModeEnabled.isActive,
+                             isTimerModeEnabled: viewModel.heaterCorridorTimerMode.isActive,
                              setTargetTemperatureClosure: viewModel.setTargetTemperature,
                              setHvacModeClosure: viewModel.setHvacMode,
                              toggleTimerModeAction: viewModel.toggleCorridorTimerMode,
-                             setClimateScheduleTime: viewModel.setClimateScheduleTask)
+                             setClimateScheduleTime: viewModel.setClimateSchedule)
                 .padding(.top)
             Divider()
             SimpleHeaterView(roomName: "Lekrummet",
@@ -39,11 +35,11 @@ struct HeatersView: View {
                              heater: $viewModel.heaterPlayroom,
                              showDetails: $viewModel.showPlayroomDetails,
                              resetClimateTime: $viewModel.resetPlayroomHeaterTime,
-                             isTimerModeEnabled: viewModel.isPlayroomTimerModeEnabled.isActive,
+                             isTimerModeEnabled: viewModel.heaterPlayroomTimerMode.isActive,
                              setTargetTemperatureClosure: viewModel.setTargetTemperature,
                              setHvacModeClosure: viewModel.setHvacMode,
                              toggleTimerModeAction: viewModel.togglePlayroomTimerMode,
-                             setClimateScheduleTime: viewModel.setClimateScheduleTask)
+                             setClimateScheduleTime: viewModel.setClimateSchedule)
                 .padding(.bottom)
             Spacer()
                 .onAppear {
@@ -51,14 +47,20 @@ struct HeatersView: View {
                 }
 
                 .popover(isPresented: $viewModel.showCorridorDetails, arrowEdge: .top) {
-                    DetailedHeaterView(heater: $viewModel.heaterCorridor,
+                    DetailedHeaterView(heater: viewModel.heaterCorridor,
+                                       fanMode: viewModel.heaterCorridor.fanMode,
+                                       horizontalMode: viewModel.heaterCorridor.vaneHorizontal,
+                                       verticalMode: viewModel.heaterCorridor.vaneVertical,
                                        fanModeSelectedCallback: viewModel.fanModeSelectedCallback,
                                        horizontalModeSelectedCallback: viewModel.horizontalModeSelectedCallback,
                                        verticalModeSelectedCallback: viewModel.verticalModeSelectedCallback)
                 }
 
                 .popover(isPresented: $viewModel.showPlayroomDetails, arrowEdge: .top) {
-                    DetailedHeaterView(heater: $viewModel.heaterPlayroom,
+                    DetailedHeaterView(heater: viewModel.heaterPlayroom,
+                                       fanMode: viewModel.heaterPlayroom.fanMode,
+                                       horizontalMode: viewModel.heaterPlayroom.vaneHorizontal,
+                                       verticalMode: viewModel.heaterPlayroom.vaneVertical,
                                        fanModeSelectedCallback: viewModel.fanModeSelectedCallback,
                                        horizontalModeSelectedCallback: viewModel.horizontalModeSelectedCallback,
                                        verticalModeSelectedCallback: viewModel.verticalModeSelectedCallback)
@@ -69,6 +71,8 @@ struct HeatersView: View {
 
 struct HeatersView_Previews: PreviewProvider {
     static var previews: some View {
-        HeatersView(viewModel: HeatersViewModel(apiService: HassApiService(urlCreator: URLCreator()), appearedAction: { _ in }))
+        HeatersView(viewModel: HeatersViewModel(websocketService: .init(),
+                                                apiService: HassApiService(urlCreator: URLCreator()),
+                                                appearedAction: { _ in }))
     }
 }

@@ -57,6 +57,9 @@
 		F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */; };
 		F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64D2693283E8FAB0073A7BF /* NetworkTask.swift */; };
 		F6552705281678740035DC72 /* RoborockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6552704281678740035DC72 /* RoborockEntity.swift */; };
+		F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */; };
+		F6591BFC2AFE31F300D5785E /* HorizontalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */; };
+		F6591BFE2AFE34FB00D5785E /* VerticalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */; };
 		F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */; };
 		F662999027B3AA5A00121C14 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662998F27B3AA5A00121C14 /* Helpers.swift */; };
 		F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */; };
@@ -70,7 +73,7 @@
 		F6633F30286326FC004D0B76 /* ThermometerGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F2F286326FC004D0B76 /* ThermometerGroupView.swift */; };
 		F6633F322863275D004D0B76 /* ThermometerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F312863275D004D0B76 /* ThermometerView.swift */; };
 		F6633F34286327F9004D0B76 /* NumberTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F33286327F9004D0B76 /* NumberTextView.swift */; };
-		F6633F3628632884004D0B76 /* HeaterVerticalPositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3528632884004D0B76 /* HeaterVerticalPositionView.swift */; };
+		F6633F3628632884004D0B76 /* VerticalPositionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3528632884004D0B76 /* VerticalPositionView.swift */; };
 		F6633F38286328E8004D0B76 /* HorizontalModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F37286328E8004D0B76 /* HorizontalModeView.swift */; };
 		F6633F3A28632954004D0B76 /* FanModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3928632954004D0B76 /* FanModeView.swift */; };
 		F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */; };
@@ -238,6 +241,9 @@
 		F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribeRequest.swift; sourceTree = "<group>"; };
 		F64D2693283E8FAB0073A7BF /* NetworkTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTask.swift; sourceTree = "<group>"; };
 		F6552704281678740035DC72 /* RoborockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockEntity.swift; sourceTree = "<group>"; };
+		F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanModeButtonView.swift; sourceTree = "<group>"; };
+		F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalButtonView.swift; sourceTree = "<group>"; };
+		F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalButtonView.swift; sourceTree = "<group>"; };
 		F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
 		F662998F27B3AA5A00121C14 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleView.swift; sourceTree = "<group>"; };
@@ -251,7 +257,7 @@
 		F6633F2F286326FC004D0B76 /* ThermometerGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermometerGroupView.swift; sourceTree = "<group>"; };
 		F6633F312863275D004D0B76 /* ThermometerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermometerView.swift; sourceTree = "<group>"; };
 		F6633F33286327F9004D0B76 /* NumberTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberTextView.swift; sourceTree = "<group>"; };
-		F6633F3528632884004D0B76 /* HeaterVerticalPositionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterVerticalPositionView.swift; sourceTree = "<group>"; };
+		F6633F3528632884004D0B76 /* VerticalPositionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalPositionView.swift; sourceTree = "<group>"; };
 		F6633F37286328E8004D0B76 /* HorizontalModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalModeView.swift; sourceTree = "<group>"; };
 		F6633F3928632954004D0B76 /* FanModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanModeView.swift; sourceTree = "<group>"; };
 		F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinceEmptiedView.swift; sourceTree = "<group>"; };
@@ -535,9 +541,12 @@
 				F6633F2F286326FC004D0B76 /* ThermometerGroupView.swift */,
 				F6633F312863275D004D0B76 /* ThermometerView.swift */,
 				F6633F33286327F9004D0B76 /* NumberTextView.swift */,
-				F6633F3528632884004D0B76 /* HeaterVerticalPositionView.swift */,
+				F6633F3528632884004D0B76 /* VerticalPositionView.swift */,
 				F6633F37286328E8004D0B76 /* HorizontalModeView.swift */,
 				F6633F3928632954004D0B76 /* FanModeView.swift */,
+				F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */,
+				F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */,
+				F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */,
 			);
 			path = Heater;
 			sourceTree = "<group>";
@@ -969,7 +978,7 @@
 				F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */,
 				F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */,
 				F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */,
-				F6633F3628632884004D0B76 /* HeaterVerticalPositionView.swift in Sources */,
+				F6633F3628632884004D0B76 /* VerticalPositionView.swift in Sources */,
 				F6F1D07C2992686E00A3292E /* Color.swift in Sources */,
 				F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */,
 				F6DBA4D028E82D6A001BA1C0 /* Task.swift in Sources */,
@@ -1040,6 +1049,8 @@
 				F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */,
 				F6F8555D28DCF93E004B9517 /* EniroDoorLock.swift in Sources */,
 				F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */,
+				F6591BFC2AFE31F300D5785E /* HorizontalButtonView.swift in Sources */,
+				F6591BFE2AFE34FB00D5785E /* VerticalButtonView.swift in Sources */,
 				F6633F322863275D004D0B76 /* ThermometerView.swift in Sources */,
 				F68DA61828B4B89C00601726 /* Actions.swift in Sources */,
 				F6633F4528632F5E004D0B76 /* RoborockRoomButton.swift in Sources */,
@@ -1066,6 +1077,7 @@
 				F60345C427A933D700212D04 /* GlobalConstants.swift in Sources */,
 				F67FA88B28A16E9A00BE4CBD /* EntityProtocol.swift in Sources */,
 				F6F8555F28DF755D004B9517 /* EniroCharging.swift in Sources */,
+				F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */,
 				F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */,
 				F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */,
 				F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */,
@@ -1584,7 +1596,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2023.10.31;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1611,7 +1623,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2023.10.31;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1638,7 +1650,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2023.10.31;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

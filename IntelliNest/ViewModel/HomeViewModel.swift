@@ -10,7 +10,7 @@ import ShipBookSDK
 import SwiftUI
 import UIKit
 
-class HomeViewModel: HassAPIViewModelProtocol {
+class HomeViewModel: ObservableObject {
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
     @Published var storageLock = LockEntity(entityId: .storageLock)

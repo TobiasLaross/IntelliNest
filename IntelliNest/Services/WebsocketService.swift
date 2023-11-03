@@ -69,6 +69,7 @@ class WebSocketService {
         mutableCommand["id"] = requestID
         if let jsonData = try? JSONSerialization.data(withJSONObject: mutableCommand, options: []),
            let jsonString = String(data: jsonData, encoding: .utf8) {
+            print("jsonString: \(jsonString)")
             if isAuthenticated {
                 socket?.write(string: jsonString)
             } else {
@@ -77,12 +78,16 @@ class WebSocketService {
         }
     }
 
-    private func sendJSONCommand<T: Encodable>(_ command: T, requestID: Int) {
+    private func sendJSONCommand<T: Encodable>(_ command: T, requestID: Int? = nil) {
         guard var dictionary = command.dictionary else {
             Log.error("Failed to encode command to JSON")
             return
         }
-        dictionary["id"] = requestID
+        if let requestID {
+            dictionary["id"] = requestID
+        } else {
+            dictionary["id"] = getNextRequestID()
+        }
 
         if let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
            let jsonString = String(data: jsonData, encoding: .utf8) {
@@ -159,11 +164,8 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     func sendGetStatesRequest() {
-        let getStatesRequest: [String: Any] = [
-            "type": "get_states"
-        ]
-        let requestID = getNextRequestID()
-        sendJSONCommand(getStatesRequest, requestID: requestID)
+        let getStatesRequest = ["type": "get_states"]
+        sendJSONCommand(getStatesRequest)
     }
 
     func updateLights(lightIDs: [EntityId], action: Action, brightness: Int) {
@@ -173,36 +175,64 @@ extension WebSocketService: WebSocketDelegate {
             updateEntityRequest.serviceData = lightData
         }
 
-        let requestID = getNextRequestID()
-        sendJSONCommand(updateEntityRequest, requestID: requestID)
+        sendJSONCommand(updateEntityRequest)
     }
 
     func updateEntity(entityID: EntityId, domain: Domain, action: Action) {
         let updateEntityRequest = UpdateEntityRequest(domain: domain, action: action, entityIds: [entityID])
-        let requestID = getNextRequestID()
-        sendJSONCommand(updateEntityRequest, requestID: requestID)
+        sendJSONCommand(updateEntityRequest)
+    }
+
+    func updateHeaterTemperature(heaterID: EntityId, temperature: Double) {
+        let serviceData = ClimateServiceData(targetTemperature: temperature)
+        var updateEntityRequest = UpdateEntityRequest(domain: .climate, action: .setTemperature, entityIds: [heaterID])
+        updateEntityRequest.serviceData = serviceData
+        sendJSONCommand(updateEntityRequest)
+    }
+
+    func updateHeaterHvacMode(heaterID: EntityId, hvacMode: HvacMode) {
+        let serviceData = ClimateServiceData(hvacMode: hvacMode)
+        var updateEntityRequest = UpdateEntityRequest(domain: .climate, action: .setHvacMode, entityIds: [heaterID])
+        updateEntityRequest.serviceData = serviceData
+        sendJSONCommand(updateEntityRequest)
+    }
+
+    func updateHeaterFanMode(heaterID: EntityId, fanMode: HeaterFanMode) {
+        let serviceData = ClimateServiceData(fanMode: fanMode)
+        var updateEntityRequest = UpdateEntityRequest(domain: .climate, action: .setFanMode, entityIds: [heaterID])
+        updateEntityRequest.serviceData = serviceData
+        sendJSONCommand(updateEntityRequest)
+    }
+
+    func updateHeaterHorizontalMode(heaterID: EntityId, horizontalMode: HeaterHorizontalMode) {
+        let serviceData = MelcloudServiceData(horizontalMode: horizontalMode)
+        var updateEntityRequest = UpdateEntityRequest(domain: .melcloud, action: .setVaneHorizontal, entityIds: [heaterID])
+        updateEntityRequest.serviceData = serviceData
+        sendJSONCommand(updateEntityRequest)
+    }
+
+    func updateHeaterVerticalMode(heaterID: EntityId, verticalMode: HeaterVerticalMode) {
+        let serviceData = MelcloudServiceData(verticalMode: verticalMode)
+        var updateEntityRequest = UpdateEntityRequest(domain: .melcloud, action: .setVaneVertical, entityIds: [heaterID])
+        updateEntityRequest.serviceData = serviceData
+        sendJSONCommand(updateEntityRequest)
     }
 
     func updateDateTimeEntity(entity: Entity) {
         var updateEntityRequest = UpdateEntityRequest(domain: .inputDateTime, action: .setDateTime, entityIds: [entity.entityId])
         let serviceData = DateTimeServiceData(date: entity.date)
         updateEntityRequest.serviceData = serviceData
-
-        let requestID = getNextRequestID()
-        sendJSONCommand(updateEntityRequest, requestID: requestID)
+        sendJSONCommand(updateEntityRequest)
     }
 
-    func callScript(scriptID: ScriptID) {
-        let callScriptRequest = CallScriptRequest(scriptID: scriptID)
-        let requestID = getNextRequestID()
-        sendJSONCommand(callScriptRequest, requestID: requestID)
+    func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil) {
+        let callScriptRequest = CallScriptRequest(scriptID: scriptID, variables: variables)
+        sendJSONCommand(callScriptRequest)
     }
 
     private func subscribe() {
-        let requestID = getNextRequestID()
         let subscribeRequest = SubscribeRequest(eventType: .stateChange)
-
-        sendJSONCommand(subscribeRequest, requestID: requestID)
+        sendJSONCommand(subscribeRequest)
     }
 
     private func parseDictionaryResult(result: [String: Any], resultID: Int) {
@@ -237,6 +267,9 @@ extension WebSocketService: WebSocketDelegate {
                 delegate?.webSocketService(didReceiveRoborock: entityID, state: state, status: status, batteryLevel: batteryLevel)
             } else if entityID.type == .light {
                 delegate?.webSocketService(didReceiveLight: entityID, state: state, brightness: brightness)
+            } else if entityID == .heaterCorridor || entityID == .heaterPlayroom {
+                let heater = HeaterEntity(entityID: entityID, state: state, attributes: newState)
+                delegate?.webSocketService(didReceiveHeater: heater)
             } else {
                 delegate?.webSocketService(didReceiveEntity: entityID, state: state, lastChanged: lastChanged)
             }
