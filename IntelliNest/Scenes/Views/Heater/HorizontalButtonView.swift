@@ -39,8 +39,8 @@ struct HorizontalButtonView: View {
                     }
                 }
 
-                if let buttomImageName = buttonImageName {
-                    Image(systemName: buttomImageName)
+                if let buttonImageName = buttonImageName {
+                    Image(systemName: buttonImageName)
                         .frame(width: 50, height: 50, alignment: .center)
                 }
             }
