@@ -20,7 +20,7 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 Last Updated: 2023-11-10
 ## Supported features
 ### Rest API and Websocket support
-Will probably replace some views to only use websocket instead of the rest api.
+Most views now use WebSocket instead of REST API for improved real-time updates.
 ### Dynamic connection
 Changing between local and remote connection depending on if counter.test88338833 is accessible or not using the local url
 ### Door locks & smart outlet
