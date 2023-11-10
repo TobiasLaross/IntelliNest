@@ -36,6 +36,10 @@ extension Navigator: WebSocketServiceDelegate {
     func webSocketService(didReceiveRoborock entityID: EntityId, state: String, status: String?, batteryLevel: Int?) {
         roborockViewModel.reloadRoborock(state: state, status: status, batteryLevel: batteryLevel)
     }
+
+    func webSocketService(didReceiveHeater heater: HeaterEntity) {
+        heatersViewModel.reloadHeater(heater)
+    }
 }
 
 extension Navigator: URLCreatorDelegate {

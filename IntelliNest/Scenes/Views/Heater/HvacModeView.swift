@@ -9,14 +9,14 @@ import SwiftUI
 
 struct HvacModeView: View {
     var heater: HeaterEntity
-    let mode: String
+    let mode: HvacMode
     let imageSize: CGFloat = 20
     var hvacModeSelectedCallback: HeaterStringClosure
 
     var body: some View {
         HStack {
             Button {
-                hvacModeSelectedCallback(heater, HvacMode.off.rawValue)
+                hvacModeSelectedCallback(heater, .off)
             } label: {
                 HvacButtonLabel(hvacButton: AnyView(
                     VStack {
@@ -24,10 +24,10 @@ struct HvacModeView: View {
                             .frame(width: imageSize, height: imageSize, alignment: .center)
                         Text("Av")
                     }
-                ), isSelectedMode: mode == HvacMode.off.rawValue)
+                ), isSelectedMode: mode == .off)
             }
             Button {
-                hvacModeSelectedCallback(heater, HvacMode.heat.rawValue)
+                hvacModeSelectedCallback(heater, .heat)
             } label: {
                 HvacButtonLabel(hvacButton: AnyView(
                     VStack {
@@ -35,10 +35,10 @@ struct HvacModeView: View {
                             .frame(width: imageSize, height: imageSize, alignment: .center)
                         Text("Värme")
                     }
-                ), isSelectedMode: mode == HvacMode.heat.rawValue)
+                ), isSelectedMode: mode == .heat)
             }
             Button {
-                hvacModeSelectedCallback(heater, HvacMode.cool.rawValue)
+                hvacModeSelectedCallback(heater, .cool)
             } label: {
                 HvacButtonLabel(hvacButton: AnyView(
                     VStack {
@@ -46,7 +46,7 @@ struct HvacModeView: View {
                             .frame(width: imageSize, height: imageSize, alignment: .center)
                         Text("Kyla")
                     }
-                ), isSelectedMode: mode == HvacMode.cool.rawValue)
+                ), isSelectedMode: mode == .cool)
             }
         }
     }

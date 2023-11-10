@@ -7,20 +7,20 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 ## Code statistics
 | Indicators                          | Now  | Desired |
 |-------------------------------------|------|---------|
-| Total LOC                           | 9015 | N/A |
-| Swift file count                    | 131 | N/A |
-| Average LOC per file                | 68 | <100 |
+| Total LOC                           | 9045 | N/A |
+| Swift file count                    | 134 | N/A |
+| Average LOC per file                | 67 | <100 |
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
-| Commit count in main                | 27 | N/A |
-| Total deleted lines                 | 872 | N/A |
-| Total added lines                   | 12913 | N/A |
+| Commit count in main                | 28 | N/A |
+| Total deleted lines                 | 1487 | N/A |
+| Total added lines                   | 13590 | N/A |
 
-Last Updated: 2023-11-02
+Last Updated: 2023-11-10
 ## Supported features
 ### Rest API and Websocket support
-Will probably replace some views to only use websocket instead of the rest api.
+Most views now use WebSocket instead of REST API for improved real-time updates.
 ### Dynamic connection
 Changing between local and remote connection depending on if counter.test88338833 is accessible or not using the local url
 ### Door locks & smart outlet

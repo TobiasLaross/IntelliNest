@@ -12,7 +12,7 @@ struct CallScriptRequest: Encodable {
     let type = "call_service"
     let domain = Domain.script
     let service = Action.turnOn
-    var serviceData = EmptyServiceData()
+    var serviceData: ServiceData = EmptyServiceData()
     let target: Target
 
     enum CodingKeys: String, CodingKey {
@@ -31,7 +31,11 @@ struct CallScriptRequest: Encodable {
         }
     }
 
-    init(scriptID: ScriptID) {
-        self.target = Target(entityIds: [scriptID.rawValue])
+    // Modified init that accepts variables
+    init(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil) {
+        target = Target(entityIds: [scriptID.rawValue])
+        if let variables {
+            serviceData = ScriptServiceData(variables: variables)
+        }
     }
 }

@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import ShipBookSDK
 
+@MainActor
 class HeatersViewModel: HassAPIViewModelProtocol {
     @Published var heaterCorridor = HeaterEntity(entityId: .heaterCorridor)
     @Published var heaterPlayroom = HeaterEntity(entityId: .heaterPlayroom)
@@ -20,138 +22,100 @@ class HeatersViewModel: HassAPIViewModelProtocol {
     @Published var thermCommonarea = Entity(entityId: .thermCommonarea)
     @Published var thermPlayroom = Entity(entityId: .thermPlayroom)
     @Published var thermGuest = Entity(entityId: .thermGuest)
-    @Published var isCorridorTimerModeEnabled = Entity(entityId: .heaterCorridorTimerMode)
-    @Published var isPlayroomTimerModeEnabled = Entity(entityId: .heaterPlayroomTimerMode)
+    @Published var heaterCorridorTimerMode = Entity(entityId: .heaterCorridorTimerMode)
+    @Published var heaterPlayroomTimerMode = Entity(entityId: .heaterPlayroomTimerMode)
 
     @Published var showCorridorDetails = false
     @Published var showPlayroomDetails = false
+    let entityIDs: [EntityId] = [.resetCorridorHeaterTime, .resetPlayroomHeaterTime, .heaterCorridorTimerMode, .heaterPlayroomTimerMode]
 
+    let websocketService: WebSocketService
     let apiService: HassApiService
     let appearedAction: DestinationClosure
-    init(apiService: HassApiService, appearedAction: @escaping DestinationClosure) {
+    init(websocketService: WebSocketService, apiService: HassApiService, appearedAction: @escaping DestinationClosure) {
+        self.websocketService = websocketService
         self.apiService = apiService
         self.appearedAction = appearedAction
     }
 
     func setTargetTemperature(entityId: EntityId, temperature: Double) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = entityId.rawValue
-            json[.temperature] = temperature
-            await apiService.sendPostRequest(json: json, domain: .climate, action: .setTemperature)
+        websocketService.updateHeaterTemperature(heaterID: entityId, temperature: temperature)
+    }
+
+    func setHvacMode(heater: HeaterEntity, hvacMode: HvacMode) {
+        websocketService.updateHeaterHvacMode(heaterID: heater.entityId, hvacMode: hvacMode)
+    }
+
+    func fanModeSelectedCallback(heater: HeaterEntity, fanMode: HeaterFanMode) {
+        if fanMode != heater.fanMode {
+            websocketService.updateHeaterFanMode(heaterID: heater.entityId, fanMode: fanMode)
         }
     }
 
-    func setHvacMode(heater: HeaterEntity, hvacMode: String) {
-        Task {
-            if hvacMode != heater.state {
-                var json = [JSONKey: Any]()
-                json[.entityID] = heater.entityId.rawValue
-                json[.hvacMode] = hvacMode
-                await apiService.sendPostRequest(json: json, domain: .climate, action: .setHvacMode)
-
-                if heater.entityId == .heaterCorridor {
-                    reloadHeaterCorridorUntilHvacUpdated()
-                } else {
-                    reloadHeaterPlayroomUntilHvacUpdated()
-                }
-            }
-        }
+    func horizontalModeSelectedCallback(heater: HeaterEntity, horizontalMode: HeaterHorizontalMode) {
+        websocketService.updateHeaterHorizontalMode(heaterID: heater.entityId, horizontalMode: horizontalMode)
     }
 
-    func fanModeSelectedCallback(heater: HeaterEntity, fanMode: FanMode) {
-        Task {
-            if fanMode != heater.fanMode {
-                var json = [JSONKey: Any]()
-                json[JSONKey.entityID] = heater.entityId.rawValue
-                json[JSONKey.fanMode] = fanMode.rawValue
-                await apiService.sendPostRequest(json: json, domain: Domain.climate,
-                                                 action: Action.setFanMode)
-                if heater.entityId == .heaterCorridor {
-                    reloadHeaterCorridorUntilFanUpdated()
-                } else {
-                    reloadHeaterPlayroomUntilFanUpdated()
-                }
-            }
-        }
+    func verticalModeSelectedCallback(heater: HeaterEntity, verticalMode: HeaterVerticalMode) {
+        websocketService.updateHeaterVerticalMode(heaterID: heater.entityId, verticalMode: verticalMode)
     }
 
-    func horizontalModeSelectedCallback(heater: HeaterEntity, horizontalMode: HorizontalMode) {
-        Task {
-            if horizontalMode != heater.vaneHorizontal {
-                var json = [JSONKey: Any]()
-                json[JSONKey.entityID] = heater.entityId.rawValue
-                json[JSONKey.position] = horizontalMode.rawValue
-                await apiService.sendPostRequest(json: json,
-                                                 domain: Domain.melcloud,
-                                                 action: Action.setVaneHorizontal)
-                if heater.entityId == .heaterCorridor {
-                    reloadHeaterCorridorUntilVaneHorizontalUpdated()
-                } else {
-                    reloadHeaterPlayroomUntilVaneHorizontalUpdated()
-                }
-            }
-        }
-    }
-
-    func verticalModeSelectedCallback(heater: HeaterEntity, verticalMode: HeaterVerticalPosition) {
-        Task {
-            if verticalMode != heater.vaneVertical {
-                var json = [JSONKey: Any]()
-                json[JSONKey.entityID] = heater.entityId.rawValue
-                json[JSONKey.position] = verticalMode.rawValue
-                await apiService.sendPostRequest(json: json,
-                                                 domain: Domain.melcloud,
-                                                 action: Action.setVaneVertical)
-                if heater.entityId == .heaterCorridor {
-                    reloadHeaterCorridorUntilVaneVerticalUpdated()
-                } else {
-                    reloadHeaterPlayroomUntilVaneVerticalUpdated()
-                }
-            }
-        }
-    }
-
-    func setClimateScheduleTask(dateEntity: Entity) {
-        Task {
-            await setClimateSchedule(dateEntity: dateEntity)
-        }
-    }
-
-    private func setClimateSchedule(dateEntity: Entity) async {
-        await apiService.setDateTimeEntity(dateEntity: dateEntity)
+    func setClimateSchedule(dateEntity: Entity) {
+        websocketService.updateDateTimeEntity(entity: dateEntity)
     }
 
     func toggleCorridorTimerMode() {
-        Task { @MainActor in
-            let action: Action = isCorridorTimerModeEnabled.isActive ? .turnOff : .turnOn
-            await apiService.setState(for: .heaterCorridorTimerMode, in: .inputBoolean, using: action)
-            isCorridorTimerModeEnabled.isActive.toggle()
-            if isCorridorTimerModeEnabled.isActive {
-                let calendar = Calendar.current
-                let now = Date()
-                if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
-                    resetCorridorHeaterTime.date = newDate
-                    await setClimateSchedule(dateEntity: resetCorridorHeaterTime)
-                }
-                await apiService.callScript(entityId: .saveClimateState, variables: [.entityID: EntityId.heaterCorridor.rawValue])
-            }
-        }
+        let action: Action = heaterCorridorTimerMode.isActive ? .turnOff : .turnOn
+        toggleHeaterTimerMode(heaterEntityID: heaterCorridor.entityId,
+                              heaterTimerModeEntityID: .heaterCorridorTimerMode,
+                              dateEntity: resetCorridorHeaterTime,
+                              action: action)
     }
 
     func togglePlayroomTimerMode() {
-        Task { @MainActor in
-            let action: Action = isPlayroomTimerModeEnabled.isActive ? .turnOff : .turnOn
-            await apiService.setState(for: .heaterPlayroomTimerMode, in: .inputBoolean, using: action)
-            isPlayroomTimerModeEnabled.isActive.toggle()
-            if isPlayroomTimerModeEnabled.isActive {
-                let calendar = Calendar.current
-                let now = Date()
-                if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
-                    resetPlayroomHeaterTime.date = newDate
-                    await setClimateSchedule(dateEntity: resetPlayroomHeaterTime)
-                }
-                await apiService.callScript(entityId: .saveClimateState, variables: [.entityID: EntityId.heaterPlayroom.rawValue])
+        let action: Action = heaterPlayroomTimerMode.isActive ? .turnOff : .turnOn
+        toggleHeaterTimerMode(heaterEntityID: heaterPlayroom.entityId,
+                              heaterTimerModeEntityID: .heaterPlayroomTimerMode,
+                              dateEntity: resetPlayroomHeaterTime,
+                              action: action)
+    }
+
+    func reload(entityID: EntityId, state: String) {
+        switch entityID {
+        case .resetCorridorHeaterTime:
+            resetCorridorHeaterTime.state = state
+        case .resetPlayroomHeaterTime:
+            resetPlayroomHeaterTime.state = state
+        case .heaterCorridorTimerMode:
+            heaterCorridorTimerMode.state = state
+        case .heaterPlayroomTimerMode:
+            heaterPlayroomTimerMode.state = state
+        default:
+            Log.error("HeatersViewModel doesn't reload entityID: \(entityID)")
+        }
+    }
+
+    func reloadHeater(_ heater: HeaterEntity) {
+        if heater.entityId == .heaterCorridor {
+            heaterCorridor = heater
+        } else if heater.entityId == .heaterPlayroom {
+            heaterPlayroom = heater
+        } else {
+            Log.error("HeatersViewModel doesn't reload heater with entityID: \(heater.entityId)")
+        }
+    }
+
+    private func toggleHeaterTimerMode(heaterEntityID: EntityId, heaterTimerModeEntityID: EntityId, dateEntity: Entity, action: Action) {
+        var dateEntity = dateEntity
+        websocketService.updateEntity(entityID: heaterTimerModeEntityID, domain: .inputBoolean, action: action)
+
+        if action == .turnOn {
+            let calendar = Calendar.current
+            let now = Date()
+            if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
+                dateEntity.date = newDate
+                setClimateSchedule(dateEntity: dateEntity)
+                websocketService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
             }
         }
     }

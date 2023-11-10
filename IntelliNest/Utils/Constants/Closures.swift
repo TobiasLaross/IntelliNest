@@ -8,19 +8,24 @@
 import Foundation
 
 typealias VoidClosure = () -> Void
+typealias MainActorVoidClosure = @MainActor () -> Void
 typealias AsyncVoidClosure = () async -> Void
 typealias MainActorAsyncVoidClosure = @MainActor () async -> Void
 typealias StringClosure = (String) -> Void
 typealias DoubleClosure = (Double) -> Void
-typealias HeaterDoubleClosure = (HeaterEntity, Double) -> Void
-typealias HeaterStringClosure = (HeaterEntity, String) -> Void
-typealias HeaterFanModeClosure = (HeaterEntity, FanMode) -> Void
-typealias HeaterHorizontalModeClosure = (HeaterEntity, HorizontalMode) -> Void
-typealias HeaterVerticalModeClosure = (HeaterEntity, HeaterVerticalPosition) -> Void
+typealias HeaterDoubleClosure = @MainActor (HeaterEntity, Double) -> Void
+typealias HeaterStringClosure = @MainActor (HeaterEntity, HvacMode) -> Void
+typealias HeaterFanModeClosure = @MainActor (HeaterEntity, HeaterFanMode) -> Void
+typealias FanModeClosure = (HeaterFanMode) -> Void
+typealias HeaterHorizontalModeClosure = @MainActor (HeaterEntity, HeaterHorizontalMode) -> Void
+typealias HorizontalModeClosure = (HeaterHorizontalMode) -> Void
+typealias HeaterVerticalModeClosure = @MainActor (HeaterEntity, HeaterVerticalMode) -> Void
+typealias VerticalModeClosure = (HeaterVerticalMode) -> Void
 typealias EntityClosure = (Entity) -> Void
+typealias MainActorEntityClosure = @MainActor (Entity) -> Void
 typealias AsyncEntityClosure = (Entity) async -> Void
 typealias ScriptIDClosure = (ScriptID) -> Void
-typealias EntityIdDoubleClosure = (EntityId, Double) -> Void
+typealias EntityIdDoubleClosure = @MainActor (EntityId, Double) -> Void
 typealias AsyncLightClosure = (LightEntity) async -> Void
 typealias AsyncSlideableClosure = (Slideable) async -> Void
 typealias SlideableIntClosure = (Slideable, Int) -> Void
