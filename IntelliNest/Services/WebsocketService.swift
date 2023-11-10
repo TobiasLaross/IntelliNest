@@ -64,17 +64,17 @@ class WebSocketService {
     }
 
     private func sendJSONCommand(_ command: [String: Any], requestID: Int) {
-        // Replace with encodable
         var mutableCommand = command
         mutableCommand["id"] = requestID
         if let jsonData = try? JSONSerialization.data(withJSONObject: mutableCommand, options: []),
            let jsonString = String(data: jsonData, encoding: .utf8) {
-            print("jsonString: \(jsonString)")
             if isAuthenticated {
                 socket?.write(string: jsonString)
             } else {
                 requests.append(jsonString)
             }
+        } else {
+            Log.error("Failed to serialize JSON: \(command.description)")
         }
     }
 
