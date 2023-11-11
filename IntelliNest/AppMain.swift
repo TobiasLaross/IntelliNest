@@ -53,8 +53,8 @@ struct AppMain: App {
                         .navigationBarItems(leading: ToolbarBackButton())
                 }
                 .navigationBarTitleDisplayMode(.inline)
-                .onChange(of: scenePhase) { newPhase in
-                    if newPhase == .active {
+                .onChange(of: scenePhase) {
+                    if scenePhase == .active {
                         navigator.didEnterForeground()
                         performActionIfNeeded()
                     }

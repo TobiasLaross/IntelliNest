@@ -90,11 +90,11 @@ struct ClimateAutomationsView: View {
         HStack {
             Text("\(title)\(spaces)\(time, style: .time)")
             Toggle("", isOn: $climateBool.isActive)
-                .onChange(of: climateBool.isActive, perform: { _ in
+                .onChange(of: climateBool.isActive) {
                     Task {
                         await updateToggle(climateBool)
                     }
-                })
+                }
         }
         .padding([.horizontal, .bottom], 8)
     }
