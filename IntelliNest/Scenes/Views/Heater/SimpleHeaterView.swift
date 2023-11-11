@@ -80,9 +80,9 @@ struct SimpleHeaterView: View {
                                 DatePicker("", selection: $resetClimateTime.date, displayedComponents: .hourAndMinute)
                                     .labelsHidden()
                                     .colorScheme(.dark)
-                                    .onChange(of: resetClimateTime.date, perform: { _ in
+                                    .onChange(of: resetClimateTime.date) {
                                         setClimateScheduleTime(resetClimateTime)
-                                    })
+                                    }
                             }
                         }
                         .padding(.trailing, 270) // Space between Buttons and VStack

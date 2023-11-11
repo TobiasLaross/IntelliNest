@@ -13,11 +13,11 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
-| Commit count in main                | 28 | N/A |
-| Total deleted lines                 | 1487 | N/A |
-| Total added lines                   | 13590 | N/A |
+| Commit count in main                | 29 | N/A |
+| Total deleted lines                 | 1660 | N/A |
+| Total added lines                   | 13641 | N/A |
 
-Last Updated: 2023-11-10
+Last Updated: 2023-11-11
 ## Supported features
 ### Rest API and Websocket support
 Most views now use WebSocket instead of REST API for improved real-time updates.

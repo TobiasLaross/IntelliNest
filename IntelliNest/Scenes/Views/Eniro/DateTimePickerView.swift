@@ -23,20 +23,20 @@ struct DateTimePickerView: View {
                 .frame(width: 20)
             DatePicker("", selection: $dateTime.date, displayedComponents: displayComponents)
                 .labelsHidden()
-                .onChange(of: dateTime.date, perform: { _ in
+                .onChange(of: dateTime.date) {
                     if dateTimeLoaded {
                         dateTimeEnabled.isActive = true
                         setDateTimeClosure(dateTime)
                     } else {
                         dateTimeLoaded = true
                     }
-                })
+                }
             Toggle("", isOn: $dateTimeEnabled.isActive)
-                .onChange(of: dateTimeEnabled.isActive, perform: { _ in
+                .onChange(of: dateTimeEnabled.isActive) {
                     Task {
                         await updateToggle(dateTimeEnabled)
                     }
-                })
+                }
         }
         .padding([.horizontal, .bottom], 8)
     }

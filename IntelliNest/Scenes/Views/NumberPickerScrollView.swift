@@ -45,13 +45,13 @@ struct NumberPickerScrollView: View {
                     .onAppear {
                         scrollView.scrollTo(targetTemperature, anchor: .center)
                     }
-                    .onChange(of: targetTemperature, perform: { temp in
-                        scrollView.scrollTo(temp, anchor: .center)
+                    .onChange(of: targetTemperature) {
+                        scrollView.scrollTo(targetTemperature, anchor: .center)
                         if selectedNewNumber {
                             selectedNewNumber = false
-                            numberSelectedCallback(entityId, temp)
+                            numberSelectedCallback(entityId, targetTemperature)
                         }
-                    })
+                    }
                 }
                 .frame(width: pickerTextWidth * 3, height: 70, alignment: .leading)
             }
