@@ -60,7 +60,7 @@ struct EniroClimateView: View {
                                         iconForegroundColor: viewModel.climateIconColor,
                                         isLoading: false,
                                         isCircle: true,
-                                        action: viewModel.startClimate)
+                                        action: viewModel.toggleClimate)
                     NavigationLink(value: Destination.eniroClimateSchedule,
                                    label: { HassButtonLabel(button: AnyView(climateScheduleButton),
                                                             buttonFrameHeight: frameSize,

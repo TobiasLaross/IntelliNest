@@ -51,7 +51,6 @@ enum EntityId: String, Decodable, CaseIterable {
     case eniroClimateTemperature = "input_number.kia_climate_temperature"
     case eniroClimateHeating = "input_boolean.kia_climate_heating"
     case eniroClimateDefrost = "input_boolean.kia_climate_defrost"
-    case eniroClimateHot = "input_boolean.car_heat_and_defrost"
     case eniroDoorLock = "lock.e_niro_door_lock"
     case eniroForceCharge = "input_boolean.manually_charge_car"
     case eniroBatteryLevel = "sensor.e_niro_ev_battery_level"
@@ -75,6 +74,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case eniroGeoLocation = "sensor.e_niro_geocoded_location"
     case eniroRange = "sensor.e_niro_range_by_ev"
     case eniroClimateControl = "script.kia_climate_control"
+    case eniroTurnOffClimateControl = "script.turn_off_kia_climate_control"
     /* Eniro climate schedule */
     case eniroClimateSchedule1Bool = "input_boolean.kia_climate"
     case eniroClimateSchedule1 = "input_datetime.kia_climate"

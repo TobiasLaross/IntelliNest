@@ -24,8 +24,13 @@ struct EniroGeoEntity: EntityProtocol {
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
         self.state = state
-        self.address = ""
-        updateIsActive()
+        address = ""
+    }
+
+    init(entityId: EntityId, state: String, addressDict: [String: Any]) {
+        self.entityId = entityId
+        self.state = state
+        configureWith(addressDict: addressDict)
     }
 
     init(from decoder: Decoder) throws {
@@ -39,8 +44,23 @@ struct EniroGeoEntity: EntityProtocol {
         if address == "" {
             address = String(state.prefix(35))
         }
+    }
 
-        updateIsActive()
+    private mutating func configureWith(addressDict: [String: Any]) {
+        let road = addressDict[AddressCodingKeys.road.rawValue] as? String ?? ""
+        let village = extractVillage(from: addressDict)
+        let addressInstance = Address(road: road, village: village)
+        self.address = addressInstance.getAddress()
+    }
+
+    private func extractVillage(from dict: [String: Any]) -> String {
+        let villageKeys: [AddressCodingKeys] = [.village, .neighbourhood, .amenity, .town, .city, .suburb]
+        for key in villageKeys {
+            if let value = dict[key.rawValue] as? String, !value.isEmpty {
+                return value
+            }
+        }
+        return ""
     }
 
     private enum AttributesCodingKeys: String, CodingKey {
@@ -70,6 +90,11 @@ struct EniroGeoEntity: EntityProtocol {
         var road: String
         var village: String
 
+        init(road: String, village: String) {
+            self.road = road
+            self.village = village
+        }
+
         init(from decoder: Decoder) throws {
             let data = try decoder.container(keyedBy: AddressCodingKeys.self)
             road = try data.decodeIfPresent(String.self, forKey: .road) ?? ""
@@ -97,10 +122,6 @@ struct EniroGeoEntity: EntityProtocol {
                 return ""
             }
         }
-    }
-
-    mutating func updateIsActive() {
-        isActive = false
     }
 
     mutating func setNextUpdateTime() {

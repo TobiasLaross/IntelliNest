@@ -9,7 +9,9 @@ import Foundation
 
 struct InputNumberEntity: EntityProtocol {
     var entityId: EntityId
-    var state: String
+    var state: String { didSet {
+        inputNumber = Double(state) ?? 0
+    }}
     var lastUpdated: Date
     var lastChanged: Date
     var nextUpdate = NSDate().addingTimeInterval(-1)

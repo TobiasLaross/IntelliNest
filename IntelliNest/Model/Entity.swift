@@ -45,11 +45,9 @@ struct Entity: EntityProtocol {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let entityId = try EntityId(rawValue: container.decode(String.self, forKey: .entityId))
         self.entityId = entityId ?? EntityId.unknown
-        state = (try container.decodeIfPresent(String.self, forKey: .state)) ?? "Loading"
+        state = try (container.decodeIfPresent(String.self, forKey: .state)) ?? "Loading"
 
-        // Parsing lastChanged and lastUpdated in UTC
-        let utcDateFormatter = DateFormatter()
-        utcDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
+        let utcDateFormatter = Entity.utcDateFormatter
 
         if let lastChangedString = try container.decodeIfPresent(String.self, forKey: .lastChanged),
            let lastChangedDate = utcDateFormatter.date(from: lastChangedString) {
@@ -81,17 +79,35 @@ struct Entity: EntityProtocol {
     }
 
     private mutating func updateDate() {
-        let localDateFormatter = DateFormatter()
-        let utcDateFormatter = DateFormatter()
-        utcDateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-
-        // Detect if the state contains only time or both date and time
-        if state.count == 8 { // Only time (HH:mm:ss)
-            localDateFormatter.dateFormat = "HH:mm:ss"
-        } else { // Date and time
-            localDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        date = .distantPast
+        guard !state.isEmpty, state.contains(where: { $0 == "T" || $0 == ":" }) else {
+            return
         }
 
-        date = localDateFormatter.date(from: state) ?? Date.distantPast
+        let dateFormatter = DateFormatter()
+        let hasTimeComponent = state.contains(":")
+        let hasDateComponent = state.contains("T") || state.count > 8
+
+        switch (hasDateComponent, hasTimeComponent) {
+        case (true, true): // Date and Time
+            dateFormatter.dateFormat = state.contains("T") ? "yyyy-MM-dd'T'HH:mm:ssXXXXX" : "yyyy-MM-dd HH:mm:ss"
+            dateFormatter.timeZone = state.contains("T") ? TimeZone(abbreviation: "UTC") : .current
+            date = dateFormatter.date(from: state) ?? .distantPast
+        case (false, true): // Only Time
+            dateFormatter.dateFormat = "HH:mm:ss"
+            if let time = dateFormatter.date(from: state) {
+                date = time
+            }
+        default:
+            break
+        }
     }
+}
+
+extension Entity {
+    static let utcDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
+        return formatter
+    }()
 }

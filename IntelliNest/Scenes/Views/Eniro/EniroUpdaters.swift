@@ -23,7 +23,7 @@ struct EniroUpdaters: View {
 
         HStack {
             Button {
-                viewModel.updateTask()
+                viewModel.update()
             } label: {
                 HassCircleButtonLabelOld(dashboardButton: AnyView(updateButton))
             }.disabled(updateIsLoading)

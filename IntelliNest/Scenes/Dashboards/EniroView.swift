@@ -49,7 +49,7 @@ struct EniroView: View {
                 EniroInfoView(viewModel: viewModel)
                     .padding(.horizontal)
                 Spacer()
-                Text("Senast uppdaterad: \(viewModel.lastUpdated())")
+                Text("Senast uppdaterad: \(viewModel.lastUpdated)")
                     .font(Font.system(size: 12).italic())
                     .foregroundColor(.white)
                     .padding(.bottom)
@@ -71,6 +71,6 @@ struct EniroView: View {
 
 struct Eniro_Previews: PreviewProvider {
     static var previews: some View {
-        EniroView(viewModel: EniroViewModel(apiService: HassApiService(urlCreator: URLCreator()), appearedAction: { _ in }))
+        EniroView(viewModel: EniroViewModel(websocketService: WebSocketService(), appearedAction: { _ in }))
     }
 }

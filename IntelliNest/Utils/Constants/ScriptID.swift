@@ -22,4 +22,6 @@ enum ScriptID: String, Decodable, CaseIterable {
     case roborockKitchenTable = "script.dammsug_matbord"
     case roborockKitchenStove = "script.dammsug_matlagning"
     case saveClimateState = "script.save_climate_state"
+    case eniroStartClimate = "script.kia_climate_control"
+    case eniroTurnOffStartClimate = "script.turn_off_kia_climate_control"
 }
