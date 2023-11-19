@@ -60,6 +60,10 @@
 		F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */; };
 		F6591BFC2AFE31F300D5785E /* HorizontalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */; };
 		F6591BFE2AFE34FB00D5785E /* VerticalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */; };
+		F6591C012B07784D00D5785E /* ServiceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C002B07784D00D5785E /* ServiceID.swift */; };
+		F6591C032B07788600D5785E /* ServiceVariableKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C022B07788600D5785E /* ServiceVariableKeys.swift */; };
+		F6591C052B0778BC00D5785E /* CallServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C042B0778BC00D5785E /* CallServiceRequest.swift */; };
+		F6591C072B0787BA00D5785E /* VariableValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C062B0787BA00D5785E /* VariableValues.swift */; };
 		F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */; };
 		F662999027B3AA5A00121C14 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662998F27B3AA5A00121C14 /* Helpers.swift */; };
 		F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */; };
@@ -237,6 +241,11 @@
 		F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanModeButtonView.swift; sourceTree = "<group>"; };
 		F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalButtonView.swift; sourceTree = "<group>"; };
 		F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalButtonView.swift; sourceTree = "<group>"; };
+		F6591BFF2B020DD600D5785E /* IntelliNest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IntelliNest.entitlements; sourceTree = "<group>"; };
+		F6591C002B07784D00D5785E /* ServiceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceID.swift; sourceTree = "<group>"; };
+		F6591C022B07788600D5785E /* ServiceVariableKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceVariableKeys.swift; sourceTree = "<group>"; };
+		F6591C042B0778BC00D5785E /* CallServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallServiceRequest.swift; sourceTree = "<group>"; };
+		F6591C062B0787BA00D5785E /* VariableValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableValues.swift; sourceTree = "<group>"; };
 		F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
 		F662998F27B3AA5A00121C14 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleView.swift; sourceTree = "<group>"; };
@@ -511,6 +520,7 @@
 			children = (
 				F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */,
 				F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */,
+				F6591C042B0778BC00D5785E /* CallServiceRequest.swift */,
 				F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */,
 				F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */,
 			);
@@ -593,6 +603,7 @@
 		F67023F927A177320070FFBB /* IntelliNest */ = {
 			isa = PBXGroup;
 			children = (
+				F6591BFF2B020DD600D5785E /* IntelliNest.entitlements */,
 				F62750AD2A01119000C1253F /* Navigation */,
 				F62CD2E6287713F900462092 /* Errors */,
 				F62CD2E128770D4900462092 /* ViewModel */,
@@ -641,12 +652,15 @@
 				F60345C327A933D700212D04 /* GlobalConstants.swift */,
 				F61BF9A92A16749D00C1802E /* JSONKey.swift */,
 				F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */,
+				F6591C022B07788600D5785E /* ServiceVariableKeys.swift */,
+				F6591C062B0787BA00D5785E /* VariableValues.swift */,
 				F61BF99D2A1655E900C1802E /* StorageKeys.swift */,
 				F6F1D08329A67B3200A3292E /* FullScreenBackgroundOverlay.swift */,
 				F6DBA4D328F09C7F001BA1C0 /* Closures.swift */,
 				F68DA61F28B4C13000601726 /* Domain.swift */,
 				F68DA61A28B4C0C100601726 /* EntityId.swift */,
 				F62542E72A5DD27600B4DDD4 /* ScriptID.swift */,
+				F6591C002B07784D00D5785E /* ServiceID.swift */,
 				F61BF99F2A166B2700C1802E /* LockID.swift */,
 				F67C0B6C298D07E50096AE49 /* DeviceID.swift */,
 				F68DA61D28B4C11600601726 /* Heater.swift */,
@@ -929,6 +943,7 @@
 				F68DA61E28B4C11600601726 /* Heater.swift in Sources */,
 				F6F1D07A299110EC00A3292E /* NordPoolHistoryView.swift in Sources */,
 				F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */,
+				F6591C072B0787BA00D5785E /* VariableValues.swift in Sources */,
 				F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */,
 				F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */,
 				F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */,
@@ -953,6 +968,7 @@
 				F6EF35B12A3CA96E00895250 /* ScriptVariableKeys.swift in Sources */,
 				F68DA61228AE35F300601726 /* BulbButton.swift in Sources */,
 				F662999627B4185D00121C14 /* BatteryView.swift in Sources */,
+				F6591C052B0778BC00D5785E /* CallServiceRequest.swift in Sources */,
 				F6633F2E2863260B004D0B76 /* SimpleHeaterView.swift in Sources */,
 				F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */,
 				F61BF9A42A166E0D00C1802E /* LockState.swift in Sources */,
@@ -1013,6 +1029,7 @@
 				F669C72C2A23C06200458165 /* CameraView.swift in Sources */,
 				F6633F3A28632954004D0B76 /* FanModeView.swift in Sources */,
 				F6EF35B92A3EC47200895250 /* UserManager.swift in Sources */,
+				F6591C032B07788600D5785E /* ServiceVariableKeys.swift in Sources */,
 				F62542E62A5C5C7600B4DDD4 /* ServiceData.swift in Sources */,
 				F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */,
 				F61BF9A02A166B2700C1802E /* LockID.swift in Sources */,
@@ -1033,6 +1050,7 @@
 				F6F8555F28DF755D004B9517 /* EniroCharging.swift in Sources */,
 				F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */,
 				F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */,
+				F6591C012B07784D00D5785E /* ServiceID.swift in Sources */,
 				F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */,
 				F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */,
 				F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */,
@@ -1223,6 +1241,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
@@ -1260,6 +1279,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
@@ -1410,6 +1430,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";

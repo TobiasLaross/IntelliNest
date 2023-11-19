@@ -23,7 +23,7 @@ class Navigator {
     lazy var heatersViewModel = HeatersViewModel(websocketService: webSocketService,
                                                  apiService: hassApiService,
                                                  appearedAction: setCurrentDestination)
-    lazy var eniroViewModel = EniroViewModel(apiService: hassApiService, appearedAction: setCurrentDestination)
+    lazy var eniroViewModel = EniroViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
     lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: hassApiService,
                                                                            appearedAction: setCurrentDestination)
     lazy var roborockViewModel = RoborockViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
@@ -72,9 +72,7 @@ class Navigator {
     }
 
     func startKiaHeater() {
-        Task {
-            await hassApiService.callScript(entityId: .eniroClimateControl)
-        }
+        webSocketService.callScript(scriptID: .eniroStartClimate)
     }
 
     @MainActor
@@ -85,7 +83,7 @@ class Navigator {
         case .heaters:
             await heatersViewModel.reload()
         case .eniro:
-            await eniroViewModel.reload()
+            break
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
         case .roborock:

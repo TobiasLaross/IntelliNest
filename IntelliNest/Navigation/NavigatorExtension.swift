@@ -21,6 +21,10 @@ extension Navigator: WebSocketServiceDelegate {
         if roborockViewModel.entityIDs.contains(entityID) {
             roborockViewModel.reload(entityID: entityID, state: state)
         }
+
+        if eniroViewModel.entityIDs.contains(entityID) {
+            eniroViewModel.reload(entityID: entityID, state: state)
+        }
     }
 
     func webSocketService(didReceiveLight entityID: EntityId, state: String, brightness: Int?) {
@@ -39,6 +43,14 @@ extension Navigator: WebSocketServiceDelegate {
 
     func webSocketService(didReceiveHeater heater: HeaterEntity) {
         heatersViewModel.reloadHeater(heater)
+    }
+
+    func webSocketService(didReceiveEniroGeoEntity geoEntity: EniroGeoEntity) {
+        eniroViewModel.reloadGeoEntity(geoEntity: geoEntity)
+    }
+
+    func webSocketService(didReceiveNordPoolEntity nordPoolEntity: NordPoolEntity) {
+        eniroViewModel.reloadNordPoolEntity(nordPoolEntity: nordPoolEntity)
     }
 }
 

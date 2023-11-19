@@ -23,7 +23,7 @@ struct DashboardButtonView: View {
     let buttonFrameWidth: CGFloat
     let buttonFrameHeight: CGFloat
     let buttonCornerRadius: CGFloat
-    var action: VoidClosure
+    var action: MainActorVoidClosure
 
     init(text: String,
          isActive: Bool = false,
@@ -40,7 +40,7 @@ struct DashboardButtonView: View {
          buttonFrameWidth: CGFloat = dashboardButtonFrameWidth,
          buttonFrameHeight: CGFloat = dashboardButtonFrameHeight,
          buttonCornerRadius: CGFloat = dashboardButtonCornerRadius,
-         action: @escaping VoidClosure) {
+         action: @escaping MainActorVoidClosure) {
         self.text = text
         self.isActive = isActive
         self.activeColor = activeColor

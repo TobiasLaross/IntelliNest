@@ -16,14 +16,12 @@ struct DoorLock: View {
     var body: some View {
         Button {
             viewModel.lock()
-            viewModel.initiateForceUpdate()
         } label: {
             HassCircleButtonLabelOld(dashboardButton: AnyView(lockDoorButton))
         }
 
         Button {
             viewModel.unlock()
-            viewModel.initiateForceUpdate()
         } label: {
             HassCircleButtonLabelOld(dashboardButton: AnyView(unlockDoorButton))
         }

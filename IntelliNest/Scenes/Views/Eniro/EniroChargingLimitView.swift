@@ -39,6 +39,6 @@ struct EniroChargingLimitView: View {
 
 struct EniroChargingLimitView_Previews: PreviewProvider {
     static var previews: some View {
-        EniroChargingLimitView(viewModel: .init(apiService: HassApiService(urlCreator: URLCreator()), appearedAction: { _ in }))
+        EniroChargingLimitView(viewModel: .init(websocketService: WebSocketService(), appearedAction: { _ in }))
     }
 }

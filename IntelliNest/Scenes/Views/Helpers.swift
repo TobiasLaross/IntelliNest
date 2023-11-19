@@ -107,7 +107,7 @@ struct SwitchButton<T: EntityProtocol>: View {
                     Image(entity.isActive ? activeImageName : defaultImageName)
                         .resizable()
                         .frame(width: buttonImageSize, height: buttonImageSize, alignment: .center)
-                        .foregroundColor(.yellow)
+                        .foregroundColor(entity.isActive ? .yellow : .white)
                 }
 
                 if buttonTitle != "" {

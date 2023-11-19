@@ -1,5 +1,5 @@
-//
 //  WebsocketService.swift
+//
 //  IntelliNest
 //
 //  Created by Tobias on 2023-06-02.
@@ -61,21 +61,6 @@ class WebSocketService {
 
     func connect() {
         socket?.connect()
-    }
-
-    private func sendJSONCommand(_ command: [String: Any], requestID: Int) {
-        var mutableCommand = command
-        mutableCommand["id"] = requestID
-        if let jsonData = try? JSONSerialization.data(withJSONObject: mutableCommand, options: []),
-           let jsonString = String(data: jsonData, encoding: .utf8) {
-            if isAuthenticated {
-                socket?.write(string: jsonString)
-            } else {
-                requests.append(jsonString)
-            }
-        } else {
-            Log.error("Failed to serialize JSON: \(command.description)")
-        }
     }
 
     private func sendJSONCommand<T: Encodable>(_ command: T, requestID: Int? = nil) {
@@ -218,6 +203,13 @@ extension WebSocketService: WebSocketDelegate {
         sendJSONCommand(updateEntityRequest)
     }
 
+    func updateInputNumberEntity(entityId: EntityId, value: Double) {
+        var updateEntityRequest = UpdateEntityRequest(domain: .inputNumber, action: .setValue, entityIds: [entityId])
+        let serviceData = InputNumberServiceData(value: value)
+        updateEntityRequest.serviceData = serviceData
+        sendJSONCommand(updateEntityRequest)
+    }
+
     func updateDateTimeEntity(entity: Entity) {
         var updateEntityRequest = UpdateEntityRequest(domain: .inputDateTime, action: .setDateTime, entityIds: [entity.entityId])
         let serviceData = DateTimeServiceData(date: entity.date)
@@ -228,6 +220,16 @@ extension WebSocketService: WebSocketDelegate {
     func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil) {
         let callScriptRequest = CallScriptRequest(scriptID: scriptID, variables: variables)
         sendJSONCommand(callScriptRequest)
+    }
+
+    func callService(serviceID: ServiceID, variables: [ServiceVariableKeys: VariableValue]? = nil) {
+        let callServiceRequest = CallServiceRequest(serviceID: serviceID, serviceData: variables)
+        sendJSONCommand(callServiceRequest)
+    }
+
+    func callService(serviceID: ServiceID, variables: [ServiceVariableKeys: String]? = nil) {
+        let callServiceRequest = CallServiceRequest(serviceID: serviceID, serviceData: variables)
+        sendJSONCommand(callServiceRequest)
     }
 
     private func subscribe() {
@@ -254,13 +256,23 @@ extension WebSocketService: WebSocketDelegate {
             var brightness: Int?
             var status: String?
             var batteryLevel: Int?
+            var addressDict: [String: Any]?
             let lastChangedString = newState["last_changed"] as? String
             let lastChanged = Date.fromISO8601(lastChangedString)
+            var todayPrices: [Int] = []
+            var tomorrowPrices: [Int] = []
 
             if let attributes = newState["attributes"] as? [String: Any] {
                 brightness = attributes["brightness"] as? Int
                 status = attributes["status"] as? String
                 batteryLevel = attributes["battery_level"] as? Int
+                addressDict = attributes["address"] as? [String: Any]
+                if let tempTodayPrices = attributes["today"] as? [Float?] {
+                    todayPrices = tempTodayPrices.map { Int($0 ?? 0) }
+                }
+                if let tempTomorrowPrices = attributes["tomorrow"] as? [Float?] {
+                    tomorrowPrices = tempTomorrowPrices.map { Int($0 ?? 0) }
+                }
             }
 
             if entityID == .roborock {
@@ -270,6 +282,14 @@ extension WebSocketService: WebSocketDelegate {
             } else if entityID == .heaterCorridor || entityID == .heaterPlayroom {
                 let heater = HeaterEntity(entityID: entityID, state: state, attributes: newState)
                 delegate?.webSocketService(didReceiveHeater: heater)
+            } else if entityID == .eniroGeoLocation, let addressDict {
+                let eniroGeoEntity = EniroGeoEntity(entityId: .eniroGeoLocation, state: state, addressDict: addressDict)
+                delegate?.webSocketService(didReceiveEniroGeoEntity: eniroGeoEntity)
+            } else if entityID == .nordPool {
+                var nordPoolEntity = NordPoolEntity(entityId: entityID, state: state)
+                nordPoolEntity.today = todayPrices
+                nordPoolEntity.tomorrow = tomorrowPrices
+                delegate?.webSocketService(didReceiveNordPoolEntity: nordPoolEntity)
             } else {
                 delegate?.webSocketService(didReceiveEntity: entityID, state: state, lastChanged: lastChanged)
             }
@@ -287,24 +307,21 @@ extension WebSocketService: WebSocketDelegate {
 extension WebSocketService: WebsocketServiceProtocol {
     @discardableResult
     func sendCameraStreamRequest(for cameraEntityID: EntityId) -> Int {
-        let cameraStreamRequest: [String: Any] = [
-            "type": "camera/stream",
-            "entity_id": "\(cameraEntityID.rawValue)"
-        ]
         let requestID = getNextRequestID()
-        sendJSONCommand(cameraStreamRequest, requestID: requestID)
+        let serviceRequest = CallServiceRequest(serviceID: .cameraStream, serviceData: [.entityID: cameraEntityID.rawValue])
+        sendJSONCommand(serviceRequest, requestID: requestID)
         return requestID
     }
 }
 
 extension String {
     var removingHTTPSchemeAndTrailingSlash: String {
-        self.replacingOccurrences(of: "http://", with: "").replacingOccurrences(of: "https://", with: "").removingTrailingSlash
+        replacingOccurrences(of: "http://", with: "").replacingOccurrences(of: "https://", with: "").removingTrailingSlash
     }
 
     var removingTrailingSlash: String {
-        if self.hasSuffix("/") {
-            return String(self.dropLast())
+        if hasSuffix("/") {
+            return String(dropLast())
         }
         return self
     }

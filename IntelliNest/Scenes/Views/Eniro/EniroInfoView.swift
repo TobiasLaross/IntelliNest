@@ -17,7 +17,7 @@ struct EniroInfoView: View {
                                                defaultImageName: "powerplug",
                                                buttonImageSize: 20)
         VStack {
-            Text("Bilen är \(viewModel.doorLock.stateToString()) på: \(viewModel.getAddress())")
+            Text("Bilen är **\(viewModel.doorLock.stateToString())** på: \(viewModel.getAddress())")
                 .foregroundColor(.white)
             Spacer()
                 .frame(height: 20)

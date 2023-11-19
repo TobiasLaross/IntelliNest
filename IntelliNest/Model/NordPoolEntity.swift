@@ -32,9 +32,13 @@ struct NordPoolEntity: EntityProtocol {
         stride(from: 0, to: 25, by: 4).map { $0 }
     }
 
-    var today: [Int] = []
+    var today: [Int] = [] { didSet {
+        populatePriceData()
+    }}
     var priceData: [NordPoolPriceData] = []
-    var tomorrow: [Int] = []
+    var tomorrow: [Int] = [] { didSet {
+        populatePriceData()
+    }}
 
     var tomorrowValid = false
 
@@ -60,7 +64,6 @@ struct NordPoolEntity: EntityProtocol {
         today = attributes.today.map { Int($0 ?? 0) }
         tomorrow = attributes.tomorrow.map { Int($0 ?? 0) }
         tomorrowValid = attributes.tomorrowValid
-        populatePriceData()
         updateIsActive()
     }
 

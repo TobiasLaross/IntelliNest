@@ -13,4 +13,6 @@ protocol WebSocketServiceDelegate: AnyObject {
     func webSocketService(didReceiveLight entityID: EntityId, state: String, brightness: Int?)
     func webSocketService(didReceiveRoborock entityID: EntityId, state: String, status: String?, batteryLevel: Int?)
     func webSocketService(didReceiveHeater heater: HeaterEntity)
+    func webSocketService(didReceiveEniroGeoEntity geoEntity: EniroGeoEntity)
+    func webSocketService(didReceiveNordPoolEntity nordPoolEntity: NordPoolEntity)
 }
