@@ -80,8 +80,8 @@ struct Entity: EntityProtocol {
     }
 
     private mutating func updateDate() {
+        date = .distantPast
         guard !state.isEmpty, state.contains(where: { $0 == "T" || $0 == ":" }) else {
-            date = .distantPast
             return
         }
 
@@ -92,22 +92,15 @@ struct Entity: EntityProtocol {
         switch (hasDateComponent, hasTimeComponent) {
         case (true, true): // Date and Time
             dateFormatter.dateFormat = state.contains("T") ? "yyyy-MM-dd'T'HH:mm:ssXXXXX" : "yyyy-MM-dd HH:mm:ss"
-            dateFormatter.timeZone = state.contains("T") ? TimeZone(abbreviation: "UTC") : TimeZone.current
-
+            dateFormatter.timeZone = state.contains("T") ? TimeZone(abbreviation: "UTC") : .current
+            date = dateFormatter.date(from: state) ?? .distantPast
         case (false, true): // Only Time
             dateFormatter.dateFormat = "HH:mm:ss"
             if let time = dateFormatter.date(from: state) {
                 date = time
-            } else {
-                date = .distantPast
             }
-            return
-
         default:
-            date = .distantPast
-            return
+            break
         }
-
-        date = dateFormatter.date(from: state) ?? .distantPast
     }
 }

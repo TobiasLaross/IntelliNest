@@ -25,12 +25,15 @@ struct CallServiceRequest: Encodable {
         type = "call_service"
 
         let components = serviceID.rawValue.split(separator: ".")
-        guard components.count == 2 else {
-            fatalError("Invalid ServiceID format: \(serviceID.rawValue)")
+        if components.count == 2 {
+            domain = String(components[0])
+            service = String(components[1])
+        } else {
+            domain = serviceID.rawValue
+            service = serviceID.rawValue
+            Log.error("ServiceID \(serviceID) does not specify domain and service")
         }
 
-        domain = String(components[0])
-        service = String(components[1])
         self.serviceData = serviceData
     }
 
