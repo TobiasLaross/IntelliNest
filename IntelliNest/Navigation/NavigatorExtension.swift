@@ -18,6 +18,10 @@ extension Navigator: WebSocketServiceDelegate {
             homeViewModel.reload(entityID: entityID, state: state, lastChanged: lastChanged)
         }
 
+        if heatersViewModel.entityIDs.contains(entityID) {
+            heatersViewModel.reload(entityID: entityID, state: state)
+        }
+
         if roborockViewModel.entityIDs.contains(entityID) {
             roborockViewModel.reload(entityID: entityID, state: state)
         }
