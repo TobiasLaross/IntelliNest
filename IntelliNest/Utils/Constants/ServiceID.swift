@@ -17,4 +17,6 @@ enum ServiceID: String, Decodable, CaseIterable {
     case kiaChargeLimit = "kia_uvo.set_charge_limits"
     case kiaStopClimate = "kia_uvo.stop_climate"
     case cameraStream = "camera/stream"
+    case boolTurnOn = "input_boolean.turn_on"
+    case boolTurnOff = "input_boolean.turn_off"
 }

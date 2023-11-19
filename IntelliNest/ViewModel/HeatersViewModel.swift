@@ -107,7 +107,8 @@ class HeatersViewModel: HassAPIViewModelProtocol {
 
     private func toggleHeaterTimerMode(heaterEntityID: EntityId, heaterTimerModeEntityID: EntityId, dateEntity: Entity, action: Action) {
         var dateEntity = dateEntity
-        websocketService.updateEntity(entityID: heaterTimerModeEntityID, domain: .inputBoolean, action: action)
+        let serviceID: ServiceID = action == .turnOn ? .boolTurnOn : .boolTurnOff
+        websocketService.callService(serviceID: serviceID, variables: [.entityID: heaterTimerModeEntityID.rawValue])
 
         if action == .turnOn {
             let calendar = Calendar.current

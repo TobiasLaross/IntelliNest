@@ -47,8 +47,7 @@ struct Entity: EntityProtocol {
         self.entityId = entityId ?? EntityId.unknown
         state = try (container.decodeIfPresent(String.self, forKey: .state)) ?? "Loading"
 
-        let utcDateFormatter = DateFormatter()
-        utcDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
+        let utcDateFormatter = Entity.utcDateFormatter
 
         if let lastChangedString = try container.decodeIfPresent(String.self, forKey: .lastChanged),
            let lastChangedDate = utcDateFormatter.date(from: lastChangedString) {
@@ -103,4 +102,12 @@ struct Entity: EntityProtocol {
             break
         }
     }
+}
+
+extension Entity {
+    static let utcDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
+        return formatter
+    }()
 }
