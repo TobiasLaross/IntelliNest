@@ -67,7 +67,7 @@ class HeatersViewModel: HassAPIViewModelProtocol {
     func toggleCorridorTimerMode() {
         let action: Action = heaterCorridorTimerMode.isActive ? .turnOff : .turnOn
         toggleHeaterTimerMode(heaterEntityID: heaterCorridor.entityId,
-                              heaterTimerModeEntityID: .heaterCorridorTimerMode,
+                              heaterTimerModeEntityID: heaterCorridorTimerMode.entityId,
                               dateEntity: resetCorridorHeaterTime,
                               action: action)
     }
@@ -75,7 +75,7 @@ class HeatersViewModel: HassAPIViewModelProtocol {
     func togglePlayroomTimerMode() {
         let action: Action = heaterPlayroomTimerMode.isActive ? .turnOff : .turnOn
         toggleHeaterTimerMode(heaterEntityID: heaterPlayroom.entityId,
-                              heaterTimerModeEntityID: .heaterPlayroomTimerMode,
+                              heaterTimerModeEntityID: heaterPlayroomTimerMode.entityId,
                               dateEntity: resetPlayroomHeaterTime,
                               action: action)
     }
