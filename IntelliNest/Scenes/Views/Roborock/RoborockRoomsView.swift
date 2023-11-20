@@ -15,73 +15,99 @@ struct RoborockRoomsView: View {
             VStack {
                 Spacer()
                     .frame(height: 50)
-                RoborockRoomButton(roborockRoom: .roborockHallway,
-                                   roomName: "Hallen",
-                                   imageName: "hallway",
-                                   isSystemName: false,
-                                   buttonWidth: 140,
-                                   callScriptClosure: callScriptClosure)
-                    .padding(.bottom, 5)
-                RoborockRoomButton(roborockRoom: .roborockKitchen,
-                                   roomName: "Köket",
-                                   imageName: "fork.knife",
-                                   buttonWidth: 90,
-                                   buttonHeight: 120,
-                                   callScriptClosure: callScriptClosure)
-                    .contextMenu {
-                        Button(action: {
-                            callScriptClosure(.roborockKitchenStove)
-                        }, label: {
-                            Text("Spisen")
-                        })
-                        Button(action: {
-                            callScriptClosure(.roborockKitchenTable)
-                        }, label: {
-                            Text("Matbordet")
-                        })
-                    }
-
-                RoborockRoomButton(roborockRoom: .roborockLaundry,
-                                   roomName: "Tvättstugan",
-                                   imageName: "washing",
-                                   isSystemName: false,
-                                   buttonWidth: 90,
-                                   buttonHeight: 70,
-                                   callScriptClosure: callScriptClosure)
+                DashboardButtonView(text: "Hallen",
+                                    icon: .init(imageName: .hallway),
+                                    iconWidth: 30,
+                                    iconHeight: 30,
+                                    buttonFrameWidth: 140,
+                                    buttonFrameHeight: 60,
+                                    action: {
+                                        callScriptClosure(.roborockHallway)
+                                    })
+                                    .padding(.bottom, 5)
+                DashboardButtonView(text: "Köket",
+                                    icon: .init(systemImageName: .forkKnife),
+                                    iconWidth: 20,
+                                    iconHeight: 20,
+                                    buttonFrameWidth: 90,
+                                    buttonFrameHeight: 100,
+                                    action: {
+                                        callScriptClosure(.roborockKitchen)
+                                    })
+                                    .contextMenu {
+                                        Button(action: {
+                                            callScriptClosure(.roborockKitchenStove)
+                                        }, label: {
+                                            Text("Spisen")
+                                        })
+                                        Button(action: {
+                                            callScriptClosure(.roborockKitchenTable)
+                                        }, label: {
+                                            Text("Matbordet")
+                                        })
+                                    }
+                DashboardButtonView(text: "Tvättstugan",
+                                    icon: .init(imageName: .washing),
+                                    iconWidth: 20,
+                                    iconHeight: 20,
+                                    buttonFrameWidth: 90,
+                                    buttonFrameHeight: 70,
+                                    action: {
+                                        callScriptClosure(.roborockLaundry)
+                                    })
             }
 
             VStack(alignment: .trailing) {
                 HStack {
-                    RoborockRoomButton(roborockRoom: .roborockCorridor,
-                                       roomName: "Korridoren",
-                                       imageName: "hallway",
-                                       isSystemName: false,
-                                       buttonHeight: 200,
-                                       callScriptClosure: callScriptClosure)
+                    DashboardButtonView(text: "Korridoren",
+                                        icon: .init(imageName: .hallway),
+                                        iconWidth: 20,
+                                        iconHeight: 20,
+                                        buttonFrameWidth: 80,
+                                        buttonFrameHeight: 200,
+                                        action: {
+                                            callScriptClosure(.roborockCorridor)
+                                        })
                     VStack {
-                        RoborockRoomButton(roborockRoom: .roborockBedroom,
-                                           roomName: "Sovrummet",
-                                           imageName: "bed.double",
-                                           callScriptClosure: callScriptClosure)
-                        RoborockRoomButton(roborockRoom: .roborockGym,
-                                           roomName: "Gymmet",
-                                           imageName: "gym",
-                                           isSystemName: false,
-                                           callScriptClosure: callScriptClosure)
-                        RoborockRoomButton(roborockRoom: .roborockVinceRoom,
-                                           roomName: "Vince rum",
-                                           imageName: "vince",
-                                           isSystemName: false,
-                                           callScriptClosure: callScriptClosure)
+                        DashboardButtonView(text: "Sovrummet",
+                                            icon: .init(systemImageName: .bedDouble),
+                                            iconWidth: 20,
+                                            iconHeight: 20,
+                                            buttonFrameWidth: 85,
+                                            buttonFrameHeight: 75,
+                                            action: {
+                                                callScriptClosure(.roborockBedroom)
+                                            })
+                        DashboardButtonView(text: "Gymmet",
+                                            icon: .init(imageName: .gym),
+                                            iconWidth: 20,
+                                            iconHeight: 20,
+                                            buttonFrameWidth: 85,
+                                            buttonFrameHeight: 65,
+                                            action: {
+                                                callScriptClosure(.roborockGym)
+                                            })
+                        DashboardButtonView(text: "Vince rum",
+                                            icon: .init(imageName: .vince),
+                                            iconWidth: 20,
+                                            iconHeight: 20,
+                                            buttonFrameWidth: 85,
+                                            buttonFrameHeight: 75,
+                                            action: {
+                                                callScriptClosure(.roborockVinceRoom)
+                                            })
                     }
                 }
 
-                RoborockRoomButton(roborockRoom: .roborockLivingroom,
-                                   roomName: "Vardagsrummet",
-                                   imageName: "play.tv",
-                                   buttonWidth: 160,
-                                   buttonHeight: 70,
-                                   callScriptClosure: callScriptClosure)
+                DashboardButtonView(text: "Vardagsrummet",
+                                    icon: .init(systemImageName: .playTV),
+                                    iconWidth: 20,
+                                    iconHeight: 20,
+                                    buttonFrameWidth: 160,
+                                    buttonFrameHeight: 70,
+                                    action: {
+                                        callScriptClosure(.roborockLivingroom)
+                                    })
             }
         }
         .padding()

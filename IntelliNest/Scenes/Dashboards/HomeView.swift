@@ -27,41 +27,44 @@ struct HomeView: View {
                                      buttonImageWidth: 30,
                                      buttonImageHeight: 50,
                                      isActive: viewModel.allLights.isActive)
-
         ZStack {
-            LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 3), alignment: .center, spacing: 10) {
-                NavigationLink(value: Destination.heaters,
-                               label: { HassButtonLabel(button: AnyView(heatersButton)) })
+            VStack {
+                HouseInfoView(viewModel: viewModel)
+                    .padding(.vertical, 20)
+                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 3), alignment: .center, spacing: 10) {
+                    NavigationLink(value: Destination.heaters,
+                                   label: { HassButtonLabel(button: AnyView(heatersButton)) })
 
-                NavigationLink(value: Destination.eniro,
-                               label: { HassButtonLabel(button: AnyView(carButton)) })
+                    NavigationLink(value: Destination.eniro,
+                                   label: { HassButtonLabel(button: AnyView(carButton)) })
 
-                CoffeeMachineButtonView(viewModel: viewModel)
-                SideDoorButtonView(viewModel: viewModel)
-                FrontDoorButtonView(viewModel: viewModel)
-                StorageDoorButtonView(viewModel: viewModel)
+                    CoffeeMachineButtonView(viewModel: viewModel)
+                    SideDoorButtonView(viewModel: viewModel)
+                    FrontDoorButtonView(viewModel: viewModel)
+                    StorageDoorButtonView(viewModel: viewModel)
 
-                if UserManager.currentUser == .tobias {
-                    SarahsIphoneButton(viewModel: viewModel)
-                }
-
-                NavigationLink(value: Destination.roborock,
-                               label: { HassButtonLabel(button: AnyView(roborockButton)) })
-                NavigationLink(value: Destination.cameras,
-                               label: { HassButtonLabel(button: AnyView(cctvButton)) })
-
-                NavigationLink(value: Destination.lights,
-                               label: { HassButtonLabel(button: AnyView(lightsButton)) })
-                    .contextMenu {
-                        Button {
-                            viewModel.toggle(light: viewModel.allLights)
-                        } label: {
-                            Text("Toggla lampor")
-                        }
+                    if UserManager.currentUser == .tobias {
+                        SarahsIphoneButton(viewModel: viewModel)
                     }
+
+                    NavigationLink(value: Destination.roborock,
+                                   label: { HassButtonLabel(button: AnyView(roborockButton)) })
+                    NavigationLink(value: Destination.cameras,
+                                   label: { HassButtonLabel(button: AnyView(cctvButton)) })
+
+                    NavigationLink(value: Destination.lights,
+                                   label: { HassButtonLabel(button: AnyView(lightsButton)) })
+                        .contextMenu {
+                            Button {
+                                viewModel.toggle(light: viewModel.allLights)
+                            } label: {
+                                Text("Toggla lampor")
+                            }
+                        }
+                }
+                .padding(.horizontal, 20)
+                Spacer(minLength: 50)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
 
             if viewModel.shouldShowCoffeeMachineScheduling {
                 CoffeeMachineSchedulingView(isVisible: $viewModel.shouldShowCoffeeMachineScheduling,
@@ -70,6 +73,9 @@ struct HomeView: View {
                                             coffeeMachineStartTimeEnabled: viewModel.coffeeMachineStartTimeEnabled,
                                             setCoffeeMachineStartTime: viewModel.updateDateTimeEntity,
                                             toggleStartTimeEnabledAction: viewModel.toggleCoffeeMachineStarTimeEnabled)
+            } else if viewModel.shouldShowNordpoolPrices {
+                NordPoolHistoryView(isVisible: $viewModel.shouldShowNordpoolPrices,
+                                    nordPool: viewModel.nordPool)
             }
         }
         .toolbar {
@@ -98,8 +104,6 @@ private struct SarahsIphoneButton: View {
                             isActive: viewModel.sarahsIphone.isActive,
                             icon: viewModel.sarahIphoneimage,
                             iconWidth: viewModel.sarahsIphone.isActive ? 60 : 25,
-                            isLoading: false,
-                            isCircle: false,
                             action: {
                                 isShowingAlert = true
                             })
@@ -111,9 +115,32 @@ private struct SarahsIphoneButton: View {
                                         Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
                                             viewModel.toggleStateForSarahsIphone()
                                         },
-                                    secondaryButton: .cancel()
-                                )
+                                    secondaryButton: .cancel())
                             }
+    }
+}
+
+private struct HouseInfoView: View {
+    @ObservedObject var viewModel: HomeViewModel
+
+    var body: some View {
+        HStack {
+            Spacer()
+            VStack(spacing: 8) {
+                CircleButtonView(buttonTitle: viewModel.tibberPrice.state.toOre(),
+                                 customFont: .circleButtonFontLarge,
+                                 icon: nil,
+                                 buttonSize: 60,
+                                 action: viewModel.showNordPoolPrices)
+                Text("""
+                Husets effekt: ***\(viewModel.pulsePower.state.toKW())***
+                Producerar: ***\(viewModel.solarPower.state.toKW())***
+                Förbrukat idag: ***\(viewModel.pulseConsumptionToday.state.toKWh())***
+                """)
+                .font(.circleButtonFontMedium)
+            }
+            .padding(.trailing, 20)
+        }
     }
 }
 
@@ -126,9 +153,7 @@ private struct CoffeeMachineButtonView: View {
                             activeColor: viewModel.coffeeMachine.activeColor,
                             icon: viewModel.coffeeMachine.image,
                             iconWidth: 30,
-                            isLoading: false,
                             indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
-                            isCircle: false,
                             action: viewModel.toggleCoffeeMachine)
             .contextMenu {
                 Button(action: {
@@ -149,7 +174,6 @@ private struct SideDoorButtonView: View {
                             icon: viewModel.sideDoor.image,
                             iconWidth: viewModel.sideDoor.isActive ? 40 : 30,
                             isLoading: viewModel.sideDoor.isLoading,
-                            isCircle: false,
                             action: viewModel.toggleStateForSideDoor)
             .disabled(viewModel.sideDoor.isLoading)
     }
@@ -164,7 +188,6 @@ private struct FrontDoorButtonView: View {
                             icon: viewModel.frontDoor.image,
                             iconWidth: viewModel.frontDoor.isActive ? 40 : 30,
                             isLoading: viewModel.frontDoor.isLoading,
-                            isCircle: false,
                             action: viewModel.toggleStateForFrontDoor)
             .disabled(viewModel.frontDoor.isLoading)
     }
@@ -179,7 +202,6 @@ private struct StorageDoorButtonView: View {
                             icon: viewModel.storageLock.image,
                             iconWidth: viewModel.storageLock.isActive ? 40 : 30,
                             isLoading: viewModel.storageLock.isLoading,
-                            isCircle: false,
                             action: viewModel.toggleStateForStorageLock)
             .disabled(viewModel.storageLock.isLoading)
             .contextMenu {
@@ -200,10 +222,15 @@ private struct StorageDoorButtonView: View {
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
         let hassApiService = HassApiService(urlCreator: URLCreator())
-        HomeView(viewModel: HomeViewModel(websocketService: .init(),
-                                          yaleApiService: YaleApiService(hassApiService: hassApiService),
-                                          urlCreator: URLCreator(),
-                                          toolbarReloadAction: {},
-                                          appearedAction: { _ in }))
+        let viewModel = HomeViewModel(websocketService: .init(),
+                                      yaleApiService: YaleApiService(hassApiService: hassApiService),
+                                      urlCreator: URLCreator(),
+                                      toolbarReloadAction: {},
+                                      appearedAction: { _ in })
+
+        VStack {
+            HomeView(viewModel: viewModel)
+            HouseInfoView(viewModel: viewModel)
+        }
     }
 }

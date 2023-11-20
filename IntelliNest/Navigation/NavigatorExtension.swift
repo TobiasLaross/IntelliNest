@@ -54,7 +54,7 @@ extension Navigator: WebSocketServiceDelegate {
     }
 
     func webSocketService(didReceiveNordPoolEntity nordPoolEntity: NordPoolEntity) {
-        eniroViewModel.reloadNordPoolEntity(nordPoolEntity: nordPoolEntity)
+        homeViewModel.reloadNordPoolEntity(nordPoolEntity: nordPoolEntity)
     }
 }
 

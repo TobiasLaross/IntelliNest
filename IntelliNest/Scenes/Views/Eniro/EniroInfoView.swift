@@ -11,11 +11,6 @@ struct EniroInfoView: View {
     @ObservedObject var viewModel: EniroViewModel
 
     var body: some View {
-        let forceChargingButton = SwitchButton(entity: $viewModel.forceCharging,
-                                               buttonTitle: "Tvinga laddning",
-                                               activeImageName: "powerplug",
-                                               defaultImageName: "powerplug",
-                                               buttonImageSize: 20)
         VStack {
             Text("Bilen är **\(viewModel.doorLock.stateToString())** på: \(viewModel.getAddress())")
                 .foregroundColor(.white)
@@ -26,19 +21,13 @@ struct EniroInfoView: View {
                             isCharging: viewModel.isCharging.isActive, degreeRotation: 90)
                     .padding(.trailing, 30)
 
-                Button {
-                    viewModel.toggleForceCharging()
-                } label: {
-                    HassCircleButtonLabelOld(dashboardButton: AnyView(forceChargingButton))
-                }
-
-                DashboardButtonView(text: "Elpris:\n\(viewModel.nordPool.price) öre",
-                                    isActive: false,
-                                    icon: nil,
-                                    isLoading: false,
-                                    isCircle: true,
-                                    action: viewModel.showNordPoolPrices)
-                    .padding(.horizontal)
+                CircleButtonView(buttonTitle: "Smart laddning",
+                                 isActive: !viewModel.forceCharging.isActive,
+                                 icon: .init(systemImageName: .powerplug),
+                                 iconWidth: 25,
+                                 iconHeight: 20,
+                                 isLoading: false,
+                                 action: viewModel.toggleForceCharging)
             }
         }
     }

@@ -16,6 +16,7 @@
 		F60345D427ABE49100212D04 /* LightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D327ABE49100212D04 /* LightsView.swift */; };
 		F60345D627ABE49700212D04 /* RoborockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D527ABE49700212D04 /* RoborockView.swift */; };
 		F6035045287F5DB10028DA57 /* SingleRoomLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6035044287F5DB10028DA57 /* SingleRoomLight.swift */; };
+		F607F6602B0DF2DC002F782F /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F607F65F2B0DF2DC002F782F /* FontExtension.swift */; };
 		F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99B2A1653E600C1802E /* YaleApiService.swift */; };
 		F61BF99E2A1655E900C1802E /* StorageKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99D2A1655E900C1802E /* StorageKeys.swift */; };
 		F61BF9A02A166B2700C1802E /* LockID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99F2A166B2700C1802E /* LockID.swift */; };
@@ -49,6 +50,7 @@
 		F62CD2E528770F3B00462092 /* HassApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E428770F3B00462092 /* HassApiService.swift */; };
 		F62CD2E82877140800462092 /* EntityError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E72877140800462092 /* EntityError.swift */; };
 		F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */; };
+		F63D1C6F2B0A605C004294D9 /* CircleButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D1C6E2B0A605C004294D9 /* CircleButtonView.swift */; };
 		F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D2B5B280E9EE000517746 /* LockEntity.swift */; };
 		F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */; };
 		F63F502E2A4862BB003A7100 /* UpdateEntityRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */; };
@@ -83,11 +85,11 @@
 		F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */; };
 		F6633F3F28632C81004D0B76 /* RoborockInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */; };
 		F6633F4328632EED004D0B76 /* RoborockRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */; };
-		F6633F4528632F5E004D0B76 /* RoborockRoomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4428632F5E004D0B76 /* RoborockRoomButton.swift */; };
 		F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4628633122004D0B76 /* RoborockMainButtons.swift */; };
 		F664BA7229B48AF80092CB2E /* EntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7129B48AF80092CB2E /* EntityTest.swift */; };
 		F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7329B48C510092CB2E /* DateExtension.swift */; };
 		F664BA7629B48F860092CB2E /* InputNumberEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */; };
+		F666B5F02B0E1F360057E8E3 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F666B5EF2B0E1F360057E8E3 /* StringExtension.swift */; };
 		F669C72C2A23C06200458165 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F669C72B2A23C06200458165 /* CameraView.swift */; };
 		F669C72E2A23C08000458165 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F669C72D2A23C08000458165 /* CameraViewModel.swift */; };
 		F669C7312A23D6DA00458165 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = F669C7302A23D6DA00458165 /* Starscream */; };
@@ -115,7 +117,7 @@
 		F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */; };
 		F6D167CC27C1287700DCC155 /* HvacModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CB27C1287700DCC155 /* HvacModeView.swift */; };
 		F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */; };
-		F6DBA4D028E82D6A001BA1C0 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4CF28E82D6A001BA1C0 /* Task.swift */; };
+		F6DBA4D028E82D6A001BA1C0 /* TaskExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4CF28E82D6A001BA1C0 /* TaskExtension.swift */; };
 		F6DBA4D428F09C7F001BA1C0 /* Closures.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4D328F09C7F001BA1C0 /* Closures.swift */; };
 		F6DE841D29F2A5BC002132A2 /* MyAppIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */; };
 		F6DE842529F2A696002132A2 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6DE842429F2A696002132A2 /* Intents.framework */; };
@@ -135,16 +137,12 @@
 		F6F118192827A15500251350 /* EniroGeoEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F118182827A15500251350 /* EniroGeoEntity.swift */; };
 		F6F1D078299104CD00A3292E /* NordPoolEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D077299104CD00A3292E /* NordPoolEntity.swift */; };
 		F6F1D07A299110EC00A3292E /* NordPoolHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */; };
-		F6F1D07C2992686E00A3292E /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D07B2992686E00A3292E /* Color.swift */; };
 		F6F1D07E299390C500A3292E /* CalendarExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D07D299390C500A3292E /* CalendarExtension.swift */; };
 		F6F1D08029A2174000A3292E /* EniroChargingLimitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D07F29A2174000A3292E /* EniroChargingLimitView.swift */; };
 		F6F1D08229A27A6100A3292E /* ImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D08129A27A6100A3292E /* ImageExtension.swift */; };
 		F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D08329A67B3200A3292E /* FullScreenBackgroundOverlay.swift */; };
 		F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D08529A94E8900A3292E /* LimitPickerView.swift */; };
 		F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */; };
-		F6F8555B28DCB0F1004B9517 /* EniroUpdaters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8555A28DCB0F1004B9517 /* EniroUpdaters.swift */; };
-		F6F8555D28DCF93E004B9517 /* EniroDoorLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8555C28DCF93E004B9517 /* EniroDoorLock.swift */; };
-		F6F8555F28DF755D004B9517 /* EniroCharging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8555E28DF755D004B9517 /* EniroCharging.swift */; };
 		F6F8556128DF9EE8004B9517 /* HeatersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */; };
 		F6F94B5E28B60DED006B1F12 /* EniroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */; };
 		F6FAD81A2A2A472000C0B364 /* CamerasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */; };
@@ -196,6 +194,7 @@
 		F60345D327ABE49100212D04 /* LightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsView.swift; sourceTree = "<group>"; };
 		F60345D527ABE49700212D04 /* RoborockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockView.swift; sourceTree = "<group>"; };
 		F6035044287F5DB10028DA57 /* SingleRoomLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleRoomLight.swift; sourceTree = "<group>"; };
+		F607F65F2B0DF2DC002F782F /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
 		F617062527C3CA9100183250 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F61BF99B2A1653E600C1802E /* YaleApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleApiService.swift; sourceTree = "<group>"; };
 		F61BF99D2A1655E900C1802E /* StorageKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageKeys.swift; sourceTree = "<group>"; };
@@ -230,6 +229,7 @@
 		F62CD2E428770F3B00462092 /* HassApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HassApiService.swift; sourceTree = "<group>"; };
 		F62CD2E72877140800462092 /* EntityError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityError.swift; sourceTree = "<group>"; };
 		F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualBulbRoomView.swift; sourceTree = "<group>"; };
+		F63D1C6E2B0A605C004294D9 /* CircleButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButtonView.swift; sourceTree = "<group>"; };
 		F63D2B5B280E9EE000517746 /* LockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntity.swift; sourceTree = "<group>"; };
 		F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideableProtocol.swift; sourceTree = "<group>"; };
 		F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateEntityRequest.swift; sourceTree = "<group>"; };
@@ -265,11 +265,11 @@
 		F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinceEmptiedView.swift; sourceTree = "<group>"; };
 		F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockInfoView.swift; sourceTree = "<group>"; };
 		F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockRoomsView.swift; sourceTree = "<group>"; };
-		F6633F4428632F5E004D0B76 /* RoborockRoomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockRoomButton.swift; sourceTree = "<group>"; };
 		F6633F4628633122004D0B76 /* RoborockMainButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockMainButtons.swift; sourceTree = "<group>"; };
 		F664BA7129B48AF80092CB2E /* EntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityTest.swift; sourceTree = "<group>"; };
 		F664BA7329B48C510092CB2E /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputNumberEntityTest.swift; sourceTree = "<group>"; };
+		F666B5EF2B0E1F360057E8E3 /* StringExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		F669C72B2A23C06200458165 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		F669C72D2A23C08000458165 /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
 		F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VLCMediaplayerMock.swift; sourceTree = "<group>"; };
@@ -300,7 +300,7 @@
 		F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterGroupLabels.swift; sourceTree = "<group>"; };
 		F6D167CB27C1287700DCC155 /* HvacModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HvacModeView.swift; sourceTree = "<group>"; };
 		F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPickerScrollView.swift; sourceTree = "<group>"; };
-		F6DBA4CF28E82D6A001BA1C0 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		F6DBA4CF28E82D6A001BA1C0 /* TaskExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskExtension.swift; sourceTree = "<group>"; };
 		F6DBA4D328F09C7F001BA1C0 /* Closures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Closures.swift; sourceTree = "<group>"; };
 		F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = MyAppIntents.intentdefinition; sourceTree = "<group>"; };
 		F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MyAppIntentsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -319,16 +319,12 @@
 		F6F118182827A15500251350 /* EniroGeoEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroGeoEntity.swift; sourceTree = "<group>"; };
 		F6F1D077299104CD00A3292E /* NordPoolEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NordPoolEntity.swift; sourceTree = "<group>"; };
 		F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NordPoolHistoryView.swift; sourceTree = "<group>"; };
-		F6F1D07B2992686E00A3292E /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		F6F1D07D299390C500A3292E /* CalendarExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarExtension.swift; sourceTree = "<group>"; };
 		F6F1D07F29A2174000A3292E /* EniroChargingLimitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroChargingLimitView.swift; sourceTree = "<group>"; };
 		F6F1D08129A27A6100A3292E /* ImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageExtension.swift; sourceTree = "<group>"; };
 		F6F1D08329A67B3200A3292E /* FullScreenBackgroundOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenBackgroundOverlay.swift; sourceTree = "<group>"; };
 		F6F1D08529A94E8900A3292E /* LimitPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitPickerView.swift; sourceTree = "<group>"; };
 		F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputNumberEntity.swift; sourceTree = "<group>"; };
-		F6F8555A28DCB0F1004B9517 /* EniroUpdaters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroUpdaters.swift; sourceTree = "<group>"; };
-		F6F8555C28DCF93E004B9517 /* EniroDoorLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroDoorLock.swift; sourceTree = "<group>"; };
-		F6F8555E28DF755D004B9517 /* EniroCharging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroCharging.swift; sourceTree = "<group>"; };
 		F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModel.swift; sourceTree = "<group>"; };
 		F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroViewModel.swift; sourceTree = "<group>"; };
 		F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CamerasViewModel.swift; sourceTree = "<group>"; };
@@ -553,7 +549,6 @@
 				F6633F3C28632C03004D0B76 /* SinceEmptiedView.swift */,
 				F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */,
 				F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */,
-				F6633F4428632F5E004D0B76 /* RoborockRoomButton.swift */,
 				F6633F4628633122004D0B76 /* RoborockMainButtons.swift */,
 			);
 			path = Roborock;
@@ -568,6 +563,7 @@
 				F6633F2A286324DE004D0B76 /* Heater */,
 				F6633F3B28632BF1004D0B76 /* Roborock */,
 				F662998F27B3AA5A00121C14 /* Helpers.swift */,
+				F63D1C6E2B0A605C004294D9 /* CircleButtonView.swift */,
 				F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */,
 				F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */,
 				F662999527B4185D00121C14 /* BatteryView.swift */,
@@ -634,11 +630,8 @@
 			children = (
 				F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */,
 				F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */,
-				F6F8555A28DCB0F1004B9517 /* EniroUpdaters.swift */,
-				F6F8555C28DCF93E004B9517 /* EniroDoorLock.swift */,
 				F6F1D07F29A2174000A3292E /* EniroChargingLimitView.swift */,
 				F6EF35AE2A3A33BE00895250 /* DateTimePickerView.swift */,
-				F6F8555E28DF755D004B9517 /* EniroCharging.swift */,
 				F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */,
 				F6F1D08529A94E8900A3292E /* LimitPickerView.swift */,
 			);
@@ -681,10 +674,11 @@
 			isa = PBXGroup;
 			children = (
 				F6830DE12904534200BBE36C /* CollectionExtension.swift */,
-				F6DBA4CF28E82D6A001BA1C0 /* Task.swift */,
-				F6F1D07B2992686E00A3292E /* Color.swift */,
+				F607F65F2B0DF2DC002F782F /* FontExtension.swift */,
+				F6DBA4CF28E82D6A001BA1C0 /* TaskExtension.swift */,
 				F6F1D07D299390C500A3292E /* CalendarExtension.swift */,
 				F6F1D08129A27A6100A3292E /* ImageExtension.swift */,
+				F666B5EF2B0E1F360057E8E3 /* StringExtension.swift */,
 				F6225E2D2AE265D600D32EF4 /* ColorExtension.swift */,
 				F62750A82A00ED9500C1253F /* UINavigationController.swift */,
 				F6DE990A29BD18FB00B8AABB /* LogExtension.swift */,
@@ -948,13 +942,13 @@
 				F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */,
 				F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */,
 				F6633F3628632884004D0B76 /* VerticalPositionView.swift in Sources */,
-				F6F1D07C2992686E00A3292E /* Color.swift in Sources */,
 				F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */,
-				F6DBA4D028E82D6A001BA1C0 /* Task.swift in Sources */,
+				F6DBA4D028E82D6A001BA1C0 /* TaskExtension.swift in Sources */,
 				F6EF35B72A3E20B100895250 /* SelectUserView.swift in Sources */,
 				F6633F292860C16E004D0B76 /* AppDelegate.swift in Sources */,
 				F6FDBE312A1CDA850081BC3D /* HomeViewModelExtension.swift in Sources */,
 				F61BF9A22A166C4900C1802E /* YaleLock.swift in Sources */,
+				F63D1C6F2B0A605C004294D9 /* CircleButtonView.swift in Sources */,
 				F61BF9AE2A167D0E00C1802E /* YaleLockResponse.swift in Sources */,
 				F6F118192827A15500251350 /* EniroGeoEntity.swift in Sources */,
 				F6633F34286327F9004D0B76 /* NumberTextView.swift in Sources */,
@@ -963,6 +957,7 @@
 				F60345C127A7F33700212D04 /* Entity.swift in Sources */,
 				F68DA62028B4C13000601726 /* Domain.swift in Sources */,
 				F6552705281678740035DC72 /* RoborockEntity.swift in Sources */,
+				F607F6602B0DF2DC002F782F /* FontExtension.swift in Sources */,
 				F61BF9AA2A16749D00C1802E /* JSONKey.swift in Sources */,
 				F6633F30286326FC004D0B76 /* ThermometerGroupView.swift in Sources */,
 				F6EF35B12A3CA96E00895250 /* ScriptVariableKeys.swift in Sources */,
@@ -987,6 +982,7 @@
 				F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */,
 				F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */,
 				F662999A27B7D8DA00121C14 /* HeaterEntity.swift in Sources */,
+				F666B5F02B0E1F360057E8E3 /* StringExtension.swift in Sources */,
 				F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */,
 				F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */,
 				F66F061727AEFC2300270E71 /* VerticalSlider.swift in Sources */,
@@ -1017,13 +1013,11 @@
 				F62CD2E528770F3B00462092 /* HassApiService.swift in Sources */,
 				F62CD2E82877140800462092 /* EntityError.swift in Sources */,
 				F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */,
-				F6F8555D28DCF93E004B9517 /* EniroDoorLock.swift in Sources */,
 				F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */,
 				F6591BFC2AFE31F300D5785E /* HorizontalButtonView.swift in Sources */,
 				F6591BFE2AFE34FB00D5785E /* VerticalButtonView.swift in Sources */,
 				F6633F322863275D004D0B76 /* ThermometerView.swift in Sources */,
 				F68DA61828B4B89C00601726 /* Actions.swift in Sources */,
-				F6633F4528632F5E004D0B76 /* RoborockRoomButton.swift in Sources */,
 				F6DE990B29BD18FB00B8AABB /* LogExtension.swift in Sources */,
 				F62750AB2A00EE8800C1253F /* ToolbarBackButton.swift in Sources */,
 				F669C72C2A23C06200458165 /* CameraView.swift in Sources */,
@@ -1034,7 +1028,6 @@
 				F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */,
 				F61BF9A02A166B2700C1802E /* LockID.swift in Sources */,
 				F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */,
-				F6F8555B28DCB0F1004B9517 /* EniroUpdaters.swift in Sources */,
 				F61BF9A82A1672C300C1802E /* HTTPMethod.swift in Sources */,
 				F60345D427ABE49100212D04 /* LightsView.swift in Sources */,
 				F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */,
@@ -1047,7 +1040,6 @@
 				F60345CC27A93BD700212D04 /* URLCreator.swift in Sources */,
 				F60345C427A933D700212D04 /* GlobalConstants.swift in Sources */,
 				F67FA88B28A16E9A00BE4CBD /* EntityProtocol.swift in Sources */,
-				F6F8555F28DF755D004B9517 /* EniroCharging.swift in Sources */,
 				F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */,
 				F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */,
 				F6591C012B07784D00D5785E /* ServiceID.swift in Sources */,
@@ -1243,7 +1235,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1261,7 +1253,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1281,7 +1273,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1299,7 +1291,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1318,7 +1310,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1327,7 +1319,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1345,7 +1337,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1354,7 +1346,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1432,7 +1424,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1450,7 +1442,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1469,7 +1461,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1478,7 +1470,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1493,7 +1485,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1505,7 +1497,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1520,7 +1512,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1532,7 +1524,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1547,7 +1539,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1559,7 +1551,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.19;
+				MARKETING_VERSION = 2023.11.22;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

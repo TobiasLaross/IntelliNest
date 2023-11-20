@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RoborockMainButtons: View {
-    @Binding var roborock: RoborockEntity
+    var roborock: RoborockEntity
     let toggleCleaningClosure: VoidClosure
     let dockRoborockClosure: VoidClosure
     let sendRoborockToBinClosure: VoidClosure
@@ -16,46 +16,30 @@ struct RoborockMainButtons: View {
     let manualEmptyClosure: VoidClosure
 
     var body: some View {
-        let playPausButton = SwitchButton(entity: $roborock, buttonTitle: "Dammsug",
-                                          activeImageName: "pause.fill", defaultImageName: "play.fill")
-        let dockButton = ServiceButton(buttonTitle: "Docka", imageName: "house.fill")
-        let locateButton = ServiceButton(buttonTitle: "Hitta", imageName: "scope")
-        let sendToBinButton = ServiceButton(buttonTitle: "Töm", imageName: "trash.fill")
-        let buttonHeight: CGFloat = 70
-        let buttonWidth: CGFloat = 80
-
         HStack {
-            Button {
-                toggleCleaningClosure()
-            } label: {
-                HassButtonLabel(button: AnyView(playPausButton), buttonFrameHeight: buttonHeight,
-                                buttonFrameWidth: buttonWidth)
-            }
-
-            Button {
-                dockRoborockClosure()
-            } label: {
-                HassButtonLabel(button: AnyView(dockButton), buttonFrameHeight: buttonHeight,
-                                buttonFrameWidth: buttonWidth)
-            }
-
-            Button {
-                locateRoborockClosure()
-            } label: {
-                HassButtonLabel(button: AnyView(locateButton), buttonFrameHeight: buttonHeight,
-                                buttonFrameWidth: buttonWidth)
-            }
-
-            Button {
-                sendRoborockToBinClosure()
-            } label: {
-                HassButtonLabel(button: AnyView(sendToBinButton), buttonFrameHeight: buttonHeight,
-                                buttonFrameWidth: buttonWidth)
-            }
-            .contextMenu {
-                Button(action: manualEmptyClosure, label: {
-                    Text("Manuell tömning")
-                })
+            Group {
+                CircleButtonView(buttonTitle: "Dammsug",
+                                 isActive: roborock.isActive,
+                                 icon: roborock.icon,
+                                 iconHeight: 25,
+                                 action: toggleCleaningClosure)
+                CircleButtonView(buttonTitle: "Docka",
+                                 icon: .init(systemImageName: .house),
+                                 imageSize: 25,
+                                 action: dockRoborockClosure)
+                CircleButtonView(buttonTitle: "Hitta",
+                                 icon: .init(systemImageName: .scope),
+                                 imageSize: 25,
+                                 action: locateRoborockClosure)
+                CircleButtonView(buttonTitle: "Töm",
+                                 icon: .init(systemImageName: .trash),
+                                 imageSize: 25,
+                                 action: sendRoborockToBinClosure)
+                    .contextMenu {
+                        Button(action: manualEmptyClosure, label: {
+                            Text("Manuell tömning")
+                        })
+                    }
             }
         }
     }
@@ -64,7 +48,7 @@ struct RoborockMainButtons: View {
 struct RoborockMainButtons_Previews: PreviewProvider {
     static var previews: some View {
         RoborockMainButtons(
-            roborock: .constant(.init(entityId: .roborock, state: "")),
+            roborock: .init(entityId: .roborock, state: ""),
             toggleCleaningClosure: {},
             dockRoborockClosure: {},
             sendRoborockToBinClosure: {},

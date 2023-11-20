@@ -5,7 +5,7 @@
 //  Created by Tobias on 2022-04-25.
 //
 
-import Foundation
+import SwiftUI
 
 struct RoborockEntity: EntityProtocol {
     let entityId: EntityId
@@ -18,6 +18,10 @@ struct RoborockEntity: EntityProtocol {
         } else {
             return false
         }
+    }
+
+    var icon: Image {
+        isActive ? .init(systemImageName: .pause) : .init(systemImageName: .play)
     }
 
     var status: String = ""

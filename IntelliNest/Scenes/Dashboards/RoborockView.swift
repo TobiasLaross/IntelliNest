@@ -60,7 +60,7 @@ struct RoborockView: View {
                 }
                 .padding(.leading)
 
-                RoborockMainButtons(roborock: $viewModel.roborock,
+                RoborockMainButtons(roborock: viewModel.roborock,
                                     toggleCleaningClosure: viewModel.toggleCleaning,
                                     dockRoborockClosure: viewModel.dockRoborock,
                                     sendRoborockToBinClosure: viewModel.sendRoborockToBin,

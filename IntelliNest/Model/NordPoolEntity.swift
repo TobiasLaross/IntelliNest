@@ -22,8 +22,12 @@ struct NordPoolPriceData: Identifiable {
 struct NordPoolEntity: EntityProtocol {
     var entityId: EntityId
     var state: String
-    var price: String {
+    private var price: String {
         state.components(separatedBy: ".").first ?? state
+    }
+
+    var title: String {
+        "\(price) öre"
     }
 
     var nextUpdate = NSDate().addingTimeInterval(-1)
