@@ -205,14 +205,10 @@ private struct StorageDoorButtonView: View {
                             action: viewModel.toggleStateForStorageLock)
             .disabled(viewModel.storageLock.isLoading)
             .contextMenu {
-                Button(action: {
-                    viewModel.lock(lockEntity: &viewModel.storageLock)
-                }, label: {
+                Button(action: viewModel.lockStorage, label: {
                     Text("Lås")
                 })
-                Button(action: {
-                    viewModel.unlock(lockEntity: &viewModel.storageLock)
-                }, label: {
+                Button(action: viewModel.unlockStorage, label: {
                     Text("Lås upp")
                 })
             }

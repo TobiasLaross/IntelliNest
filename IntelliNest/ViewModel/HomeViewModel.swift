@@ -121,13 +121,13 @@ class HomeViewModel: ObservableObject {
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
     }
 
-    func lock(lockEntity: inout LockEntity) {
+    func lockStorage() {
         let action: Action = .lock
         storageLock.expectedState = .locked
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
     }
 
-    func unlock(lockEntity: inout LockEntity) {
+    func unlockStorage() {
         let action: Action = .unlock
         storageLock.expectedState = .unlocked
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
