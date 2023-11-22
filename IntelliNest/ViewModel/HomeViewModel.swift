@@ -20,9 +20,16 @@ class HomeViewModel: ObservableObject {
     @Published var shouldShowCoffeeMachineScheduling = false
     @Published var coffeeMachineStartTime = Entity(entityId: .coffeeMachineStartTime)
     @Published var coffeeMachineStartTimeEnabled = Entity(entityId: .coffeeMachineStartTimeEnabled)
+    @Published var nordPool = NordPoolEntity(entityId: .nordPool)
+    @Published var solarPower = Entity(entityId: .solarPower)
+    @Published var pulsePower = Entity(entityId: .pulsePower)
+    @Published var tibberPrice = Entity(entityId: .tibberPrice)
+    @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
+    @Published var shouldShowNordpoolPrices = false
 
     var isReloading = false
-    let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled]
+    let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
+                                 .solarPower, .pulsePower, .tibberPrice, .pulseConsumptionToday]
 
     var sarahIphoneimage: Image {
         if sarahsIphone.isActive {
@@ -72,6 +79,10 @@ class HomeViewModel: ObservableObject {
         websocketService.updateEntity(entityID: .hittaSarahsIphone, domain: .script, action: action)
     }
 
+    func showNordPoolPrices() {
+        shouldShowNordpoolPrices = true
+    }
+
     func toggleCoffeeMachine() {
         let action: Action = coffeeMachine.isActive ? .turnOff : .turnOn
         websocketService.updateEntity(entityID: .coffeeMachine, domain: .switchDomain, action: action)
@@ -110,18 +121,19 @@ class HomeViewModel: ObservableObject {
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
     }
 
-    func lock(lockEntity: inout LockEntity) {
+    func lockStorage() {
         let action: Action = .lock
         storageLock.expectedState = .locked
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
     }
 
-    func unlock(lockEntity: inout LockEntity) {
+    func unlockStorage() {
         let action: Action = .unlock
         storageLock.expectedState = .unlocked
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         switch entityID {
         case .allLights:
@@ -139,9 +151,21 @@ class HomeViewModel: ObservableObject {
             coffeeMachineStartTime.state = state
         case .coffeeMachineStartTimeEnabled:
             coffeeMachineStartTimeEnabled.state = state
+        case .solarPower:
+            solarPower.state = state
+        case .pulsePower:
+            pulsePower.state = state
+        case .tibberPrice:
+            tibberPrice.state = state
+        case .pulseConsumptionToday:
+            pulseConsumptionToday.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }
+    }
+
+    func reloadNordPoolEntity(nordPoolEntity: NordPoolEntity) {
+        nordPool = nordPoolEntity
     }
 
     @MainActor

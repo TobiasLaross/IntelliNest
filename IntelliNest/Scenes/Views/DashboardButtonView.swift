@@ -1,5 +1,5 @@
 //
-//  HassCircleButtonView.swift
+//  DashboardButtonView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-05-18.
@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct DashboardButtonView: View {
+    @State private var tapped = false
+
     var text: String
     var isActive: Bool
     var activeColor: Color
@@ -16,10 +18,8 @@ struct DashboardButtonView: View {
     var iconHeight: CGFloat
     var iconForegroundColor: Color
     var backgroundColor: Color
-    var circleSize: CGFloat
     var isLoading: Bool
     let indicatorIcon: Image?
-    var isCircle: Bool
     let buttonFrameWidth: CGFloat
     let buttonFrameHeight: CGFloat
     let buttonCornerRadius: CGFloat
@@ -34,9 +34,8 @@ struct DashboardButtonView: View {
          iconForegroundColor: Color = .white,
          backgroundColor: Color = topGrayColor,
          circleSize: CGFloat = dashboardCircleButtonFrameSize,
-         isLoading: Bool,
+         isLoading: Bool = false,
          indicatorIcon: Image? = nil,
-         isCircle: Bool,
          buttonFrameWidth: CGFloat = dashboardButtonFrameWidth,
          buttonFrameHeight: CGFloat = dashboardButtonFrameHeight,
          buttonCornerRadius: CGFloat = dashboardButtonCornerRadius,
@@ -49,10 +48,8 @@ struct DashboardButtonView: View {
         self.iconHeight = iconHeight
         self.iconForegroundColor = iconForegroundColor
         self.backgroundColor = backgroundColor
-        self.circleSize = circleSize
         self.isLoading = isLoading
         self.indicatorIcon = indicatorIcon
-        self.isCircle = isCircle
         self.buttonFrameWidth = buttonFrameWidth
         self.buttonFrameHeight = buttonFrameHeight
         self.buttonCornerRadius = buttonCornerRadius
@@ -62,18 +59,18 @@ struct DashboardButtonView: View {
     var body: some View {
         Button {
             action()
+            withAnimation(.spring()) {
+                tapped = true
+                Task { @MainActor in
+                    try? await Task.sleep(seconds: 0.1)
+                    tapped = false
+                }
+            }
         } label: {
             ZStack {
-                Group {
-                    if isCircle {
-                        Circle()
-                            .frame(width: circleSize, height: circleSize)
-                    } else {
-                        RoundedRectangle(cornerRadius: buttonCornerRadius)
-                            .frame(width: buttonFrameWidth, height: buttonFrameHeight)
-                    }
-                }
-                .foregroundColor(backgroundColor)
+                RoundedRectangle(cornerRadius: buttonCornerRadius)
+                    .frame(width: buttonFrameWidth, height: buttonFrameHeight)
+                    .foregroundColor(backgroundColor)
                 VStack {
                     icon.map {
                         $0
@@ -110,9 +107,8 @@ struct DashboardButtonView: View {
                     }
                 }
             }
-            .frame(width: isCircle ? circleSize : buttonFrameWidth,
-                   height: isCircle ? circleSize : buttonFrameHeight,
-                   alignment: .center)
+            .scaleEffect(tapped ? 0.9 : 1.0)
+            .frame(width: buttonFrameWidth, height: buttonFrameHeight, alignment: .center)
         }
     }
 }

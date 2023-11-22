@@ -8,11 +8,7 @@
 import SwiftUI
 
 struct EniroView: View {
-    @ObservedObject private var viewModel: EniroViewModel
-
-    init(viewModel: EniroViewModel) {
-        self.viewModel = viewModel
-    }
+    @ObservedObject var viewModel: EniroViewModel
 
     var body: some View {
         ZStack {
@@ -30,16 +26,44 @@ struct EniroView: View {
 
                 VStack {
                     HStack {
-                        EniroUpdaters(viewModel: viewModel,
-                                      updateIsLoading: $viewModel.updateIsloading,
-                                      forceUpdateIsLoading: viewModel.forceUpdateIsLoading,
-                                      lastUpdated: viewModel.eniroLastUpdate.state)
-                        Charging(viewModel: viewModel)
+                        CircleButtonView(buttonTitle: "Ladda ner från bil",
+                                         icon: .init(systemImageName: .arrowDown),
+                                         imageSize: 20,
+                                         isLoading: viewModel.updateIsloading,
+                                         action: viewModel.update)
+                            .disabled(viewModel.updateIsloading)
+                        CircleButtonView(buttonTitle: "Ladda upp från bil",
+                                         icon: .init(systemImageName: .arrowUp),
+                                         imageSize: 20,
+                                         action: viewModel.initiateForceUpdate)
+
+                        CircleButtonView(buttonTitle: "Starta laddning",
+                                         icon: .init(systemImageName: .boltCar),
+                                         imageSize: 20,
+                                         action: viewModel.startCharging)
+                        CircleButtonView(buttonTitle: "Avbryt laddning",
+                                         icon: .init(systemImageName: .xmarkCircle),
+                                         imageSize: 20,
+                                         action: viewModel.stopCharging)
                     }
 
                     HStack {
-                        DoorLock(viewModel: viewModel)
-                        EniroChargingLimitView(viewModel: viewModel)
+                        CircleButtonView(buttonTitle: "Lås dörrarna",
+                                         icon: .init(systemImageName: .locked),
+                                         iconHeight: 25,
+                                         action: viewModel.lock)
+                        CircleButtonView(buttonTitle: "Lås upp dörrarna",
+                                         icon: .init(systemImageName: .unlocked),
+                                         imageSize: 25,
+                                         action: viewModel.lock)
+                        CircleButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
+                                         icon: .init(imageName: .evPlugType2),
+                                         imageSize: 35,
+                                         action: viewModel.showACLimitPicker)
+                        CircleButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
+                                         icon: .init(imageName: .evPlugCCS2),
+                                         imageSize: 35,
+                                         action: viewModel.showDCLimitPicker)
                     }
                     .padding(.horizontal)
                 }
@@ -54,10 +78,7 @@ struct EniroView: View {
                     .foregroundColor(.white)
                     .padding(.bottom)
             }
-            if viewModel.shouldShowNordpoolPrices {
-                NordPoolHistoryView(isVisible: $viewModel.shouldShowNordpoolPrices,
-                                    nordPool: viewModel.nordPool)
-            } else if let limitPickerEntity = viewModel.limitPickerEntity {
+            if let limitPickerEntity = viewModel.limitPickerEntity {
                 LimitPickerView(limitEntity: limitPickerEntity,
                                 saveChargerLimit: viewModel.saveChargerLimit,
                                 currentLimit: limitPickerEntity.inputNumber)

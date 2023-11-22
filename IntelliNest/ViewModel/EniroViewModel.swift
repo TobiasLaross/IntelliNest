@@ -26,17 +26,14 @@ class EniroViewModel: ObservableObject {
     @Published var eniroEngine = Entity(entityId: .eniroEngine)
     @Published var eniroLastUpdate = Entity(entityId: .eniroLastUpdate)
     @Published var eniroGeoLocation = EniroGeoEntity(entityId: .eniroGeoLocation)
-    @Published var nordPool = NordPoolEntity(entityId: .nordPool)
     @Published var climateControlScript = Entity(entityId: .eniroClimateControl)
 
     let entityIDs: [EntityId] = [.eniroDoorLock, .eniroClimateTemperature, .eniroClimateHeating, .eniroClimateDefrost, .eniroForceCharge,
                                  .eniroACChargingLimit, .eniroDCChargingLimit, .eniroBatteryLevel, .eniroIsCharging, .eniroBackWindowHeater,
-                                 .eniroAirConditioner, .eniroDefroster, .eniroEngine, .eniroLastUpdate, .eniroGeoLocation, .nordPool,
+                                 .eniroAirConditioner, .eniroDefroster, .eniroEngine, .eniroLastUpdate, .eniroGeoLocation,
                                  .eniroClimateControl]
     @Published var lastUpdateInitialDate: Date = .distantPast.addingTimeInterval(3600)
-    @Published var shouldShowNordpoolPrices = false
     @Published var updateIsloading = false
-    @Published var forceUpdateIsLoading = false
     @Published var limitPickerEntity: InputNumberEntity?
     var isReloading = false
     var recentlyUpdated: Bool {
@@ -98,8 +95,6 @@ class EniroViewModel: ObservableObject {
             eniroLastUpdate.state = state
         case .eniroGeoLocation:
             eniroGeoLocation.state = state
-        case .nordPool:
-            nordPool.state = state
         case .eniroClimateControl:
             climateControlScript.state = state
         default:
@@ -109,10 +104,6 @@ class EniroViewModel: ObservableObject {
 
     func reloadGeoEntity(geoEntity: EniroGeoEntity) {
         eniroGeoLocation = geoEntity
-    }
-
-    func reloadNordPoolEntity(nordPoolEntity: NordPoolEntity) {
-        nordPool = nordPoolEntity
     }
 
     func setStateForLock(action: Action) {
@@ -162,7 +153,6 @@ class EniroViewModel: ObservableObject {
     }
 
     func initiateForceUpdate() {
-        forceUpdateIsLoading = true
         lastUpdateInitialDate = eniroLastUpdate.date
         websocketService.callService(serviceID: .kiaForceUpdate, variables: [.deviceID: DeviceID.eniro.rawValue])
     }
@@ -191,10 +181,6 @@ class EniroViewModel: ObservableObject {
 
     func getAddress() -> String {
         eniroGeoLocation.address
-    }
-
-    func showNordPoolPrices() {
-        shouldShowNordpoolPrices = true
     }
 
     func showACLimitPicker() {
