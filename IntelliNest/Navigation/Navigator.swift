@@ -50,8 +50,7 @@ class Navigator {
 
     func show(destination: Destination) -> some View {
         setCurrentDestination(destination)
-        return ZStack {
-            background()
+        return Group {
             switch destination {
             case .cameras:
                 showCamerasView()
@@ -69,6 +68,7 @@ class Navigator {
                 showLightsView()
             }
         }
+        .backgroundModifier()
     }
 
     func startKiaHeater() {
@@ -150,5 +150,21 @@ class Navigator {
                 camerasViewModel.setIsActiveScreen(destination == .cameras)
             }
         }
+    }
+}
+
+extension View {
+    func backgroundModifier() -> some View {
+        self
+            .background(
+                Group {
+                    Rectangle()
+                        .foregroundColor(topGrayColor)
+                        .ignoresSafeArea()
+                    Rectangle()
+                        .foregroundColor(bodyColor)
+                        .edgesIgnoringSafeArea(.bottom)
+                }
+            )
     }
 }

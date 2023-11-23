@@ -124,7 +124,11 @@ private struct HouseInfoView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
+            Text(viewModel.dynamicInfoText)
+                .font(.circleButtonFontMedium)
+                .padding(.leading, 20)
+                .lineLimit(6)
             Spacer()
             VStack(spacing: 8) {
                 CircleButtonView(buttonTitle: viewModel.tibberPrice.state.toOre(),
@@ -141,6 +145,7 @@ private struct HouseInfoView: View {
             }
             .padding(.trailing, 20)
         }
+        .foregroundStyle(.white)
     }
 }
 
@@ -226,7 +231,7 @@ struct Home_Previews: PreviewProvider {
 
         VStack {
             HomeView(viewModel: viewModel)
-            HouseInfoView(viewModel: viewModel)
+                .backgroundModifier()
         }
     }
 }

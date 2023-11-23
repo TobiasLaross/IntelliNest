@@ -33,4 +33,12 @@ extension String {
             return "? Öre"
         }
     }
+
+    mutating func addNewLineAndappend(_ other: String) {
+        if isNotEmpty {
+            append("\n")
+        }
+
+        append(other)
+    }
 }

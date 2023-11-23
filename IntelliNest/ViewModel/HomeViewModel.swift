@@ -25,19 +25,18 @@ class HomeViewModel: ObservableObject {
     @Published var pulsePower = Entity(entityId: .pulsePower)
     @Published var tibberPrice = Entity(entityId: .tibberPrice)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
+    @Published var washerCompletionTime = Entity(entityId: .washerCompletionTime)
+    @Published var washerState = Entity(entityId: .washerState)
+    @Published var dryerCompletionTime = Entity(entityId: .dryerCompletionTime)
+    @Published var dryerState = Entity(entityId: .dryerState)
+    @Published var easeeCharger = Entity(entityId: .easeeCharger)
+
     @Published var shouldShowNordpoolPrices = false
 
     var isReloading = false
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
-                                 .solarPower, .pulsePower, .tibberPrice, .pulseConsumptionToday]
-
-    var sarahIphoneimage: Image {
-        if sarahsIphone.isActive {
-            return Image(systemImageName: .iPhoneActive)
-        } else {
-            return Image(systemImageName: .iPhone)
-        }
-    }
+                                 .solarPower, .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
+                                 .dryerCompletionTime, .washerState, .dryerState, .easeeCharger]
 
     private var websocketService: WebSocketService
     let yaleApiService: YaleApiService
@@ -159,6 +158,16 @@ class HomeViewModel: ObservableObject {
             tibberPrice.state = state
         case .pulseConsumptionToday:
             pulseConsumptionToday.state = state
+        case .washerCompletionTime:
+            washerCompletionTime.state = state
+        case .washerState:
+            washerState.state = state
+        case .dryerCompletionTime:
+            dryerCompletionTime.state = state
+        case .dryerState:
+            dryerState.state = state
+        case .easeeCharger:
+            easeeCharger.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }

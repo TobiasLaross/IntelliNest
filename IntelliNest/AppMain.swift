@@ -32,48 +32,46 @@ struct AppMain: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ZStack {
-                    navigator.background()
-                    HomeView(viewModel: navigator.homeViewModel)
-                }
-                .navigationDestination(for: Destination.self) { destination in
-                    navigator.show(destination: destination)
-                        .toolbar {
-                            ToolbarItem(placement: .principal) {
-                                ToolbarTitleView(destination: destination)
+                HomeView(viewModel: navigator.homeViewModel)
+                    .backgroundModifier()
+                    .navigationDestination(for: Destination.self) { destination in
+                        navigator.show(destination: destination)
+                            .toolbar {
+                                ToolbarItem(placement: .principal) {
+                                    ToolbarTitleView(destination: destination)
+                                }
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    ToolBarConnectionStateView(urlCreator: navigator.urlCreator)
+                                }
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    ToolbarReloadButtonView(destination: destination, reloadAction: navigator.reloadCurrentModel)
+                                }
                             }
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                ToolBarConnectionStateView(urlCreator: navigator.urlCreator)
-                            }
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                ToolbarReloadButtonView(destination: destination, reloadAction: navigator.reloadCurrentModel)
-                            }
-                        }
-                        .navigationBarBackButtonHidden(true)
-                        .navigationBarItems(leading: ToolbarBackButton())
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .onChange(of: scenePhase) {
-                    if scenePhase == .active {
-                        navigator.didEnterForeground()
-                        performActionIfNeeded()
+                            .navigationBarBackButtonHidden(true)
+                            .navigationBarItems(leading: ToolbarBackButton())
                     }
-                }
-                .onAppear {
-                    if UserManager.shared.isUserNotSet {
-                        shouldShowSelectUserActionSheet = true
-                    }
-                }
-                .actionSheet(isPresented: $shouldShowSelectUserActionSheet) {
-                    ActionSheet(title: Text("Välj användare"), buttons: User.allCases.map { user in
-                        .default(Text(user.name)) {
-                            UserManager.shared.setUser(user)
-                            Task {
-                                await navigator.reloadCurrentModel()
-                            }
+                    .navigationBarTitleDisplayMode(.inline)
+                    .onChange(of: scenePhase) {
+                        if scenePhase == .active {
+                            navigator.didEnterForeground()
+                            performActionIfNeeded()
                         }
-                    } + [.cancel()])
-                }
+                    }
+                    .onAppear {
+                        if UserManager.shared.isUserNotSet {
+                            shouldShowSelectUserActionSheet = true
+                        }
+                    }
+                    .actionSheet(isPresented: $shouldShowSelectUserActionSheet) {
+                        ActionSheet(title: Text("Välj användare"), buttons: User.allCases.map { user in
+                            .default(Text(user.name)) {
+                                UserManager.shared.setUser(user)
+                                Task {
+                                    await navigator.reloadCurrentModel()
+                                }
+                            }
+                        } + [.cancel()])
+                    }
             }
         }
     }
