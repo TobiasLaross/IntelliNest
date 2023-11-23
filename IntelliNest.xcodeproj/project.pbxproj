@@ -57,6 +57,7 @@
 		F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502F2A486650003A7100 /* EncodableExtension.swift */; };
 		F63F50322A4CADEB003A7100 /* URLCreatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */; };
 		F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */; };
+		F64A38812B0F5E6900BA9FAC /* DoubleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64A38802B0F5E6900BA9FAC /* DoubleExtension.swift */; };
 		F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64D2693283E8FAB0073A7BF /* NetworkTask.swift */; };
 		F6552705281678740035DC72 /* RoborockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6552704281678740035DC72 /* RoborockEntity.swift */; };
 		F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */; };
@@ -237,6 +238,7 @@
 		F63F502F2A486650003A7100 /* EncodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableExtension.swift; sourceTree = "<group>"; };
 		F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreatorDelegate.swift; sourceTree = "<group>"; };
 		F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribeRequest.swift; sourceTree = "<group>"; };
+		F64A38802B0F5E6900BA9FAC /* DoubleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleExtension.swift; sourceTree = "<group>"; };
 		F64D2693283E8FAB0073A7BF /* NetworkTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTask.swift; sourceTree = "<group>"; };
 		F6552704281678740035DC72 /* RoborockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockEntity.swift; sourceTree = "<group>"; };
 		F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanModeButtonView.swift; sourceTree = "<group>"; };
@@ -688,6 +690,7 @@
 				F6830DE12904534200BBE36C /* CollectionExtension.swift */,
 				F6225E2D2AE265D600D32EF4 /* ColorExtension.swift */,
 				F664BA7329B48C510092CB2E /* DateExtension.swift */,
+				F64A38802B0F5E6900BA9FAC /* DoubleExtension.swift */,
 				F63F502F2A486650003A7100 /* EncodableExtension.swift */,
 				F607F65F2B0DF2DC002F782F /* FontExtension.swift */,
 				F6F1D08129A27A6100A3292E /* ImageExtension.swift */,
@@ -951,6 +954,7 @@
 				F6591C072B0787BA00D5785E /* VariableValues.swift in Sources */,
 				F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */,
 				F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */,
+				F64A38812B0F5E6900BA9FAC /* DoubleExtension.swift in Sources */,
 				F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */,
 				F6633F3628632884004D0B76 /* VerticalPositionView.swift in Sources */,
 				F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */,

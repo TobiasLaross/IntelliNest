@@ -124,7 +124,7 @@ private struct HouseInfoView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     var body: some View {
-        HStack(alignment: .top) {
+        HStack(alignment: .bottom) {
             Text(viewModel.dynamicInfoText)
                 .font(.circleButtonFontMedium)
                 .padding(.leading, 20)

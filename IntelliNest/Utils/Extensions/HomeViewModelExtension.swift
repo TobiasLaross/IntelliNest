@@ -18,18 +18,18 @@ extension HomeViewModel {
 
     var dynamicInfoText: String {
         var text = ""
-        let washerCompletionInMInutes = washerCompletionTime.date.minutesLeft()
-        if washerCompletionInMInutes >= 0 && washerState.state != "none" {
-            text.addNewLineAndappend("Tvätten klar om \(timeRemainingFormatter(minutesRemaining: washerCompletionInMInutes))")
+        let washerCompletionInMinutes = washerCompletionTime.date.minutesLeft()
+        if washerCompletionInMinutes >= 0 && washerState.state.isRunning() {
+            text.addNewLineAndAppend("Tvätten: \(timeRemainingFormatter(minutesRemaining: washerCompletionInMinutes))")
         }
 
-        let dryerCompletionInMInutes = dryerCompletionTime.date.minutesLeft()
-        if dryerCompletionInMInutes >= 0 && dryerState.state != "none" {
-            text.addNewLineAndappend("Torktumlaren klar om \(timeRemainingFormatter(minutesRemaining: dryerCompletionInMInutes))")
+        let dryerCompletionInMinutes = dryerCompletionTime.date.minutesLeft()
+        if dryerCompletionInMinutes >= 0 && dryerState.state.isRunning() {
+            text.addNewLineAndAppend("Torktumlaren: \(timeRemainingFormatter(minutesRemaining: dryerCompletionInMinutes))")
         }
 
         if let chargingPower = Double(easeeCharger.state), chargingPower > 0 {
-            text.addNewLineAndappend("Laddbox: \(chargingPower)kW")
+            text.addNewLineAndAppend("Laddbox: \(chargingPower)kW")
         }
 
         return text
@@ -43,5 +43,11 @@ extension HomeViewModel {
         } else {
             return "\(minutesRemaining)min"
         }
+    }
+}
+
+private extension String {
+    func isRunning() -> Bool {
+        self.lowercased() != "none"
     }
 }

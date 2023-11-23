@@ -7,15 +7,15 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 ## Code statistics
 | Indicators                          | Now  | Desired |
 |-------------------------------------|------|---------|
-| Total LOC                           | 9147 | N/A |
-| Swift file count                    | 137 | N/A |
+| Total LOC                           | 9171 | N/A |
+| Swift file count                    | 138 | N/A |
 | Average LOC per file                | 66 | <100 |
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
 | Commit count in main                | 33 | N/A |
-| Total deleted lines                 | 2663 | N/A |
-| Total added lines                   | 14676 | N/A |
+| Total deleted lines                 | 2763 | N/A |
+| Total added lines                   | 14905 | N/A |
 
 Last Updated: 2023-11-23
 ## Supported features
