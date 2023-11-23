@@ -11,59 +11,14 @@ struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     var body: some View {
-        let heatersButton = NavButton(buttonTitle: "Värmepumpar", image: Image(imageName: .aircondition))
-        let carButton = NavButton(buttonTitle: "E-Niro", image: Image(systemName: "car.fill"))
-
-        let roborockButton = NavButton(buttonTitle: "Roborock",
-                                       image: Image("roborocks7"),
-                                       buttonImageWidth: 50,
-                                       buttonImageHeight: 50)
-        let cctvButton = NavButton(buttonTitle: "Kameror",
-                                   image: Image(systemName: "video.fill"),
-                                   buttonImageWidth: 50,
-                                   buttonImageHeight: 35)
-        let lightsButton = NavButton(buttonTitle: "Lampor",
-                                     image: Image(systemName: "lightbulb.fill"),
-                                     buttonImageWidth: 30,
-                                     buttonImageHeight: 50,
-                                     isActive: viewModel.allLights.isActive)
         ZStack {
             VStack {
                 HouseInfoView(viewModel: viewModel)
-                    .padding(.vertical, 20)
-                LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 3), alignment: .center, spacing: 10) {
-                    NavigationLink(value: Destination.heaters,
-                                   label: { HassButtonLabel(button: AnyView(heatersButton)) })
-
-                    NavigationLink(value: Destination.eniro,
-                                   label: { HassButtonLabel(button: AnyView(carButton)) })
-
-                    CoffeeMachineButtonView(viewModel: viewModel)
-                    SideDoorButtonView(viewModel: viewModel)
-                    FrontDoorButtonView(viewModel: viewModel)
-                    StorageDoorButtonView(viewModel: viewModel)
-
-                    if UserManager.currentUser == .tobias {
-                        SarahsIphoneButton(viewModel: viewModel)
-                    }
-
-                    NavigationLink(value: Destination.roborock,
-                                   label: { HassButtonLabel(button: AnyView(roborockButton)) })
-                    NavigationLink(value: Destination.cameras,
-                                   label: { HassButtonLabel(button: AnyView(cctvButton)) })
-
-                    NavigationLink(value: Destination.lights,
-                                   label: { HassButtonLabel(button: AnyView(lightsButton)) })
-                        .contextMenu {
-                            Button {
-                                viewModel.toggle(light: viewModel.allLights)
-                            } label: {
-                                Text("Toggla lampor")
-                            }
-                        }
-                }
-                .padding(.horizontal, 20)
-                Spacer(minLength: 50)
+                    .padding(.vertical, 50)
+                HomeNavigationButtonsView(viewModel: viewModel)
+                    .padding(.bottom, 20)
+                HomeServiceButtonsView(viewModel: viewModel)
+                Spacer(minLength: 40)
             }
 
             if viewModel.shouldShowCoffeeMachineScheduling {
@@ -95,31 +50,6 @@ struct HomeView: View {
     }
 }
 
-private struct SarahsIphoneButton: View {
-    @ObservedObject var viewModel: HomeViewModel
-    @State private var isShowingAlert = false
-
-    var body: some View {
-        DashboardButtonView(text: "Hitta Sarah's iPhone?",
-                            isActive: viewModel.sarahsIphone.isActive,
-                            icon: viewModel.sarahIphoneimage,
-                            iconWidth: viewModel.sarahsIphone.isActive ? 60 : 25,
-                            action: {
-                                isShowingAlert = true
-                            })
-                            .alert(isPresented: $isShowingAlert) {
-                                Alert(
-                                    title: Text("Hitta Sarah's iPhone?"),
-                                    message: Text(""),
-                                    primaryButton: .destructive(
-                                        Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
-                                            viewModel.toggleStateForSarahsIphone()
-                                        },
-                                    secondaryButton: .cancel())
-                            }
-    }
-}
-
 private struct HouseInfoView: View {
     @ObservedObject var viewModel: HomeViewModel
 
@@ -133,8 +63,8 @@ private struct HouseInfoView: View {
             VStack(spacing: 8) {
                 CircleButtonView(buttonTitle: viewModel.tibberPrice.state.toOre(),
                                  customFont: .circleButtonFontLarge,
-                                 icon: nil,
                                  buttonSize: 60,
+                                 icon: nil,
                                  action: viewModel.showNordPoolPrices)
                 Text("""
                 Husets effekt: ***\(viewModel.pulsePower.state.toKW())***
@@ -149,74 +79,144 @@ private struct HouseInfoView: View {
     }
 }
 
-private struct CoffeeMachineButtonView: View {
+private struct HomeNavigationButtonsView: View {
     @ObservedObject var viewModel: HomeViewModel
+    let buttonSize = 90.0
+    let heatersButton = NavButton(buttonTitle: "", image: Image(imageName: .aircondition))
+    let carButton = NavButton(buttonTitle: "", image: Image(systemName: "car.fill"))
+
+    let roborockButton = NavButton(buttonTitle: "",
+                                   image: Image("roborocks7"),
+                                   buttonImageWidth: 50,
+                                   buttonImageHeight: 50)
+    let cctvButton = NavButton(buttonTitle: "",
+                               image: Image(systemName: "video.fill"),
+                               buttonImageWidth: 50,
+                               buttonImageHeight: 35)
 
     var body: some View {
-        DashboardButtonView(text: viewModel.coffeeMachine.title,
-                            isActive: viewModel.coffeeMachine.isActive,
-                            activeColor: viewModel.coffeeMachine.activeColor,
-                            icon: viewModel.coffeeMachine.image,
-                            iconWidth: 30,
-                            indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
-                            action: viewModel.toggleCoffeeMachine)
-            .contextMenu {
-                Button(action: {
-                    viewModel.showCoffeeMachineScheduling()
-                }, label: {
-                    Text("Schemalägg nästa start")
-                })
+        let lightsButton = NavButton(buttonTitle: "",
+                                     image: Image(systemName: "lightbulb.fill"),
+                                     buttonImageWidth: 30,
+                                     buttonImageHeight: 50,
+                                     isActive: viewModel.allLights.isActive)
+        VStack {
+            HStack(spacing: 20) {
+                NavigationLink(value: Destination.heaters,
+                               label: { HassButtonLabel(button: AnyView(heatersButton)) })
+
+                NavigationLink(value: Destination.eniro,
+                               label: { HassButtonLabel(button: AnyView(carButton)) })
+
+                NavigationLink(value: Destination.roborock,
+                               label: { HassButtonLabel(button: AnyView(roborockButton)) })
             }
-    }
-}
+            HStack {
+                NavigationLink(value: Destination.cameras,
+                               label: { HassButtonLabel(button: AnyView(cctvButton)) })
 
-private struct SideDoorButtonView: View {
-    @ObservedObject var viewModel: HomeViewModel
-
-    var body: some View {
-        DashboardButtonView(text: "\(viewModel.sideDoor.actionText) sidodörren",
-                            isActive: viewModel.sideDoor.isActive,
-                            icon: viewModel.sideDoor.image,
-                            iconWidth: viewModel.sideDoor.isActive ? 40 : 30,
-                            isLoading: viewModel.sideDoor.isLoading,
-                            action: viewModel.toggleStateForSideDoor)
-            .disabled(viewModel.sideDoor.isLoading)
-    }
-}
-
-private struct FrontDoorButtonView: View {
-    @ObservedObject var viewModel: HomeViewModel
-
-    var body: some View {
-        DashboardButtonView(text: "\(viewModel.frontDoor.actionText) framdörren",
-                            isActive: viewModel.frontDoor.isActive,
-                            icon: viewModel.frontDoor.image,
-                            iconWidth: viewModel.frontDoor.isActive ? 40 : 30,
-                            isLoading: viewModel.frontDoor.isLoading,
-                            action: viewModel.toggleStateForFrontDoor)
-            .disabled(viewModel.frontDoor.isLoading)
-    }
-}
-
-private struct StorageDoorButtonView: View {
-    @ObservedObject var viewModel: HomeViewModel
-
-    var body: some View {
-        DashboardButtonView(text: "\(viewModel.storageLock.actionText) förrådet",
-                            isActive: viewModel.storageLock.isActive,
-                            icon: viewModel.storageLock.image,
-                            iconWidth: viewModel.storageLock.isActive ? 40 : 30,
-                            isLoading: viewModel.storageLock.isLoading,
-                            action: viewModel.toggleStateForStorageLock)
-            .disabled(viewModel.storageLock.isLoading)
-            .contextMenu {
-                Button(action: viewModel.lockStorage, label: {
-                    Text("Lås")
-                })
-                Button(action: viewModel.unlockStorage, label: {
-                    Text("Lås upp")
-                })
+                NavigationLink(value: Destination.lights,
+                               label: { HassButtonLabel(button: AnyView(lightsButton)) })
+                    .contextMenu {
+                        Button {
+                            viewModel.toggle(light: viewModel.allLights)
+                        } label: {
+                            Text("Toggla lampor")
+                        }
+                    }
             }
+        }
+    }
+}
+
+private struct HomeServiceButtonsView: View {
+    @ObservedObject var viewModel: HomeViewModel
+    @State private var isShowingAlert = false
+    let buttonSize = 90.0
+
+    var body: some View {
+        VStack {
+            HStack {
+                CircleButtonView(buttonTitle: "\(viewModel.frontDoor.actionText) framdörren",
+                                 customFont: .circleButtonFontSmall,
+                                 isActive: viewModel.frontDoor.isActive,
+                                 buttonSize: buttonSize,
+                                 icon: viewModel.frontDoor.image,
+                                 iconHeight: 30,
+                                 isLoading: viewModel.frontDoor.isLoading,
+                                 action: viewModel.toggleStateForFrontDoor)
+                    .disabled(viewModel.frontDoor.isLoading)
+                CircleButtonView(buttonTitle: "\(viewModel.sideDoor.actionText) sidodörren",
+                                 customFont: .circleButtonFontSmall,
+                                 isActive: viewModel.sideDoor.isActive,
+                                 buttonSize: buttonSize,
+                                 icon: viewModel.sideDoor.image,
+                                 iconWidth: viewModel.sideDoor.isActive ? 30 : 20,
+                                 iconHeight: 30,
+                                 isLoading: viewModel.sideDoor.isLoading,
+                                 action: viewModel.toggleStateForSideDoor)
+                    .disabled(viewModel.sideDoor.isLoading)
+                CircleButtonView(buttonTitle: "\(viewModel.storageLock.actionText) förrådet",
+                                 customFont: .circleButtonFontSmall,
+                                 isActive: viewModel.storageLock.isActive,
+                                 buttonSize: buttonSize,
+                                 icon: viewModel.storageLock.image,
+                                 iconWidth: viewModel.storageLock.isActive ? 30 : 20,
+                                 iconHeight: 30,
+                                 isLoading: viewModel.storageLock.isLoading,
+                                 action: viewModel.toggleStateForStorageLock)
+                    .disabled(viewModel.storageLock.isLoading)
+                    .contextMenu {
+                        Button(action: viewModel.lockStorage, label: {
+                            Text("Lås")
+                        })
+                        Button(action: viewModel.unlockStorage, label: {
+                            Text("Lås upp")
+                        })
+                    }
+            }
+
+            HStack {
+                CircleButtonView(buttonTitle: viewModel.coffeeMachine.title,
+                                 customFont: .circleButtonFontSmall,
+                                 isActive: viewModel.coffeeMachine.isActive,
+                                 buttonSize: buttonSize,
+                                 icon: viewModel.coffeeMachine.image,
+                                 iconWidth: 25,
+                                 iconHeight: 30,
+                                 indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
+                                 action: viewModel.toggleCoffeeMachine)
+                    .contextMenu {
+                        Button(action: {
+                            viewModel.showCoffeeMachineScheduling()
+                        }, label: {
+                            Text("Schemalägg nästa start")
+                        })
+                    }
+                if UserManager.currentUser == .tobias {
+                    CircleButtonView(buttonTitle: "Hitta Sarah's iPhone?",
+                                     customFont: .circleButtonFontSmall,
+                                     isActive: viewModel.sarahsIphone.isActive,
+                                     buttonSize: buttonSize,
+                                     icon: viewModel.sarahIphoneimage,
+                                     iconWidth: viewModel.sarahsIphone.isActive ? 40 : 20,
+                                     iconHeight: 30,
+                                     action: {
+                                         isShowingAlert = true
+                                     })
+                                     .alert(isPresented: $isShowingAlert) {
+                                         Alert(
+                                             title: Text("Hitta Sarah's iPhone?"),
+                                             message: Text(""),
+                                             primaryButton: .destructive(
+                                                 Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
+                                                     viewModel.toggleStateForSarahsIphone()
+                                                 },
+                                             secondaryButton: .cancel())
+                                     }
+                }
+            }
+        }
     }
 }
 

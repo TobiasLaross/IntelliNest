@@ -29,7 +29,7 @@ extension HomeViewModel {
         }
 
         if let chargingPower = Double(easeeCharger.state), chargingPower > 0 {
-            text.addNewLineAndAppend("Laddbox: \(chargingPower)kW")
+            text.addNewLineAndAppend("Laddbox: \(chargingPower.roundedWithOneDecimal)kW")
         }
 
         return text
