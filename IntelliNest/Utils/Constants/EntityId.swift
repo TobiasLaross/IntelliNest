@@ -30,6 +30,11 @@ enum EntityId: String, Decodable, CaseIterable {
     case pulsePower = "sensor.pulse_power"
     case tibberPrice = "sensor.electricity_price_hem"
     case pulseConsumptionToday = "sensor.pulse_consumption_today"
+    case washerCompletionTime = "sensor.washing_machine_washer_completion_time"
+    case washerState = "sensor.washing_machine_washer_job_state"
+    case dryerCompletionTime = "sensor.tumble_dryer_dryer_completion_time"
+    case dryerState = "sensor.tumble_dryer_dryer_job_state"
+    case easeeCharger = "sensor.eh4ngpuj_power"
     /* Lights */
     case sofa = "light.soffbordet"
     case cozyCorner = "light.myshornan"

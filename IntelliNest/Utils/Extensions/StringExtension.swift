@@ -10,7 +10,8 @@ import Foundation
 extension String {
     func toKW() -> String {
         if let doubleValue = Double(self) {
-            let kiloWatt = doubleValue / 1000.0
+            let rounded = doubleValue.roundedWithOneDecimal
+            let kiloWatt = rounded / 1000.0
             return kiloWatt == 0 ? "\(Int(kiloWatt))kW" : String(format: "%.1fkW", kiloWatt)
         } else {
             return "?kW"
@@ -19,7 +20,8 @@ extension String {
 
     func toKWh() -> String {
         if let kiloWattHours = Double(self) {
-            return kiloWattHours == 0 ? "\(Int(kiloWattHours))kWh" : String(format: "%.1fkWh", kiloWattHours)
+            let rounded = kiloWattHours.roundedWithOneDecimal
+            return kiloWattHours == 0 ? "\(Int(rounded))kWh" : String(format: "%.1fkWh", rounded)
         } else {
             return "?kWh"
         }
@@ -27,10 +29,18 @@ extension String {
 
     func toOre() -> String {
         if let doubleValue = Double(self) {
-            let ore = Int(doubleValue * 100)
+            let ore = Int(round(doubleValue * 100))
             return "\(ore) Öre"
         } else {
             return "? Öre"
         }
+    }
+
+    mutating func addNewLineAndAppend(_ other: String) {
+        if isNotEmpty {
+            append("\n")
+        }
+
+        append(other)
     }
 }

@@ -17,4 +17,11 @@ extension Date {
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"
         return dateFormatter.date(from: dateString)
     }
+
+    func minutesLeft() -> Int {
+        let timeZoneOffset = TimeZone.current.secondsFromGMT()
+        let selfInLocalTimezone = self.addingTimeInterval(TimeInterval(timeZoneOffset))
+        let now = Date().addingTimeInterval(TimeInterval(timeZoneOffset))
+        return Calendar.current.dateComponents([.minute], from: now, to: selfInLocalTimezone).minute ?? -1
+    }
 }
