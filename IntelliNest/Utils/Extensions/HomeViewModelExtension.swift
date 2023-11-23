@@ -9,7 +9,7 @@ import SwiftUI
 
 extension HomeViewModel {
     var sarahIphoneimage: Image {
-        if sarahsIphone.isActive {
+        if !sarahsIphone.isActive {
             return Image(systemImageName: .iPhoneActive)
         } else {
             return Image(systemImageName: .iPhone)
@@ -29,7 +29,7 @@ extension HomeViewModel {
         }
 
         if let chargingPower = Double(easeeCharger.state), chargingPower > 0 {
-            text.addNewLineAndAppend("Laddbox: \(chargingPower)kW")
+            text.addNewLineAndAppend("Laddbox: \(chargingPower.roundedWithOneDecimal)kW")
         }
 
         return text

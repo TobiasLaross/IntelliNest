@@ -89,16 +89,6 @@ class HomeViewModel: ObservableObject {
 
     func showCoffeeMachineScheduling() {
         if !coffeeMachineStartTimeEnabled.isActive {
-            let calendar = Calendar.current
-            let now = Date()
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "HH:mm:ss"
-            if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
-                let formattedDate = dateFormatter.string(from: newDate)
-                coffeeMachineStartTime.state = formattedDate
-                updateDateTimeEntity(entity: coffeeMachineStartTime)
-            }
-
             toggleCoffeeMachineStarTimeEnabled()
         }
 

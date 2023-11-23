@@ -9,10 +9,10 @@ import SwiftUI
 
 let dashboardButtonBigTitleSize: CGFloat = 24
 let dashboardButtonTitleSize: CGFloat = 14
-let dashboardButtonImageSize: CGFloat = 40
+let dashboardButtonImageSize: CGFloat = 35
 let dashboardServiceButtonImageSIze: CGFloat = 20
-let dashboardButtonFrameHeight: CGFloat = 110
-let dashboardButtonFrameWidth: CGFloat = 110
+let dashboardButtonFrameHeight: CGFloat = 90
+let dashboardButtonFrameWidth: CGFloat = 90
 let dashboardCircleButtonFrameSize: CGFloat = 80
 let dashboardButtonCornerRadius: CGFloat = 20
 let topGrayIntensity = 0.15
@@ -27,7 +27,8 @@ struct HassButtonLabel: View {
     let buttonFrameWidth: CGFloat
     let buttonCornerRadius: CGFloat
 
-    init(button: AnyView, buttonFrameHeight: CGFloat = dashboardButtonFrameHeight,
+    init(button: AnyView,
+         buttonFrameHeight: CGFloat = dashboardButtonFrameHeight,
          buttonFrameWidth: CGFloat = dashboardButtonFrameWidth,
          buttonCornerRadius: CGFloat = dashboardButtonCornerRadius) {
         self.button = button
@@ -53,20 +54,17 @@ struct NavButton: View {
     var image: Image
     let buttonImageWidth: CGFloat
     let buttonImageHeight: CGFloat
-    let buttonTitleSize: CGFloat
     let isActive: Bool
 
     init(buttonTitle: String,
          image: Image,
          buttonImageWidth: CGFloat = dashboardButtonImageSize,
          buttonImageHeight: CGFloat = dashboardButtonImageSize,
-         buttonTitleSize: CGFloat = dashboardButtonTitleSize,
          isActive: Bool = false) {
         self.buttonTitle = buttonTitle
         self.image = image
         self.buttonImageWidth = buttonImageWidth
         self.buttonImageHeight = buttonImageHeight
-        self.buttonTitleSize = buttonTitleSize
         self.isActive = isActive
     }
 
@@ -76,9 +74,11 @@ struct NavButton: View {
                 .resizable()
                 .frame(width: buttonImageWidth, height: buttonImageHeight)
                 .foregroundColor(isActive ? .yellow : .white)
-            Text(buttonTitle)
-                .font(.system(size: buttonTitleSize))
-                .foregroundColor(.white)
+            if buttonTitle.isNotEmpty {
+                Text(buttonTitle)
+                    .font(.circleButtonFontMedium)
+                    .foregroundColor(.white)
+            }
         }
     }
 }

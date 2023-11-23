@@ -27,16 +27,16 @@ struct EniroClimateView: View {
                     HStack {
                         CircleButtonView(buttonTitle: "",
                                          isActive: viewModel.climateHeating.isActive,
-                                         icon: .init(imageName: .seatHeater),
                                          buttonSize: 65,
+                                         icon: .init(imageName: .seatHeater),
                                          imageSize: 30,
                                          action: {
                                              viewModel.toggleState(for: viewModel.climateHeating)
                                          })
                         CircleButtonView(buttonTitle: "",
                                          isActive: viewModel.climateDefrost.isActive,
-                                         icon: .init(imageName: .defrost),
                                          buttonSize: 65,
+                                         icon: .init(imageName: .defrost),
                                          iconWidth: 30,
                                          iconHeight: 35,
                                          action: {

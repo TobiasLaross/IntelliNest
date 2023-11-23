@@ -18,6 +18,7 @@ struct CircleButtonView: View {
     let icon: Image?
     let iconWidth: CGFloat
     let iconHeight: CGFloat
+    let indicatorIcon: Image?
     var isLoading: Bool
     let action: MainActorVoidClosure
 
@@ -54,10 +55,23 @@ struct CircleButtonView: View {
                                     .lineLimit(2)
                                     .font(customFont)
                                     .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 6)
+                                    .padding(.horizontal, 7)
                             }
                         }
                         .foregroundColor(.white)
+                    }
+                    .overlay {
+                        if let indicatorIcon {
+                            VStack {
+                                HStack {
+                                    indicatorIcon
+                                        .foregroundColor(.lightBlue)
+                                        .padding()
+                                    Spacer()
+                                }
+                                Spacer()
+                            }
+                        }
                     }
             }
             .scaleEffect(tapped ? 0.9 : 1.0)
@@ -68,20 +82,22 @@ struct CircleButtonView: View {
          customFont: Font = .circleButtonFontMedium,
          isActive: Bool = false,
          activeColor: Color = .yellow,
-         icon: Image?,
          buttonSize: CGFloat = 80,
+         icon: Image?,
          iconWidth: CGFloat = 20,
          iconHeight: CGFloat = 20,
+         indicatorIcon: Image? = nil,
          isLoading: Bool = false,
          action: @escaping MainActorVoidClosure) {
         self.buttonTitle = buttonTitle
         self.customFont = customFont
         self.isActive = isActive
         self.activeColor = activeColor
-        self.icon = icon
         self.buttonSize = buttonSize
+        self.icon = icon
         self.iconWidth = iconWidth
         self.iconHeight = iconHeight
+        self.indicatorIcon = indicatorIcon
         self.isLoading = isLoading
         self.action = action
     }
@@ -90,8 +106,8 @@ struct CircleButtonView: View {
          customFont: Font = .circleButtonFontMedium,
          isActive: Bool = false,
          activeColor: Color = .yellow,
-         icon: Image?,
          buttonSize: CGFloat = 80,
+         icon: Image?,
          imageSize: CGFloat = 20,
          isLoading: Bool = false,
          action: @escaping MainActorVoidClosure) {
@@ -99,8 +115,8 @@ struct CircleButtonView: View {
                   customFont: customFont,
                   isActive: isActive,
                   activeColor: activeColor,
-                  icon: icon,
                   buttonSize: buttonSize,
+                  icon: icon,
                   iconWidth: imageSize,
                   iconHeight: imageSize,
                   isLoading: isLoading,
@@ -110,8 +126,8 @@ struct CircleButtonView: View {
 
 #Preview {
     CircleButtonView(buttonTitle: "Service",
-                     icon: .init(systemImageName: .bolt),
                      buttonSize: 20,
+                     icon: .init(systemImageName: .bolt),
                      iconWidth: 33,
                      iconHeight: 33,
                      isLoading: false,
