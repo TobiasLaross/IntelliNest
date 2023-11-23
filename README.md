@@ -14,8 +14,8 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
 | Commit count in main                | 34 | N/A |
-| Total deleted lines                 | 2750 | N/A |
-| Total added lines                   | 14898 | N/A |
+| Total deleted lines                 | 2924 | N/A |
+| Total added lines                   | 15078 | N/A |
 
 Last Updated: 2023-11-23
 ## Supported features

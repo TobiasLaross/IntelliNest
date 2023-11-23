@@ -196,10 +196,10 @@ private struct HomeServiceButtonsView: View {
                 if UserManager.currentUser == .tobias {
                     CircleButtonView(buttonTitle: "Hitta Sarah's iPhone?",
                                      customFont: .circleButtonFontSmall,
-                                     isActive: !viewModel.sarahsIphone.isActive,
+                                     isActive: viewModel.sarahsIphone.isActive,
                                      buttonSize: buttonSize,
                                      icon: viewModel.sarahIphoneimage,
-                                     iconWidth: !viewModel.sarahsIphone.isActive ? 40 : 20,
+                                     iconWidth: viewModel.sarahsIphone.isActive ? 40 : 20,
                                      iconHeight: 30,
                                      action: {
                                          isShowingAlert = true

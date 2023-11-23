@@ -9,7 +9,7 @@ import SwiftUI
 
 extension HomeViewModel {
     var sarahIphoneimage: Image {
-        if !sarahsIphone.isActive {
+        if sarahsIphone.isActive {
             return Image(systemImageName: .iPhoneActive)
         } else {
             return Image(systemImageName: .iPhone)
