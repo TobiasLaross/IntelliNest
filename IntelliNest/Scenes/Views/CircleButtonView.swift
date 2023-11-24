@@ -48,6 +48,7 @@ struct CircleButtonView: View {
                                     .resizable()
                                     .frame(width: iconWidth, height: iconHeight, alignment: .center)
                                     .foregroundColor(isActive ? .yellow : .white)
+                                    .contentTransition(.symbolEffect(.replace))
                             }
 
                             if buttonTitle.isNotEmpty {

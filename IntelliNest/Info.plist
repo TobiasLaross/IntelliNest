@@ -2,14 +2,34 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location access is needed to get SSID</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location access is needed to get SSID</string>
 	<key>EXTERNAL_URL</key>
 	<string>$(EXTERNAL_URL)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LOCAL_SSID</key>
+	<string>$(LOCAL_SSID)</string>
 	<key>NSUserActivityTypes</key>
 	<array>
-		<string>ToggleMonitorIntent</string>
-		<string>UnlockStoreHouseIntent</string>
+		<dict>
+			<key>IntentsSupported</key>
+			<array>
+				<string>INSendMessageIntent</string>
+			</array>
+			<key>UIShortcutWidget</key>
+			<dict>
+				<key>ShortcutWidgetDescription</key>
+				<dict>
+					<key>UIApplicationShortcutWidgetSupportedIntentPhrases</key>
+					<array>
+						<string>Example phrase for sending a message</string>
+					</array>
+				</dict>
+			</dict>
+		</dict>
 	</array>
 	<key>SECRET_HASS_TOKEN</key>
 	<string>$(SECRET_HASS_TOKEN)</string>
@@ -46,6 +66,10 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>CarHeater</string>
 		</dict>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
 	</array>
 </dict>
 </plist>
