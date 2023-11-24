@@ -15,6 +15,14 @@ struct GlobalConstants {
         return ""
     }
 
+    static var localSSID: String {
+        if let localSSID = Bundle.main.object(forInfoDictionaryKey: "LOCAL_SSID") as? String {
+            return localSSID
+        } else {
+            return ""
+        }
+    }
+
     static var secretHassToken: String {
         if let hassToken = Bundle.main.object(forInfoDictionaryKey: "SECRET_HASS_TOKEN") as? String {
             return hassToken
@@ -80,6 +88,9 @@ struct GlobalConstants {
 
     static let baseInternalUrlString = "http://192.168.1.205:8123/"
     static let githubFakeUrlString = "https://192.218.223.123/"
+    static var shouldUseLocalSSID: Bool {
+        GlobalConstants.localSSID.isNotEmpty && GlobalConstants.localSSID != "None"
+    }
 
     static func isGithubActionsRunning() -> Bool {
         return baseExternalUrlString == githubFakeUrlString

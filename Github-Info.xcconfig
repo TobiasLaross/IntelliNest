@@ -9,6 +9,7 @@
 // https://help.apple.com/xcode/#/dev745c5c974
 SECRET_HASS_TOKEN = default_token
 EXTERNAL_URL = 192.218.223.123/
+LOCAL_SSID = None
 SECRET_SHIP_BOOK_APP_ID = appID
 SECRET_SHIP_BOOK_APP_KEY = appKey
 SECRET_YALE_API_KEY = abc

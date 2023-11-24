@@ -5,11 +5,13 @@
 //  Created by Tobias on 2022-06-20.
 //
 
+import CoreLocation
 import ShipBookSDK
 import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     private let actionService = QuickActionService.shared
+    let locationManager = CLLocationManager()
 
     func application(_ application: UIApplication,
                      configurationForConnecting connectingSceneSession: UISceneSession,
@@ -28,7 +30,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         ShipBook.start(appId: GlobalConstants.secretShipBookAppID,
                        appKey: GlobalConstants.secretShipBookAppKey)
-
+        locationManager.requestAlwaysAuthorization()
         return true
     }
 }
