@@ -47,7 +47,7 @@ struct CircleButtonView: View {
                                 icon
                                     .resizable()
                                     .frame(width: iconWidth, height: iconHeight, alignment: .center)
-                                    .foregroundColor(isActive ? .yellow : .white)
+                                    .foregroundColor(isActive ? activeColor : .white)
                                     .contentTransition(.symbolEffect(.replace))
                             }
 

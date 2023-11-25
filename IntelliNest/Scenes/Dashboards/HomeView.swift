@@ -104,8 +104,8 @@ private struct HomeNavigationButtonsView: View {
                                    buttonImageHeight: 50)
     let cctvButton = NavButton(buttonTitle: "",
                                image: Image(systemName: "video.fill"),
-                               buttonImageWidth: 50,
-                               buttonImageHeight: 35)
+                               buttonImageWidth: 45,
+                               buttonImageHeight: 30)
 
     var body: some View {
         let lightsButton = NavButton(buttonTitle: "",
@@ -155,6 +155,7 @@ private struct HomeServiceButtonsView: View {
                                  isActive: viewModel.frontDoor.isActive,
                                  buttonSize: buttonSize,
                                  icon: viewModel.frontDoor.image,
+                                 iconWidth: viewModel.frontDoor.isActive ? 30 : 20,
                                  iconHeight: 30,
                                  isLoading: viewModel.frontDoor.isLoading,
                                  action: viewModel.toggleStateForFrontDoor)
@@ -193,10 +194,11 @@ private struct HomeServiceButtonsView: View {
                 CircleButtonView(buttonTitle: viewModel.coffeeMachine.title,
                                  customFont: .circleButtonFontSmall,
                                  isActive: viewModel.coffeeMachine.isActive,
+                                 activeColor: viewModel.coffeeMachine.activeColor,
                                  buttonSize: buttonSize,
                                  icon: viewModel.coffeeMachine.image,
                                  iconWidth: 25,
-                                 iconHeight: 30,
+                                 iconHeight: 35,
                                  indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
                                  action: viewModel.toggleCoffeeMachine)
                     .contextMenu {
