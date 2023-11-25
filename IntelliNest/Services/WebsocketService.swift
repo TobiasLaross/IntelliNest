@@ -267,10 +267,10 @@ extension WebSocketService: WebSocketDelegate {
                 status = attributes["status"] as? String
                 batteryLevel = attributes["battery_level"] as? Int
                 addressDict = attributes["address"] as? [String: Any]
-                if let tempTodayPrices = attributes["today"] as? [Float?] {
+                if let tempTodayPrices = attributes["today"] as? [Double?] {
                     todayPrices = tempTodayPrices.map { Int($0 ?? 0) }
                 }
-                if let tempTomorrowPrices = attributes["tomorrow"] as? [Float?] {
+                if let tempTomorrowPrices = attributes["tomorrow"] as? [Double?] {
                     tomorrowPrices = tempTomorrowPrices.map { Int($0 ?? 0) }
                 }
             }
