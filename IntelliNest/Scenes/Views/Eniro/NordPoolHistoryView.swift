@@ -29,7 +29,7 @@ struct NordPoolHistoryView: View {
                     Text(
                         """
                         \(Calendar.currentHour):00
-                        \(nordPool.priceData[Calendar.currentHour].price) öre
+                        \(nordPool.price(hour: Calendar.currentHour)) öre
                         """
                     )
                     .padding(4)

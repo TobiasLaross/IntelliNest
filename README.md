@@ -7,17 +7,17 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 ## Code statistics
 | Indicators                          | Now  | Desired |
 |-------------------------------------|------|---------|
-| Total LOC                           | 9306 | N/A |
+| Total LOC                           | 9303 | N/A |
 | Swift file count                    | 139 | N/A |
 | Average LOC per file                | 66 | <100 |
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
-| Commit count in main                | 36 | N/A |
-| Total deleted lines                 | 3001 | N/A |
-| Total added lines                   | 15342 | N/A |
+| Commit count in main                | 37 | N/A |
+| Total deleted lines                 | 3058 | N/A |
+| Total added lines                   | 15395 | N/A |
 
-Last Updated: 2023-11-25
+Last Updated: 2023-11-30
 ## Supported features
 ### Rest API and Websocket support
 Most views now use WebSocket instead of REST API for improved real-time updates.
@@ -43,7 +43,6 @@ Climate handling and scheduling, refresh data, start/stop charging, lock/unlock 
  <div style="display: flex; justify-content: space-around;">
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car.PNG" alt="Car Image" width="120" height="280"/>
   <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car2.PNG" alt="Car Image" width="120" height="280"/>
-  <img src="https://github.com/TobiasLaross/IntelliNest/blob/main/Images/Car3.PNG" alt="Car Image" width="120" height="280"/>
  </div>
  
 ### Roborock
