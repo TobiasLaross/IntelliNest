@@ -253,44 +253,27 @@ extension WebSocketService: WebSocketDelegate {
         if let entityIDString = newState["entity_id"] as? String,
            let entityID = EntityId(rawValue: entityIDString),
            let state = newState["state"] as? String {
-            var brightness: Int?
-            var status: String?
-            var batteryLevel: Int?
-            var addressDict: [String: Any]?
-            let lastChangedString = newState["last_changed"] as? String
-            let lastChanged = Date.fromISO8601(lastChangedString)
-            var todayPrices: [Int] = []
-            var tomorrowPrices: [Int] = []
-
-            if let attributes = newState["attributes"] as? [String: Any] {
-                brightness = attributes["brightness"] as? Int
-                status = attributes["status"] as? String
-                batteryLevel = attributes["battery_level"] as? Int
-                addressDict = attributes["address"] as? [String: Any]
-                if let tempTodayPrices = attributes["today"] as? [Double?] {
-                    todayPrices = tempTodayPrices.map { Int($0 ?? 0) }
-                }
-                if let tempTomorrowPrices = attributes["tomorrow"] as? [Double?] {
-                    tomorrowPrices = tempTomorrowPrices.map { Int($0 ?? 0) }
-                }
-            }
-
+            let attributes = newState["attributes"] as? [String: Any] ?? [:]
             if entityID == .roborock {
+                let status = attributes["status"] as? String
+                let batteryLevel = attributes["battery_level"] as? Int
                 delegate?.webSocketService(didReceiveRoborock: entityID, state: state, status: status, batteryLevel: batteryLevel)
             } else if entityID.type == .light {
+                let brightness = attributes["brightness"] as? Int
                 delegate?.webSocketService(didReceiveLight: entityID, state: state, brightness: brightness)
             } else if entityID == .heaterCorridor || entityID == .heaterPlayroom {
                 let heater = HeaterEntity(entityID: entityID, state: state, attributes: newState)
                 delegate?.webSocketService(didReceiveHeater: heater)
-            } else if entityID == .eniroGeoLocation, let addressDict {
+            } else if entityID == .eniroGeoLocation {
+                let addressDict = attributes["address"] as? [String: Any] ?? [:]
                 let eniroGeoEntity = EniroGeoEntity(entityId: .eniroGeoLocation, state: state, addressDict: addressDict)
                 delegate?.webSocketService(didReceiveEniroGeoEntity: eniroGeoEntity)
             } else if entityID == .nordPool {
-                var nordPoolEntity = NordPoolEntity(entityId: entityID, state: state)
-                nordPoolEntity.today = todayPrices
-                nordPoolEntity.tomorrow = tomorrowPrices
+                let nordPoolEntity = NordPoolEntity(entityId: entityID, state: state, attributes: attributes)
                 delegate?.webSocketService(didReceiveNordPoolEntity: nordPoolEntity)
             } else {
+                let lastChangedString = newState["last_changed"] as? String
+                let lastChanged = Date.fromISO8601(lastChangedString)
                 delegate?.webSocketService(didReceiveEntity: entityID, state: state, lastChanged: lastChanged)
             }
         }

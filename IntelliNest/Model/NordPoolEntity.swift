@@ -55,7 +55,18 @@ struct NordPoolEntity: EntityProtocol {
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
         self.state = state
-        updateIsActive()
+    }
+
+    init(entityId: EntityId, state: String, attributes: [String: Any]) {
+        self.init(entityId: entityId, state: state)
+        if let tempTodayPrices = attributes["today"] as? [Double?] {
+            today = tempTodayPrices.map { Int($0 ?? 0) }
+        }
+        if let tempTomorrowPrices = attributes["tomorrow"] as? [Double?] {
+            tomorrow = tempTomorrowPrices.map { Int($0 ?? 0) }
+        }
+        tomorrowValid = attributes[AttributesCodingKeys.tomorrowValid.rawValue] as? Bool ?? false
+        populatePriceData()
     }
 
     init(from decoder: Decoder) throws {
@@ -68,15 +79,18 @@ struct NordPoolEntity: EntityProtocol {
         today = attributes.today.map { Int($0 ?? 0) }
         tomorrow = attributes.tomorrow.map { Int($0 ?? 0) }
         tomorrowValid = attributes.tomorrowValid
-        updateIsActive()
-    }
-
-    mutating func updateIsActive() {
-        isActive = true
     }
 
     func chartBarHeight() -> Int {
         Int(1.1 * Double(today.max() ?? 0))
+    }
+
+    func price(hour: Int) -> String {
+        if priceData.count > hour {
+            return "\(priceData[hour].price)"
+        } else {
+            return "?"
+        }
     }
 
     private mutating func populatePriceData() {
