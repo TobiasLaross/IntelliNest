@@ -51,7 +51,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
         nextUpdate = Date().addingTimeInterval(1)
 
         if GlobalConstants.shouldUseLocalSSID {
-            let ssid = await SSIDUtil.fetchSSID()
+            let ssid = await SSIDUtil.getCurrentSSID()
             if ssid == GlobalConstants.localSSID {
                 connectionState = .local
             } else {
