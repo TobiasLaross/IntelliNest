@@ -116,6 +116,8 @@
 		F68DA61E28B4C11600601726 /* Heater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61D28B4C11600601726 /* Heater.swift */; };
 		F68DA62028B4C13000601726 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61F28B4C13000601726 /* Domain.swift */; };
 		F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */; };
+		F6BA4F5D2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */; };
+		F6BA4F5E2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */; };
 		F6BB7DF0284A29A4007F44D0 /* RoborockMapImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */; };
 		F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */; };
 		F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */; };
@@ -199,7 +201,7 @@
 		F60345D527ABE49700212D04 /* RoborockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockView.swift; sourceTree = "<group>"; };
 		F6035044287F5DB10028DA57 /* SingleRoomLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleRoomLight.swift; sourceTree = "<group>"; };
 		F607F65F2B0DF2DC002F782F /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
-		F617062527C3CA9100183250 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F617062527C3CA9100183250 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F61BF99B2A1653E600C1802E /* YaleApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleApiService.swift; sourceTree = "<group>"; };
 		F61BF99D2A1655E900C1802E /* StorageKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageKeys.swift; sourceTree = "<group>"; };
 		F61BF99F2A166B2700C1802E /* LockID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockID.swift; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 		F68DA61D28B4C11600601726 /* Heater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Heater.swift; sourceTree = "<group>"; };
 		F68DA61F28B4C13000601726 /* Domain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
 		F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockViewModel.swift; sourceTree = "<group>"; };
+		F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = AppIntentVocabulary.plist; sourceTree = "<group>"; };
 		F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockMapImageView.swift; sourceTree = "<group>"; };
 		F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "IntelliNest-Info.xcconfig"; sourceTree = "<group>"; };
 		F6C2BF3C283A34E9002EE9F9 /* Github-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Github-Info.xcconfig"; sourceTree = "<group>"; };
@@ -610,16 +613,13 @@
 				F62750AD2A01119000C1253F /* Navigation */,
 				F62CD2E6287713F900462092 /* Errors */,
 				F62CD2E128770D4900462092 /* ViewModel */,
-				F617062527C3CA9100183250 /* Info.plist */,
 				F60345C627A934F200212D04 /* Scenes */,
 				F60345CA27A93BB400212D04 /* Services */,
 				F60345C527A9344600212D04 /* Model */,
 				F60345C227A933C500212D04 /* Utils */,
 				F67023FA27A177320070FFBB /* AppMain.swift */,
-				F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */,
+				F6BA4F5B2B18D9D3006817DB /* Supporting Files */,
 				F6633F282860C16E004D0B76 /* AppDelegate.swift */,
-				F6591BFF2B020DD600D5785E /* IntelliNest.entitlements */,
-				F67023FE27A177330070FFBB /* Assets.xcassets */,
 				F670240027A177330070FFBB /* Preview Content */,
 			);
 			path = IntelliNest;
@@ -677,6 +677,18 @@
 				F61BF9A72A1672C300C1802E /* HTTPMethod.swift */,
 			);
 			path = Constants;
+			sourceTree = "<group>";
+		};
+		F6BA4F5B2B18D9D3006817DB /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F617062527C3CA9100183250 /* Info.plist */,
+				F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */,
+				F6591BFF2B020DD600D5785E /* IntelliNest.entitlements */,
+				F67023FE27A177330070FFBB /* Assets.xcassets */,
+				F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */,
+			);
+			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		F6D167C827C1282500DCC155 /* Labels */ = {
@@ -848,6 +860,7 @@
 			files = (
 				F670240227A177330070FFBB /* Preview Assets.xcassets in Resources */,
 				F67023FF27A177330070FFBB /* Assets.xcassets in Resources */,
+				F6BA4F5D2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -862,6 +875,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6BA4F5E2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1257,17 +1271,19 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1279,7 +1295,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1297,17 +1313,19 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1319,7 +1337,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1338,7 +1356,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1347,7 +1365,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1365,7 +1383,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1374,7 +1392,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1450,17 +1468,19 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = IntelliNest/IntelliNest.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = IntelliNest/Info.plist;
+				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1472,7 +1492,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1491,7 +1511,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1500,7 +1520,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1516,19 +1536,21 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
+				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access to get SSID";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1544,19 +1566,21 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
+				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access to get SSID";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1572,19 +1596,21 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
+				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access to get SSID";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.11.30;
+				MARKETING_VERSION = 2023.12.01;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

@@ -79,7 +79,6 @@ class Navigator {
     func reload(for destination: Destination) async {
         switch destination {
         case .home:
-            homeViewModel.checkLocationAccess()
             await homeViewModel.reload()
         case .heaters:
             await heatersViewModel.reload()

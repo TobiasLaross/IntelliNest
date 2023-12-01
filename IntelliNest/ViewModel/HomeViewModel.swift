@@ -5,7 +5,6 @@
 //  Created by Tobias on 2022-08-20.
 //
 
-import CoreLocation
 import Foundation
 import ShipBookSDK
 import SwiftUI
@@ -33,7 +32,6 @@ class HomeViewModel: ObservableObject {
     @Published var easeeCharger = Entity(entityId: .easeeCharger)
 
     @Published var shouldShowNordpoolPrices = false
-    @Published var noLocationAccess = false
 
     var isReloading = false
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
@@ -41,7 +39,6 @@ class HomeViewModel: ObservableObject {
                                  .dryerCompletionTime, .washerState, .dryerState, .easeeCharger]
 
     private var websocketService: WebSocketService
-    private let locationManager = CLLocationManager()
     let yaleApiService: YaleApiService
     var urlCreator: URLCreator
     private(set) var toolbarReloadAction: MainActorAsyncVoidClosure
@@ -123,24 +120,6 @@ class HomeViewModel: ObservableObject {
         let action: Action = .unlock
         storageLock.expectedState = .unlocked
         websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
-    }
-
-    func checkLocationAccess() {
-        Task { @MainActor in
-            noLocationAccess = locationManager.authorizationStatus != .authorizedAlways
-        }
-    }
-
-    func openLocationSettings() {
-        Task { @MainActor in
-            guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                return
-            }
-
-            if UIApplication.shared.canOpenURL(settingsUrl) {
-                UIApplication.shared.open(settingsUrl, options: [:], completionHandler: nil)
-            }
-        }
     }
 
     // swiftlint:disable cyclomatic_complexity
