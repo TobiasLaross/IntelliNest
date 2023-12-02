@@ -1283,7 +1283,7 @@
 				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
@@ -1325,7 +1325,7 @@
 				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
@@ -1481,7 +1481,7 @@
 				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
