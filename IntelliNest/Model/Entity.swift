@@ -80,9 +80,6 @@ struct Entity: EntityProtocol {
 
     private mutating func updateDate() {
         date = .distantPast
-        guard !state.isEmpty, state.contains(where: { $0 == "T" || $0 == ":" }) else {
-            return
-        }
 
         let dateFormatter = DateFormatter()
         let hasTimeComponent = state.contains(":")
@@ -98,6 +95,10 @@ struct Entity: EntityProtocol {
             if let time = dateFormatter.date(from: state) {
                 date = time
             }
+        case (true, false): // Only Date
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+            date = dateFormatter.date(from: state) ?? .distantPast
         default:
             break
         }

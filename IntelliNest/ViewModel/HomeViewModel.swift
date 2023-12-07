@@ -30,13 +30,16 @@ class HomeViewModel: ObservableObject {
     @Published var dryerCompletionTime = Entity(entityId: .dryerCompletionTime)
     @Published var dryerState = Entity(entityId: .dryerState)
     @Published var easeeCharger = Entity(entityId: .easeeCharger)
+    @Published var generalWasteDate = Entity(entityId: .generalWasteDate)
+    @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
 
     @Published var shouldShowNordpoolPrices = false
 
     var isReloading = false
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
                                  .solarPower, .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
-                                 .dryerCompletionTime, .washerState, .dryerState, .easeeCharger]
+                                 .dryerCompletionTime, .washerState, .dryerState, .easeeCharger,
+                                 .generalWasteDate, .plasticWasteDate]
 
     private var websocketService: WebSocketService
     let yaleApiService: YaleApiService
@@ -158,6 +161,10 @@ class HomeViewModel: ObservableObject {
             dryerState.state = state
         case .easeeCharger:
             easeeCharger.state = state
+        case .generalWasteDate:
+            generalWasteDate.state = state
+        case .plasticWasteDate:
+            plasticWasteDate.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }
