@@ -35,6 +35,8 @@ enum EntityId: String, Decodable, CaseIterable {
     case dryerCompletionTime = "sensor.tumble_dryer_dryer_completion_time"
     case dryerState = "sensor.tumble_dryer_dryer_job_state"
     case easeeCharger = "sensor.eh4ngpuj_power"
+    case generalWasteDate = "sensor.general_waste_collection_date"
+    case plasticWasteDate = "sensor.plastic_waste_collection_date"
     /* Lights */
     case sofa = "light.soffbordet"
     case cozyCorner = "light.myshornan"

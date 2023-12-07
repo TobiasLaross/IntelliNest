@@ -32,6 +32,13 @@ extension HomeViewModel {
             text.addNewLineAndAppend("Laddbox: \(chargingPower.roundedWithOneDecimal)kW")
         }
 
+        if let generalWasteDescription = generalWasteDate.date.daysRemainingDescription() {
+            text.addNewLineAndAppend("Restavfall töms \(generalWasteDescription)")
+        }
+        if let plasticWasteDescription = plasticWasteDate.date.daysRemainingDescription() {
+            text.addNewLineAndAppend("Plast töms \(plasticWasteDescription)")
+        }
+
         return text
     }
 
