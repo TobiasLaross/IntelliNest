@@ -18,7 +18,7 @@ struct RoborockView: View {
         ZStack {
             VStack {
                 Group {
-                    Text("Status: \(viewModel.getStatus())")
+                    Text("Status: \(viewModel.status)")
                         .font(.title2)
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -67,25 +67,34 @@ struct RoborockView: View {
                                     locateRoborockClosure: viewModel.locateRoborock,
                                     manualEmptyClosure: viewModel.manualEmpty)
                 Divider()
-                RoborockRoomsView(callScriptClosure: viewModel.callScript)
+                if viewModel.showingrooms {
+                    RoborockRoomsView(callScriptClosure: viewModel.callScript)
+                } else {
+                    VStack {
+                        Spacer()
+                            .frame(height: 120)
+                        CircleButtonView(buttonTitle: "Visa rum",
+                                         icon: .init(imageName: .floorplan),
+                                         action: {
+                                             viewModel.showingrooms = true
+                                         })
+                    }
+                }
                 Spacer()
             }
             .padding(.top)
             .onAppear {
+                viewModel.showingrooms = false
                 viewModel.appearedAction(.roborock)
             }
 
             if viewModel.showingMapView {
-                RoborockMapImageView(baseURLString: viewModel.baseURLString)
+                RoborockMapImageView(viewModel: viewModel)
             }
         }
-        .gesture(
-            LongPressGesture(minimumDuration: 0)
-                .sequenced(before: DragGesture(minimumDistance: 0))
-                .onEnded { _ in
-                    self.viewModel.showingMapView = false
-                }
-        )
+        .onTapGesture {
+            viewModel.showingMapView = false
+        }
     }
 }
 

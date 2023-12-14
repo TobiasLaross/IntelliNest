@@ -16,18 +16,32 @@ class RoborockViewModel: ObservableObject {
     @Published var roborockAreaSinceEmptied = Entity(entityId: .roborockAreaSinceEmptied)
     @Published var roborockEmptiedAtDate = Entity(entityId: .roborockEmptiedAtDate)
     @Published var roborockWaterShortage = Entity(entityId: .roborockWaterShortage, state: "off")
+    @Published var roborockMapImage = ImageEntity(entityID: .roborockMapImage)
     @Published var showingMapView = false
+    @Published var showingrooms = false
 
-    var baseURLString: String {
+    private var baseURLString: String {
         websocketService.baseURLString
     }
 
-    let entityIDs: [EntityId] = [.roborock,
-                                 .roborockAutomation,
-                                 .roborockWaterShortage,
-                                 .roborockEmptiedAtDate,
-                                 .roborockLastCleanArea,
-                                 .roborockAreaSinceEmptied]
+    var imagageURLString: String {
+        baseURLString.removingTrailingSlash + roborockMapImage.urlPath
+    }
+
+    var status: String {
+        let status = roborock.status.lowercased()
+        let state = roborock.state.lowercased()
+        if status == state || status.contains(state) {
+            return status.capitalized
+        } else if status == "" {
+            return state.capitalized
+        } else {
+            return "\(roborock.state.capitalized) - \(roborock.status)"
+        }
+    }
+
+    let entityIDs: [EntityId] = [.roborock, .roborockAutomation, .roborockWaterShortage, .roborockEmptiedAtDate, .roborockLastCleanArea,
+                                 .roborockAreaSinceEmptied, .roborockMapImage]
     private var websocketService: WebSocketService
     let appearedAction: DestinationClosure
 
@@ -48,9 +62,18 @@ class RoborockViewModel: ObservableObject {
             roborockEmptiedAtDate.state = state
         case .roborockWaterShortage:
             roborockWaterShortage.state = state
-
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
+        }
+    }
+
+    func reload(entityID: EntityId, state: String, urlPath: String) {
+        switch entityID {
+        case .roborockMapImage:
+            roborockMapImage.state = state
+            roborockMapImage.urlPath = urlPath
+        default:
+            Log.error("HomeViewModel doesn't reload image entity: \(entityID)")
         }
     }
 
@@ -89,14 +112,5 @@ class RoborockViewModel: ObservableObject {
         let action: Action = roborockAutomation.isActive ? .turnOff : .turnOn
         roborockAutomation.isActive.toggle()
         websocketService.updateEntity(entityID: .roborockAutomation, domain: .automation, action: action)
-    }
-
-    func getStatus() -> String {
-        if roborock.status.lowercased() == roborock.state.lowercased() ||
-            roborock.status.lowercased().contains(roborock.state.lowercased()) {
-            return "\(roborock.status.capitalized)"
-        } else {
-            return "\(roborock.state.capitalized) - \(roborock.status)"
-        }
     }
 }

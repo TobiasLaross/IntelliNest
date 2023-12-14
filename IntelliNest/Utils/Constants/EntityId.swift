@@ -8,6 +8,7 @@
 import Foundation
 
 enum EntityType: String {
+    case image
     case light
     case lock
     case powerSwitch = "switch"
@@ -121,6 +122,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case roborockAreaSinceEmptied = "input_number.bob_clean_area_since_trash_emptied"
     case roborockEmptiedAtDate = "input_datetime.bob_trash_last_emptied"
     case roborockWaterShortage = "binary_sensor.bob_water_shortage"
+    case roborockMapImage = "image.bob_houseplan"
     /* Cameras */
     case cameraVince = "camera.vince_rtsp"
     case cameraFront = "camera.framsidan_frigate"
@@ -139,6 +141,8 @@ enum EntityId: String, Decodable, CaseIterable {
             switch rawType.lowercased() {
             case "light":
                 return .light
+            case "image":
+                return .image
             default:
                 break
             }

@@ -31,6 +31,10 @@ extension Navigator: WebSocketServiceDelegate {
         }
     }
 
+    func webSocketService(didReceiveImage entityID: EntityId, state: String, urlPath: String) {
+        roborockViewModel.reload(entityID: entityID, state: state, urlPath: urlPath)
+    }
+
     func webSocketService(didReceiveLight entityID: EntityId, state: String, brightness: Int?) {
         if lightsViewModel.lightEntities.keys.contains(entityID) {
             lightsViewModel.reload(lightID: entityID, state: state, brightness: brightness)

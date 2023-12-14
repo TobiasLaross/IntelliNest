@@ -22,6 +22,7 @@ enum ImageName: String {
     case aircondition
     case evPlugType2 = "ev-plug-type2"
     case evPlugCCS2 = "ev-plug-ccs2"
+    case floorplan
     case refresh
     case settings
     case seatHeater = "seatheater.filled"

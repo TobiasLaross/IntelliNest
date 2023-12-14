@@ -156,16 +156,15 @@ class Navigator {
 
 extension View {
     func backgroundModifier() -> some View {
-        self
-            .background(
-                Group {
-                    Rectangle()
-                        .foregroundColor(topGrayColor)
-                        .ignoresSafeArea()
-                    Rectangle()
-                        .foregroundColor(bodyColor)
-                        .edgesIgnoringSafeArea(.bottom)
-                }
-            )
+        background(
+            Group {
+                Rectangle()
+                    .foregroundColor(topGrayColor)
+                    .ignoresSafeArea()
+                Rectangle()
+                    .foregroundColor(bodyColor)
+                    .edgesIgnoringSafeArea(.bottom)
+            }
+        )
     }
 }
