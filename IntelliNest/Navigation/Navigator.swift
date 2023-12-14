@@ -20,6 +20,9 @@ class Navigator {
                                            toolbarReloadAction: reloadCurrentModel,
                                            appearedAction: setCurrentDestination)
     lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: hassApiService)
+    lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
+                                                         websocketService: webSocketService,
+                                                         appearedAction: setCurrentDestination)
     lazy var heatersViewModel = HeatersViewModel(websocketService: webSocketService,
                                                  apiService: hassApiService,
                                                  appearedAction: setCurrentDestination)
@@ -54,6 +57,8 @@ class Navigator {
             switch destination {
             case .cameras:
                 showCamerasView()
+            case .electricity:
+                showElectricityView()
             case .home:
                 Text("Home navigation not implemented")
             case .heaters:
@@ -81,6 +86,8 @@ class Navigator {
         case .home:
             homeViewModel.checkLocationAccess()
             await homeViewModel.reload()
+        case .electricity:
+            break
         case .heaters:
             await heatersViewModel.reload()
         case .eniro:
@@ -98,9 +105,14 @@ class Navigator {
 
     func didEnterForeground() {
         webSocketService.connect()
+        electricityViewModel.isViewActive = currentDestination == .electricity
         Task {
             await reloadCurrentModel()
         }
+    }
+
+    func didResignForeground() {
+        electricityViewModel.isViewActive = false
     }
 
     @MainActor
@@ -116,6 +128,10 @@ class Navigator {
 
     private func showCamerasView() -> CamerasView {
         CamerasView(viewModel: self.camerasViewModel)
+    }
+
+    private func showElectricityView() -> ElectricityView {
+        ElectricityView(viewModel: electricityViewModel)
     }
 
     private func showHeatersView() -> HeatersView {
@@ -149,6 +165,7 @@ class Navigator {
                 await reloadCurrentModelTask.value
 
                 camerasViewModel.setIsActiveScreen(destination == .cameras)
+                electricityViewModel.isViewActive = destination == .electricity
             }
         }
     }

@@ -8,17 +8,26 @@
 import Foundation
 
 extension String {
-    func toKW() -> String {
+    var removingHTTPSchemeAndTrailingSlash: String {
+        replacingOccurrences(of: "http://", with: "").replacingOccurrences(of: "https://", with: "").removingTrailingSlash
+    }
+
+    var removingTrailingSlash: String {
+        if hasSuffix("/") {
+            return String(dropLast())
+        }
+        return self
+    }
+
+    var toKW: String {
         if let doubleValue = Double(self) {
-            let rounded = doubleValue.roundedWithOneDecimal
-            let kiloWatt = rounded / 1000.0
-            return kiloWatt == 0 ? "\(Int(kiloWatt))kW" : String(format: "%.1fkW", kiloWatt)
+            return doubleValue.toKW
         } else {
             return "?kW"
         }
     }
 
-    func toKWh() -> String {
+    var toKWh: String {
         if let kiloWattHours = Double(self) {
             let rounded = kiloWattHours.roundedWithOneDecimal
             return kiloWattHours == 0 ? "\(Int(rounded))kWh" : String(format: "%.1fkWh", rounded)
@@ -27,7 +36,7 @@ extension String {
         }
     }
 
-    func toOre() -> String {
+    var toOre: String {
         if let doubleValue = Double(self) {
             let ore = Int(round(doubleValue * 100))
             return "\(ore) Öre"

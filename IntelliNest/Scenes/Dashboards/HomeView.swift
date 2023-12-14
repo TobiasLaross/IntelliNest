@@ -74,15 +74,15 @@ private struct HouseInfoView: View {
             }
             Spacer()
             VStack(spacing: 8) {
-                CircleButtonView(buttonTitle: viewModel.tibberPrice.state.toOre(),
+                CircleButtonView(buttonTitle: viewModel.tibberPrice.state.toOre,
                                  customFont: .circleButtonFontLarge,
                                  buttonSize: 60,
                                  icon: nil,
                                  action: viewModel.showNordPoolPrices)
                 Text("""
-                Husets effekt: ***\(viewModel.pulsePower.state.toKW())***
-                Producerar: ***\(viewModel.solarPower.state.toKW())***
-                Förbrukat idag: ***\(viewModel.pulseConsumptionToday.state.toKWh())***
+                Huvudsäkringen: ***\(viewModel.pulsePower.state.toKW)***
+                Producerar: ***\(viewModel.sonnenBattery.solarProduction.toKW)***
+                Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)
                 .font(.circleButtonFontMedium)
             }
@@ -94,6 +94,7 @@ private struct HouseInfoView: View {
 
 private struct HomeNavigationButtonsView: View {
     @ObservedObject var viewModel: HomeViewModel
+
     let buttonSize = 90.0
     let heatersButton = NavButton(buttonTitle: "", image: Image(imageName: .aircondition))
     let carButton = NavButton(buttonTitle: "", image: Image(systemName: "car.fill"))
@@ -102,8 +103,12 @@ private struct HomeNavigationButtonsView: View {
                                    image: Image("roborocks7"),
                                    buttonImageWidth: 50,
                                    buttonImageHeight: 50)
+    let electricityButton = NavButton(buttonTitle: "",
+                                      image: Image(imageName: .powerGrid),
+                                      buttonImageWidth: 45,
+                                      buttonImageHeight: 50)
     let cctvButton = NavButton(buttonTitle: "",
-                               image: Image(systemName: "video.fill"),
+                               image: Image(systemImageName: .cctv),
                                buttonImageWidth: 45,
                                buttonImageHeight: 30)
 
@@ -114,7 +119,7 @@ private struct HomeNavigationButtonsView: View {
                                      buttonImageHeight: 50,
                                      isActive: viewModel.allLights.isActive)
         VStack {
-            HStack(spacing: 20) {
+            HStack(spacing: 15) {
                 NavigationLink(value: Destination.heaters,
                                label: { HassButtonLabel(button: AnyView(heatersButton)) })
 
@@ -124,10 +129,11 @@ private struct HomeNavigationButtonsView: View {
                 NavigationLink(value: Destination.roborock,
                                label: { HassButtonLabel(button: AnyView(roborockButton)) })
             }
-            HStack {
+            HStack(spacing: 15) {
+                NavigationLink(value: Destination.electricity,
+                               label: { HassButtonLabel(button: AnyView(electricityButton)) })
                 NavigationLink(value: Destination.cameras,
                                label: { HassButtonLabel(button: AnyView(cctvButton)) })
-
                 NavigationLink(value: Destination.lights,
                                label: { HassButtonLabel(button: AnyView(lightsButton)) })
                     .contextMenu {

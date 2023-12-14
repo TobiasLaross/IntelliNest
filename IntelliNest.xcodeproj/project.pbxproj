@@ -16,6 +16,7 @@
 		F60345D427ABE49100212D04 /* LightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D327ABE49100212D04 /* LightsView.swift */; };
 		F60345D627ABE49700212D04 /* RoborockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D527ABE49700212D04 /* RoborockView.swift */; };
 		F6035045287F5DB10028DA57 /* SingleRoomLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6035044287F5DB10028DA57 /* SingleRoomLight.swift */; };
+		F60663492B33267200575FE4 /* FlowIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60663482B33267200575FE4 /* FlowIndicatorView.swift */; };
 		F607F6602B0DF2DC002F782F /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F607F65F2B0DF2DC002F782F /* FontExtension.swift */; };
 		F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99B2A1653E600C1802E /* YaleApiService.swift */; };
 		F61BF99E2A1655E900C1802E /* StorageKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99D2A1655E900C1802E /* StorageKeys.swift */; };
@@ -68,7 +69,7 @@
 		F6591C012B07784D00D5785E /* ServiceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C002B07784D00D5785E /* ServiceID.swift */; };
 		F6591C032B07788600D5785E /* ServiceVariableKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C022B07788600D5785E /* ServiceVariableKeys.swift */; };
 		F6591C052B0778BC00D5785E /* CallServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C042B0778BC00D5785E /* CallServiceRequest.swift */; };
-		F6591C072B0787BA00D5785E /* VariableValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C062B0787BA00D5785E /* VariableValues.swift */; };
+		F6591C072B0787BA00D5785E /* VariableValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C062B0787BA00D5785E /* VariableValue.swift */; };
 		F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */; };
 		F662999027B3AA5A00121C14 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662998F27B3AA5A00121C14 /* Helpers.swift */; };
 		F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */; };
@@ -109,6 +110,9 @@
 		F67FA88B28A16E9A00BE4CBD /* EntityProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */; };
 		F680EE5B2B0F4AC80055334C /* HomeViewModelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F680EE5A2B0F4AC80055334C /* HomeViewModelExtension.swift */; };
 		F6830DE22904534200BBE36C /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6830DE12904534200BBE36C /* CollectionExtension.swift */; };
+		F685F8012B2B153C008E47AF /* ElectricityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F685F8002B2B153C008E47AF /* ElectricityViewModel.swift */; };
+		F685F8032B2B43F9008E47AF /* SonnenEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F685F8022B2B43F9008E47AF /* SonnenEntity.swift */; };
+		F685F8052B2C4F2E008E47AF /* ElectricityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F685F8042B2C4F2E008E47AF /* ElectricityView.swift */; };
 		F68DA61228AE35F300601726 /* BulbButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61128AE35F300601726 /* BulbButton.swift */; };
 		F68DA61628B0D12B00601726 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61528B0D12B00601726 /* HomeViewModel.swift */; };
 		F68DA61828B4B89C00601726 /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61728B4B89C00601726 /* Actions.swift */; };
@@ -119,6 +123,8 @@
 		F6BA4F5D2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */; };
 		F6BA4F5E2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */; };
 		F6BB7DF0284A29A4007F44D0 /* RoborockMapImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */; };
+		F6BD968F2B32DD3D00A46C8F /* ElectricityFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BD968E2B32DD3D00A46C8F /* ElectricityFlowView.swift */; };
+		F6BD96912B32E1AF00A46C8F /* SonnenStatusEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BD96902B32E1AF00A46C8F /* SonnenStatusEntity.swift */; };
 		F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */; };
 		F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */; };
 		F6D167CC27C1287700DCC155 /* HvacModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CB27C1287700DCC155 /* HvacModeView.swift */; };
@@ -201,6 +207,7 @@
 		F60345D327ABE49100212D04 /* LightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsView.swift; sourceTree = "<group>"; };
 		F60345D527ABE49700212D04 /* RoborockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockView.swift; sourceTree = "<group>"; };
 		F6035044287F5DB10028DA57 /* SingleRoomLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleRoomLight.swift; sourceTree = "<group>"; };
+		F60663482B33267200575FE4 /* FlowIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowIndicatorView.swift; sourceTree = "<group>"; };
 		F607F65F2B0DF2DC002F782F /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
 		F617062527C3CA9100183250 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F61BF99B2A1653E600C1802E /* YaleApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleApiService.swift; sourceTree = "<group>"; };
@@ -254,7 +261,7 @@
 		F6591C002B07784D00D5785E /* ServiceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceID.swift; sourceTree = "<group>"; };
 		F6591C022B07788600D5785E /* ServiceVariableKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceVariableKeys.swift; sourceTree = "<group>"; };
 		F6591C042B0778BC00D5785E /* CallServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallServiceRequest.swift; sourceTree = "<group>"; };
-		F6591C062B0787BA00D5785E /* VariableValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableValues.swift; sourceTree = "<group>"; };
+		F6591C062B0787BA00D5785E /* VariableValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableValue.swift; sourceTree = "<group>"; };
 		F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
 		F662998F27B3AA5A00121C14 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleView.swift; sourceTree = "<group>"; };
@@ -296,6 +303,9 @@
 		F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityProtocol.swift; sourceTree = "<group>"; };
 		F680EE5A2B0F4AC80055334C /* HomeViewModelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HomeViewModelExtension.swift; path = ../HomeViewModelExtension.swift; sourceTree = "<group>"; };
 		F6830DE12904534200BBE36C /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
+		F685F8002B2B153C008E47AF /* ElectricityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityViewModel.swift; sourceTree = "<group>"; };
+		F685F8022B2B43F9008E47AF /* SonnenEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonnenEntity.swift; sourceTree = "<group>"; };
+		F685F8042B2C4F2E008E47AF /* ElectricityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityView.swift; sourceTree = "<group>"; };
 		F68DA61128AE35F300601726 /* BulbButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulbButton.swift; sourceTree = "<group>"; };
 		F68DA61528B0D12B00601726 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		F68DA61728B4B89C00601726 /* Actions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Actions.swift; sourceTree = "<group>"; };
@@ -305,6 +315,8 @@
 		F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockViewModel.swift; sourceTree = "<group>"; };
 		F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = AppIntentVocabulary.plist; sourceTree = "<group>"; };
 		F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockMapImageView.swift; sourceTree = "<group>"; };
+		F6BD968E2B32DD3D00A46C8F /* ElectricityFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityFlowView.swift; sourceTree = "<group>"; };
+		F6BD96902B32E1AF00A46C8F /* SonnenStatusEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonnenStatusEntity.swift; sourceTree = "<group>"; };
 		F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "IntelliNest-Info.xcconfig"; sourceTree = "<group>"; };
 		F6C2BF3C283A34E9002EE9F9 /* Github-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Github-Info.xcconfig"; sourceTree = "<group>"; };
 		F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntityTest.swift; sourceTree = "<group>"; };
@@ -406,6 +418,8 @@
 				F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */,
 				F6552704281678740035DC72 /* RoborockEntity.swift */,
 				F6DBCBDF2B278C27008F9846 /* ImageEntity.swift */,
+				F685F8022B2B43F9008E47AF /* SonnenEntity.swift */,
+				F6BD96902B32E1AF00A46C8F /* SonnenStatusEntity.swift */,
 				F6633F262860B90C004D0B76 /* QuickActionService.swift */,
 				F61BF9A32A166E0D00C1802E /* LockState.swift */,
 				F61BF9AB2A167AC600C1802E /* DoorState.swift */,
@@ -429,12 +443,13 @@
 			children = (
 				F669C72B2A23C06200458165 /* CameraView.swift */,
 				F624EF672A2B4AAB004AC6BA /* CamerasView.swift */,
+				F685F8042B2C4F2E008E47AF /* ElectricityView.swift */,
+				F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */,
+				F60345CF27ABB46900212D04 /* EniroView.swift */,
+				F60345CD27AAF84E00212D04 /* HeatersView.swift */,
 				F60345C827A9379200212D04 /* HomeView.swift */,
 				F60345D327ABE49100212D04 /* LightsView.swift */,
-				F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */,
 				F60345D527ABE49700212D04 /* RoborockView.swift */,
-				F60345CD27AAF84E00212D04 /* HeatersView.swift */,
-				F60345CF27ABB46900212D04 /* EniroView.swift */,
 			);
 			path = Dashboards;
 			sourceTree = "<group>";
@@ -502,6 +517,7 @@
 				F669C72D2A23C08000458165 /* CameraViewModel.swift */,
 				F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */,
 				F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */,
+				F685F8002B2B153C008E47AF /* ElectricityViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -572,6 +588,7 @@
 			isa = PBXGroup;
 			children = (
 				F6225E2A2AE1351D00D32EF4 /* Home */,
+				F6BD968D2B32DD2200A46C8F /* Electricity */,
 				F67F6B4928D8FB780003CE9F /* Eniro */,
 				F62CD2E92877275400462092 /* Light */,
 				F6633F2A286324DE004D0B76 /* Heater */,
@@ -666,7 +683,7 @@
 				F61BF9A92A16749D00C1802E /* JSONKey.swift */,
 				F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */,
 				F6591C022B07788600D5785E /* ServiceVariableKeys.swift */,
-				F6591C062B0787BA00D5785E /* VariableValues.swift */,
+				F6591C062B0787BA00D5785E /* VariableValue.swift */,
 				F61BF99D2A1655E900C1802E /* StorageKeys.swift */,
 				F6F1D08329A67B3200A3292E /* FullScreenBackgroundOverlay.swift */,
 				F6DBA4D328F09C7F001BA1C0 /* Closures.swift */,
@@ -692,6 +709,15 @@
 				F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */,
 			);
 			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F6BD968D2B32DD2200A46C8F /* Electricity */ = {
+			isa = PBXGroup;
+			children = (
+				F6BD968E2B32DD3D00A46C8F /* ElectricityFlowView.swift */,
+				F60663482B33267200575FE4 /* FlowIndicatorView.swift */,
+			);
+			path = Electricity;
 			sourceTree = "<group>";
 		};
 		F6D167C827C1282500DCC155 /* Labels */ = {
@@ -971,14 +997,16 @@
 			files = (
 				F6FDBE2F2A1CD7980081BC3D /* LockServiceProtocol.swift in Sources */,
 				F64A38832B1085B600BA9FAC /* SSIDUtil.swift in Sources */,
+				F60663492B33267200575FE4 /* FlowIndicatorView.swift in Sources */,
 				F6FAD81C2A2A654900C0B364 /* WebsocketService.swift in Sources */,
 				F68DA61E28B4C11600601726 /* Heater.swift in Sources */,
 				F6F1D07A299110EC00A3292E /* NordPoolHistoryView.swift in Sources */,
 				F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */,
-				F6591C072B0787BA00D5785E /* VariableValues.swift in Sources */,
+				F6591C072B0787BA00D5785E /* VariableValue.swift in Sources */,
 				F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */,
 				F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */,
 				F64A38812B0F5E6900BA9FAC /* DoubleExtension.swift in Sources */,
+				F685F8052B2C4F2E008E47AF /* ElectricityView.swift in Sources */,
 				F66E28AE2A34FBDE0003EC70 /* VLCMediaplayerMock.swift in Sources */,
 				F6633F3628632884004D0B76 /* VerticalPositionView.swift in Sources */,
 				F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */,
@@ -996,6 +1024,7 @@
 				F60345C127A7F33700212D04 /* Entity.swift in Sources */,
 				F68DA62028B4C13000601726 /* Domain.swift in Sources */,
 				F6552705281678740035DC72 /* RoborockEntity.swift in Sources */,
+				F685F8032B2B43F9008E47AF /* SonnenEntity.swift in Sources */,
 				F607F6602B0DF2DC002F782F /* FontExtension.swift in Sources */,
 				F61BF9AA2A16749D00C1802E /* JSONKey.swift in Sources */,
 				F6633F30286326FC004D0B76 /* ThermometerGroupView.swift in Sources */,
@@ -1053,7 +1082,9 @@
 				F6225E2C2AE1354700D32EF4 /* CoffeeMachineSchedulingView.swift in Sources */,
 				F62CD2E528770F3B00462092 /* HassApiService.swift in Sources */,
 				F62CD2E82877140800462092 /* EntityError.swift in Sources */,
+				F6BD96912B32E1AF00A46C8F /* SonnenStatusEntity.swift in Sources */,
 				F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */,
+				F685F8012B2B153C008E47AF /* ElectricityViewModel.swift in Sources */,
 				F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */,
 				F6591BFC2AFE31F300D5785E /* HorizontalButtonView.swift in Sources */,
 				F6591BFE2AFE34FB00D5785E /* VerticalButtonView.swift in Sources */,
@@ -1084,6 +1115,7 @@
 				F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */,
 				F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */,
 				F6591C012B07784D00D5785E /* ServiceID.swift in Sources */,
+				F6BD968F2B32DD3D00A46C8F /* ElectricityFlowView.swift in Sources */,
 				F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */,
 				F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */,
 				F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */,
@@ -1279,7 +1311,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1301,7 +1333,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1321,7 +1353,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1343,7 +1375,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1362,7 +1394,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1371,7 +1403,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1389,7 +1421,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1398,7 +1430,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1477,7 +1509,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1499,7 +1531,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1518,7 +1550,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1527,7 +1559,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1543,7 +1575,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1557,7 +1589,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1573,7 +1605,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1587,7 +1619,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1603,7 +1635,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1617,7 +1649,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2023.12.14;
+				MARKETING_VERSION = 2023.12.21;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

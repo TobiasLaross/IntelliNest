@@ -55,7 +55,7 @@ struct EniroView: View {
                         CircleButtonView(buttonTitle: "Lås upp dörrarna",
                                          icon: .init(systemImageName: .unlocked),
                                          imageSize: 25,
-                                         action: viewModel.lock)
+                                         action: viewModel.unlock)
                         CircleButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
                                          icon: .init(imageName: .evPlugType2),
                                          imageSize: 35,

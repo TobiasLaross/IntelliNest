@@ -22,7 +22,7 @@ class HomeViewModel: ObservableObject {
     @Published var coffeeMachineStartTime = Entity(entityId: .coffeeMachineStartTime)
     @Published var coffeeMachineStartTimeEnabled = Entity(entityId: .coffeeMachineStartTimeEnabled)
     @Published var nordPool = NordPoolEntity(entityId: .nordPool)
-    @Published var solarPower = Entity(entityId: .solarPower)
+    @Published var sonnenBattery = SonnenEntity(entityID: .sonnenBattery)
     @Published var pulsePower = Entity(entityId: .pulsePower)
     @Published var tibberPrice = Entity(entityId: .tibberPrice)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
@@ -39,7 +39,7 @@ class HomeViewModel: ObservableObject {
 
     var isReloading = false
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
-                                 .solarPower, .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
+                                 .sonnenBattery, .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
                                  .dryerCompletionTime, .washerState, .dryerState, .easeeCharger,
                                  .generalWasteDate, .plasticWasteDate]
 
@@ -165,8 +165,6 @@ class HomeViewModel: ObservableObject {
             coffeeMachineStartTime.state = state
         case .coffeeMachineStartTimeEnabled:
             coffeeMachineStartTimeEnabled.state = state
-        case .solarPower:
-            solarPower.state = state
         case .pulsePower:
             pulsePower.state = state
         case .tibberPrice:
@@ -192,8 +190,19 @@ class HomeViewModel: ObservableObject {
         }
     }
 
+    @MainActor
     func reloadNordPoolEntity(nordPoolEntity: NordPoolEntity) {
         nordPool = nordPoolEntity
+    }
+
+    @MainActor
+    func reloadSonnenBattery(_ sonnenEntity: SonnenEntity) {
+        sonnenBattery.update(from: sonnenEntity)
+    }
+
+    @MainActor
+    func reloadSonnenStatusBattery(_ sonnenStatusEntity: SonnenStatusEntity) {
+        sonnenBattery.update(from: sonnenStatusEntity)
     }
 
     @MainActor

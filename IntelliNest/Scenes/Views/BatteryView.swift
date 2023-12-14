@@ -11,12 +11,16 @@ struct BatteryView: View {
     var level: Int
     var isCharging: Bool
     var degreeRotation: Double
+    var width: CGFloat
+    var height: CGFloat
     private let batteryCornerRadius: CGFloat = 15
 
-    init(level: Int, isCharging: Bool, degreeRotation: Double = 0) {
+    init(level: Int, isCharging: Bool, degreeRotation: Double = 0, width: CGFloat = 50, height: CGFloat = 90) {
         self.level = level
         self.isCharging = isCharging
         self.degreeRotation = degreeRotation
+        self.width = width
+        self.height = height
     }
 
     var body: some View {
@@ -24,18 +28,18 @@ struct BatteryView: View {
             Group {
                 VStack {
                     Rectangle()
-                        .frame(width: 12, height: 6, alignment: .center)
+                        .frame(width: 0.25 * width, height: 0.07 * height, alignment: .center)
                         .padding(.bottom, -4)
                         .foregroundColor(Color(navigationBarGrayColor))
                     Rectangle()
                         .fill(Color(navigationBarGrayColor))
-                        .frame(width: 50, height: 90, alignment: .bottom)
+                        .frame(width: width, height: height, alignment: .bottom)
                         .cornerRadius(batteryCornerRadius)
                         .padding(.top, -4)
                 }
                 Rectangle()
                     .fill(level > 60 ? .green : level > 30 ? .yellow : .red)
-                    .frame(width: 50, height: 90, alignment: .bottom)
+                    .frame(width: width, height: height, alignment: .bottom)
                     .scaleEffect(CGSize(width: 1, height: CGFloat(level) / 100.0), anchor: .bottom)
                     .cornerRadius(batteryCornerRadius)
                     .padding(.bottom, -5)

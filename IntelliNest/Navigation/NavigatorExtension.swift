@@ -29,6 +29,10 @@ extension Navigator: WebSocketServiceDelegate {
         if eniroViewModel.entityIDs.contains(entityID) {
             eniroViewModel.reload(entityID: entityID, state: state)
         }
+
+        if electricityViewModel.entityIDs.contains(entityID) {
+            electricityViewModel.reload(entityID: entityID, state: state)
+        }
     }
 
     func webSocketService(didReceiveImage entityID: EntityId, state: String, urlPath: String) {
@@ -59,6 +63,17 @@ extension Navigator: WebSocketServiceDelegate {
 
     func webSocketService(didReceiveNordPoolEntity nordPoolEntity: NordPoolEntity) {
         homeViewModel.reloadNordPoolEntity(nordPoolEntity: nordPoolEntity)
+        electricityViewModel.reloadNordPoolEntity(nordPoolEntity: nordPoolEntity)
+    }
+
+    func webSocketService(didReceiveSonnenEntity sonnenEntity: SonnenEntity) {
+        homeViewModel.reloadSonnenBattery(sonnenEntity)
+        electricityViewModel.reloadSonnenBattery(sonnenEntity)
+    }
+
+    func webSocketService(didReceiveSonnenStatusEntity sonnenStatusEntity: SonnenStatusEntity) {
+        homeViewModel.reloadSonnenStatusBattery(sonnenStatusEntity)
+        electricityViewModel.reloadSonnenStatusBattery(sonnenStatusEntity)
     }
 }
 

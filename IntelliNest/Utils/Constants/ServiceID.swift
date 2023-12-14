@@ -19,4 +19,5 @@ enum ServiceID: String, Decodable, CaseIterable {
     case cameraStream = "camera/stream"
     case boolTurnOn = "input_boolean.turn_on"
     case boolTurnOff = "input_boolean.turn_off"
+    case updateEntity = "homeassistant.update_entity"
 }

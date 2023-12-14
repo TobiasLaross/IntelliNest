@@ -106,18 +106,6 @@ class EniroViewModel: ObservableObject {
         eniroGeoLocation = geoEntity
     }
 
-    func setStateForLock(action: Action) {
-        if action == .lock {
-            doorLock.expectedState = .locked
-        } else if action == .unlock {
-            doorLock.expectedState = .unlocked
-        } else {
-            return
-        }
-
-        websocketService.updateEntity(entityID: doorLock.entityId, domain: .lock, action: action)
-    }
-
     func toggleForceCharging() {
         let action: Action = forceCharging.isActive ? .turnOff : .turnOn
         websocketService.updateEntity(entityID: forceCharging.entityId, domain: .inputBoolean, action: action)

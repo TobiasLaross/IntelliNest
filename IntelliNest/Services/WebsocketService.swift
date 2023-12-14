@@ -273,6 +273,12 @@ extension WebSocketService: WebSocketDelegate {
             } else if entityID == .nordPool {
                 let nordPoolEntity = NordPoolEntity(entityId: entityID, state: state, attributes: attributes)
                 delegate?.webSocketService(didReceiveNordPoolEntity: nordPoolEntity)
+            } else if entityID == .sonnenBattery {
+                let sonnenEntity = SonnenEntity(entityID: entityID, state: state, attributes: attributes)
+                delegate?.webSocketService(didReceiveSonnenEntity: sonnenEntity)
+            } else if entityID == .sonnenBatteryStatus {
+                let sonnenStatusEntity = SonnenStatusEntity(entityID: entityID, attributes: attributes)
+                delegate?.webSocketService(didReceiveSonnenStatusEntity: sonnenStatusEntity)
             } else {
                 let lastChangedString = newState["last_changed"] as? String
                 let lastChanged = Date.fromISO8601(lastChangedString)
@@ -296,18 +302,5 @@ extension WebSocketService: WebsocketServiceProtocol {
         let serviceRequest = CallServiceRequest(serviceID: .cameraStream, serviceData: [.entityID: cameraEntityID.rawValue])
         sendJSONCommand(serviceRequest, requestID: requestID)
         return requestID
-    }
-}
-
-extension String {
-    var removingHTTPSchemeAndTrailingSlash: String {
-        replacingOccurrences(of: "http://", with: "").replacingOccurrences(of: "https://", with: "").removingTrailingSlash
-    }
-
-    var removingTrailingSlash: String {
-        if hasSuffix("/") {
-            return String(dropLast())
-        }
-        return self
     }
 }

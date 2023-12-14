@@ -9,6 +9,7 @@ import Foundation
 
 enum Destination: String {
     case cameras
+    case electricity
     case home
     case heaters
     case eniro
@@ -20,6 +21,8 @@ enum Destination: String {
         switch self {
         case .cameras:
             return "Kameror"
+        case .electricity:
+            return "Ström"
         case .home:
             return "Hem"
         case .heaters:
