@@ -46,6 +46,7 @@ struct HomeView: View {
         }
         .onAppear {
             viewModel.appearedAction(.home)
+            viewModel.checkLocationAccess()
         }
     }
 }
@@ -56,6 +57,16 @@ private struct HouseInfoView: View {
     var body: some View {
         HStack(alignment: .bottom) {
             VStack {
+                if viewModel.noLocationAccess {
+                    Button {
+                        viewModel.openLocationSettings()
+                    } label: {
+                        Text("Go to settings and add location access")
+                            .font(.circleButtonFontMedium)
+                            .foregroundStyle(.red)
+                            .padding()
+                    }
+                }
                 Text(viewModel.dynamicInfoText)
                     .font(.circleButtonFontMedium)
                     .padding(.leading, 20)
