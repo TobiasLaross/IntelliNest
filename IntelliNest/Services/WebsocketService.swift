@@ -258,6 +258,8 @@ extension WebSocketService: WebSocketDelegate {
                 let status = attributes["status"] as? String
                 let batteryLevel = attributes["battery_level"] as? Int
                 delegate?.webSocketService(didReceiveRoborock: entityID, state: state, status: status, batteryLevel: batteryLevel)
+            } else if entityID.type == .image, let urlPath = attributes["entity_picture"] as? String {
+                delegate?.webSocketService(didReceiveImage: entityID, state: state, urlPath: urlPath)
             } else if entityID.type == .light {
                 let brightness = attributes["brightness"] as? Int
                 delegate?.webSocketService(didReceiveLight: entityID, state: state, brightness: brightness)

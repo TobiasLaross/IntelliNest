@@ -228,12 +228,10 @@ class HassApiService: URLRequestBuilder {
 
         let (data, response) = try await session.data(for: request)
 
-        // You should check the HTTP response status code here
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw EntityError.badResponse
         }
 
-        // Now you can create a UIImage from the data and then create a SwiftUI Image from that
         if let uiImage = UIImage(data: data) {
             return Image(uiImage: uiImage)
         } else {
