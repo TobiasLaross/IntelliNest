@@ -80,7 +80,7 @@ private struct HouseInfoView: View {
                                  icon: nil,
                                  action: viewModel.showNordPoolPrices)
                 Text("""
-                Huvudsäkringen: ***\(viewModel.pulsePower.state.toKW)***
+                Elnät: ***\(viewModel.pulsePower.state.toKW)***
                 Producerar: ***\(viewModel.sonnenBattery.solarProduction.toKW)***
                 Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)
