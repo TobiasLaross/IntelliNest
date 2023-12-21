@@ -51,14 +51,14 @@ struct SonnenEntity {
         if let batteryPower = attributes["Pac_total_W"] as? Double {
             self.batteryPower = batteryPower * -1
         }
-        if let gridPower = attributes["GridFeedIn_W"] as? Double {
-            self.gridPower = gridPower
-        }
-        /* Get this from status entity
-          if let solarProduction = attributes["Production_W"] as? Double {
-             self.solarProduction = solarProduction
+        /* Get this from status or tibber pulse
+          if let gridPower = attributes["GridFeedIn_W"] as? Double {
+             self.gridPower = gridPower
          }
           */
+        if let solarProduction = attributes["Production_W"] as? Double {
+            self.solarProduction = solarProduction
+        }
     }
 
     mutating func update(from sonnenEntity: SonnenEntity) {
