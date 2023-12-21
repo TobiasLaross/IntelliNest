@@ -17,7 +17,7 @@ struct ElectricityView: View {
                     .frame(width: 230)
                     .padding([.top, .leading], 16)
                 Text("""
-                Huvudsäkringen: ***\(viewModel.pulsePower.state.toKW)***
+                Elnät: ***\(viewModel.pulsePower.state.toKW)***
                 Pris: ***\(viewModel.tibberPrice.state.toOre)***
                 Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)
