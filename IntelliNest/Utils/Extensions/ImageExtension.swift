@@ -20,20 +20,23 @@ extension Image {
 
 enum ImageName: String {
     case aircondition
+    case defrost = "defrost.filled"
     case evPlugType2 = "ev-plug-type2"
     case evPlugCCS2 = "ev-plug-ccs2"
     case floorplan
+    case gym
+    case hallway
+    case powerGrid = "powergrid"
     case refresh
     case settings
+    case solarPanel = "solarpanel"
     case seatHeater = "seatheater.filled"
-    case defrost = "defrost.filled"
-    case hallway
-    case washing
-    case gym
     case vince
+    case washing
 }
 
 enum SystemImageName: String {
+    case cctv = "video.fill"
     case house = "house.fill"
     case scope
     case forkKnife = "fork.knife"

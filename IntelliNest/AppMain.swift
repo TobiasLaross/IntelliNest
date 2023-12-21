@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct AppLauncher {
+enum AppLauncher {
     static func main() throws {
         if NSClassFromString("XCTestCase") == nil {
             AppMain.main()
@@ -55,6 +55,8 @@ struct AppMain: App {
                         if scenePhase == .active {
                             navigator.didEnterForeground()
                             performActionIfNeeded()
+                        } else {
+                            navigator.didResignForeground()
                         }
                     }
                     .onAppear {

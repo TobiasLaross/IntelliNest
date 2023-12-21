@@ -1,5 +1,5 @@
 //
-//  VariableValues.swift
+//  VariableValue.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-11-17.
@@ -10,6 +10,7 @@ import Foundation
 enum VariableValue: Encodable {
     case string(String)
     case double(Double)
+    case stringArray([String])
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
@@ -18,6 +19,8 @@ enum VariableValue: Encodable {
             try container.encode(stringValue)
         case .double(let doubleValue):
             try container.encode(doubleValue)
+        case .stringArray(let stringArrayValue):
+            try container.encode(stringArrayValue)
         }
     }
 }
