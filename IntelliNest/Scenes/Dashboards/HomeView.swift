@@ -28,9 +28,6 @@ struct HomeView: View {
                                             coffeeMachineStartTimeEnabled: viewModel.coffeeMachineStartTimeEnabled,
                                             setCoffeeMachineStartTime: viewModel.updateDateTimeEntity,
                                             toggleStartTimeEnabledAction: viewModel.toggleCoffeeMachineStarTimeEnabled)
-            } else if viewModel.shouldShowNordpoolPrices {
-                NordPoolHistoryView(isVisible: $viewModel.shouldShowNordpoolPrices,
-                                    nordPool: viewModel.nordPool)
             }
         }
         .toolbar {
@@ -73,14 +70,10 @@ private struct HouseInfoView: View {
                     .lineLimit(6)
             }
             Spacer()
-            VStack(spacing: 8) {
-                CircleButtonView(buttonTitle: viewModel.tibberPrice.state.toOre,
-                                 customFont: .circleButtonFontLarge,
-                                 buttonSize: 60,
-                                 icon: nil,
-                                 action: viewModel.showNordPoolPrices)
+            VStack {
                 Text("""
                 Elnät: ***\(viewModel.pulsePower.state.toKW)***
+                Pris: ***\(viewModel.tibberPrice.state.toOre)***
                 Producerar: ***\(viewModel.sonnenBattery.solarProduction.toKW)***
                 Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)

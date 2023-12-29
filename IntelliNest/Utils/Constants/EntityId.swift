@@ -31,6 +31,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case sonnenBatteryStatus = "sensor.sonnen_battery_status"
     case pulsePower = "sensor.pulse_power"
     case tibberPrice = "sensor.electricity_price_hem"
+    case tibberCostToday = "sensor.accumulated_cost_hem"
     case pulseConsumptionToday = "sensor.pulse_consumption_today"
     case washerCompletionTime = "sensor.washing_machine_washer_completion_time"
     case washerState = "sensor.washing_machine_washer_job_state"

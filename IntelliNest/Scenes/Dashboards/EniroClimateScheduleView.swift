@@ -33,7 +33,8 @@ struct EniroClimateScheduleView: View {
                                        updateToggle: viewModel.updateToggle,
                                        setDateTimeClosure: viewModel.setClimateSchedule)
                 }
-                .background(topGrayColor).cornerRadius(dashboardButtonCornerRadius)
+                .background(Color.topGrayColor)
+                .cornerRadius(dashboardButtonCornerRadius)
                 .padding()
 
                 VStack {

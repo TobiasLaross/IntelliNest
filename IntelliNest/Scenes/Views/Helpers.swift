@@ -15,10 +15,7 @@ let dashboardButtonFrameHeight: CGFloat = 90
 let dashboardButtonFrameWidth: CGFloat = 90
 let dashboardCircleButtonFrameSize: CGFloat = 80
 let dashboardButtonCornerRadius: CGFloat = 20
-let topGrayIntensity = 0.15
 let backgroundGrayIntensity = 0.21
-let topGrayColor = Color(red: topGrayIntensity, green: topGrayIntensity, blue: topGrayIntensity)
-let navigationBarGrayColor = UIColor(red: topGrayIntensity, green: topGrayIntensity, blue: topGrayIntensity, alpha: 1)
 let bodyColor = Color(red: backgroundGrayIntensity, green: backgroundGrayIntensity, blue: backgroundGrayIntensity)
 
 struct HassButtonLabel: View {
@@ -43,7 +40,7 @@ struct HassButtonLabel: View {
                 button
             }
             .frame(width: buttonFrameWidth, height: buttonFrameHeight, alignment: .center)
-            .background(topGrayColor)
+            .background(Color.topGrayColor)
             .cornerRadius(buttonCornerRadius)
         }
     }

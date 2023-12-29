@@ -33,16 +33,21 @@ struct NordPoolEntity: EntityProtocol {
     var nextUpdate = NSDate().addingTimeInterval(-1)
     var isActive = true
     var hours: [Int] {
-        stride(from: 0, to: 25, by: 4).map { $0 }
+        stride(from: 0, to: 24, by: 3).map { $0 }
     }
 
-    var today: [Int] = [] { didSet {
-        populatePriceData()
-    }}
+    var today: [Int] = [] {
+        didSet {
+            populatePriceData()
+        }
+    }
+
     var priceData: [NordPoolPriceData] = []
-    var tomorrow: [Int] = [] { didSet {
-        populatePriceData()
-    }}
+    var tomorrow: [Int] = [] {
+        didSet {
+            populatePriceData()
+        }
+    }
 
     var tomorrowValid = false
 
@@ -60,10 +65,10 @@ struct NordPoolEntity: EntityProtocol {
     init(entityId: EntityId, state: String, attributes: [String: Any]) {
         self.init(entityId: entityId, state: state)
         if let tempTodayPrices = attributes["today"] as? [Double?] {
-            today = tempTodayPrices.map { Int($0 ?? 0) }
+            today = tempTodayPrices.map { Int($0?.rounded() ?? 0) }
         }
         if let tempTomorrowPrices = attributes["tomorrow"] as? [Double?] {
-            tomorrow = tempTomorrowPrices.map { Int($0 ?? 0) }
+            tomorrow = tempTomorrowPrices.map { Int($0?.rounded() ?? 0) }
         }
         tomorrowValid = attributes[AttributesCodingKeys.tomorrowValid.rawValue] as? Bool ?? false
         populatePriceData()
@@ -76,21 +81,13 @@ struct NordPoolEntity: EntityProtocol {
         state = try container.decode(String.self, forKey: .state)
 
         let attributes = try container.decode(Attributes.self, forKey: .attributes)
-        today = attributes.today.map { Int($0 ?? 0) }
-        tomorrow = attributes.tomorrow.map { Int($0 ?? 0) }
+        today = attributes.today.map { Int($0?.rounded() ?? 0) }
+        tomorrow = attributes.tomorrow.map { Int($0?.rounded() ?? 0) }
         tomorrowValid = attributes.tomorrowValid
     }
 
-    func chartBarHeight() -> Int {
-        Int(1.1 * Double(today.max() ?? 0))
-    }
-
-    func price(hour: Int) -> String {
-        if priceData.count > hour {
-            return "\(priceData[hour].price)"
-        } else {
-            return "?"
-        }
+    func price(hour: Int) -> Int {
+        priceData.count > hour ? priceData[hour].price : 0
     }
 
     private mutating func populatePriceData() {
@@ -123,9 +120,9 @@ struct NordPoolEntity: EntityProtocol {
 
         init(from decoder: Decoder) throws {
             let data = try decoder.container(keyedBy: AttributesCodingKeys.self)
-            self.today = try data.decodeIfPresent([Float?].self, forKey: .today) ?? []
-            self.tomorrow = try data.decodeIfPresent([Float?].self, forKey: .tomorrow) ?? []
-            self.tomorrowValid = try data.decodeIfPresent(Bool.self, forKey: .tomorrowValid) ?? false
+            today = try data.decodeIfPresent([Float?].self, forKey: .today) ?? []
+            tomorrow = try data.decodeIfPresent([Float?].self, forKey: .tomorrow) ?? []
+            tomorrowValid = try data.decodeIfPresent(Bool.self, forKey: .tomorrowValid) ?? false
         }
     }
 

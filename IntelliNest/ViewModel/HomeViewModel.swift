@@ -34,7 +34,6 @@ class HomeViewModel: ObservableObject {
     @Published var generalWasteDate = Entity(entityId: .generalWasteDate)
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
 
-    @Published var shouldShowNordpoolPrices = false
     @Published var noLocationAccess = false
 
     var isReloading = false
@@ -82,10 +81,6 @@ class HomeViewModel: ObservableObject {
     func toggleStateForSarahsIphone() {
         let action: Action = sarahsIphone.isActive ? .turnOff : .turnOn
         websocketService.updateEntity(entityID: .hittaSarahsIphone, domain: .script, action: action)
-    }
-
-    func showNordPoolPrices() {
-        shouldShowNordpoolPrices = true
     }
 
     func toggleCoffeeMachine() {

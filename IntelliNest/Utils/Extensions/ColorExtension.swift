@@ -8,8 +8,10 @@
 import SwiftUI
 
 extension Color {
+    private static let topGrayIntensity = 0.15
     static let lightBlue = Color(red: 0.2, green: 0.6, blue: 1.0)
-    static var backgroundOverlay = Color.black.opacity(0.4)
+    static let backgroundOverlay = Color.black.opacity(0.4)
+    static let topGrayColor = Color(red: topGrayIntensity, green: topGrayIntensity, blue: topGrayIntensity)
 
     static func blend(_ color1: Color, with color2: Color, ratio: CGFloat) -> Color {
         let uiColor1 = UIColor(color1)
