@@ -13,7 +13,7 @@ class ElectricityViewModel: ObservableObject {
     @Published var sonnenBattery: SonnenEntity
     @Published var nordPool = NordPoolEntity(entityId: .nordPool)
     @Published var pulsePower = Entity(entityId: .pulsePower)
-    @Published var tibberPrice = Entity(entityId: .tibberPrice)
+    @Published var tibberCostToday = Entity(entityId: .tibberCostToday)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
 
     var sonnenUpdateTask: Task<Void, Error>?
@@ -25,7 +25,7 @@ class ElectricityViewModel: ObservableObject {
         }
     }
 
-    let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberPrice, .pulseConsumptionToday]
+    let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberCostToday, .pulseConsumptionToday]
 
     var websocketService: WebSocketService
     let appearedAction: DestinationClosure
@@ -45,8 +45,8 @@ class ElectricityViewModel: ObservableObject {
             if let power = Double(state) {
                 sonnenBattery.update(gridPower: power)
             }
-        case .tibberPrice:
-            tibberPrice.state = state
+        case .tibberCostToday:
+            tibberCostToday.state = state
         case .pulseConsumptionToday:
             pulseConsumptionToday.state = state
         default:

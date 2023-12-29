@@ -36,7 +36,7 @@ struct CircleButtonView: View {
             ZStack {
                 Circle()
                     .frame(width: buttonSize, height: buttonSize)
-                    .foregroundStyle(topGrayColor)
+                    .foregroundStyle(Color.topGrayColor)
                     .overlay {
                         VStack {
                             if isLoading {

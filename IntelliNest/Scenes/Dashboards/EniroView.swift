@@ -12,7 +12,6 @@ struct EniroView: View {
 
     var body: some View {
         ZStack {
-            Rectangle().background(topGrayColor).foregroundColor(bodyColor).edgesIgnoringSafeArea(.bottom)
             VStack {
                 VStack {
                     Text("Klimathantering")

@@ -43,7 +43,7 @@ class Navigator {
     func background() -> some View {
         Group {
             Rectangle()
-                .foregroundColor(topGrayColor)
+                .foregroundStyle(Color.topGrayColor)
                 .ignoresSafeArea()
             Rectangle()
                 .foregroundColor(bodyColor)
@@ -176,7 +176,7 @@ extension View {
         background(
             Group {
                 Rectangle()
-                    .foregroundColor(topGrayColor)
+                    .foregroundStyle(Color.topGrayColor)
                     .ignoresSafeArea()
                 Rectangle()
                     .foregroundColor(bodyColor)

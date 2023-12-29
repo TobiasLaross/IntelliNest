@@ -28,7 +28,9 @@ struct NumberPickerScrollView: View {
         HStack {
             ScrollViewReader { scrollView in
                 ZStack {
-                    Rectangle().foregroundColor(topGrayColor).cornerRadius(dashboardButtonCornerRadius)
+                    Rectangle()
+                        .foregroundStyle(Color.topGrayColor)
+                        .cornerRadius(dashboardButtonCornerRadius)
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
                             ForEach(Array(stride(from: strideFrom,

@@ -17,8 +17,7 @@ struct ElectricityView: View {
                     .frame(width: 230)
                     .padding([.top, .leading], 16)
                 Text("""
-                Elnät: ***\(viewModel.pulsePower.state.toKW)***
-                Pris: ***\(viewModel.tibberPrice.state.toOre)***
+                Kostnad idag: ***\(viewModel.tibberCostToday.state.toKr)***
                 Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)
                 .font(.circleButtonFontMedium)
@@ -26,6 +25,10 @@ struct ElectricityView: View {
                 Spacer()
             }
             Spacer()
+            NordPoolHistoryView(nordPool: viewModel.nordPool)
+                .frame(height: 350)
+                .padding(.bottom, 16)
+                .padding(.horizontal, 8)
         }
         .onAppear {
             viewModel.appearedAction(.electricity)

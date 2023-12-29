@@ -7,17 +7,17 @@ With chatGPT I think this would be doable even if you are not a iOS developer bu
 ## Code statistics
 | Indicators                          | Now  | Desired |
 |-------------------------------------|------|---------|
-| Total LOC                           | 9881 | N/A |
+| Total LOC                           | 9901 | N/A |
 | Swift file count                    | 146 | N/A |
 | Average LOC per file                | 67 | <100 |
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
-| Commit count in main                | 45 | N/A |
-| Total deleted lines                 | 3504 | N/A |
-| Total added lines                   | 16556 | N/A |
+| Commit count in main                | 46 | N/A |
+| Total deleted lines                 | 3630 | N/A |
+| Total added lines                   | 16702 | N/A |
 
-Last Updated: 2023-12-21
+Last Updated: 2023-12-29
 ## Supported features
 ### Rest API and Websocket support
 Most views now use WebSocket instead of REST API for improved real-time updates.

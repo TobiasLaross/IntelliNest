@@ -45,6 +45,14 @@ extension String {
         }
     }
 
+    var toKr: String {
+        if let doubleValue = Double(self) {
+            return "\(doubleValue.roundedWithOneDecimal) Kr"
+        } else {
+            return "? Kr"
+        }
+    }
+
     mutating func addNewLineAndAppend(_ other: String) {
         if isNotEmpty {
             append("\n")
