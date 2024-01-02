@@ -10,75 +10,74 @@ import SwiftUI
 
 struct NordPoolHistoryView: View {
     let nordPool: NordPoolEntity
-    private let chartWidth = 330.0
     @State var selectedHour = Calendar.currentHour
 
     var body: some View {
-        Group {
-            Chart(nordPool.priceData) {
-                LineMark(
-                    x: .value("", $0.hour),
-                    y: .value("", $0.price)
-                )
-                .interpolationMethod(.stepStart)
-                .foregroundStyle(by: .value("Day", $0.day.rawValue))
+        GeometryReader { geometry in
+            let chartWidth = geometry.size.width * 0.78
+            Group {
+                Chart(nordPool.priceData) {
+                    LineMark(
+                        x: .value("", $0.hour),
+                        y: .value("", $0.price)
+                    )
+                    .interpolationMethod(.stepStart)
+                    .foregroundStyle(by: .value("Day", $0.day.rawValue))
 
-                BarMark(x: .value("", max(0, Double(selectedHour) - 0.5)),
-                        yStart: .value("", 0),
-                        yEnd: .value("", nordPool.price(hour: selectedHour)),
-                        width: .fixed(6))
-                    .clipShape(Capsule())
-                    .foregroundStyle(.gray)
-                    .opacity(0.3)
-            }
-            .onTapGesture { location in
-                updateSelectedHour(at: location)
-            }
-            .gesture(
-                DragGesture().onChanged { value in
-                    updateSelectedHour(at: value.location)
+                    BarMark(x: .value("", max(0, Double(selectedHour) - 0.5)),
+                            yStart: .value("", 0),
+                            yEnd: .value("", nordPool.price(hour: selectedHour)),
+                            width: .fixed(6))
+                        .clipShape(Capsule())
+                        .foregroundStyle(.gray)
+                        .opacity(0.3)
                 }
-            )
-            .sensoryFeedback(.selection, trigger: selectedHour)
-            .chartOverlay { _ in
-                RoundedRectangle(cornerRadius: 12)
-                    .overlay {
-                        Text(
-                            """
-                            \(selectedHour.description)
-                            \(nordPool.price(hour: selectedHour)) öre
-                            """
-                        )
-                        .foregroundStyle(.white)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
+                .gesture(
+                    DragGesture(minimumDistance: 0).onChanged { value in
+                        updateSelectedHour(at: value.location, width: chartWidth)
                     }
-                    .foregroundStyle(Color.topGrayColor)
-                    .frame(width: 75, height: 60)
-                    .position(x: 170, y: -40)
-            }
-            .chartXAxis {
-                AxisMarks(values: nordPool.hours)
-            }
-            .chartXAxisLabel(position: .bottom, alignment: .center) {
-                Text("Timme")
-            }
-            .chartYAxisLabel(position: .trailing, alignment: .center) {
-                Text("Öre")
+                )
+                .sensoryFeedback(.selection, trigger: selectedHour)
+                .chartOverlay { _ in
+                    RoundedRectangle(cornerRadius: 12)
+                        .overlay {
+                            Text(
+                                """
+                                \(selectedHour.description)
+                                \(nordPool.price(hour: selectedHour)) öre
+                                """
+                            )
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                        }
+                        .foregroundStyle(Color.topGrayColor)
+                        .frame(width: 75, height: 60)
+                        .position(x: 170, y: -40)
+                }
+                .chartXAxis {
+                    AxisMarks(values: nordPool.hours)
+                }
+                .chartXAxisLabel(position: .bottom, alignment: .center) {
+                    Text("Timme")
+                }
+                .chartYAxisLabel(position: .trailing, alignment: .center) {
+                    Text("Öre")
+                }
             }
         }
         .background(Color.topGrayColor)
         .opacity(0.9)
     }
 
-    private func updateSelectedHour(at location: CGPoint) {
+    private func updateSelectedHour(at location: CGPoint, width: CGFloat) {
         let xPos = location.x
         if xPos <= 0 {
             selectedHour = 0
-        } else if xPos >= chartWidth {
+        } else if xPos >= width {
             selectedHour = 23
         } else {
-            selectedHour = Int((23 * xPos / chartWidth).rounded())
+            selectedHour = Int((23 * xPos / width).rounded())
         }
     }
 }
