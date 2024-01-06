@@ -54,7 +54,7 @@ extension Navigator: WebSocketServiceDelegate {
     }
 
     func webSocketService(didReceiveHeater heater: HeaterEntity) {
-        heatersViewModel.reloadHeater(heater)
+        heatersViewModel.updateHeater(from: heater)
     }
 
     func webSocketService(didReceiveEniroGeoEntity geoEntity: EniroGeoEntity) {

@@ -169,10 +169,7 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     func updateHeaterTemperature(heaterID: EntityId, temperature: Double) {
-        let serviceData = ClimateServiceData(targetTemperature: temperature)
-        var updateEntityRequest = UpdateEntityRequest(domain: .climate, action: .setTemperature, entityIds: [heaterID])
-        updateEntityRequest.serviceData = serviceData
-        sendJSONCommand(updateEntityRequest)
+        callService(serviceID: .heaterTemperature, variables: [.entityID: .string(heaterID.rawValue), .temperature: .double(temperature)])
     }
 
     func updateHeaterHvacMode(heaterID: EntityId, hvacMode: HvacMode) {
