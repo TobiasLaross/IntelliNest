@@ -13,4 +13,5 @@ enum ServiceVariableKeys: String, Equatable, Codable, Hashable, CodingKey {
     case deviceID = "device_id"
     case dcLimit = "dc_limit"
     case acLimit = "ac_limit"
+    case temperature
 }

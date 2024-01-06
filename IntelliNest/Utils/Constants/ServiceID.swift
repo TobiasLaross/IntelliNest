@@ -20,4 +20,5 @@ enum ServiceID: String, Decodable, CaseIterable {
     case boolTurnOn = "input_boolean.turn_on"
     case boolTurnOff = "input_boolean.turn_off"
     case updateEntity = "homeassistant.update_entity"
+    case heaterTemperature = "climate.set_temperature"
 }

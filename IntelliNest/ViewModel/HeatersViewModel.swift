@@ -39,7 +39,9 @@ class HeatersViewModel: HassAPIViewModelProtocol {
     }
 
     func setTargetTemperature(entityId: EntityId, temperature: Double) {
-        websocketService.updateHeaterTemperature(heaterID: entityId, temperature: temperature)
+        websocketService.callService(serviceID: .heaterTemperature,
+                                     variables: [.entityID: .string(entityId.rawValue),
+                                                 .temperature: .double(temperature)])
     }
 
     func setHvacMode(heater: HeaterEntity, hvacMode: HvacMode) {
@@ -95,13 +97,13 @@ class HeatersViewModel: HassAPIViewModelProtocol {
         }
     }
 
-    func reloadHeater(_ heater: HeaterEntity) {
+    func updateHeater(from heater: HeaterEntity) {
         if heater.entityId == .heaterCorridor {
             heaterCorridor = heater
         } else if heater.entityId == .heaterPlayroom {
             heaterPlayroom = heater
         } else {
-            Log.error("HeatersViewModel doesn't reload heater with entityID: \(heater.entityId)")
+            Log.error("HeatersViewModel doesn't update heater with entityID: \(heater.entityId)")
         }
     }
 
