@@ -12,16 +12,20 @@ struct CallServiceRequest: Encodable {
     let type: String
     let domain: String
     let service: String
-    let serviceData: [ServiceVariableKeys: VariableValue]?
+    let target: [ServiceTargetKeys: ServiceValues]?
+    let serviceData: [ServiceDataKeys: ServiceValues]?
 
     enum CodingKeys: String, CodingKey {
         case type
         case domain
         case service
         case serviceData = "service_data"
+        case target
     }
 
-    init(serviceID: ServiceID, serviceData: [ServiceVariableKeys: VariableValue]?) {
+    init(serviceID: ServiceID,
+         target: [ServiceTargetKeys: ServiceValues]?,
+         serviceData: [ServiceDataKeys: ServiceValues]?) {
         type = "call_service"
 
         let components = serviceID.rawValue.split(separator: ".")
@@ -34,11 +38,12 @@ struct CallServiceRequest: Encodable {
             Log.error("ServiceID \(serviceID) does not specify domain and service")
         }
 
+        self.target = target
         self.serviceData = serviceData
     }
 
-    init(serviceID: ServiceID, serviceData: [ServiceVariableKeys: String]?) {
-        self.init(serviceID: serviceID, serviceData: serviceData?.mapValues { .string($0) })
+    init(serviceID: ServiceID, serviceData: [ServiceDataKeys: String]?) {
+        self.init(serviceID: serviceID, target: nil, serviceData: serviceData?.mapValues { .string($0) })
     }
 
     func encode(to encoder: Encoder) throws {
@@ -47,8 +52,15 @@ struct CallServiceRequest: Encodable {
         try container.encode(domain, forKey: .domain)
         try container.encode(service, forKey: .service)
 
+        if let target {
+            var targetContainer = container.nestedContainer(keyedBy: ServiceTargetKeys.self, forKey: .target)
+            for (key, value) in target {
+                try targetContainer.encode(value, forKey: key)
+            }
+        }
+
         if let serviceData {
-            var serviceDataContainer = container.nestedContainer(keyedBy: ServiceVariableKeys.self, forKey: .serviceData)
+            var serviceDataContainer = container.nestedContainer(keyedBy: ServiceDataKeys.self, forKey: .serviceData)
             for (key, value) in serviceData {
                 try serviceDataContainer.encode(value, forKey: key)
             }

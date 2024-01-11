@@ -168,38 +168,6 @@ extension WebSocketService: WebSocketDelegate {
         sendJSONCommand(updateEntityRequest)
     }
 
-    func updateHeaterTemperature(heaterID: EntityId, temperature: Double) {
-        callService(serviceID: .heaterTemperature, variables: [.entityID: .string(heaterID.rawValue), .temperature: .double(temperature)])
-    }
-
-    func updateHeaterHvacMode(heaterID: EntityId, hvacMode: HvacMode) {
-        let serviceData = ClimateServiceData(hvacMode: hvacMode)
-        var updateEntityRequest = UpdateEntityRequest(domain: .climate, action: .setHvacMode, entityIds: [heaterID])
-        updateEntityRequest.serviceData = serviceData
-        sendJSONCommand(updateEntityRequest)
-    }
-
-    func updateHeaterFanMode(heaterID: EntityId, fanMode: HeaterFanMode) {
-        let serviceData = ClimateServiceData(fanMode: fanMode)
-        var updateEntityRequest = UpdateEntityRequest(domain: .climate, action: .setFanMode, entityIds: [heaterID])
-        updateEntityRequest.serviceData = serviceData
-        sendJSONCommand(updateEntityRequest)
-    }
-
-    func updateHeaterHorizontalMode(heaterID: EntityId, horizontalMode: HeaterHorizontalMode) {
-        let serviceData = MelcloudServiceData(horizontalMode: horizontalMode)
-        var updateEntityRequest = UpdateEntityRequest(domain: .melcloud, action: .setVaneHorizontal, entityIds: [heaterID])
-        updateEntityRequest.serviceData = serviceData
-        sendJSONCommand(updateEntityRequest)
-    }
-
-    func updateHeaterVerticalMode(heaterID: EntityId, verticalMode: HeaterVerticalMode) {
-        let serviceData = MelcloudServiceData(verticalMode: verticalMode)
-        var updateEntityRequest = UpdateEntityRequest(domain: .melcloud, action: .setVaneVertical, entityIds: [heaterID])
-        updateEntityRequest.serviceData = serviceData
-        sendJSONCommand(updateEntityRequest)
-    }
-
     func updateInputNumberEntity(entityId: EntityId, value: Double) {
         var updateEntityRequest = UpdateEntityRequest(domain: .inputNumber, action: .setValue, entityIds: [entityId])
         let serviceData = InputNumberServiceData(value: value)
@@ -219,13 +187,15 @@ extension WebSocketService: WebSocketDelegate {
         sendJSONCommand(callScriptRequest)
     }
 
-    func callService(serviceID: ServiceID, variables: [ServiceVariableKeys: VariableValue]? = nil) {
-        let callServiceRequest = CallServiceRequest(serviceID: serviceID, serviceData: variables)
+    func callService(serviceID: ServiceID,
+                     target: [ServiceTargetKeys: ServiceValues]? = nil,
+                     data: [ServiceDataKeys: ServiceValues]? = nil) {
+        let callServiceRequest = CallServiceRequest(serviceID: serviceID, target: target, serviceData: data)
         sendJSONCommand(callServiceRequest)
     }
 
-    func callService(serviceID: ServiceID, variables: [ServiceVariableKeys: String]? = nil) {
-        let callServiceRequest = CallServiceRequest(serviceID: serviceID, serviceData: variables)
+    func callService(serviceID: ServiceID, data: [ServiceDataKeys: String]? = nil) {
+        let callServiceRequest = CallServiceRequest(serviceID: serviceID, serviceData: data)
         sendJSONCommand(callServiceRequest)
     }
 

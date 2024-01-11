@@ -43,62 +43,6 @@ class InputNumberServiceData: ServiceData {
     }
 }
 
-class ClimateServiceData: ServiceData {
-    let targetTemperature: Double?
-    let hvacMode: HvacMode?
-    let fanMode: HeaterFanMode?
-    let swingMode: String?
-
-    init(targetTemperature: Double? = nil,
-         hvacMode: HvacMode? = nil,
-         fanMode: HeaterFanMode? = nil,
-         swingMode: String? = nil) {
-        self.targetTemperature = targetTemperature
-        self.hvacMode = hvacMode
-        self.fanMode = fanMode
-        self.swingMode = swingMode
-    }
-
-    override func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(targetTemperature, forKey: .targetTemperature)
-        try container.encodeIfPresent(hvacMode?.rawValue, forKey: .hvacMode)
-        try container.encodeIfPresent(fanMode?.rawValue, forKey: .fanMode)
-        try container.encodeIfPresent(swingMode, forKey: .swingMode)
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case targetTemperature = "target_temperature"
-        case hvacMode = "hvac_mode"
-        case fanMode = "fan_mode"
-        case swingMode = "swing_mode"
-    }
-}
-
-class MelcloudServiceData: ServiceData {
-    let horizontalMode: HeaterHorizontalMode?
-    let verticalMode: HeaterVerticalMode?
-
-    init(horizontalMode: HeaterHorizontalMode? = nil, verticalMode: HeaterVerticalMode? = nil) {
-        self.horizontalMode = horizontalMode
-        self.verticalMode = verticalMode
-
-        if horizontalMode != nil && verticalMode != nil {
-            Log.error("Both horizontalMode and verticalMode can't be set in the same MelcloudServiceData")
-        }
-    }
-
-    override func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(horizontalMode, forKey: .position)
-        try container.encodeIfPresent(verticalMode, forKey: .position)
-    }
-
-    private enum CodingKeys: String, CodingKey {
-        case position
-    }
-}
-
 class DateTimeServiceData: ServiceData {
     let date: String?
     let time: String?

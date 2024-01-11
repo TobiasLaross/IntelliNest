@@ -69,10 +69,10 @@ class ElectricityViewModel: ObservableObject {
     func updateSonnenContinously() {
         sonnenUpdateTask?.cancel()
         let entityIDs = [EntityId.sonnenBattery.rawValue, EntityId.sonnenBatteryStatus.rawValue]
-        let variableValueEntities: VariableValue = .stringArray(entityIDs)
+        let variableValueEntities: ServiceValues = .stringArray(entityIDs)
         sonnenUpdateTask = Task {
             while isViewActive {
-                websocketService.callService(serviceID: .updateEntity, variables: [.entityID: variableValueEntities])
+                websocketService.callService(serviceID: .updateEntity, data: [.entityID: variableValueEntities])
                 try? await Task.sleep(seconds: 1)
             }
         }

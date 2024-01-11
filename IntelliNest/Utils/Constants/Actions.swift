@@ -22,10 +22,7 @@ enum Action: String, Codable {
     case snapshot
     case stop
     case start
-    case setTemperature = "set_temperature"
-    case setHvacMode = "set_hvac_mode"
     case setDateTime = "set_datetime"
-    case setFanMode = "set_fan_mode"
     case setVaneHorizontal = "set_vane_horizontal"
     case setVaneVertical = "set_vane_vertical"
     case setValue = "set_value"

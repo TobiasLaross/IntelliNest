@@ -18,7 +18,8 @@ struct SimpleHeaterView: View {
     var therm4: Entity
     @Binding var heater: HeaterEntity
     @Binding var showDetails: Bool
-    @Binding var resetClimateTime: Entity
+    @Binding var resetClimateTimeEntity: Entity
+    @Binding private var resetClimateTimeDate: Date
 
     var isTimerModeEnabled: Bool
     let setTargetTemperatureClosure: EntityIdDoubleClosure
@@ -77,11 +78,11 @@ struct SimpleHeaterView: View {
                                     .foregroundColor(isTimerModeEnabled ? .lightBlue : .white)
                             }
                             if isTimerModeEnabled {
-                                DatePicker("", selection: $resetClimateTime.date, displayedComponents: .hourAndMinute)
+                                DatePicker("", selection: $resetClimateTimeDate, displayedComponents: .hourAndMinute)
                                     .labelsHidden()
                                     .colorScheme(.dark)
-                                    .onChange(of: resetClimateTime.date) {
-                                        setClimateScheduleTime(resetClimateTime)
+                                    .onChange(of: resetClimateTimeDate) {
+                                        setClimateScheduleTime(resetClimateTimeEntity)
                                     }
                             }
                         }
@@ -96,6 +97,31 @@ struct SimpleHeaterView: View {
             .padding(.vertical, 0)
         }
     }
+
+    init(roomName: String, therm1: Entity, therm2: Entity, therm3: Entity, therm4: Entity,
+         heater: Binding<HeaterEntity>,
+         showDetails: Binding<Bool>,
+         resetClimateTimeEntity: Binding<Entity>,
+         isTimerModeEnabled: Bool,
+         setTargetTemperatureClosure: @escaping EntityIdDoubleClosure,
+         setHvacModeClosure: @escaping HeaterStringClosure,
+         toggleTimerModeAction: @escaping MainActorVoidClosure,
+         setClimateScheduleTime: @escaping MainActorEntityClosure) {
+        self.roomName = roomName
+        self.therm1 = therm1
+        self.therm2 = therm2
+        self.therm3 = therm3
+        self.therm4 = therm4
+        _heater = heater
+        _showDetails = showDetails
+        _resetClimateTimeEntity = resetClimateTimeEntity
+        _resetClimateTimeDate = _resetClimateTimeEntity.date
+        self.isTimerModeEnabled = isTimerModeEnabled
+        self.setTargetTemperatureClosure = setTargetTemperatureClosure
+        self.setHvacModeClosure = setHvacModeClosure
+        self.toggleTimerModeAction = toggleTimerModeAction
+        self.setClimateScheduleTime = setClimateScheduleTime
+    }
 }
 
 struct SimpleHeaterView_Previews: PreviewProvider {
@@ -109,7 +135,7 @@ struct SimpleHeaterView_Previews: PreviewProvider {
                          therm4: therm,
                          heater: .constant(heater),
                          showDetails: .constant(false),
-                         resetClimateTime: .constant(.init(entityId: .eniroClimate)),
+                         resetClimateTimeEntity: .constant(.init(entityId: .eniroClimate)),
                          isTimerModeEnabled: true,
                          setTargetTemperatureClosure: { _, _ in },
                          setHvacModeClosure: { _, _ in },

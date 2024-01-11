@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum VariableValue: Encodable {
+enum ServiceValues: Encodable {
     case string(String)
     case double(Double)
     case stringArray([String])
