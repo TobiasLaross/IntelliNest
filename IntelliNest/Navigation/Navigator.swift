@@ -104,7 +104,6 @@ class Navigator {
     }
 
     func didEnterForeground() {
-        webSocketService.connect()
         electricityViewModel.isViewActive = currentDestination == .electricity
         Task {
             await reloadCurrentModel()
@@ -118,6 +117,8 @@ class Navigator {
     @MainActor
     func reloadCurrentModel() async {
         await updateConnectionState()
+        webSocketService.connect()
+        webSocketService.sendGetStatesRequest()
         await reload(for: currentDestination)
     }
 

@@ -137,33 +137,33 @@ class EniroViewModel: ObservableObject {
     }
 
     func update() {
-        websocketService.callService(serviceID: .kiaUpdate, variables: [.deviceID: DeviceID.eniro.rawValue])
+        websocketService.callService(serviceID: .kiaUpdate, data: [.deviceID: DeviceID.eniro.rawValue])
     }
 
     func initiateForceUpdate() {
         lastUpdateInitialDate = eniroLastUpdate.date
-        websocketService.callService(serviceID: .kiaForceUpdate, variables: [.deviceID: DeviceID.eniro.rawValue])
+        websocketService.callService(serviceID: .kiaForceUpdate, data: [.deviceID: DeviceID.eniro.rawValue])
     }
 
     func startCharging() {
-        websocketService.callService(serviceID: .kiaStartCharge, variables: [.deviceID: DeviceID.eniro.rawValue])
+        websocketService.callService(serviceID: .kiaStartCharge, data: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
     func stopCharging() {
-        websocketService.callService(serviceID: .kiaStopCharge, variables: [.deviceID: DeviceID.eniro.rawValue])
+        websocketService.callService(serviceID: .kiaStopCharge, data: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
     func unlock() {
         doorLock.expectedState = .unlocked
-        websocketService.callService(serviceID: .kiaUnlock, variables: [.deviceID: DeviceID.eniro.rawValue])
+        websocketService.callService(serviceID: .kiaUnlock, data: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
     func lock() {
         doorLock.expectedState = .locked
-        websocketService.callService(serviceID: .kiaLock, variables: [.deviceID: DeviceID.eniro.rawValue])
+        websocketService.callService(serviceID: .kiaLock, data: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
@@ -181,10 +181,10 @@ class EniroViewModel: ObservableObject {
 
     func saveChargerLimit(entityID: EntityId, newLimit: Double) {
         if limitPickerEntity?.inputNumber != newLimit {
-            var variables: [ServiceVariableKeys: VariableValue] = [.deviceID: .string(DeviceID.eniro.rawValue)]
+            var variables: [ServiceDataKeys: ServiceValues] = [.deviceID: .string(DeviceID.eniro.rawValue)]
             variables[.acLimit] = .double(entityID == .eniroACChargingLimit ? newLimit : eniroChargingACLimit.inputNumber)
             variables[.dcLimit] = .double(entityID == .eniroDCChargingLimit ? newLimit : eniroChargingDCLimit.inputNumber)
-            websocketService.callService(serviceID: .kiaChargeLimit, variables: variables)
+            websocketService.callService(serviceID: .kiaChargeLimit, data: variables)
             updateAfterShortDelay()
         }
 

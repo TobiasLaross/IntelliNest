@@ -21,4 +21,9 @@ enum ServiceID: String, Decodable, CaseIterable {
     case boolTurnOff = "input_boolean.turn_off"
     case updateEntity = "homeassistant.update_entity"
     case heaterTemperature = "climate.set_temperature"
+    case heaterHvacMode = "climate.set_hvac_mode"
+    case heaterFanMode = "climate.set_fan_mode"
+    case heaterHorizontal = "melcloud.set_vane_horizontal"
+    case heaterVertical = "melcloud.set_vane_vertical"
+    case setDateTime = "input_datetime.set_datetime"
 }
