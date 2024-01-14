@@ -12,12 +12,6 @@ struct EniroClimateView: View {
 
     var body: some View {
         let climateButtonImageSize: CGFloat = 30
-        let frameSize: CGFloat = 80
-
-        let climateScheduleButton = NavButton(buttonTitle: "Schemalägg start",
-                                              image: Image(systemName: "calendar"),
-                                              buttonImageWidth: climateButtonImageSize,
-                                              buttonImageHeight: climateButtonImageSize)
 
         VStack {
             HStack {
@@ -55,12 +49,12 @@ struct EniroClimateView: View {
                                      isLoading: false,
                                      action: viewModel.toggleClimate)
 
-                    NavigationLink(value: Destination.eniroClimateSchedule,
-                                   label: {
-                                       HassButtonLabel(button: AnyView(climateScheduleButton),
-                                                       buttonFrameHeight: frameSize,
-                                                       buttonFrameWidth: frameSize)
-                                   })
+                    NavigationButtonView(buttonTitle: "Schemalägg start",
+                                         image: Image(systemName: "calendar"),
+                                         buttonImageWidth: climateButtonImageSize,
+                                         buttonImageHeight: climateButtonImageSize,
+                                         frameSize: 80,
+                                         action: viewModel.showClimateSchedulingAction)
                 }
                 .padding(.trailing)
             }

@@ -91,6 +91,8 @@ struct EniroView: View {
 
 struct Eniro_Previews: PreviewProvider {
     static var previews: some View {
-        EniroView(viewModel: EniroViewModel(websocketService: WebSocketService(), appearedAction: { _ in }))
+        EniroView(viewModel: EniroViewModel(websocketService: WebSocketService(),
+                                            showClimateSchedulingAction: {},
+                                            appearedAction: { _ in }))
     }
 }

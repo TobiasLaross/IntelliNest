@@ -31,11 +31,9 @@ class HeatersViewModel: HassAPIViewModelProtocol {
 
     let websocketService: WebSocketService
     let apiService: HassApiService
-    let appearedAction: DestinationClosure
-    init(websocketService: WebSocketService, apiService: HassApiService, appearedAction: @escaping DestinationClosure) {
+    init(websocketService: WebSocketService, apiService: HassApiService) {
         self.websocketService = websocketService
         self.apiService = apiService
-        self.appearedAction = appearedAction
     }
 
     func setTargetTemperature(entityId: EntityId, temperature: Double) {

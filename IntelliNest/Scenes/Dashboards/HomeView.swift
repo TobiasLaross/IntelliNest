@@ -15,9 +15,9 @@ struct HomeView: View {
             VStack {
                 HouseInfoView(viewModel: viewModel)
                     .padding(.vertical, 50)
-                HomeNavigationButtonsView(viewModel: viewModel)
+                NavigationButtonsView(viewModel: viewModel)
                     .padding(.bottom, 20)
-                HomeServiceButtonsView(viewModel: viewModel)
+                ServiceButtonsView(viewModel: viewModel)
                 Spacer(minLength: 40)
             }
 
@@ -42,7 +42,6 @@ struct HomeView: View {
             }
         }
         .onAppear {
-            viewModel.appearedAction(.home)
             viewModel.checkLocationAccess()
         }
     }
@@ -85,55 +84,41 @@ private struct HouseInfoView: View {
     }
 }
 
-private struct HomeNavigationButtonsView: View {
+private struct NavigationButtonsView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     let buttonSize = 90.0
-    let heatersButton = NavButton(buttonTitle: "", image: Image(imageName: .aircondition))
-    let carButton = NavButton(buttonTitle: "", image: Image(systemName: "car.fill"))
-
-    let roborockButton = NavButton(buttonTitle: "",
-                                   image: Image("roborocks7"),
-                                   buttonImageWidth: 50,
-                                   buttonImageHeight: 50)
-    let electricityButton = NavButton(buttonTitle: "",
-                                      image: Image(imageName: .powerGrid),
-                                      buttonImageWidth: 45,
-                                      buttonImageHeight: 50)
-    let cctvButton = NavButton(buttonTitle: "",
-                               image: Image(systemImageName: .cctv),
-                               buttonImageWidth: 45,
-                               buttonImageHeight: 30)
-
     var body: some View {
-        let lightsButton = NavButton(buttonTitle: "",
-                                     image: Image(systemName: "lightbulb.fill"),
-                                     buttonImageWidth: 30,
-                                     buttonImageHeight: 50,
-                                     isActive: viewModel.allLights.isActive)
         VStack {
             HStack(spacing: 15) {
-                NavigationLink(value: Destination.heaters,
-                               label: { HassButtonLabel(button: AnyView(heatersButton)) })
-
-                NavigationLink(value: Destination.eniro,
-                               label: { HassButtonLabel(button: AnyView(carButton)) })
-
-                NavigationLink(value: Destination.roborock,
-                               label: { HassButtonLabel(button: AnyView(roborockButton)) })
+                NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), action: viewModel.showHeatersAction)
+                NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.fill"), action: viewModel.showEniroAction)
+                NavigationButtonView(buttonTitle: "",
+                                     image: Image("roborocks7"),
+                                     buttonImageWidth: 50,
+                                     buttonImageHeight: 50,
+                                     action: viewModel.showRoborockAction)
             }
             HStack(spacing: 15) {
-                NavigationLink(value: Destination.electricity,
-                               label: { HassButtonLabel(button: AnyView(electricityButton)) })
-                NavigationLink(value: Destination.cameras,
-                               label: { HassButtonLabel(button: AnyView(cctvButton)) })
-                NavigationLink(value: Destination.lights,
-                               label: { HassButtonLabel(button: AnyView(lightsButton)) })
+                NavigationButtonView(image: Image(imageName: .powerGrid),
+                                     buttonImageWidth: 45,
+                                     buttonImageHeight: 50,
+                                     action: viewModel.showPowerGridAction)
+                NavigationButtonView(image: Image(systemImageName: .cctv),
+                                     buttonImageWidth: 45,
+                                     buttonImageHeight: 30,
+                                     action: viewModel.showCamerasAction)
+
+                NavigationButtonView(image: Image(systemName: "lightbulb.fill"),
+                                     buttonImageWidth: 30,
+                                     buttonImageHeight: 50,
+                                     isActive: viewModel.allLights.isActive,
+                                     action: viewModel.showLightsAction)
                     .contextMenu {
                         Button {
-                            viewModel.toggle(light: viewModel.allLights)
+                            viewModel.turnOffLight(viewModel.allLights)
                         } label: {
-                            Text("Toggla lampor")
+                            Text("Släck alla lampor")
                         }
                     }
             }
@@ -141,7 +126,7 @@ private struct HomeNavigationButtonsView: View {
     }
 }
 
-private struct HomeServiceButtonsView: View {
+private struct ServiceButtonsView: View {
     @ObservedObject var viewModel: HomeViewModel
     @State private var isShowingAlert = false
     let buttonSize = 90.0
@@ -240,8 +225,13 @@ struct Home_Previews: PreviewProvider {
         let viewModel = HomeViewModel(websocketService: .init(),
                                       yaleApiService: YaleApiService(hassApiService: hassApiService),
                                       urlCreator: URLCreator(),
-                                      toolbarReloadAction: {},
-                                      appearedAction: { _ in })
+                                      showHeatersAction: {},
+                                      showEniroAction: {},
+                                      showRoborockAction: {},
+                                      showPowerGridAction: {},
+                                      showCamerasAction: {},
+                                      showLightsAction: {},
+                                      toolbarReloadAction: {})
 
         VStack {
             HomeView(viewModel: viewModel)
