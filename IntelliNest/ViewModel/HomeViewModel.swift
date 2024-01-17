@@ -46,19 +46,34 @@ class HomeViewModel: ObservableObject {
     private let locationManager = CLLocationManager()
     let yaleApiService: YaleApiService
     var urlCreator: URLCreator
+    let showHeatersAction: MainActorVoidClosure
+    let showEniroAction: MainActorVoidClosure
+    let showRoborockAction: MainActorVoidClosure
+    let showPowerGridAction: MainActorVoidClosure
+    let showCamerasAction: MainActorVoidClosure
+    let showLightsAction: MainActorVoidClosure
     private(set) var toolbarReloadAction: MainActorAsyncVoidClosure
-    let appearedAction: DestinationClosure
 
     init(websocketService: WebSocketService,
          yaleApiService: YaleApiService,
          urlCreator: URLCreator,
-         toolbarReloadAction: @escaping MainActorAsyncVoidClosure,
-         appearedAction: @escaping DestinationClosure) {
+         showHeatersAction: @escaping MainActorVoidClosure,
+         showEniroAction: @escaping MainActorVoidClosure,
+         showRoborockAction: @escaping MainActorVoidClosure,
+         showPowerGridAction: @escaping MainActorVoidClosure,
+         showCamerasAction: @escaping MainActorVoidClosure,
+         showLightsAction: @escaping MainActorVoidClosure,
+         toolbarReloadAction: @escaping MainActorAsyncVoidClosure) {
         self.websocketService = websocketService
         self.yaleApiService = yaleApiService
         self.urlCreator = urlCreator
+        self.showHeatersAction = showHeatersAction
+        self.showEniroAction = showEniroAction
+        self.showRoborockAction = showRoborockAction
+        self.showPowerGridAction = showPowerGridAction
+        self.showCamerasAction = showCamerasAction
+        self.showLightsAction = showLightsAction
         self.toolbarReloadAction = toolbarReloadAction
-        self.appearedAction = appearedAction
     }
 
     @MainActor
@@ -76,6 +91,10 @@ class HomeViewModel: ObservableObject {
     func toggle(light: LightEntity) {
         let action: Action = light.isActive ? .turnOff : .turnOn
         websocketService.updateLights(lightIDs: [light.entityId], action: action, brightness: light.brightness)
+    }
+
+    func turnOffLight(_ light: LightEntity) {
+        websocketService.updateLights(lightIDs: [light.entityId], action: .turnOff, brightness: 0)
     }
 
     func toggleStateForSarahsIphone() {

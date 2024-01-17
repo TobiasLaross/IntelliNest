@@ -42,10 +42,6 @@ struct HeatersView: View {
                              setClimateScheduleTime: viewModel.setClimateSchedule)
                 .padding(.bottom)
             Spacer()
-                .onAppear {
-                    viewModel.appearedAction(.heaters)
-                }
-
                 .popover(isPresented: $viewModel.showCorridorDetails, arrowEdge: .top) {
                     DetailedHeaterView(heater: viewModel.heaterCorridor,
                                        fanMode: viewModel.heaterCorridor.fanMode,
@@ -71,8 +67,6 @@ struct HeatersView: View {
 
 struct HeatersView_Previews: PreviewProvider {
     static var previews: some View {
-        HeatersView(viewModel: HeatersViewModel(websocketService: .init(),
-                                                apiService: HassApiService(urlCreator: URLCreator()),
-                                                appearedAction: { _ in }))
+        HeatersView(viewModel: HeatersViewModel(websocketService: .init(), apiService: HassApiService(urlCreator: URLCreator())))
     }
 }

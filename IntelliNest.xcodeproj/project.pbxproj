@@ -63,6 +63,7 @@
 		F64A38842B1095AA00BA9FAC /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6830DE12904534200BBE36C /* CollectionExtension.swift */; };
 		F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64D2693283E8FAB0073A7BF /* NetworkTask.swift */; };
 		F6552705281678740035DC72 /* RoborockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6552704281678740035DC72 /* RoborockEntity.swift */; };
+		F655F6502B57D77D00620BCD /* NavigationButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F655F64F2B57D77D00620BCD /* NavigationButtonView.swift */; };
 		F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */; };
 		F6591BFC2AFE31F300D5785E /* HorizontalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */; };
 		F6591BFE2AFE34FB00D5785E /* VerticalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */; };
@@ -71,7 +72,7 @@
 		F6591C052B0778BC00D5785E /* CallServiceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C042B0778BC00D5785E /* CallServiceRequest.swift */; };
 		F6591C072B0787BA00D5785E /* ServiceValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C062B0787BA00D5785E /* ServiceValues.swift */; };
 		F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */; };
-		F662999027B3AA5A00121C14 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662998F27B3AA5A00121C14 /* Helpers.swift */; };
+		F662999027B3AA5A00121C14 /* VerticalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662998F27B3AA5A00121C14 /* VerticalDivider.swift */; };
 		F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */; };
 		F662999627B4185D00121C14 /* BatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999527B4185D00121C14 /* BatteryView.swift */; };
 		F662999A27B7D8DA00121C14 /* HeaterEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999927B7D8DA00121C14 /* HeaterEntity.swift */; };
@@ -105,6 +106,13 @@
 		F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C0B6C298D07E50096AE49 /* DeviceID.swift */; };
 		F67C263D2AE118A100C22ADB /* SwitchEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67C263C2AE118A100C22ADB /* SwitchEntity.swift */; };
 		F67D77102B4FFA4200F52EB0 /* ServiceTargetKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D770F2B4FFA4200F52EB0 /* ServiceTargetKeys.swift */; };
+		F67D77192B5130CA00F52EB0 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F67D77182B5130CA00F52EB0 /* WidgetKit.framework */; };
+		F67D771B2B5130CA00F52EB0 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F67D771A2B5130CA00F52EB0 /* SwiftUI.framework */; };
+		F67D771E2B5130CA00F52EB0 /* IntelliWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D771D2B5130CA00F52EB0 /* IntelliWidgetBundle.swift */; };
+		F67D77222B5130CA00F52EB0 /* IntelliWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D77212B5130CA00F52EB0 /* IntelliWidget.swift */; };
+		F67D77242B5130CA00F52EB0 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D77232B5130CA00F52EB0 /* AppIntent.swift */; };
+		F67D77262B5130CB00F52EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F67D77252B5130CB00F52EB0 /* Assets.xcassets */; };
+		F67D772A2B5130CB00F52EB0 /* IntelliWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */; };
 		F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */; };
 		F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */; };
@@ -175,6 +183,13 @@
 			remoteGlobalIDString = F67023F627A177320070FFBB;
 			remoteInfo = IntelliNest;
 		};
+		F67D77282B5130CB00F52EB0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F67023EF27A177320070FFBB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F67D77162B5130CA00F52EB0;
+			remoteInfo = IntelliWidgetExtension;
+		};
 		F6DE843B29F2A696002132A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F67023EF27A177320070FFBB /* Project object */;
@@ -191,6 +206,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				F67D772A2B5130CB00F52EB0 /* IntelliWidgetExtension.appex in Embed Foundation Extensions */,
 				F6DE843D29F2A696002132A2 /* MyAppIntentsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -255,6 +271,7 @@
 		F64A38822B1085B600BA9FAC /* SSIDUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDUtil.swift; sourceTree = "<group>"; };
 		F64D2693283E8FAB0073A7BF /* NetworkTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTask.swift; sourceTree = "<group>"; };
 		F6552704281678740035DC72 /* RoborockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockEntity.swift; sourceTree = "<group>"; };
+		F655F64F2B57D77D00620BCD /* NavigationButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButtonView.swift; sourceTree = "<group>"; };
 		F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanModeButtonView.swift; sourceTree = "<group>"; };
 		F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalButtonView.swift; sourceTree = "<group>"; };
 		F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalButtonView.swift; sourceTree = "<group>"; };
@@ -264,7 +281,7 @@
 		F6591C042B0778BC00D5785E /* CallServiceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallServiceRequest.swift; sourceTree = "<group>"; };
 		F6591C062B0787BA00D5785E /* ServiceValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceValues.swift; sourceTree = "<group>"; };
 		F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
-		F662998F27B3AA5A00121C14 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
+		F662998F27B3AA5A00121C14 /* VerticalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalDivider.swift; sourceTree = "<group>"; };
 		F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleView.swift; sourceTree = "<group>"; };
 		F662999527B4185D00121C14 /* BatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryView.swift; sourceTree = "<group>"; };
 		F662999927B7D8DA00121C14 /* HeaterEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterEntity.swift; sourceTree = "<group>"; };
@@ -299,6 +316,14 @@
 		F67C0B6C298D07E50096AE49 /* DeviceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceID.swift; sourceTree = "<group>"; };
 		F67C263C2AE118A100C22ADB /* SwitchEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchEntity.swift; sourceTree = "<group>"; };
 		F67D770F2B4FFA4200F52EB0 /* ServiceTargetKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceTargetKeys.swift; sourceTree = "<group>"; };
+		F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = IntelliWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F67D77182B5130CA00F52EB0 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		F67D771A2B5130CA00F52EB0 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		F67D771D2B5130CA00F52EB0 /* IntelliWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntelliWidgetBundle.swift; sourceTree = "<group>"; };
+		F67D77212B5130CA00F52EB0 /* IntelliWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntelliWidget.swift; sourceTree = "<group>"; };
+		F67D77232B5130CA00F52EB0 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
+		F67D77252B5130CB00F52EB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F67D77272B5130CB00F52EB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleViewModel.swift; sourceTree = "<group>"; };
 		F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroInfoView.swift; sourceTree = "<group>"; };
 		F67F6B4C28DA36F70003CE9F /* EniroClimateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateView.swift; sourceTree = "<group>"; };
@@ -376,6 +401,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F67D77142B5130CA00F52EB0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F67D771B2B5130CA00F52EB0 /* SwiftUI.framework in Frameworks */,
+				F67D77192B5130CA00F52EB0 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -555,6 +589,21 @@
 			path = Websocket;
 			sourceTree = "<group>";
 		};
+		F655F6512B57D7BE00620BCD /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				F662999527B4185D00121C14 /* BatteryView.swift */,
+				F662998F27B3AA5A00121C14 /* VerticalDivider.swift */,
+				F655F64F2B57D77D00620BCD /* NavigationButtonView.swift */,
+				F63D1C6E2B0A605C004294D9 /* CircleButtonView.swift */,
+				F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */,
+				F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */,
+				F6EF35B62A3E20B100895250 /* SelectUserView.swift */,
+				F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		F6633F2A286324DE004D0B76 /* Heater */ = {
 			isa = PBXGroup;
 			children = (
@@ -589,19 +638,13 @@
 		F66F061527AEFC0F00270E71 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F655F6512B57D7BE00620BCD /* Components */,
 				F6225E2A2AE1351D00D32EF4 /* Home */,
 				F6BD968D2B32DD2200A46C8F /* Electricity */,
 				F67F6B4928D8FB780003CE9F /* Eniro */,
 				F62CD2E92877275400462092 /* Light */,
 				F6633F2A286324DE004D0B76 /* Heater */,
 				F6633F3B28632BF1004D0B76 /* Roborock */,
-				F662998F27B3AA5A00121C14 /* Helpers.swift */,
-				F63D1C6E2B0A605C004294D9 /* CircleButtonView.swift */,
-				F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */,
-				F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */,
-				F662999527B4185D00121C14 /* BatteryView.swift */,
-				F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */,
-				F6EF35B62A3E20B100895250 /* SelectUserView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -614,6 +657,7 @@
 				F67023F927A177320070FFBB /* IntelliNest */,
 				F6260EF5283280D200B87614 /* IntelliNestTests */,
 				F6DE842629F2A696002132A2 /* MyAppIntentsExtension */,
+				F67D771C2B5130CA00F52EB0 /* IntelliWidget */,
 				F6DE842329F2A696002132A2 /* Frameworks */,
 				F67023F827A177320070FFBB /* Products */,
 			);
@@ -625,6 +669,7 @@
 				F67023F727A177320070FFBB /* IntelliNest.app */,
 				F670240727A177340070FFBB /* IntelliNestTests.xctest */,
 				F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */,
+				F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -653,6 +698,18 @@
 				F670240127A177330070FFBB /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F67D771C2B5130CA00F52EB0 /* IntelliWidget */ = {
+			isa = PBXGroup;
+			children = (
+				F67D771D2B5130CA00F52EB0 /* IntelliWidgetBundle.swift */,
+				F67D77212B5130CA00F52EB0 /* IntelliWidget.swift */,
+				F67D77232B5130CA00F52EB0 /* AppIntent.swift */,
+				F67D77252B5130CB00F52EB0 /* Assets.xcassets */,
+				F67D77272B5130CB00F52EB0 /* Info.plist */,
+			);
+			path = IntelliWidget;
 			sourceTree = "<group>";
 		};
 		F67F6B4928D8FB780003CE9F /* Eniro */ = {
@@ -756,6 +813,8 @@
 			children = (
 				F6DE842429F2A696002132A2 /* Intents.framework */,
 				F6DE842F29F2A696002132A2 /* IntentsUI.framework */,
+				F67D77182B5130CA00F52EB0 /* WidgetKit.framework */,
+				F67D771A2B5130CA00F52EB0 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -792,6 +851,7 @@
 			);
 			dependencies = (
 				F6DE843C29F2A696002132A2 /* PBXTargetDependency */,
+				F67D77292B5130CB00F52EB0 /* PBXTargetDependency */,
 			);
 			name = IntelliNest;
 			packageProductDependencies = (
@@ -820,6 +880,23 @@
 			productReference = F670240727A177340070FFBB /* IntelliNestTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		F67D77162B5130CA00F52EB0 /* IntelliWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F67D772E2B5130CB00F52EB0 /* Build configuration list for PBXNativeTarget "IntelliWidgetExtension" */;
+			buildPhases = (
+				F67D77132B5130CA00F52EB0 /* Sources */,
+				F67D77142B5130CA00F52EB0 /* Frameworks */,
+				F67D77152B5130CA00F52EB0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IntelliWidgetExtension;
+			productName = IntelliWidgetExtension;
+			productReference = F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F6DE842129F2A696002132A2 /* MyAppIntentsExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F6DE844229F2A696002132A2 /* Build configuration list for PBXNativeTarget "MyAppIntentsExtension" */;
@@ -845,7 +922,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1520;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					F67023F627A177320070FFBB = {
@@ -855,6 +932,9 @@
 						CreatedOnToolsVersion = 13.2.1;
 						LastSwiftMigration = 1330;
 						TestTargetID = F67023F627A177320070FFBB;
+					};
+					F67D77162B5130CA00F52EB0 = {
+						CreatedOnToolsVersion = 15.2;
 					};
 					F6DE842129F2A696002132A2 = {
 						CreatedOnToolsVersion = 14.3;
@@ -881,6 +961,7 @@
 				F67023F627A177320070FFBB /* IntelliNest */,
 				F670240627A177340070FFBB /* IntelliNestTests */,
 				F6DE842129F2A696002132A2 /* MyAppIntentsExtension */,
+				F67D77162B5130CA00F52EB0 /* IntelliWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -900,6 +981,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F67D77152B5130CA00F52EB0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F67D77262B5130CB00F52EB0 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1056,6 +1145,7 @@
 				F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */,
 				F662999A27B7D8DA00121C14 /* HeaterEntity.swift in Sources */,
 				F666B5F02B0E1F360057E8E3 /* StringExtension.swift in Sources */,
+				F655F6502B57D77D00620BCD /* NavigationButtonView.swift in Sources */,
 				F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */,
 				F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */,
 				F66F061727AEFC2300270E71 /* VerticalSlider.swift in Sources */,
@@ -1128,7 +1218,7 @@
 				F6F1D07E299390C500A3292E /* CalendarExtension.swift in Sources */,
 				F63F502E2A4862BB003A7100 /* UpdateEntityRequest.swift in Sources */,
 				F60345C927A9379200212D04 /* HomeView.swift in Sources */,
-				F662999027B3AA5A00121C14 /* Helpers.swift in Sources */,
+				F662999027B3AA5A00121C14 /* VerticalDivider.swift in Sources */,
 				F6F1D078299104CD00A3292E /* NordPoolEntity.swift in Sources */,
 				F669C72E2A23C08000458165 /* CameraViewModel.swift in Sources */,
 				F62750A129FE39B100C1253F /* Destination.swift in Sources */,
@@ -1148,6 +1238,16 @@
 				F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */,
 				F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */,
 				F6EF35B52A3E1BB500895250 /* LightEntityTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F67D77132B5130CA00F52EB0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F67D77242B5130CA00F52EB0 /* AppIntent.swift in Sources */,
+				F67D771E2B5130CA00F52EB0 /* IntelliWidgetBundle.swift in Sources */,
+				F67D77222B5130CA00F52EB0 /* IntelliWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1172,6 +1272,11 @@
 			isa = PBXTargetDependency;
 			target = F67023F627A177320070FFBB /* IntelliNest */;
 			targetProxy = F670240827A177340070FFBB /* PBXContainerItemProxy */;
+		};
+		F67D77292B5130CB00F52EB0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F67D77162B5130CA00F52EB0 /* IntelliWidgetExtension */;
+			targetProxy = F67D77282B5130CB00F52EB0 /* PBXContainerItemProxy */;
 		};
 		F6DE843C29F2A696002132A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1315,7 +1420,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1337,7 +1442,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1357,7 +1462,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1379,7 +1484,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1398,7 +1503,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1407,7 +1512,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1425,7 +1530,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1434,7 +1539,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1443,6 +1548,103 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IntelliNest.app/IntelliNest";
 			};
 			name = Release;
+		};
+		F67D772B2B5130CB00F52EB0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 22;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IntelliWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = IntelliWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 2024.01.17;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F67D772C2B5130CB00F52EB0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 22;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IntelliWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = IntelliWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 2024.01.17;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F67D772D2B5130CB00F52EB0 /* Github actions */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 22;
+				DEVELOPMENT_TEAM = 2LLC328P4S;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IntelliWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = IntelliWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 2024.01.17;
+				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Github actions";
 		};
 		F6C2BF38283A34AE002EE9F9 /* Github actions */ = {
 			isa = XCBuildConfiguration;
@@ -1513,7 +1715,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1535,7 +1737,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1554,7 +1756,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1563,7 +1765,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1579,7 +1781,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1593,7 +1795,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1609,7 +1811,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1623,7 +1825,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1639,7 +1841,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1653,7 +1855,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.11;
+				MARKETING_VERSION = 2024.01.17;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1692,6 +1894,16 @@
 				F670241F27A177340070FFBB /* Debug */,
 				F670242027A177340070FFBB /* Release */,
 				F6C2BF3A283A34AE002EE9F9 /* Github actions */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F67D772E2B5130CB00F52EB0 /* Build configuration list for PBXNativeTarget "IntelliWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F67D772B2B5130CB00F52EB0 /* Debug */,
+				F67D772C2B5130CB00F52EB0 /* Release */,
+				F67D772D2B5130CB00F52EB0 /* Github actions */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

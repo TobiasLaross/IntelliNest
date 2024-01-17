@@ -8,34 +8,60 @@
 import Foundation
 import SwiftUI
 
-class Navigator {
+@MainActor
+class Navigator: ObservableObject {
     @ObservedObject var urlCreator = URLCreator()
-    var currentDestination: Destination = .home
+    @Published var navigationPath = [Destination]()
+
+    var currentDestination: Destination {
+        navigationPath.last ?? .home
+    }
+
     var webSocketService = WebSocketService()
     lazy var hassApiService = HassApiService(urlCreator: urlCreator)
     lazy var yaleApiService = YaleApiService(hassApiService: hassApiService)
     lazy var homeViewModel = HomeViewModel(websocketService: webSocketService,
                                            yaleApiService: yaleApiService,
                                            urlCreator: urlCreator,
-                                           toolbarReloadAction: reloadCurrentModel,
-                                           appearedAction: setCurrentDestination)
+                                           showHeatersAction: { [weak self] in
+                                               self?.push(.heaters)
+                                           },
+                                           showEniroAction: { [weak self] in
+                                               self?.push(.eniro)
+                                           },
+                                           showRoborockAction: { [weak self] in
+                                               self?.push(.roborock)
+                                           },
+                                           showPowerGridAction: { [weak self] in
+                                               self?.push(.electricity)
+                                           },
+                                           showCamerasAction: { [weak self] in
+                                               self?.push(.cameras)
+                                           },
+                                           showLightsAction: { [weak self] in
+                                               self?.push(.lights)
+                                           },
+                                           toolbarReloadAction: reloadCurrentModel)
     lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: hassApiService)
     lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
                                                          websocketService: webSocketService,
-                                                         appearedAction: setCurrentDestination)
+                                                         appearedAction: push)
     lazy var heatersViewModel = HeatersViewModel(websocketService: webSocketService,
-                                                 apiService: hassApiService,
-                                                 appearedAction: setCurrentDestination)
-    lazy var eniroViewModel = EniroViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
+                                                 apiService: hassApiService)
+    lazy var eniroViewModel = EniroViewModel(websocketService: webSocketService,
+                                             showClimateSchedulingAction: { [weak self] in
+                                                 self?.push(.eniroClimateSchedule)
+                                             },
+                                             appearedAction: push)
     lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: hassApiService,
-                                                                           appearedAction: setCurrentDestination)
-    lazy var roborockViewModel = RoborockViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
-    lazy var lightsViewModel = LightsViewModel(websocketService: webSocketService, appearedAction: setCurrentDestination)
+                                                                           appearedAction: push)
+    lazy var roborockViewModel = RoborockViewModel(websocketService: webSocketService, appearedAction: push)
+    lazy var lightsViewModel = LightsViewModel(websocketService: webSocketService, appearedAction: push)
 
     init() {
         urlCreator.delegate = self
         webSocketService.delegate = self
-        Task { @MainActor in
+        Task {
             await urlCreator.updateConnectionState()
         }
     }
@@ -51,8 +77,11 @@ class Navigator {
         }
     }
 
+    func pop() {
+        navigationPath.removeLast()
+    }
+
     func show(destination: Destination) -> some View {
-        setCurrentDestination(destination)
         return Group {
             switch destination {
             case .cameras:
@@ -60,7 +89,8 @@ class Navigator {
             case .electricity:
                 showElectricityView()
             case .home:
-                Text("Home navigation not implemented")
+                Text("Not implemented for home")
+//                showHomeView()
             case .heaters:
                 showHeatersView()
             case .eniro:
@@ -74,6 +104,26 @@ class Navigator {
             }
         }
         .backgroundModifier()
+    }
+
+    func push(_ destination: Destination) {
+        if currentDestination != destination {
+            Task {
+                if destination == .home {
+                    navigationPath = []
+                } else {
+                    navigationPath.append(destination)
+                }
+                async let updateConnectionStateTask = Task { await updateConnectionState() }
+                async let reloadCurrentModelTask = Task { await reloadCurrentModel() }
+
+                await updateConnectionStateTask.value
+                await reloadCurrentModelTask.value
+
+                camerasViewModel.setIsActiveScreen(destination == .cameras)
+                electricityViewModel.isViewActive = destination == .electricity
+            }
+        }
     }
 
     func startKiaHeater() {
@@ -135,6 +185,10 @@ class Navigator {
         ElectricityView(viewModel: electricityViewModel)
     }
 
+    private func showHomeView() -> HomeView {
+        HomeView(viewModel: homeViewModel)
+    }
+
     private func showHeatersView() -> HeatersView {
         HeatersView(viewModel: heatersViewModel)
     }
@@ -153,22 +207,6 @@ class Navigator {
 
     private func showLightsView() -> LightsView {
         LightsView(viewModel: lightsViewModel)
-    }
-
-    private func setCurrentDestination(_ destination: Destination) {
-        if currentDestination != destination {
-            currentDestination = destination
-            Task { @MainActor in
-                async let updateConnectionStateTask = Task { await updateConnectionState() }
-                async let reloadCurrentModelTask = Task { await reloadCurrentModel() }
-
-                await updateConnectionStateTask.value
-                await reloadCurrentModelTask.value
-
-                camerasViewModel.setIsActiveScreen(destination == .cameras)
-                electricityViewModel.isViewActive = destination == .electricity
-            }
-        }
     }
 }
 

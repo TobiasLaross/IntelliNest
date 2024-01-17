@@ -49,5 +49,16 @@
 			<string>CarHeater</string>
 		</dict>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>IntelliNest</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>se.laross.intellinest</string>
+		</dict>
+	</array>
 </dict>
 </plist>

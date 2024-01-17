@@ -55,10 +55,14 @@ class EniroViewModel: ObservableObject {
     }
 
     var websocketService: WebSocketService
+    let showClimateSchedulingAction: MainActorVoidClosure
     let appearedAction: DestinationClosure
 
-    init(websocketService: WebSocketService, appearedAction: @escaping DestinationClosure) {
+    init(websocketService: WebSocketService,
+         showClimateSchedulingAction: @escaping MainActorVoidClosure,
+         appearedAction: @escaping DestinationClosure) {
         self.websocketService = websocketService
+        self.showClimateSchedulingAction = showClimateSchedulingAction
         self.appearedAction = appearedAction
     }
 

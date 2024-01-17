@@ -23,15 +23,11 @@ struct AppMain: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     private let actionService = QuickActionService.shared
     @Environment(\.scenePhase) var scenePhase
-    private let navigator: Navigator
-
-    init() {
-        navigator = Navigator()
-    }
+    @StateObject private var navigator = Navigator()
 
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
+            NavigationStack(path: $navigator.navigationPath) {
                 HomeView(viewModel: navigator.homeViewModel)
                     .backgroundModifier()
                     .navigationDestination(for: Destination.self) { destination in
@@ -60,6 +56,9 @@ struct AppMain: App {
                         }
                     }
                     .onAppear {
+                        Task {
+                            await navigator.reloadCurrentModel()
+                        }
                         if UserManager.shared.isUserNotSet {
                             shouldShowSelectUserActionSheet = true
                         }
@@ -74,6 +73,16 @@ struct AppMain: App {
                             }
                         } + [.cancel()])
                     }
+            }
+            .onOpenURL { url in
+                if url.scheme == "IntelliNest", let path = url.host {
+                    if path == "start-car-heater" {
+                        navigator.navigationPath = [.eniro]
+                        navigator.startKiaHeater()
+                    } else {
+                        navigator.navigationPath = []
+                    }
+                }
             }
         }
     }

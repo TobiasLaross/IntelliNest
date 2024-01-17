@@ -94,7 +94,9 @@ extension WebSocketService: WebSocketDelegate {
             socket?.connect()
         case .error(let error):
             let errorMessage = String(describing: error)
-            if !ignoredErrorMessages.contains(errorMessage) {
+            if let wsError = error as? Starscream.WSError, wsError.type == .securityError {
+                Log.error("Websocket security error: \(wsError.message)")
+            } else if !ignoredErrorMessages.contains(errorMessage) {
                 Log.error("Websocket error: \(String(describing: error))")
             }
         default:
