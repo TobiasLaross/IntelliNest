@@ -21,13 +21,13 @@ struct EniroInfoView: View {
                             isCharging: viewModel.isCharging.isActive, degreeRotation: 90)
                     .padding(.trailing, 30)
 
-                CircleButtonView(buttonTitle: "Smart laddning",
-                                 isActive: !viewModel.forceCharging.isActive,
-                                 icon: .init(systemImageName: .powerplug),
-                                 iconWidth: 25,
-                                 iconHeight: 20,
-                                 isLoading: false,
-                                 action: viewModel.toggleForceCharging)
+                ServiceButtonView(buttonTitle: "Smart laddning",
+                                  isActive: !viewModel.forceCharging.isActive,
+                                  icon: .init(systemImageName: .powerplug),
+                                  iconWidth: 25,
+                                  iconHeight: 20,
+                                  isLoading: false,
+                                  action: viewModel.toggleForceCharging)
             }
         }
     }

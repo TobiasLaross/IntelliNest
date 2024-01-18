@@ -25,44 +25,44 @@ struct EniroView: View {
 
                 VStack {
                     HStack {
-                        CircleButtonView(buttonTitle: "Ladda ner från bil",
-                                         icon: .init(systemImageName: .arrowDown),
-                                         imageSize: 20,
-                                         isLoading: viewModel.updateIsloading,
-                                         action: viewModel.update)
+                        ServiceButtonView(buttonTitle: "Ladda ner från bil",
+                                          icon: .init(systemImageName: .arrowDown),
+                                          imageSize: 20,
+                                          isLoading: viewModel.updateIsloading,
+                                          action: viewModel.update)
                             .disabled(viewModel.updateIsloading)
-                        CircleButtonView(buttonTitle: "Ladda upp från bil",
-                                         icon: .init(systemImageName: .arrowUp),
-                                         imageSize: 20,
-                                         action: viewModel.initiateForceUpdate)
+                        ServiceButtonView(buttonTitle: "Ladda upp från bil",
+                                          icon: .init(systemImageName: .arrowUp),
+                                          imageSize: 20,
+                                          action: viewModel.initiateForceUpdate)
 
-                        CircleButtonView(buttonTitle: "Starta laddning",
-                                         icon: .init(systemImageName: .boltCar),
-                                         imageSize: 20,
-                                         action: viewModel.startCharging)
-                        CircleButtonView(buttonTitle: "Avbryt laddning",
-                                         icon: .init(systemImageName: .xmarkCircle),
-                                         imageSize: 20,
-                                         action: viewModel.stopCharging)
+                        ServiceButtonView(buttonTitle: "Starta laddning",
+                                          icon: .init(systemImageName: .boltCar),
+                                          imageSize: 20,
+                                          action: viewModel.startCharging)
+                        ServiceButtonView(buttonTitle: "Avbryt laddning",
+                                          icon: .init(systemImageName: .xmarkCircle),
+                                          imageSize: 20,
+                                          action: viewModel.stopCharging)
                     }
 
                     HStack {
-                        CircleButtonView(buttonTitle: "Lås dörrarna",
-                                         icon: .init(systemImageName: .locked),
-                                         iconHeight: 25,
-                                         action: viewModel.lock)
-                        CircleButtonView(buttonTitle: "Lås upp dörrarna",
-                                         icon: .init(systemImageName: .unlocked),
-                                         imageSize: 25,
-                                         action: viewModel.unlock)
-                        CircleButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
-                                         icon: .init(imageName: .evPlugType2),
-                                         imageSize: 35,
-                                         action: viewModel.showACLimitPicker)
-                        CircleButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
-                                         icon: .init(imageName: .evPlugCCS2),
-                                         imageSize: 35,
-                                         action: viewModel.showDCLimitPicker)
+                        ServiceButtonView(buttonTitle: "Lås dörrarna",
+                                          icon: .init(systemImageName: .locked),
+                                          iconHeight: 25,
+                                          action: viewModel.lock)
+                        ServiceButtonView(buttonTitle: "Lås upp dörrarna",
+                                          icon: .init(systemImageName: .unlocked),
+                                          imageSize: 25,
+                                          action: viewModel.unlock)
+                        ServiceButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
+                                          icon: .init(imageName: .evPlugType2),
+                                          imageSize: 35,
+                                          action: viewModel.showACLimitPicker)
+                        ServiceButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
+                                          icon: .init(imageName: .evPlugCCS2),
+                                          imageSize: 35,
+                                          action: viewModel.showDCLimitPicker)
                     }
                     .padding(.horizontal)
                 }
@@ -83,16 +83,12 @@ struct EniroView: View {
                                 currentLimit: limitPickerEntity.inputNumber)
             }
         }
-        .onAppear {
-            viewModel.appearedAction(.eniro)
-        }
     }
 }
 
 struct Eniro_Previews: PreviewProvider {
     static var previews: some View {
         EniroView(viewModel: EniroViewModel(websocketService: WebSocketService(),
-                                            showClimateSchedulingAction: {},
-                                            appearedAction: { _ in }))
+                                            showClimateSchedulingAction: {}))
     }
 }

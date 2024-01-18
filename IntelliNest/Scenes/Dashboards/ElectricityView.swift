@@ -11,27 +11,31 @@ struct ElectricityView: View {
     @ObservedObject var viewModel: ElectricityViewModel
 
     var body: some View {
-        VStack {
-            HStack(alignment: .top) {
-                ElectricityFlowView(viewModel: viewModel)
-                    .frame(width: 230)
-                    .padding([.top, .leading], 16)
-                Text("""
-                Kostnad idag: ***\(viewModel.tibberCostToday.state.toKr)***
-                Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
-                """)
-                .font(.circleButtonFontMedium)
-                .padding(.top, 8)
+        ZStack {
+            VStack {
+                HStack(alignment: .top) {
+                    ElectricityFlowView(viewModel: viewModel)
+                        .frame(width: 230)
+                        .padding([.top, .leading], 16)
+                    Text("""
+                    Kostnad idag: ***\(viewModel.tibberCostToday.state.toKr)***
+                    Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
+                    Mode: ***\(viewModel.sonnenBattery.operationMode.title)***
+                    """)
+                    .font(.circleButtonFontMedium)
+                    .padding(.top, 8)
+                    Spacer()
+                }
                 Spacer()
+                NordPoolHistoryView(nordPool: viewModel.nordPool)
+                    .frame(height: 350)
+                    .padding(.bottom, 16)
+                    .padding(.horizontal, 8)
             }
-            Spacer()
-            NordPoolHistoryView(nordPool: viewModel.nordPool)
-                .frame(height: 350)
-                .padding(.bottom, 16)
-                .padding(.horizontal, 8)
-        }
-        .onAppear {
-            viewModel.appearedAction(.electricity)
+
+            if viewModel.isShowingSonnenSettings {
+                SonnenSettingsView(viewModel: viewModel)
+            }
         }
         .foregroundStyle(.white)
     }
@@ -41,8 +45,7 @@ struct ElectricityView: View {
     ZStack {
         FullScreenBackgroundOverlay()
         VStack {
-            ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery), websocketService: .init(),
-                                             appearedAction: { _ in }))
+            ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery), websocketService: .init()))
         }
     }
 }

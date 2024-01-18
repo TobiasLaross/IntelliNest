@@ -17,8 +17,8 @@ class RoborockViewModel: ObservableObject {
     @Published var roborockEmptiedAtDate = Entity(entityId: .roborockEmptiedAtDate)
     @Published var roborockWaterShortage = Entity(entityId: .roborockWaterShortage, state: "off")
     @Published var roborockMapImage = ImageEntity(entityID: .roborockMapImage)
-    @Published var showingMapView = false
-    @Published var showingrooms = false
+    @Published var isShowingMapView = false
+    @Published var isShowingrooms = false
 
     private var baseURLString: String {
         websocketService.baseURLString
@@ -43,11 +43,9 @@ class RoborockViewModel: ObservableObject {
     let entityIDs: [EntityId] = [.roborock, .roborockAutomation, .roborockWaterShortage, .roborockEmptiedAtDate, .roborockLastCleanArea,
                                  .roborockAreaSinceEmptied, .roborockMapImage]
     private var websocketService: WebSocketService
-    let appearedAction: DestinationClosure
 
-    init(websocketService: WebSocketService, appearedAction: @escaping DestinationClosure) {
+    init(websocketService: WebSocketService) {
         self.websocketService = websocketService
-        self.appearedAction = appearedAction
     }
 
     func reload(entityID: EntityId, state: String) {

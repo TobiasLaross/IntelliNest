@@ -20,4 +20,6 @@ enum ServiceDataKeys: String, Equatable, Codable, Hashable, CodingKey {
     case date
     case time
     case datetime
+    case watt
+    case operationMode
 }

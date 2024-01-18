@@ -21,10 +21,8 @@ class EniroClimateScheduleViewModel: HassAPIViewModelProtocol {
     var isReloading = false
 
     private var apiService: HassApiService
-    let appearedAction: DestinationClosure
-    init(apiService: HassApiService, appearedAction: @escaping DestinationClosure) {
+    init(apiService: HassApiService) {
         self.apiService = apiService
-        self.appearedAction = appearedAction
     }
 
     func setClimateSchedule(dateEntity: Entity) {

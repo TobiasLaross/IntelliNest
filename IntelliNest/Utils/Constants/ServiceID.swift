@@ -17,6 +17,8 @@ enum ServiceID: String, Decodable, CaseIterable {
     case kiaChargeLimit = "kia_uvo.set_charge_limits"
     case kiaStopClimate = "kia_uvo.stop_climate"
     case cameraStream = "camera/stream"
+    case automationTurnOn = "automation.turn_on"
+    case automationTurnOff = "automation.turn_off"
     case boolTurnOn = "input_boolean.turn_on"
     case boolTurnOff = "input_boolean.turn_off"
     case updateEntity = "homeassistant.update_entity"
@@ -26,4 +28,7 @@ enum ServiceID: String, Decodable, CaseIterable {
     case heaterHorizontal = "melcloud.set_vane_horizontal"
     case heaterVertical = "melcloud.set_vane_vertical"
     case setDateTime = "input_datetime.set_datetime"
+    case sonnenOperationMode = "rest_command.sonnen_put_config_operation_mode"
+    case sonnenCharge = "rest_command.sonnen_charge"
+    case sonnenDischarge = "rest_command.sonnen_discharge"
 }

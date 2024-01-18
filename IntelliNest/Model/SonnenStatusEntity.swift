@@ -7,9 +7,30 @@
 
 import Foundation
 
+enum SonnenOperationModes: String, CaseIterable {
+    case manual = "1"
+    case selfConsumption = "2"
+    case timeOfUse = "10"
+    case unknown
+
+    var title: String {
+        switch self {
+        case .manual:
+            return "Manual"
+        case .selfConsumption:
+            return "Self consumption"
+        case .timeOfUse:
+            return "Time of use"
+        case .unknown:
+            return "Unknown"
+        }
+    }
+}
+
 struct SonnenStatusEntity {
     let entityID: EntityId
     var gridPower: Double = 0.0
+    var operationMode = SonnenOperationModes.unknown
     var hasFlowGridToBattery = false
     var hasFlowGridToHouse = false
     var hasFlowSolarToHouse = false
@@ -39,6 +60,9 @@ struct SonnenStatusEntity {
         }
         if let gridIn = attributes["GridFeedIn_W"] as? Double {
             self.gridPower = gridIn
+        }
+        if let operationMode = attributes["OperatingMode"] as? String {
+            self.operationMode = SonnenOperationModes(rawValue: operationMode) ?? .unknown
         }
     }
 }

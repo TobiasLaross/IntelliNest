@@ -40,7 +40,7 @@ struct RoborockView: View {
                     HStack {
                         RoborockInfoView(lastCleanArea: viewModel.roborockLastCleanArea.state,
                                          batteryLevel: viewModel.roborock.batteryLevel,
-                                         showingMapView: $viewModel.showingMapView)
+                                         showingMapView: $viewModel.isShowingMapView)
                         Spacer()
                     }
 
@@ -67,39 +67,35 @@ struct RoborockView: View {
                                     locateRoborockClosure: viewModel.locateRoborock,
                                     manualEmptyClosure: viewModel.manualEmpty)
                 Divider()
-                if viewModel.showingrooms {
+                if viewModel.isShowingrooms {
                     RoborockRoomsView(callScriptClosure: viewModel.callScript)
                 } else {
                     VStack {
                         Spacer()
                             .frame(height: 120)
-                        CircleButtonView(buttonTitle: "Visa rum",
-                                         icon: .init(imageName: .floorplan),
-                                         action: {
-                                             viewModel.showingrooms = true
-                                         })
+                        ServiceButtonView(buttonTitle: "Visa rum",
+                                          icon: .init(imageName: .floorplan),
+                                          action: {
+                                              viewModel.isShowingrooms = true
+                                          })
                     }
                 }
                 Spacer()
             }
             .padding(.top)
             .onAppear {
-                viewModel.showingrooms = false
-                viewModel.appearedAction(.roborock)
+                viewModel.isShowingrooms = false
             }
 
-            if viewModel.showingMapView {
+            if viewModel.isShowingMapView {
                 RoborockMapImageView(viewModel: viewModel)
             }
-        }
-        .onTapGesture {
-            viewModel.showingMapView = false
         }
     }
 }
 
 struct Roborock_Previews: PreviewProvider {
     static var previews: some View {
-        RoborockView(viewModel: .init(websocketService: .init(), appearedAction: { _ in }))
+        RoborockView(viewModel: .init(websocketService: .init()))
     }
 }

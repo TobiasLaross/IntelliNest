@@ -18,23 +18,23 @@ struct RoborockMainButtons: View {
     var body: some View {
         HStack {
             Group {
-                CircleButtonView(buttonTitle: "Dammsug",
-                                 isActive: roborock.isActive,
-                                 icon: roborock.icon,
-                                 iconHeight: 25,
-                                 action: toggleCleaningClosure)
-                CircleButtonView(buttonTitle: "Docka",
-                                 icon: .init(systemImageName: .house),
-                                 imageSize: 25,
-                                 action: dockRoborockClosure)
-                CircleButtonView(buttonTitle: "Hitta",
-                                 icon: .init(systemImageName: .scope),
-                                 imageSize: 25,
-                                 action: locateRoborockClosure)
-                CircleButtonView(buttonTitle: "Töm",
-                                 icon: .init(systemImageName: .trash),
-                                 imageSize: 25,
-                                 action: sendRoborockToBinClosure)
+                ServiceButtonView(buttonTitle: "Dammsug",
+                                  isActive: roborock.isActive,
+                                  icon: roborock.icon,
+                                  iconHeight: 25,
+                                  action: toggleCleaningClosure)
+                ServiceButtonView(buttonTitle: "Docka",
+                                  icon: .init(systemImageName: .house),
+                                  imageSize: 25,
+                                  action: dockRoborockClosure)
+                ServiceButtonView(buttonTitle: "Hitta",
+                                  icon: .init(systemImageName: .scope),
+                                  imageSize: 25,
+                                  action: locateRoborockClosure)
+                ServiceButtonView(buttonTitle: "Töm",
+                                  icon: .init(systemImageName: .trash),
+                                  imageSize: 25,
+                                  action: sendRoborockToBinClosure)
                     .contextMenu {
                         Button(action: manualEmptyClosure, label: {
                             Text("Manuell tömning")

@@ -37,11 +37,8 @@ class LightsViewModel: ObservableObject {
     let laundryRoomName = "Tvättstugan"
 
     private var websocketService: WebSocketService
-    let appearedAction: DestinationClosure
-    init(websocketService: WebSocketService,
-         appearedAction: @escaping DestinationClosure) {
+    init(websocketService: WebSocketService) {
         self.websocketService = websocketService
-        self.appearedAction = appearedAction
     }
 
     @MainActor

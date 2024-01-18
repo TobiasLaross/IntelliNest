@@ -7,14 +7,16 @@
 
 import SwiftUI
 
-struct CircleButtonView: View {
+struct ServiceButtonView: View {
     @State private var tapped = false
 
     var buttonTitle: String
     var customFont: Font
     var isActive: Bool
     var activeColor: Color
-    let buttonSize: CGFloat
+    let buttonWidth: CGFloat
+    let buttonHeight: CGFloat
+    let cornerRadius: CGFloat
     let icon: Image?
     let iconWidth: CGFloat
     let iconHeight: CGFloat
@@ -34,8 +36,8 @@ struct CircleButtonView: View {
             }
         } label: {
             ZStack {
-                Circle()
-                    .frame(width: buttonSize, height: buttonSize)
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .frame(width: buttonWidth, height: buttonHeight)
                     .foregroundStyle(Color.topGrayColor)
                     .overlay {
                         VStack {
@@ -83,8 +85,10 @@ struct CircleButtonView: View {
          customFont: Font = .circleButtonFontMedium,
          isActive: Bool = false,
          activeColor: Color = .yellow,
-         buttonSize: CGFloat = 80,
-         icon: Image?,
+         buttonWidth: CGFloat = 80,
+         buttonHeight: CGFloat = 80,
+         cornerRadius: CGFloat = 100,
+         icon: Image? = nil,
          iconWidth: CGFloat = 20,
          iconHeight: CGFloat = 20,
          indicatorIcon: Image? = nil,
@@ -94,7 +98,9 @@ struct CircleButtonView: View {
         self.customFont = customFont
         self.isActive = isActive
         self.activeColor = activeColor
-        self.buttonSize = buttonSize
+        self.buttonWidth = buttonWidth
+        self.buttonHeight = buttonHeight
+        self.cornerRadius = cornerRadius
         self.icon = icon
         self.iconWidth = iconWidth
         self.iconHeight = iconHeight
@@ -108,7 +114,35 @@ struct CircleButtonView: View {
          isActive: Bool = false,
          activeColor: Color = .yellow,
          buttonSize: CGFloat = 80,
+         cornerRadius: CGFloat = 100,
          icon: Image?,
+         iconWidth: CGFloat = 20,
+         iconHeight: CGFloat = 20,
+         indicatorIcon: Image? = nil,
+         isLoading: Bool = false,
+         action: @escaping MainActorVoidClosure) {
+        self.init(buttonTitle: buttonTitle,
+                  customFont: customFont,
+                  isActive: isActive,
+                  activeColor: activeColor,
+                  buttonWidth: buttonSize,
+                  buttonHeight: buttonSize,
+                  cornerRadius: cornerRadius,
+                  icon: icon,
+                  iconWidth: iconWidth,
+                  iconHeight: iconHeight,
+                  indicatorIcon: indicatorIcon,
+                  isLoading: isLoading,
+                  action: action)
+    }
+
+    init(buttonTitle: String,
+         customFont: Font = .circleButtonFontMedium,
+         isActive: Bool = false,
+         activeColor: Color = .yellow,
+         buttonSize: CGFloat = 80,
+         cornerRadius: CGFloat = 100,
+         icon: Image? = nil,
          imageSize: CGFloat = 20,
          isLoading: Bool = false,
          action: @escaping MainActorVoidClosure) {
@@ -116,7 +150,9 @@ struct CircleButtonView: View {
                   customFont: customFont,
                   isActive: isActive,
                   activeColor: activeColor,
-                  buttonSize: buttonSize,
+                  buttonWidth: buttonSize,
+                  buttonHeight: buttonSize,
+                  cornerRadius: cornerRadius,
                   icon: icon,
                   iconWidth: imageSize,
                   iconHeight: imageSize,
@@ -126,11 +162,11 @@ struct CircleButtonView: View {
 }
 
 #Preview {
-    CircleButtonView(buttonTitle: "Service",
-                     buttonSize: 20,
-                     icon: .init(systemImageName: .bolt),
-                     iconWidth: 33,
-                     iconHeight: 33,
-                     isLoading: false,
-                     action: {})
+    ServiceButtonView(buttonTitle: "Service",
+                      buttonSize: 20,
+                      icon: .init(systemImageName: .bolt),
+                      iconWidth: 33,
+                      iconHeight: 33,
+                      isLoading: false,
+                      action: {})
 }
