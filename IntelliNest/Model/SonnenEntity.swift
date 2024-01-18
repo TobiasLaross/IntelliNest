@@ -16,6 +16,7 @@ struct SonnenEntity {
     var batteryPower = 0.0 // Pac_total_W
     var gridPower = 0.0 // GridFeedIn_W replaced by tibber power
     var solarProduction = 0.0 // Production_W
+    var operationMode = SonnenOperationModes.unknown
     var hasFlowGridToBattery = false
     var hasFlowGridToHouse = false
     var hasFlowBatteryToHouse = false
@@ -71,13 +72,14 @@ struct SonnenEntity {
         solarProduction = sonnenEntity.solarProduction
     }
 
-    mutating func update(from sonnenStatusEntity: SonnenStatusEntity) {
-        hasFlowGridToBattery = sonnenStatusEntity.hasFlowGridToBattery
-        hasFlowGridToHouse = sonnenStatusEntity.hasFlowGridToHouse
-        hasFlowSolarToHouse = sonnenStatusEntity.hasFlowSolarToHouse
-        hasFlowBatteryToHouse = sonnenStatusEntity.hasFlowBatteryToHouse
-        hasFlowSolarToBattery = sonnenStatusEntity.hasFlowSolarToBattery
-        hasFlowSolarToGrid = sonnenStatusEntity.hasFlowSolarToGrid
+    mutating func update(from statusEntity: SonnenStatusEntity) {
+        hasFlowGridToBattery = statusEntity.hasFlowGridToBattery
+        hasFlowGridToHouse = statusEntity.hasFlowGridToHouse
+        hasFlowSolarToHouse = statusEntity.hasFlowSolarToHouse
+        hasFlowBatteryToHouse = statusEntity.hasFlowBatteryToHouse
+        hasFlowSolarToBattery = statusEntity.hasFlowSolarToBattery
+        hasFlowSolarToGrid = statusEntity.hasFlowSolarToGrid
+        operationMode = statusEntity.operationMode
 //        gridPower = sonnenStatusEntity.gridPower
     }
 

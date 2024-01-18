@@ -89,15 +89,11 @@ struct LightsView: View {
             Spacer()
         }
         .padding([.top, .leading])
-        .onAppear {
-            viewModel.appearedAction(.lights)
-        }
     }
 }
 
 struct Lights_Previews: PreviewProvider {
     static var previews: some View {
-        LightsView(viewModel: .init(websocketService:
-            .init(), appearedAction: { _ in }))
+        LightsView(viewModel: .init(websocketService: .init()))
     }
 }

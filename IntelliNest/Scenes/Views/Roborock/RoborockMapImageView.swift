@@ -13,12 +13,13 @@ struct RoborockMapImageView: View {
     var body: some View {
         ZStack {
             FullScreenBackgroundOverlay()
+                .onTapGesture {
+                    viewModel.isShowingMapView = false
+                }
             if let url = URL(string: viewModel.imagageURLString) {
                 AsyncImage(url: url) { phase in
                     if let image = phase.image {
-                        image
-                            .resizable()
-                            .scaleEffect(1.5)
+                        ZoomableImageView(image: image, isPortrait: true, isFullScreen: .constant(false), initialScale: 1.5)
                             .frame(width: 300, height: 330)
                     } else if phase.error != nil {
                         Image(systemName: "exclamationmark.triangle")

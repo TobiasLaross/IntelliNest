@@ -134,35 +134,35 @@ private struct ServiceButtonsView: View {
     var body: some View {
         VStack {
             HStack {
-                CircleButtonView(buttonTitle: "\(viewModel.frontDoor.actionText) framdörren",
-                                 customFont: .circleButtonFontSmall,
-                                 isActive: viewModel.frontDoor.isActive,
-                                 buttonSize: buttonSize,
-                                 icon: viewModel.frontDoor.image,
-                                 iconWidth: viewModel.frontDoor.isActive ? 30 : 20,
-                                 iconHeight: 30,
-                                 isLoading: viewModel.frontDoor.isLoading,
-                                 action: viewModel.toggleStateForFrontDoor)
+                ServiceButtonView(buttonTitle: "\(viewModel.frontDoor.actionText) framdörren",
+                                  customFont: .circleButtonFontSmall,
+                                  isActive: viewModel.frontDoor.isActive,
+                                  buttonSize: buttonSize,
+                                  icon: viewModel.frontDoor.image,
+                                  iconWidth: viewModel.frontDoor.isActive ? 30 : 20,
+                                  iconHeight: 30,
+                                  isLoading: viewModel.frontDoor.isLoading,
+                                  action: viewModel.toggleStateForFrontDoor)
                     .disabled(viewModel.frontDoor.isLoading)
-                CircleButtonView(buttonTitle: "\(viewModel.sideDoor.actionText) sidodörren",
-                                 customFont: .circleButtonFontSmall,
-                                 isActive: viewModel.sideDoor.isActive,
-                                 buttonSize: buttonSize,
-                                 icon: viewModel.sideDoor.image,
-                                 iconWidth: viewModel.sideDoor.isActive ? 30 : 20,
-                                 iconHeight: 30,
-                                 isLoading: viewModel.sideDoor.isLoading,
-                                 action: viewModel.toggleStateForSideDoor)
+                ServiceButtonView(buttonTitle: "\(viewModel.sideDoor.actionText) sidodörren",
+                                  customFont: .circleButtonFontSmall,
+                                  isActive: viewModel.sideDoor.isActive,
+                                  buttonSize: buttonSize,
+                                  icon: viewModel.sideDoor.image,
+                                  iconWidth: viewModel.sideDoor.isActive ? 30 : 20,
+                                  iconHeight: 30,
+                                  isLoading: viewModel.sideDoor.isLoading,
+                                  action: viewModel.toggleStateForSideDoor)
                     .disabled(viewModel.sideDoor.isLoading)
-                CircleButtonView(buttonTitle: "\(viewModel.storageLock.actionText) förrådet",
-                                 customFont: .circleButtonFontSmall,
-                                 isActive: viewModel.storageLock.isActive,
-                                 buttonSize: buttonSize,
-                                 icon: viewModel.storageLock.image,
-                                 iconWidth: viewModel.storageLock.isActive ? 30 : 20,
-                                 iconHeight: 30,
-                                 isLoading: viewModel.storageLock.isLoading,
-                                 action: viewModel.toggleStateForStorageLock)
+                ServiceButtonView(buttonTitle: "\(viewModel.storageLock.actionText) förrådet",
+                                  customFont: .circleButtonFontSmall,
+                                  isActive: viewModel.storageLock.isActive,
+                                  buttonSize: buttonSize,
+                                  icon: viewModel.storageLock.image,
+                                  iconWidth: viewModel.storageLock.isActive ? 30 : 20,
+                                  iconHeight: 30,
+                                  isLoading: viewModel.storageLock.isLoading,
+                                  action: viewModel.toggleStateForStorageLock)
                     .disabled(viewModel.storageLock.isLoading)
                     .contextMenu {
                         Button(action: viewModel.lockStorage, label: {
@@ -175,16 +175,16 @@ private struct ServiceButtonsView: View {
             }
 
             HStack {
-                CircleButtonView(buttonTitle: viewModel.coffeeMachine.title,
-                                 customFont: .circleButtonFontSmall,
-                                 isActive: viewModel.coffeeMachine.isActive,
-                                 activeColor: viewModel.coffeeMachine.activeColor,
-                                 buttonSize: buttonSize,
-                                 icon: viewModel.coffeeMachine.image,
-                                 iconWidth: 25,
-                                 iconHeight: 35,
-                                 indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
-                                 action: viewModel.toggleCoffeeMachine)
+                ServiceButtonView(buttonTitle: viewModel.coffeeMachine.title,
+                                  customFont: .circleButtonFontSmall,
+                                  isActive: viewModel.coffeeMachine.isActive,
+                                  activeColor: viewModel.coffeeMachine.activeColor,
+                                  buttonSize: buttonSize,
+                                  icon: viewModel.coffeeMachine.image,
+                                  iconWidth: 25,
+                                  iconHeight: 35,
+                                  indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
+                                  action: viewModel.toggleCoffeeMachine)
                     .contextMenu {
                         Button(action: {
                             viewModel.showCoffeeMachineScheduling()
@@ -193,26 +193,26 @@ private struct ServiceButtonsView: View {
                         })
                     }
                 if UserManager.currentUser == .tobias {
-                    CircleButtonView(buttonTitle: "Hitta Sarah's iPhone?",
-                                     customFont: .circleButtonFontSmall,
-                                     isActive: viewModel.sarahsIphone.isActive,
-                                     buttonSize: buttonSize,
-                                     icon: viewModel.sarahIphoneimage,
-                                     iconWidth: viewModel.sarahsIphone.isActive ? 40 : 20,
-                                     iconHeight: 30,
-                                     action: {
-                                         isShowingAlert = true
-                                     })
-                                     .alert(isPresented: $isShowingAlert) {
-                                         Alert(
-                                             title: Text("Hitta Sarah's iPhone?"),
-                                             message: Text(""),
-                                             primaryButton: .destructive(
-                                                 Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
-                                                     viewModel.toggleStateForSarahsIphone()
-                                                 },
-                                             secondaryButton: .cancel())
-                                     }
+                    ServiceButtonView(buttonTitle: "Hitta Sarah's iPhone?",
+                                      customFont: .circleButtonFontSmall,
+                                      isActive: viewModel.sarahsIphone.isActive,
+                                      buttonSize: buttonSize,
+                                      icon: viewModel.sarahIphoneimage,
+                                      iconWidth: viewModel.sarahsIphone.isActive ? 40 : 20,
+                                      iconHeight: 30,
+                                      action: {
+                                          isShowingAlert = true
+                                      })
+                                      .alert(isPresented: $isShowingAlert) {
+                                          Alert(
+                                              title: Text("Hitta Sarah's iPhone?"),
+                                              message: Text(""),
+                                              primaryButton: .destructive(
+                                                  Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
+                                                      viewModel.toggleStateForSarahsIphone()
+                                                  },
+                                              secondaryButton: .cancel())
+                                      }
                 }
             }
         }

@@ -27,6 +27,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case storageLock = "lock.forradet"
     case hittaSarahsIphone = "script.hitta_sarahs_iphone"
     case nordPool = "sensor.nordpool_kwh_se4_sek_0_10_0"
+    case sonnenAutomation = "automation.battery_charger"
     case sonnenBattery = "sensor.sonnen_battery"
     case sonnenBatteryStatus = "sensor.sonnen_battery_status"
     case pulsePower = "sensor.pulse_power"

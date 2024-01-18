@@ -90,6 +90,9 @@ struct ElectricityFlowView: View {
                                                    isCharging: viewModel.sonnenBattery.batteryPower > 100,
                                                    width: 45,
                                                    height: 80))
+                    .onTapGesture {
+                        viewModel.isShowingSonnenSettings = true
+                    }
                     .overlay(alignment: .leading) {
                         FlowIndicatorView(isFlowing: hasFlowBatteryToGrid,
                                           flowIntensity: 0.5,
@@ -116,7 +119,7 @@ struct ElectricityFlowView: View {
 
 #Preview {
     ElectricityFlowView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                         websocketService: .init(), appearedAction: { _ in }))
+                                         websocketService: .init()))
 }
 
 #Preview {

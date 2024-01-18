@@ -15,6 +15,8 @@ class ElectricityViewModel: ObservableObject {
     @Published var pulsePower = Entity(entityId: .pulsePower)
     @Published var tibberCostToday = Entity(entityId: .tibberCostToday)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
+    @Published var sonnenAutomationEnabled = Entity(entityId: .sonnenAutomation)
+    @Published var isShowingSonnenSettings = false
 
     var sonnenUpdateTask: Task<Void, Error>?
     var isViewActive = false {
@@ -25,17 +27,13 @@ class ElectricityViewModel: ObservableObject {
         }
     }
 
-    let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberCostToday, .pulseConsumptionToday]
+    let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberCostToday, .pulseConsumptionToday, .sonnenAutomation]
 
     var websocketService: WebSocketService
-    let appearedAction: DestinationClosure
 
-    init(sonnenBattery: SonnenEntity,
-         websocketService: WebSocketService,
-         appearedAction: @escaping DestinationClosure) {
+    init(sonnenBattery: SonnenEntity, websocketService: WebSocketService) {
         self.sonnenBattery = sonnenBattery
         self.websocketService = websocketService
-        self.appearedAction = appearedAction
     }
 
     func reload(entityID: EntityId, state: String) {
@@ -49,6 +47,8 @@ class ElectricityViewModel: ObservableObject {
             tibberCostToday.state = state
         case .pulseConsumptionToday:
             pulseConsumptionToday.state = state
+        case .sonnenAutomation:
+            sonnenAutomationEnabled.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }
@@ -76,5 +76,34 @@ class ElectricityViewModel: ObservableObject {
                 try? await Task.sleep(seconds: 1)
             }
         }
+    }
+
+    func charge(watt: Int) {
+        guard watt <= 10000 && watt >= 0 else {
+            return
+        }
+
+        websocketService.callService(serviceID: .sonnenCharge, data: [.watt: .int(watt)])
+    }
+
+    func discharge(watt: Int) {
+        guard watt <= 10000 && watt >= 0 else {
+            return
+        }
+
+        websocketService.callService(serviceID: .sonnenDischarge, data: [.watt: .int(watt)])
+    }
+
+    func setSonnenOperationMode(_ mode: SonnenOperationModes) {
+        guard mode != .unknown else {
+            return
+        }
+
+        websocketService.callService(serviceID: .sonnenOperationMode, data: [.operationMode: .string(mode.rawValue)])
+    }
+
+    func setSonnenAutomationEnabled(_ isEnabled: Bool) {
+        websocketService.callService(serviceID: isEnabled ? .automationTurnOn : .automationTurnOff,
+                                     target: [.entityID: .string(EntityId.sonnenAutomation.rawValue)])
     }
 }

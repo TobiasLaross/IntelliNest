@@ -56,14 +56,10 @@ class EniroViewModel: ObservableObject {
 
     var websocketService: WebSocketService
     let showClimateSchedulingAction: MainActorVoidClosure
-    let appearedAction: DestinationClosure
 
-    init(websocketService: WebSocketService,
-         showClimateSchedulingAction: @escaping MainActorVoidClosure,
-         appearedAction: @escaping DestinationClosure) {
+    init(websocketService: WebSocketService, showClimateSchedulingAction: @escaping MainActorVoidClosure) {
         self.websocketService = websocketService
         self.showClimateSchedulingAction = showClimateSchedulingAction
-        self.appearedAction = appearedAction
     }
 
     // swiftlint:disable cyclomatic_complexity

@@ -9,6 +9,7 @@ import Foundation
 
 enum ServiceValues: Encodable {
     case string(String)
+    case int(Int)
     case double(Double)
     case stringArray([String])
 
@@ -17,6 +18,8 @@ enum ServiceValues: Encodable {
         switch self {
         case .string(let stringValue):
             try container.encode(stringValue)
+        case .int(let intValue):
+            try container.encode(intValue)
         case .double(let doubleValue):
             try container.encode(doubleValue)
         case .stringArray(let stringArrayValue):

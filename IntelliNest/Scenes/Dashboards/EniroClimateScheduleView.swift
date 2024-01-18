@@ -54,16 +54,12 @@ struct EniroClimateScheduleView: View {
                 Spacer()
             }
         }
-        .onAppear {
-            viewModel.appearedAction(.eniroClimateSchedule)
-        }
     }
 }
 
 struct EniroClimateSchedule_Previews: PreviewProvider {
     static var previews: some View {
-        EniroClimateScheduleView(viewModel: EniroClimateScheduleViewModel(apiService: HassApiService(urlCreator: URLCreator()),
-                                                                          appearedAction: { _ in }))
+        EniroClimateScheduleView(viewModel: EniroClimateScheduleViewModel(apiService: HassApiService(urlCreator: URLCreator())))
     }
 }
 

@@ -44,19 +44,16 @@ class Navigator: ObservableObject {
                                            toolbarReloadAction: reloadCurrentModel)
     lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: hassApiService)
     lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
-                                                         websocketService: webSocketService,
-                                                         appearedAction: push)
+                                                         websocketService: webSocketService)
     lazy var heatersViewModel = HeatersViewModel(websocketService: webSocketService,
                                                  apiService: hassApiService)
     lazy var eniroViewModel = EniroViewModel(websocketService: webSocketService,
                                              showClimateSchedulingAction: { [weak self] in
                                                  self?.push(.eniroClimateSchedule)
-                                             },
-                                             appearedAction: push)
-    lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: hassApiService,
-                                                                           appearedAction: push)
-    lazy var roborockViewModel = RoborockViewModel(websocketService: webSocketService, appearedAction: push)
-    lazy var lightsViewModel = LightsViewModel(websocketService: webSocketService, appearedAction: push)
+                                             })
+    lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: hassApiService)
+    lazy var roborockViewModel = RoborockViewModel(websocketService: webSocketService)
+    lazy var lightsViewModel = LightsViewModel(websocketService: webSocketService)
 
     init() {
         urlCreator.delegate = self
