@@ -10,6 +10,7 @@ import Foundation
 import ShipBookSDK
 import SwiftUI
 import UIKit
+import WidgetKit
 
 class HomeViewModel: ObservableObject {
     @Published var sideDoor = YaleLock(id: .sideDoor)
@@ -33,6 +34,7 @@ class HomeViewModel: ObservableObject {
     @Published var easeeCharger = Entity(entityId: .easeeCharger)
     @Published var generalWasteDate = Entity(entityId: .generalWasteDate)
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
+    @Published var isSarahsPillsTaken: Bool
 
     @Published var noLocationAccess = false
 
@@ -74,6 +76,9 @@ class HomeViewModel: ObservableObject {
         self.showCamerasAction = showCamerasAction
         self.showLightsAction = showLightsAction
         self.toolbarReloadAction = toolbarReloadAction
+
+        let lastTakenPillsDate = UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) as? Date
+        isSarahsPillsTaken = Calendar.current.isDateInToday(lastTakenPillsDate ?? .distantPast)
     }
 
     @MainActor
@@ -241,6 +246,13 @@ class HomeViewModel: ObservableObject {
                 break
             }
         }
+    }
+
+    @MainActor
+    func sarahDidTakePills() {
+        UserDefaults.shared.setValue(Date(), forKey: StorageKeys.sarahPills.rawValue)
+        WidgetCenter.shared.reloadAllTimelines()
+        isSarahsPillsTaken = true
     }
 
     private func reload(lockID: LockID) async -> LockState {

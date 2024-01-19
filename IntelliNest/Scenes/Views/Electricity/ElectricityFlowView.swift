@@ -119,7 +119,7 @@ struct ElectricityFlowView: View {
 
 #Preview {
     ElectricityFlowView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                         websocketService: .init()))
+                                         websocketService: .init(reloadConnectionAction: {})))
 }
 
 #Preview {

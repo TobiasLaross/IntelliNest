@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import WidgetKit
 
 @MainActor
 class Navigator: ObservableObject {
@@ -17,7 +18,11 @@ class Navigator: ObservableObject {
         navigationPath.last ?? .home
     }
 
-    var webSocketService = WebSocketService()
+    var reloadedConnectionDate = Date.distantPast
+
+    lazy var webSocketService = WebSocketService(reloadConnectionAction: { [weak self] in
+        self?.reloadConnection()
+    })
     lazy var hassApiService = HassApiService(urlCreator: urlCreator)
     lazy var yaleApiService = YaleApiService(hassApiService: hassApiService)
     lazy var homeViewModel = HomeViewModel(websocketService: webSocketService,
@@ -58,6 +63,12 @@ class Navigator: ObservableObject {
     init() {
         urlCreator.delegate = self
         webSocketService.delegate = self
+        if UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) == nil {
+            UserDefaults.shared.setValue(Date.distantPast, forKey: StorageKeys.sarahPills.rawValue)
+        }
+
+        WidgetCenter.shared.reloadAllTimelines()
+
         Task {
             await urlCreator.updateConnectionState()
         }
@@ -204,6 +215,16 @@ class Navigator: ObservableObject {
 
     private func showLightsView() -> LightsView {
         LightsView(viewModel: lightsViewModel)
+    }
+
+    @MainActor
+    private func reloadConnection() {
+        if reloadedConnectionDate.timeIntervalSinceNow < -1 {
+            reloadedConnectionDate = Date()
+            Task {
+                await reloadCurrentModel()
+            }
+        }
     }
 }
 

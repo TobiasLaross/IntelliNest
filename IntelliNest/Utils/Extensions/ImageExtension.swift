@@ -36,28 +36,29 @@ enum ImageName: String {
 }
 
 enum SystemImageName: String {
-    case cctv = "video.fill"
-    case house = "house.fill"
-    case scope
-    case forkKnife = "fork.knife"
-    case trash = "trash.fill"
-    case unlocked = "lock.open.fill"
-    case locked = "lock.fill"
-    case lockSlash = "lock.slash.fill"
-    case clock
-    case iPhone = "iphone"
-    case iPhoneActive = "iphone.radiowaves.left.and.right"
+    case arrowDown = "arrow.down"
+    case arrowUp = "arrow.up"
+    case bedDouble = "bed.double"
     case bolt = "bolt.fill"
     case boltSlash = "bolt.slash"
     case boltCar = "bolt.car"
-    case xmarkCircle = "xmark.circle"
-    case powerplug
-    case arrowDown = "arrow.down"
-    case arrowUp = "arrow.up"
-    case play = "play.fill"
+    case cctv = "video.fill"
+    case clock
+    case forkKnife = "fork.knife"
+    case house = "house.fill"
+    case iPhone = "iphone"
+    case iPhoneActive = "iphone.radiowaves.left.and.right"
+    case locked = "lock.fill"
+    case lockSlash = "lock.slash.fill"
     case pause = "pause.fill"
-    case bedDouble = "bed.double"
+    case pills = "pills.fill"
+    case play = "play.fill"
     case playTV = "play.tv"
+    case powerplug
+    case scope
     case thermometer
+    case trash = "trash.fill"
     case unknown = "questionmark.circle"
+    case unlocked = "lock.open.fill"
+    case xmarkCircle = "xmark.circle"
 }

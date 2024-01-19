@@ -64,7 +64,7 @@ struct AppMain: App {
                         }
                     }
                     .actionSheet(isPresented: $shouldShowSelectUserActionSheet) {
-                        ActionSheet(title: Text("Välj användare"), buttons: User.allCases.map { user in
+                        ActionSheet(title: Text("Välj användare"), buttons: User.allCases.filter({ $0 != .unknownUser }).map { user in
                             .default(Text(user.name)) {
                                 UserManager.shared.setUser(user)
                                 Task {

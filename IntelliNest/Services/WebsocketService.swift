@@ -30,7 +30,10 @@ class WebSocketService {
     var baseURLString = ""
     private let ignoredErrorMessages = ["The network connection was lost", "abort", "Socket is not connected"]
 
-    init() {}
+    private var reloadConnectionAction: VoidClosure
+    init(reloadConnectionAction: @escaping VoidClosure) {
+        self.reloadConnectionAction = reloadConnectionAction
+    }
 
     func baseURLChanged(urlString: String) {
         baseURLString = urlString
@@ -93,6 +96,7 @@ extension WebSocketService: WebSocketDelegate {
         case .disconnected:
             socket?.connect()
         case .error(let error):
+            reloadConnectionAction()
             let errorMessage = String(describing: error)
             if let wsError = error as? Starscream.WSError, wsError.type == .securityError {
                 Log.error("Websocket security error: \(wsError.message)")

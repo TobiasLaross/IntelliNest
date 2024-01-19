@@ -19,7 +19,7 @@ struct EniroChargingLimitView: View {
 
 struct EniroChargingLimitView_Previews: PreviewProvider {
     static var previews: some View {
-        EniroChargingLimitView(viewModel: .init(websocketService: WebSocketService(),
+        EniroChargingLimitView(viewModel: .init(websocketService: WebSocketService(reloadConnectionAction: {}),
                                                 showClimateSchedulingAction: {}))
     }
 }

@@ -96,6 +96,6 @@ struct RoborockView: View {
 
 struct Roborock_Previews: PreviewProvider {
     static var previews: some View {
-        RoborockView(viewModel: .init(websocketService: .init()))
+        RoborockView(viewModel: .init(websocketService: .init(reloadConnectionAction: {})))
     }
 }
