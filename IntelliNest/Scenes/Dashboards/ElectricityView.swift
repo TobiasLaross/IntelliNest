@@ -45,7 +45,8 @@ struct ElectricityView: View {
     ZStack {
         FullScreenBackgroundOverlay()
         VStack {
-            ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery), websocketService: .init()))
+            ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
+                                             websocketService: .init(reloadConnectionAction: {})))
         }
     }
 }

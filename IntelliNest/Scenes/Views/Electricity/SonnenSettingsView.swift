@@ -24,7 +24,7 @@ struct SonnenSettingsView: View {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.topGrayColor, lineWidth: 8)
                 .fill(bodyColor)
-                .frame(width: 340, height: 180)
+                .frame(width: 300, height: 180)
                 .overlay {
                     VStack(spacing: 8) {
                         Group {
@@ -90,5 +90,6 @@ struct SonnenSettingsView: View {
 }
 
 #Preview {
-    SonnenSettingsView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery), websocketService: .init()))
+    SonnenSettingsView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
+                                        websocketService: .init(reloadConnectionAction: {})))
 }

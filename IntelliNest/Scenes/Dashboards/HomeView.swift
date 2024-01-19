@@ -213,6 +213,16 @@ private struct ServiceButtonsView: View {
                                                   },
                                               secondaryButton: .cancel())
                                       }
+                } else if UserManager.currentUser == .sarah && !viewModel.isSarahsPillsTaken {
+                    ServiceButtonView(buttonTitle: "Tagit medicin",
+                                      customFont: .circleButtonFontSmall,
+                                      buttonSize: buttonSize,
+                                      icon: .init(systemImageName: .pills),
+                                      iconWidth: 30,
+                                      iconHeight: 30,
+                                      action: {
+                                          viewModel.sarahDidTakePills()
+                                      })
                 }
             }
         }
@@ -222,7 +232,7 @@ private struct ServiceButtonsView: View {
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
         let hassApiService = HassApiService(urlCreator: URLCreator())
-        let viewModel = HomeViewModel(websocketService: .init(),
+        let viewModel = HomeViewModel(websocketService: .init(reloadConnectionAction: {}),
                                       yaleApiService: YaleApiService(hassApiService: hassApiService),
                                       urlCreator: URLCreator(),
                                       showHeatersAction: {},

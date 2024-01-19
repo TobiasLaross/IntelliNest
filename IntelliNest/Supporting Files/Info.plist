@@ -2,6 +2,17 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>se.laross.intellinest</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>IntelliNest</string>
+			</array>
+		</dict>
+	</array>
 	<key>EXTERNAL_URL</key>
 	<string>$(EXTERNAL_URL)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -49,16 +60,9 @@
 			<string>CarHeater</string>
 		</dict>
 	</array>
-	<key>CFBundleURLTypes</key>
+	<key>UIBackgroundModes</key>
 	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>IntelliNest</string>
-			</array>
-			<key>CFBundleURLName</key>
-			<string>se.laross.intellinest</string>
-		</dict>
+		<string>fetch</string>
 	</array>
 </dict>
 </plist>

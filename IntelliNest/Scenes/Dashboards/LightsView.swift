@@ -94,6 +94,6 @@ struct LightsView: View {
 
 struct Lights_Previews: PreviewProvider {
     static var previews: some View {
-        LightsView(viewModel: .init(websocketService: .init()))
+        LightsView(viewModel: .init(websocketService: .init(reloadConnectionAction: {})))
     }
 }

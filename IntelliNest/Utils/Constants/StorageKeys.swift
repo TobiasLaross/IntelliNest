@@ -8,5 +8,7 @@
 import Foundation
 
 enum StorageKeys: String {
+    case sarahPills
+    case userInitials
     case yaleAccessToken
 }
