@@ -11,6 +11,7 @@ import SwiftUI
 @main
 struct IntelliWidgetBundle: WidgetBundle {
     var body: some Widget {
-        IntelliWidget()
+        HomeWidget()
+        CarHeaterWidget()
     }
 }

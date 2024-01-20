@@ -58,6 +58,7 @@
 		F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502F2A486650003A7100 /* EncodableExtension.swift */; };
 		F63F50322A4CADEB003A7100 /* URLCreatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */; };
 		F63F50342A4CB71E003A7100 /* SubscribeRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */; };
+		F646EB142B5C30DD002DBD98 /* HomeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F646EB132B5C30DD002DBD98 /* HomeWidget.swift */; };
 		F64A38812B0F5E6900BA9FAC /* DoubleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64A38802B0F5E6900BA9FAC /* DoubleExtension.swift */; };
 		F64A38832B1085B600BA9FAC /* SSIDUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64A38822B1085B600BA9FAC /* SSIDUtil.swift */; };
 		F64A38842B1095AA00BA9FAC /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6830DE12904534200BBE36C /* CollectionExtension.swift */; };
@@ -114,7 +115,7 @@
 		F67D77192B5130CA00F52EB0 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F67D77182B5130CA00F52EB0 /* WidgetKit.framework */; };
 		F67D771B2B5130CA00F52EB0 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F67D771A2B5130CA00F52EB0 /* SwiftUI.framework */; };
 		F67D771E2B5130CA00F52EB0 /* IntelliWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D771D2B5130CA00F52EB0 /* IntelliWidgetBundle.swift */; };
-		F67D77222B5130CA00F52EB0 /* IntelliWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D77212B5130CA00F52EB0 /* IntelliWidget.swift */; };
+		F67D77222B5130CA00F52EB0 /* CarHeaterWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D77212B5130CA00F52EB0 /* CarHeaterWidget.swift */; };
 		F67D77242B5130CA00F52EB0 /* AppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D77232B5130CA00F52EB0 /* AppIntent.swift */; };
 		F67D77262B5130CB00F52EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F67D77252B5130CB00F52EB0 /* Assets.xcassets */; };
 		F67D772A2B5130CB00F52EB0 /* IntelliWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -271,6 +272,7 @@
 		F63F502F2A486650003A7100 /* EncodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableExtension.swift; sourceTree = "<group>"; };
 		F63F50312A4CADEB003A7100 /* URLCreatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreatorDelegate.swift; sourceTree = "<group>"; };
 		F63F50332A4CB71E003A7100 /* SubscribeRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscribeRequest.swift; sourceTree = "<group>"; };
+		F646EB132B5C30DD002DBD98 /* HomeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWidget.swift; sourceTree = "<group>"; };
 		F64A38802B0F5E6900BA9FAC /* DoubleExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleExtension.swift; sourceTree = "<group>"; };
 		F64A38822B1085B600BA9FAC /* SSIDUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSIDUtil.swift; sourceTree = "<group>"; };
 		F64D2693283E8FAB0073A7BF /* NetworkTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTask.swift; sourceTree = "<group>"; };
@@ -327,7 +329,7 @@
 		F67D77182B5130CA00F52EB0 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		F67D771A2B5130CA00F52EB0 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		F67D771D2B5130CA00F52EB0 /* IntelliWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntelliWidgetBundle.swift; sourceTree = "<group>"; };
-		F67D77212B5130CA00F52EB0 /* IntelliWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntelliWidget.swift; sourceTree = "<group>"; };
+		F67D77212B5130CA00F52EB0 /* CarHeaterWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarHeaterWidget.swift; sourceTree = "<group>"; };
 		F67D77232B5130CA00F52EB0 /* AppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntent.swift; sourceTree = "<group>"; };
 		F67D77252B5130CB00F52EB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F67D77272B5130CB00F52EB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -718,7 +720,8 @@
 				F658F3DE2B5A6EF900F7940D /* Extensions */,
 				F658F3DB2B5A6D3500F7940D /* IntelliWidgetExtension.entitlements */,
 				F67D771D2B5130CA00F52EB0 /* IntelliWidgetBundle.swift */,
-				F67D77212B5130CA00F52EB0 /* IntelliWidget.swift */,
+				F67D77212B5130CA00F52EB0 /* CarHeaterWidget.swift */,
+				F646EB132B5C30DD002DBD98 /* HomeWidget.swift */,
 				F67D77232B5130CA00F52EB0 /* AppIntent.swift */,
 				F67D77252B5130CB00F52EB0 /* Assets.xcassets */,
 				F67D77272B5130CB00F52EB0 /* Info.plist */,
@@ -1264,7 +1267,8 @@
 			files = (
 				F67D77242B5130CA00F52EB0 /* AppIntent.swift in Sources */,
 				F67D771E2B5130CA00F52EB0 /* IntelliWidgetBundle.swift in Sources */,
-				F67D77222B5130CA00F52EB0 /* IntelliWidget.swift in Sources */,
+				F646EB142B5C30DD002DBD98 /* HomeWidget.swift in Sources */,
+				F67D77222B5130CA00F52EB0 /* CarHeaterWidget.swift in Sources */,
 				F658F3E62B5A722000F7940D /* UserManager.swift in Sources */,
 				F658F3E72B5A722200F7940D /* UserDefaultsExtension.swift in Sources */,
 				F658F3E32B5A6F3800F7940D /* StorageKeys.swift in Sources */,
@@ -1440,7 +1444,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1462,7 +1466,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1482,7 +1486,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1504,7 +1508,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1523,7 +1527,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1532,7 +1536,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1550,7 +1554,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1559,7 +1563,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1577,7 +1581,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1593,7 +1597,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1612,7 +1616,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1628,7 +1632,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1646,7 +1650,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1662,7 +1666,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1741,7 +1745,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1763,7 +1767,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1782,7 +1786,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1791,7 +1795,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1807,7 +1811,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1821,7 +1825,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1837,7 +1841,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1851,7 +1855,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1867,7 +1871,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24;
+				CURRENT_PROJECT_VERSION = 25;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1881,7 +1885,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.19;
+				MARKETING_VERSION = 2024.01.20;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

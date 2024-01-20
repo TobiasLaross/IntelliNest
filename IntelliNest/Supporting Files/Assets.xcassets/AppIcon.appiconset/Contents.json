@@ -13,13 +13,13 @@
       "size" : "20x20"
     },
     {
-      "filename" : "iPhone Spotlight iOS 5,6 & Settings.png",
+      "filename" : "iPad Settings.png",
       "idiom" : "iphone",
       "scale" : "1x",
       "size" : "29x29"
     },
     {
-      "filename" : "iPhone Spotlight iOS 5,6 & Settings@2x.png",
+      "filename" : "iPad Settings@2x 1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
@@ -31,7 +31,7 @@
       "size" : "29x29"
     },
     {
-      "filename" : "iPhone Spotlight iOS 7,12@2x.png",
+      "filename" : "iPad Spotlight iOS 7,12@2x 1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "40x40"
@@ -79,7 +79,7 @@
       "size" : "20x20"
     },
     {
-      "filename" : "iPad Settings.png",
+      "filename" : "iPad Settings 1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "29x29"
@@ -103,7 +103,7 @@
       "size" : "40x40"
     },
     {
-      "filename" : "iPad App Icon iOS 7,12.png",
+      "filename" : "iPad App Icon iOS 7,12 1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"

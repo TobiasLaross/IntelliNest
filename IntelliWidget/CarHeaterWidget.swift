@@ -8,21 +8,18 @@
 import SwiftUI
 import WidgetKit
 
-struct IntelliWidgetEntryView: View {
+struct CarHeaterEntryView: View {
     var entry: SimpleEntry
+    let frameSize = 55.0
 
     var body: some View {
-        HStack {
-            Image(systemName: UserManager.currentUser == .sarah && !entry.isSarahsPillsTaken ? "pills.fill" : "house")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 30, height: 30)
-                .padding(.horizontal, 8)
+        ZStack {
+            AccessoryWidgetBackground()
             Link(destination: URL(string: "IntelliNest://start-car-heater")!) {
                 Image(systemName: "car")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 30, height: 30)
+                    .padding(9)
             }
         }
     }
@@ -69,23 +66,23 @@ struct SimpleEntry: TimelineEntry {
     let isSarahsPillsTaken: Bool
 }
 
-struct IntelliWidget: Widget {
-    let kind: String = "IntelliWidget"
+struct CarHeaterWidget: Widget {
+    let kind: String = "CarHeaterWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            IntelliWidgetEntryView(entry: entry)
+            CarHeaterEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("IntelliWidget")
         .description("Tap the car to activate car heater")
-        .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+        .supportedFamilies([.accessoryCircular])
     }
 }
 
 struct IntelliWidget_Previews: PreviewProvider {
     static var previews: some View {
-        IntelliWidgetEntryView(entry: SimpleEntry(date: Date(), isSarahsPillsTaken: false))
+        CarHeaterEntryView(entry: SimpleEntry(date: Date(), isSarahsPillsTaken: false))
             .containerBackground(.fill.tertiary, for: .widget)
             .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
     }
