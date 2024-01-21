@@ -44,7 +44,7 @@ struct HorizontalButtonView: View {
                         .frame(width: 50, height: 50, alignment: .center)
                 }
             }
-            .background(isSelectedMode ? .yellow : .topGrayColor)
+            .background(isSelectedMode ? .yellow : .topBarColor)
             .foregroundColor(isSelectedMode ? .black : .white)
             .cornerRadius(horizontalButtonCornerRadius)
         }

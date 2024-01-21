@@ -34,8 +34,8 @@ class HomeViewModel: ObservableObject {
     @Published var easeeCharger = Entity(entityId: .easeeCharger)
     @Published var generalWasteDate = Entity(entityId: .generalWasteDate)
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
-    @Published var isSarahsPillsTaken: Bool
 
+    @Published var isSarahsPillsTaken = false
     @Published var noLocationAccess = false
 
     var isReloading = false
@@ -77,14 +77,14 @@ class HomeViewModel: ObservableObject {
         self.showLightsAction = showLightsAction
         self.toolbarReloadAction = toolbarReloadAction
 
-        let lastTakenPillsDate = UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) as? Date
-        isSarahsPillsTaken = Calendar.current.isDateInToday(lastTakenPillsDate ?? .distantPast)
+        reloadSarahsPill()
     }
 
     @MainActor
     func reload() async {
         if !isReloading {
             isReloading = true
+            reloadSarahsPill()
             async let tmpSideDoorState = await reload(lockID: sideDoor.id)
             async let tmpFrontDoorState = await reload(lockID: frontDoor.id)
 
@@ -262,5 +262,10 @@ class HomeViewModel: ObservableObject {
             Log.error("Failed to load \(lockID) with error: \(error)")
             return .unknown
         }
+    }
+
+    private func reloadSarahsPill() {
+        let lastTakenPillsDate = UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) as? Date
+        isSarahsPillsTaken = Calendar.current.isDateInToday(lastTakenPillsDate ?? .distantPast)
     }
 }

@@ -20,7 +20,7 @@ struct ThermometerView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.01)
         }
-        .background(bodyColor)
+        .background(Color.bodyColor)
     }
 }
 

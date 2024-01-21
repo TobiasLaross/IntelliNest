@@ -23,7 +23,7 @@ struct SinceEmptiedView: View {
             }
             Spacer()
         }
-        .background(bodyColor)
+        .background(Color.bodyColor)
     }
 }
 

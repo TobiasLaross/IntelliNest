@@ -16,8 +16,6 @@ let dashboardButtonFrameHeight: CGFloat = 90
 let dashboardButtonFrameWidth: CGFloat = 90
 let dashboardCircleButtonFrameSize: CGFloat = 80
 let dashboardButtonCornerRadius: CGFloat = 20
-let backgroundGrayIntensity = 0.21
-let bodyColor = Color(red: backgroundGrayIntensity, green: backgroundGrayIntensity, blue: backgroundGrayIntensity)
 
 struct GlobalConstants {
     static var baseExternalUrlString: String {

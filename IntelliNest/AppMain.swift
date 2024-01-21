@@ -78,7 +78,10 @@ struct AppMain: App {
                 if url.scheme == "IntelliNest", let path = url.host {
                     if path == "start-car-heater" {
                         navigator.navigationPath = [.eniro]
-                        navigator.startKiaHeater()
+                        Task {
+                            try? await Task.sleep(seconds: 0.5)
+                            navigator.startKiaHeater()
+                        }
                     } else {
                         navigator.navigationPath = []
                     }

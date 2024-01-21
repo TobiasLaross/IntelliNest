@@ -38,7 +38,7 @@ struct ServiceButtonView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .frame(width: buttonWidth, height: buttonHeight)
-                    .foregroundStyle(Color.topGrayColor)
+                    .foregroundStyle(Color.topBarColor)
                     .overlay {
                         VStack {
                             if isLoading {

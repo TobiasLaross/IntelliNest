@@ -32,7 +32,7 @@ struct DashboardButtonView: View {
          iconWidth: CGFloat = dashboardButtonImageSize,
          iconHeight: CGFloat = dashboardButtonImageSize,
          iconForegroundColor: Color = .white,
-         backgroundColor: Color = .topGrayColor,
+         backgroundColor: Color = .topBarColor,
          circleSize: CGFloat = dashboardCircleButtonFrameSize,
          isLoading: Bool = false,
          indicatorIcon: Image? = nil,

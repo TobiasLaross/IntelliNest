@@ -57,7 +57,7 @@ struct NavigationButtonView: View {
                 }
             }
             .frame(width: frameSize, height: frameSize, alignment: .center)
-            .background(Color.topGrayColor)
+            .background(Color.topBarColor)
             .cornerRadius(dashboardButtonCornerRadius)
         }
     }

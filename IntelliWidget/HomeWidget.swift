@@ -8,17 +8,24 @@
 import SwiftUI
 import WidgetKit
 
-struct HomeEntryView: View {
+struct HomeWidgetEntryView: View {
     var entry: SimpleEntry
 
     var body: some View {
         ZStack {
             AccessoryWidgetBackground()
             Link(destination: URL(string: "IntelliNest://home")!) {
-                Image(systemName: UserManager.currentUser == .sarah && !entry.isSarahsPillsTaken ? "pills.fill" : "house")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .padding(9)
+                if UserManager.currentUser == .sarah && !entry.isSarahsPillsTaken {
+                    Image(systemName: "pills.fill")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .padding(9)
+                } else {
+                    Image("widget-home-icon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .padding(9)
+                }
             }
         }
     }
@@ -29,7 +36,7 @@ struct HomeWidget: Widget {
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            HomeEntryView(entry: entry)
+            HomeWidgetEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("IntelliWidget")
@@ -39,5 +46,5 @@ struct HomeWidget: Widget {
 }
 
 #Preview {
-    HomeEntryView(entry: .init(date: Date(), isSarahsPillsTaken: true))
+    HomeWidgetEntryView(entry: .init(date: Date(), isSarahsPillsTaken: true))
 }
