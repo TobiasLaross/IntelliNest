@@ -11,7 +11,9 @@ extension Color {
     private static let topGrayIntensity = 0.15
     static let lightBlue = Color(red: 0.2, green: 0.6, blue: 1.0)
     static let backgroundOverlay = Color.black.opacity(0.4)
-    static let topGrayColor = Color(red: topGrayIntensity, green: topGrayIntensity, blue: topGrayIntensity)
+    static let topBarColor = Color(red: topGrayIntensity, green: topGrayIntensity, blue: topGrayIntensity)
+    static let backgroundGrayIntensity = 0.21
+    static let bodyColor = Color(red: backgroundGrayIntensity, green: backgroundGrayIntensity, blue: backgroundGrayIntensity)
 
     static func blend(_ color1: Color, with color2: Color, ratio: CGFloat) -> Color {
         let uiColor1 = UIColor(color1)
@@ -29,5 +31,19 @@ extension Color {
         let blendedBlue = cgColor1[2] + (cgColor2[2] - cgColor1[2]) * ratio
 
         return Color(UIColor(red: blendedRed, green: blendedGreen, blue: blendedBlue, alpha: 1))
+    }
+}
+
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex.hasPrefix("#") ? String(hex.dropFirst()) : hex)
+        var rgbValue: UInt64 = 0
+        scanner.scanHexInt64(&rgbValue)
+
+        let red = Double((rgbValue & 0xFF0000) >> 16) / 255.0
+        let green = Double((rgbValue & 0x00FF00) >> 8) / 255.0
+        let blue = Double(rgbValue & 0x0000FF) / 255.0
+
+        self.init(red: red, green: green, blue: blue)
     }
 }

@@ -77,10 +77,10 @@ class Navigator: ObservableObject {
     func background() -> some View {
         Group {
             Rectangle()
-                .foregroundStyle(Color.topGrayColor)
+                .foregroundStyle(Color.topBarColor)
                 .ignoresSafeArea()
             Rectangle()
-                .foregroundColor(bodyColor)
+                .foregroundColor(Color.bodyColor)
                 .edgesIgnoringSafeArea(.bottom)
         }
     }
@@ -233,10 +233,10 @@ extension View {
         background(
             Group {
                 Rectangle()
-                    .foregroundStyle(Color.topGrayColor)
+                    .foregroundStyle(Color.topBarColor)
                     .ignoresSafeArea()
                 Rectangle()
-                    .foregroundColor(bodyColor)
+                    .foregroundColor(Color.bodyColor)
                     .edgesIgnoringSafeArea(.bottom)
             }
         )

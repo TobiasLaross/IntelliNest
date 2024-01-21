@@ -42,7 +42,7 @@ struct FanModeButtonView: View {
                 }
             }
             .frame(width: fanButtonSize, height: fanButtonSize, alignment: .center)
-            .background(isSelectedFanMode ? .yellow : .topGrayColor)
+            .background(isSelectedFanMode ? .yellow : .topBarColor)
             .foregroundStyle(isSelectedFanMode ? .black : .white)
             .cornerRadius(fanButtonCornerRadius)
         }
