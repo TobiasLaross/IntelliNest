@@ -53,7 +53,7 @@ struct DetailedHeaterView: View {
             Spacer()
         }
         .padding()
-        .background(Color.bodyColor)
+        .backgroundModifier()
     }
 }
 

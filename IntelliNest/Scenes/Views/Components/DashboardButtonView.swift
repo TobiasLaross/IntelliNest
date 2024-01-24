@@ -32,7 +32,7 @@ struct DashboardButtonView: View {
          iconWidth: CGFloat = dashboardButtonImageSize,
          iconHeight: CGFloat = dashboardButtonImageSize,
          iconForegroundColor: Color = .white,
-         backgroundColor: Color = .topBarColor,
+         backgroundColor: Color = .primaryContentBackground,
          circleSize: CGFloat = dashboardCircleButtonFrameSize,
          isLoading: Bool = false,
          indicatorIcon: Image? = nil,
@@ -70,7 +70,7 @@ struct DashboardButtonView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: buttonCornerRadius)
                     .frame(width: buttonFrameWidth, height: buttonFrameHeight)
-                    .foregroundColor(backgroundColor)
+                    .foregroundStyle(LinearGradient.buttonGradient)
                 VStack {
                     icon.map {
                         $0

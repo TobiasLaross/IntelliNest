@@ -22,17 +22,29 @@ protocol WebsocketServiceProtocol {
 }
 
 class WebSocketService {
-    var socket: WebSocket?
     weak var delegate: WebSocketServiceDelegate?
-    var requestID = 0
-    var requests: [String] = []
+
+    private var socket: WebSocket?
+    private var requestID = 0
+    private var requests: [String] = []
+    private var recentlySentRequests: [String] = [] {
+        didSet {
+            let count = recentlySentRequests.count
+            if count > 10 {
+                recentlySentRequests.removeFirst(count - 10)
+            }
+        }
+    }
+
     var isAuthenticated = false
     var baseURLString = ""
     private let ignoredErrorMessages = ["The network connection was lost", "abort", "Socket is not connected"]
 
     private var reloadConnectionAction: VoidClosure
-    init(reloadConnectionAction: @escaping VoidClosure) {
+    private var reloadBaseURLAction: VoidClosure
+    init(reloadConnectionAction: @escaping VoidClosure, reloadBaseURLAction: @escaping VoidClosure) {
         self.reloadConnectionAction = reloadConnectionAction
+        self.reloadBaseURLAction = reloadBaseURLAction
     }
 
     func baseURLChanged(urlString: String) {
@@ -62,13 +74,9 @@ class WebSocketService {
         return requestID
     }
 
-    func connect() {
-        socket?.connect()
-    }
-
     private func sendJSONCommand<T: Encodable>(_ command: T, requestID: Int? = nil) {
         guard var dictionary = command.dictionary else {
-            Log.error("Failed to encode command to JSON")
+            Log.error("Failed to encode command to JSON: \(command)")
             return
         }
         if let requestID {
@@ -80,7 +88,7 @@ class WebSocketService {
         if let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
            let jsonString = String(data: jsonData, encoding: .utf8) {
             if isAuthenticated {
-                socket?.write(string: jsonString)
+                writeToSocket(string: jsonString)
             } else {
                 requests.append(jsonString)
             }
@@ -95,17 +103,50 @@ extension WebSocketService: WebSocketDelegate {
             didReceive(text: string)
         case .disconnected:
             socket?.connect()
-        case .error(let error):
-            reloadConnectionAction()
-            let errorMessage = String(describing: error)
-            if let wsError = error as? Starscream.WSError, wsError.type == .securityError {
-                Log.error("Websocket security error: \(wsError.message)")
-            } else if !ignoredErrorMessages.contains(errorMessage) {
-                Log.error("Websocket error: \(String(describing: error))")
+        case .ping(let data):
+            if let data {
+                socket?.write(pong: data)
+                recentlySentRequests.append("Pong")
+            } else {
+                Log.error("Received ping with data set to nil")
             }
+        case .error(let error):
+            handleWebSocketError(error)
         default:
-            break
+            print("Unhandled websocket log: \(event)")
         }
+    }
+
+    private func handleWebSocketError(_ error: Error?) {
+        isAuthenticated = false
+        reloadConnectionAction()
+        socket?.connect()
+        let errorMessage = String(describing: error)
+        if let wsError = error as? Starscream.WSError, wsError.type == .securityError {
+            Log.error("Websocket security error: \(wsError.message)")
+            logRecentlySentRequests()
+        } else if let darwinError = error as? POSIXError, darwinError.code == .ECONNABORTED {
+            recentlySentRequests.removeAll()
+            reloadBaseURLAction()
+        } else if let darwinError = error as? POSIXError, darwinError.code == .ENOTCONN {
+            let lastSentRequest = recentlySentRequests.removeLast()
+            requests.append(lastSentRequest)
+        } else if !ignoredErrorMessages.contains(errorMessage) {
+            Log.error("Websocket error: \(String(describing: error))")
+            logRecentlySentRequests()
+        } else { // TODO: Temporarily log ignored messages
+            let lastSentRequest = recentlySentRequests.removeLast()
+            requests.append(lastSentRequest)
+            Log.error("Websocket error: \(String(describing: error)), last sent request: \(lastSentRequest)")
+        }
+    }
+
+    private func logRecentlySentRequests() {
+        Log.error("""
+        Recently sent requests:
+        \(recentlySentRequests.reversed().joined(separator: "\n"))
+        """)
+        recentlySentRequests.removeAll()
     }
 
     private func didReceive(text: String) {
@@ -144,7 +185,13 @@ extension WebSocketService: WebSocketDelegate {
         if let jsonData = try? JSONSerialization.data(withJSONObject: authMessage, options: []),
            let jsonString = String(data: jsonData, encoding: .utf8) {
             socket?.write(string: jsonString)
+            recentlySentRequests.append("type: auth, access_token: eyxxxx")
         }
+    }
+
+    private func writeToSocket(string: String) {
+        socket?.write(string: string)
+        recentlySentRequests.append(string)
     }
 
     private func onAuthenticationSuccessful() {
@@ -205,6 +252,10 @@ extension WebSocketService: WebSocketDelegate {
         sendJSONCommand(callServiceRequest)
     }
 
+    func removeRecentlySentRequests() {
+        recentlySentRequests.removeAll()
+    }
+
     private func subscribe() {
         let subscribeRequest = SubscribeRequest(eventType: .stateChange)
         sendJSONCommand(subscribeRequest)
@@ -252,6 +303,10 @@ extension WebSocketService: WebSocketDelegate {
             } else if entityID == .sonnenBatteryStatus {
                 let sonnenStatusEntity = SonnenStatusEntity(entityID: entityID, attributes: attributes)
                 delegate?.webSocketService(didReceiveSonnenStatusEntity: sonnenStatusEntity)
+            } else if entityID == .homeLocation,
+                      let latitude = attributes["latitude"] as? Double,
+                      let longitude = attributes["longitude"] as? Double {
+                delegate?.webSocketService(didReceiveCoodinates: Coordinates(longitude: longitude, latitude: latitude), for: entityID)
             } else {
                 let lastChangedString = newState["last_changed"] as? String
                 let lastChanged = Date.fromISO8601(lastChangedString)
@@ -263,7 +318,8 @@ extension WebSocketService: WebSocketDelegate {
     private func sendRequests() {
         while !requests.isEmpty {
             let request = requests.removeFirst()
-            socket?.write(string: request)
+            writeToSocket(string: request)
+            recentlySentRequests.append(request)
         }
     }
 }

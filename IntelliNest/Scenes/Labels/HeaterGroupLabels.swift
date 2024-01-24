@@ -17,8 +17,10 @@ struct HvacButtonLabel: View {
             hvacButton
         }
         .frame(width: hvacButtonSize, height: hvacButtonSize, alignment: .center)
-        .background(isSelectedMode ? .yellow : .topBarColor)
-        .foregroundColor(isSelectedMode ? .black : .white)
-        .cornerRadius(hvacButtonCornerRadius)
+        .foregroundColor(isSelectedMode ? .yellow : .white)
+        .font(isSelectedMode ? .buttonFontLarge.bold() : .buttonFontMedium)
+        .overlay {
+            PrimaryContentBorderView(isSelected: isSelectedMode)
+        }
     }
 }

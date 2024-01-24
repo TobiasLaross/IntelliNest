@@ -58,13 +58,13 @@ private struct HouseInfoView: View {
                         viewModel.openLocationSettings()
                     } label: {
                         Text("Go to settings and add location access")
-                            .font(.circleButtonFontMedium)
+                            .font(.buttonFontMedium)
                             .foregroundStyle(.red)
                             .padding()
                     }
                 }
                 Text(viewModel.dynamicInfoText)
-                    .font(.circleButtonFontMedium)
+                    .font(.buttonFontMedium)
                     .padding(.leading, 20)
                     .lineLimit(6)
             }
@@ -76,7 +76,7 @@ private struct HouseInfoView: View {
                 Producerar: ***\(viewModel.sonnenBattery.solarProduction.toKW)***
                 Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)
-                .font(.circleButtonFontMedium)
+                .font(.buttonFontMedium)
             }
             .padding(.trailing, 20)
         }
@@ -135,7 +135,7 @@ private struct ServiceButtonsView: View {
         VStack {
             HStack {
                 ServiceButtonView(buttonTitle: "\(viewModel.frontDoor.actionText) framdörren",
-                                  customFont: .circleButtonFontSmall,
+                                  customFont: .buttonFontSmall,
                                   isActive: viewModel.frontDoor.isActive,
                                   buttonSize: buttonSize,
                                   icon: viewModel.frontDoor.image,
@@ -145,7 +145,7 @@ private struct ServiceButtonsView: View {
                                   action: viewModel.toggleStateForFrontDoor)
                     .disabled(viewModel.frontDoor.isLoading)
                 ServiceButtonView(buttonTitle: "\(viewModel.sideDoor.actionText) sidodörren",
-                                  customFont: .circleButtonFontSmall,
+                                  customFont: .buttonFontSmall,
                                   isActive: viewModel.sideDoor.isActive,
                                   buttonSize: buttonSize,
                                   icon: viewModel.sideDoor.image,
@@ -155,7 +155,7 @@ private struct ServiceButtonsView: View {
                                   action: viewModel.toggleStateForSideDoor)
                     .disabled(viewModel.sideDoor.isLoading)
                 ServiceButtonView(buttonTitle: "\(viewModel.storageLock.actionText) förrådet",
-                                  customFont: .circleButtonFontSmall,
+                                  customFont: .buttonFontSmall,
                                   isActive: viewModel.storageLock.isActive,
                                   buttonSize: buttonSize,
                                   icon: viewModel.storageLock.image,
@@ -176,7 +176,7 @@ private struct ServiceButtonsView: View {
 
             HStack {
                 ServiceButtonView(buttonTitle: viewModel.coffeeMachine.title,
-                                  customFont: .circleButtonFontSmall,
+                                  customFont: .buttonFontSmall,
                                   isActive: viewModel.coffeeMachine.isActive,
                                   activeColor: viewModel.coffeeMachine.activeColor,
                                   buttonSize: buttonSize,
@@ -194,7 +194,7 @@ private struct ServiceButtonsView: View {
                     }
                 if UserManager.currentUser == .tobias {
                     ServiceButtonView(buttonTitle: "Hitta Sarah's iPhone?",
-                                      customFont: .circleButtonFontSmall,
+                                      customFont: .buttonFontSmall,
                                       isActive: viewModel.sarahsIphone.isActive,
                                       buttonSize: buttonSize,
                                       icon: viewModel.sarahIphoneimage,
@@ -215,7 +215,7 @@ private struct ServiceButtonsView: View {
                                       }
                 } else if UserManager.currentUser == .sarah && !viewModel.isSarahsPillsTaken {
                     ServiceButtonView(buttonTitle: "Tagit medicin",
-                                      customFont: .circleButtonFontSmall,
+                                      customFont: .buttonFontSmall,
                                       buttonSize: buttonSize,
                                       icon: .init(systemImageName: .pills),
                                       iconWidth: 30,
@@ -232,7 +232,7 @@ private struct ServiceButtonsView: View {
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
         let hassApiService = HassApiService(urlCreator: URLCreator())
-        let viewModel = HomeViewModel(websocketService: .init(reloadConnectionAction: {}),
+        let viewModel = HomeViewModel(websocketService: .init(reloadConnectionAction: {}, reloadBaseURLAction: {}),
                                       yaleApiService: YaleApiService(hassApiService: hassApiService),
                                       urlCreator: URLCreator(),
                                       showHeatersAction: {},

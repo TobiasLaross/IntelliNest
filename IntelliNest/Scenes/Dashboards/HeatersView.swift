@@ -67,7 +67,7 @@ struct HeatersView: View {
 
 struct HeatersView_Previews: PreviewProvider {
     static var previews: some View {
-        HeatersView(viewModel: HeatersViewModel(websocketService: .init(reloadConnectionAction: {}),
+        HeatersView(viewModel: HeatersViewModel(websocketService: PreviewProviderUtil.websocketService,
                                                 apiService: HassApiService(urlCreator: URLCreator())))
     }
 }

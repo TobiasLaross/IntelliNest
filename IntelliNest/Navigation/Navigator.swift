@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ShipBookSDK
 import SwiftUI
 import WidgetKit
 
@@ -18,11 +19,23 @@ class Navigator: ObservableObject {
         navigationPath.last ?? .home
     }
 
-    var reloadedConnectionDate = Date.distantPast
+    private var reloadedConnectionDate = Date.distantPast
+    private var homeCoordinates: Coordinates?
+    private lazy var geoFenceManager = GeofenceManager(didEnterHomeAction: { [weak self] in
+                                                           self?.didEnterHome()
+                                                       },
+                                                       didExitHomeAction: { [weak self] in
+                                                           self?.didExitHome()
+                                                       })
 
     lazy var webSocketService = WebSocketService(reloadConnectionAction: { [weak self] in
-        self?.reloadConnection()
-    })
+                                                     self?.reloadConnection()
+                                                 },
+                                                 reloadBaseURLAction: { [weak self] in
+                                                     Task {
+                                                         await self?.urlCreator.updateConnectionState(ignoreLocalSSID: true)
+                                                     }
+                                                 })
     lazy var hassApiService = HassApiService(urlCreator: urlCreator)
     lazy var yaleApiService = YaleApiService(hassApiService: hassApiService)
     lazy var homeViewModel = HomeViewModel(websocketService: webSocketService,
@@ -61,10 +74,15 @@ class Navigator: ObservableObject {
     lazy var lightsViewModel = LightsViewModel(websocketService: webSocketService)
 
     init() {
+        homeCoordinates = UserDefaults.standard.value(forKey: StorageKeys.homeCoordinates.rawValue) as? Coordinates
         urlCreator.delegate = self
         webSocketService.delegate = self
         if UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) == nil {
             UserDefaults.shared.setValue(Date.distantPast, forKey: StorageKeys.sarahPills.rawValue)
+        }
+
+        if let homeCoordinates {
+            geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates)
         }
 
         WidgetCenter.shared.reloadAllTimelines()
@@ -72,16 +90,9 @@ class Navigator: ObservableObject {
         Task {
             await urlCreator.updateConnectionState()
         }
-    }
 
-    func background() -> some View {
-        Group {
-            Rectangle()
-                .foregroundStyle(Color.topBarColor)
-                .ignoresSafeArea()
-            Rectangle()
-                .foregroundColor(Color.bodyColor)
-                .edgesIgnoringSafeArea(.bottom)
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
+            // Register for remote push { granted, error in
         }
     }
 
@@ -174,15 +185,21 @@ class Navigator: ObservableObject {
 
     @MainActor
     func reloadCurrentModel() async {
-        await updateConnectionState()
-        webSocketService.connect()
-        webSocketService.sendGetStatesRequest()
+        reloadConnection()
         await reload(for: currentDestination)
     }
 
     @MainActor
     func updateConnectionState() async {
         await urlCreator.updateConnectionState()
+    }
+
+    func setHomeCoordinates(_ homeCoordinates: Coordinates) {
+        if self.homeCoordinates != homeCoordinates {
+            geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates, oldCoordinates: self.homeCoordinates)
+            self.homeCoordinates = homeCoordinates
+            UserDefaults.standard.setCoordinates(homeCoordinates, forKey: StorageKeys.homeCoordinates)
+        }
     }
 
     private func showCamerasView() -> CamerasView {
@@ -217,28 +234,57 @@ class Navigator: ObservableObject {
         LightsView(viewModel: lightsViewModel)
     }
 
-    @MainActor
-    private func reloadConnection() {
-        if reloadedConnectionDate.timeIntervalSinceNow < -1 {
-            reloadedConnectionDate = Date()
-            Task {
-                await reloadCurrentModel()
+    private func didEnterHome() {
+        updateYaleLocks(with: .unlock)
+        guard UserManager.currentUser == .sarah || UserManager.currentUser == .tobias else {
+            Log.warning("Geofence utan användare: \(UserManager.currentUser)")
+            return
+        }
+        let entityID: EntityId = UserManager.currentUser == .sarah ? .sarahIsAway : .tobiasIsAway
+        hassApiService.turnOffBoolEntity(entityID, useExternalURL: true)
+    }
+
+    private func didExitHome() {
+        updateYaleLocks(with: .lock)
+        guard UserManager.currentUser == .sarah || UserManager.currentUser == .tobias else {
+            Log.warning("Geofence utan användare: \(UserManager.currentUser)")
+            return
+        }
+        let entityID: EntityId = UserManager.currentUser == .sarah ? .sarahIsAway : .tobiasIsAway
+        hassApiService.turnOnBoolEntity(entityID, useExternalURL: true)
+    }
+
+    private func updateYaleLocks(with action: Action) {
+        Task {
+            async let tmpFrontDoorSuccess = yaleApiService.setLockState(lockID: .frontDoor, action: action)
+            async let tmpSideDoorSuccess = yaleApiService.setLockState(lockID: .sideDoor, action: action)
+            let (frontDoorSuccess, sideDoorSuccess) = await(tmpFrontDoorSuccess, tmpSideDoorSuccess)
+            if !frontDoorSuccess || !sideDoorSuccess {
+                var errorMessage = "Lyckades inte låsa".appending(action == .unlock ? " upp" : "")
+                if !frontDoorSuccess && !sideDoorSuccess {
+                    errorMessage.append(frontDoorSuccess ? "" : " varken fram- eller sidodörren")
+                } else if !frontDoorSuccess {
+                    errorMessage.append(frontDoorSuccess ? "" : " framdörren.")
+                } else if !sideDoorSuccess {
+                    errorMessage.append(sideDoorSuccess ? "" : " sidodörren.")
+                }
+
+                NotificationService.sendNotification(title: "Geofence",
+                                                     message: errorMessage,
+                                                     identifier: "Geofence-yale-failure")
             }
         }
     }
-}
 
-extension View {
-    func backgroundModifier() -> some View {
-        background(
-            Group {
-                Rectangle()
-                    .foregroundStyle(Color.topBarColor)
-                    .ignoresSafeArea()
-                Rectangle()
-                    .foregroundColor(Color.bodyColor)
-                    .edgesIgnoringSafeArea(.bottom)
+    @MainActor
+    private func reloadConnection() {
+        Task {
+            if reloadedConnectionDate.timeIntervalSinceNow > -0.5 {
+                try? await Task.sleep(seconds: 0.5)
             }
-        )
+
+            await updateConnectionState()
+            reloadedConnectionDate = Date()
+        }
     }
 }

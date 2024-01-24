@@ -18,6 +18,7 @@
 		F6035045287F5DB10028DA57 /* SingleRoomLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6035044287F5DB10028DA57 /* SingleRoomLight.swift */; };
 		F60663492B33267200575FE4 /* FlowIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60663482B33267200575FE4 /* FlowIndicatorView.swift */; };
 		F607F6602B0DF2DC002F782F /* FontExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F607F65F2B0DF2DC002F782F /* FontExtension.swift */; };
+		F61726352B627512007C1E99 /* PrimaryContentBorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61726342B627512007C1E99 /* PrimaryContentBorderView.swift */; };
 		F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99B2A1653E600C1802E /* YaleApiService.swift */; };
 		F61BF99E2A1655E900C1802E /* StorageKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99D2A1655E900C1802E /* StorageKeys.swift */; };
 		F61BF9A02A166B2700C1802E /* LockID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99F2A166B2700C1802E /* LockID.swift */; };
@@ -53,6 +54,11 @@
 		F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */; };
 		F63D1C6F2B0A605C004294D9 /* ServiceButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D1C6E2B0A605C004294D9 /* ServiceButtonView.swift */; };
 		F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D2B5B280E9EE000517746 /* LockEntity.swift */; };
+		F63F1A722B615A8E006D8906 /* Coordinates.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A712B615A8E006D8906 /* Coordinates.swift */; };
+		F63F1A742B615D92006D8906 /* ShipBookSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F63F1A732B615D92006D8906 /* ShipBookSDK */; };
+		F63F1A762B615DCC006D8906 /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A752B615DCC006D8906 /* UserDefaultsExtension.swift */; };
+		F63F1A782B6255EF006D8906 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A772B6255EE006D8906 /* NotificationService.swift */; };
+		F63F1A7A2B625CAE006D8906 /* PreviewProvideUtilr.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A792B625CAE006D8906 /* PreviewProvideUtilr.swift */; };
 		F63F502B2A4858EA003A7100 /* SlideableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */; };
 		F63F502E2A4862BB003A7100 /* UpdateEntityRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */; };
 		F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F502F2A486650003A7100 /* EncodableExtension.swift */; };
@@ -66,10 +72,10 @@
 		F6552705281678740035DC72 /* RoborockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6552704281678740035DC72 /* RoborockEntity.swift */; };
 		F655F6502B57D77D00620BCD /* NavigationButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F655F64F2B57D77D00620BCD /* NavigationButtonView.swift */; };
 		F655F6532B591FF700620BCD /* SonnenSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F655F6522B591FF700620BCD /* SonnenSettingsView.swift */; };
-		F658F3DD2B5A6ED300F7940D /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F658F3DC2B5A6ED300F7940D /* UserDefaultsExtension.swift */; };
+		F658F3DD2B5A6ED300F7940D /* UserDefaultsExtensionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = F658F3DC2B5A6ED300F7940D /* UserDefaultsExtensionShared.swift */; };
 		F658F3E32B5A6F3800F7940D /* StorageKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF99D2A1655E900C1802E /* StorageKeys.swift */; };
 		F658F3E62B5A722000F7940D /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35B82A3EC47200895250 /* UserManager.swift */; };
-		F658F3E72B5A722200F7940D /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F658F3DC2B5A6ED300F7940D /* UserDefaultsExtension.swift */; };
+		F658F3E72B5A722200F7940D /* UserDefaultsExtensionShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = F658F3DC2B5A6ED300F7940D /* UserDefaultsExtensionShared.swift */; };
 		F6591BFA2AFE2AE500D5785E /* FanModeButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */; };
 		F6591BFC2AFE31F300D5785E /* HorizontalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */; };
 		F6591BFE2AFE34FB00D5785E /* VerticalButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */; };
@@ -140,6 +146,9 @@
 		F6BD968F2B32DD3D00A46C8F /* ElectricityFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BD968E2B32DD3D00A46C8F /* ElectricityFlowView.swift */; };
 		F6BD96912B32E1AF00A46C8F /* SonnenStatusEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BD96902B32E1AF00A46C8F /* SonnenStatusEntity.swift */; };
 		F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */; };
+		F6C4CA8D2B5E72DE0037B777 /* GeofenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C4CA8C2B5E72DE0037B777 /* GeofenceManager.swift */; };
+		F6C4CA8F2B6127E30037B777 /* LinearGradientExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C4CA8E2B6127E30037B777 /* LinearGradientExtension.swift */; };
+		F6C4CA912B612E7C0037B777 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C4CA902B612E7C0037B777 /* ViewExtension.swift */; };
 		F6D167CA27C1284200DCC155 /* HeaterGroupLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */; };
 		F6D167CC27C1287700DCC155 /* HvacModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CB27C1287700DCC155 /* HvacModeView.swift */; };
 		F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */; };
@@ -231,6 +240,7 @@
 		F60663482B33267200575FE4 /* FlowIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowIndicatorView.swift; sourceTree = "<group>"; };
 		F607F65F2B0DF2DC002F782F /* FontExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtension.swift; sourceTree = "<group>"; };
 		F617062527C3CA9100183250 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F61726342B627512007C1E99 /* PrimaryContentBorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryContentBorderView.swift; sourceTree = "<group>"; };
 		F61BF99B2A1653E600C1802E /* YaleApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleApiService.swift; sourceTree = "<group>"; };
 		F61BF99D2A1655E900C1802E /* StorageKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageKeys.swift; sourceTree = "<group>"; };
 		F61BF99F2A166B2700C1802E /* LockID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockID.swift; sourceTree = "<group>"; };
@@ -266,6 +276,10 @@
 		F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualBulbRoomView.swift; sourceTree = "<group>"; };
 		F63D1C6E2B0A605C004294D9 /* ServiceButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceButtonView.swift; sourceTree = "<group>"; };
 		F63D2B5B280E9EE000517746 /* LockEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntity.swift; sourceTree = "<group>"; };
+		F63F1A712B615A8E006D8906 /* Coordinates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinates.swift; sourceTree = "<group>"; };
+		F63F1A752B615DCC006D8906 /* UserDefaultsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtension.swift; sourceTree = "<group>"; };
+		F63F1A772B6255EE006D8906 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		F63F1A792B625CAE006D8906 /* PreviewProvideUtilr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewProvideUtilr.swift; sourceTree = "<group>"; };
 		F63F502A2A4858EA003A7100 /* SlideableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideableProtocol.swift; sourceTree = "<group>"; };
 		F63F502D2A4862BB003A7100 /* UpdateEntityRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateEntityRequest.swift; sourceTree = "<group>"; };
 		F63F502F2A486650003A7100 /* EncodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableExtension.swift; sourceTree = "<group>"; };
@@ -279,7 +293,7 @@
 		F655F64F2B57D77D00620BCD /* NavigationButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButtonView.swift; sourceTree = "<group>"; };
 		F655F6522B591FF700620BCD /* SonnenSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SonnenSettingsView.swift; sourceTree = "<group>"; };
 		F658F3DB2B5A6D3500F7940D /* IntelliWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IntelliWidgetExtension.entitlements; sourceTree = "<group>"; };
-		F658F3DC2B5A6ED300F7940D /* UserDefaultsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtension.swift; sourceTree = "<group>"; };
+		F658F3DC2B5A6ED300F7940D /* UserDefaultsExtensionShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensionShared.swift; sourceTree = "<group>"; };
 		F6591BF92AFE2AE500D5785E /* FanModeButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FanModeButtonView.swift; sourceTree = "<group>"; };
 		F6591BFB2AFE31F300D5785E /* HorizontalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalButtonView.swift; sourceTree = "<group>"; };
 		F6591BFD2AFE34FB00D5785E /* VerticalButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalButtonView.swift; sourceTree = "<group>"; };
@@ -354,6 +368,9 @@
 		F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "IntelliNest-Info.xcconfig"; sourceTree = "<group>"; };
 		F6C2BF3C283A34E9002EE9F9 /* Github-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Github-Info.xcconfig"; sourceTree = "<group>"; };
 		F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockEntityTest.swift; sourceTree = "<group>"; };
+		F6C4CA8C2B5E72DE0037B777 /* GeofenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeofenceManager.swift; sourceTree = "<group>"; };
+		F6C4CA8E2B6127E30037B777 /* LinearGradientExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinearGradientExtension.swift; sourceTree = "<group>"; };
+		F6C4CA902B612E7C0037B777 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		F6D167C927C1284200DCC155 /* HeaterGroupLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterGroupLabels.swift; sourceTree = "<group>"; };
 		F6D167CB27C1287700DCC155 /* HvacModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HvacModeView.swift; sourceTree = "<group>"; };
 		F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPickerScrollView.swift; sourceTree = "<group>"; };
@@ -416,6 +433,7 @@
 			files = (
 				F67D771B2B5130CA00F52EB0 /* SwiftUI.framework in Frameworks */,
 				F67D77192B5130CA00F52EB0 /* WidgetKit.framework in Frameworks */,
+				F63F1A742B615D92006D8906 /* ShipBookSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -445,6 +463,7 @@
 			children = (
 				F63F502C2A4862AB003A7100 /* Websocket */,
 				F60345C027A7F33700212D04 /* Entity.swift */,
+				F63F1A712B615A8E006D8906 /* Coordinates.swift */,
 				F67C263C2AE118A100C22ADB /* SwitchEntity.swift */,
 				F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */,
 				F62CD2DF286D950A00462092 /* LightEntity.swift */,
@@ -507,6 +526,9 @@
 				F61BF99B2A1653E600C1802E /* YaleApiService.swift */,
 				F6FAD81B2A2A654900C0B364 /* WebsocketService.swift */,
 				F6FAD81D2A2A695600C0B364 /* WebsocketServiceDelegate.swift */,
+				F6C4CA8C2B5E72DE0037B777 /* GeofenceManager.swift */,
+				F63F1A792B625CAE006D8906 /* PreviewProvideUtilr.swift */,
+				F63F1A772B6255EE006D8906 /* NotificationService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -601,6 +623,7 @@
 				F662999527B4185D00121C14 /* BatteryView.swift */,
 				F662998F27B3AA5A00121C14 /* VerticalDivider.swift */,
 				F655F64F2B57D77D00620BCD /* NavigationButtonView.swift */,
+				F61726342B627512007C1E99 /* PrimaryContentBorderView.swift */,
 				F63D1C6E2B0A605C004294D9 /* ServiceButtonView.swift */,
 				F61BF9B12A16A01D00C1802E /* DashboardButtonView.swift */,
 				F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */,
@@ -810,6 +833,8 @@
 				F6F1D07D299390C500A3292E /* CalendarExtension.swift */,
 				F6830DE12904534200BBE36C /* CollectionExtension.swift */,
 				F6225E2D2AE265D600D32EF4 /* ColorExtension.swift */,
+				F6C4CA902B612E7C0037B777 /* ViewExtension.swift */,
+				F6C4CA8E2B6127E30037B777 /* LinearGradientExtension.swift */,
 				F664BA7329B48C510092CB2E /* DateExtension.swift */,
 				F64A38802B0F5E6900BA9FAC /* DoubleExtension.swift */,
 				F63F502F2A486650003A7100 /* EncodableExtension.swift */,
@@ -819,7 +844,8 @@
 				F666B5EF2B0E1F360057E8E3 /* StringExtension.swift */,
 				F6DBA4CF28E82D6A001BA1C0 /* TaskExtension.swift */,
 				F62750A82A00ED9500C1253F /* UINavigationController.swift */,
-				F658F3DC2B5A6ED300F7940D /* UserDefaultsExtension.swift */,
+				F658F3DC2B5A6ED300F7940D /* UserDefaultsExtensionShared.swift */,
+				F63F1A752B615DCC006D8906 /* UserDefaultsExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -909,6 +935,9 @@
 			dependencies = (
 			);
 			name = IntelliWidgetExtension;
+			packageProductDependencies = (
+				F63F1A732B615D92006D8906 /* ShipBookSDK */,
+			);
 			productName = IntelliWidgetExtension;
 			productReference = F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -1156,12 +1185,14 @@
 				F680EE5B2B0F4AC80055334C /* HomeViewModelExtension.swift in Sources */,
 				F6DBCBE02B278C27008F9846 /* ImageEntity.swift in Sources */,
 				F6225E2E2AE265D600D32EF4 /* ColorExtension.swift in Sources */,
+				F6C4CA8F2B6127E30037B777 /* LinearGradientExtension.swift in Sources */,
 				F6633F272860B90C004D0B76 /* QuickActionService.swift in Sources */,
 				F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */,
 				F67F6B4B28D8FB7F0003CE9F /* EniroInfoView.swift in Sources */,
 				F662999A27B7D8DA00121C14 /* HeaterEntity.swift in Sources */,
 				F666B5F02B0E1F360057E8E3 /* StringExtension.swift in Sources */,
 				F655F6502B57D77D00620BCD /* NavigationButtonView.swift in Sources */,
+				F6C4CA8D2B5E72DE0037B777 /* GeofenceManager.swift in Sources */,
 				F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */,
 				F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */,
 				F66F061727AEFC2300270E71 /* VerticalSlider.swift in Sources */,
@@ -1174,6 +1205,7 @@
 				F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */,
 				F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */,
 				F61BF9A62A166F9A00C1802E /* Lockable.swift in Sources */,
+				F61726352B627512007C1E99 /* PrimaryContentBorderView.swift in Sources */,
 				F6F1D08029A2174000A3292E /* EniroChargingLimitView.swift in Sources */,
 				F6633F38286328E8004D0B76 /* HorizontalModeView.swift in Sources */,
 				F6F1D08229A27A6100A3292E /* ImageExtension.swift in Sources */,
@@ -1181,8 +1213,10 @@
 				F6BB7DF0284A29A4007F44D0 /* RoborockMapImageView.swift in Sources */,
 				F62750A92A00ED9500C1253F /* UINavigationController.swift in Sources */,
 				F6FDBE2D2A1A2F970081BC3D /* URLRequestBuilder.swift in Sources */,
+				F6C4CA912B612E7C0037B777 /* ViewExtension.swift in Sources */,
 				F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */,
 				F60345D027ABB46900212D04 /* EniroView.swift in Sources */,
+				F63F1A782B6255EF006D8906 /* NotificationService.swift in Sources */,
 				F6FAD81A2A2A472000C0B364 /* CamerasViewModel.swift in Sources */,
 				F6633F3F28632C81004D0B76 /* RoborockInfoView.swift in Sources */,
 				F6633F4328632EED004D0B76 /* RoborockRoomsView.swift in Sources */,
@@ -1206,13 +1240,15 @@
 				F6633F3A28632954004D0B76 /* FanModeView.swift in Sources */,
 				F6EF35B92A3EC47200895250 /* UserManager.swift in Sources */,
 				F6591C032B07788600D5785E /* ServiceDataKeys.swift in Sources */,
+				F63F1A762B615DCC006D8906 /* UserDefaultsExtension.swift in Sources */,
 				F62542E62A5C5C7600B4DDD4 /* ServiceData.swift in Sources */,
 				F6EF35B32A3DFE3100895250 /* HeatersViewModelExtension.swift in Sources */,
 				F61BF9A02A166B2700C1802E /* LockID.swift in Sources */,
 				F63F50302A486650003A7100 /* EncodableExtension.swift in Sources */,
 				F61BF9A82A1672C300C1802E /* HTTPMethod.swift in Sources */,
+				F63F1A7A2B625CAE006D8906 /* PreviewProvideUtilr.swift in Sources */,
 				F60345D427ABE49100212D04 /* LightsView.swift in Sources */,
-				F658F3DD2B5A6ED300F7940D /* UserDefaultsExtension.swift in Sources */,
+				F658F3DD2B5A6ED300F7940D /* UserDefaultsExtensionShared.swift in Sources */,
 				F67F6B4D28DA36F70003CE9F /* EniroClimateView.swift in Sources */,
 				F62750A329FE756800C1253F /* HassAPIViewModelProtocol.swift in Sources */,
 				F624EF682A2B4AAB004AC6BA /* CamerasView.swift in Sources */,
@@ -1239,6 +1275,7 @@
 				F6F1D078299104CD00A3292E /* NordPoolEntity.swift in Sources */,
 				F669C72E2A23C08000458165 /* CameraViewModel.swift in Sources */,
 				F62750A129FE39B100C1253F /* Destination.swift in Sources */,
+				F63F1A722B615A8E006D8906 /* Coordinates.swift in Sources */,
 				F6F94B5E28B60DED006B1F12 /* EniroViewModel.swift in Sources */,
 				F6EF35AF2A3A33BE00895250 /* DateTimePickerView.swift in Sources */,
 				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
@@ -1266,7 +1303,7 @@
 				F646EB142B5C30DD002DBD98 /* HomeWidget.swift in Sources */,
 				F67D77222B5130CA00F52EB0 /* CarHeaterWidget.swift in Sources */,
 				F658F3E62B5A722000F7940D /* UserManager.swift in Sources */,
-				F658F3E72B5A722200F7940D /* UserDefaultsExtension.swift in Sources */,
+				F658F3E72B5A722200F7940D /* UserDefaultsExtensionShared.swift in Sources */,
 				F658F3E32B5A6F3800F7940D /* StorageKeys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1440,7 +1477,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1448,7 +1485,7 @@
 				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to handle geofence";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
@@ -1462,7 +1499,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1482,7 +1519,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1490,7 +1527,7 @@
 				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to handle geofence";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
@@ -1504,7 +1541,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1523,7 +1560,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1532,7 +1569,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1550,7 +1587,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1559,7 +1596,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1577,7 +1614,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1593,7 +1630,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1612,7 +1649,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1628,7 +1665,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1646,7 +1683,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1662,7 +1699,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1741,7 +1778,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1749,7 +1786,7 @@
 				INFOPLIST_FILE = "IntelliNest/Supporting Files/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = IntelliNest;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to get SSID";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to handle geofence";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
@@ -1763,7 +1800,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1782,7 +1819,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1791,7 +1828,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1807,7 +1844,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1821,7 +1858,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1837,7 +1874,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1851,7 +1888,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1867,7 +1904,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1881,7 +1918,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.01.21;
+				MARKETING_VERSION = 2024.01.25;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1966,6 +2003,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F63F1A732B615D92006D8906 /* ShipBookSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
+			productName = ShipBookSDK;
+		};
 		F669C7302A23D6DA00458165 /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */;

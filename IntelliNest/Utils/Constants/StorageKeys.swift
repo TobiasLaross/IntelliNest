@@ -8,6 +8,7 @@
 import Foundation
 
 enum StorageKeys: String {
+    case homeCoordinates
     case sarahPills
     case userInitials
     case yaleAccessToken

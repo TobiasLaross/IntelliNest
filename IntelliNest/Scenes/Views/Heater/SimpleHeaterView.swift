@@ -92,7 +92,6 @@ struct SimpleHeaterView: View {
                     }
                 }
             }
-            .background(Color.bodyColor)
             .padding(.horizontal, isTimerModeEnabled ? 10 : 0)
             .padding(.vertical, 0)
         }

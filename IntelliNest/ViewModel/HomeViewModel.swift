@@ -149,8 +149,7 @@ class HomeViewModel: ObservableObject {
 
     func checkLocationAccess() {
         Task { @MainActor in
-            let status = locationManager.authorizationStatus
-            noLocationAccess = status != .authorizedWhenInUse && status != .authorizedAlways
+            noLocationAccess = locationManager.authorizationStatus != .authorizedAlways
         }
     }
 

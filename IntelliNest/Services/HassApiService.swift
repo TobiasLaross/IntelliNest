@@ -46,7 +46,7 @@ class HassApiService: URLRequestBuilder {
         var updatedEntity: T
 
         do {
-            try await updatedEntity = self.get(entityId: entityId, entityType: entityType)
+            try await updatedEntity = get(entityId: entityId, entityType: entityType)
             return updatedEntity
         } catch EntityError.badRequest {
             Log.error("Failed to create request")
@@ -272,5 +272,28 @@ class HassApiService: URLRequestBuilder {
         }
 
         return UIImage(data: data)
+    }
+
+    func turnOnBoolEntity(_ entityID: EntityId, useExternalURL: Bool) {
+        setBoolEntity(entityID, useExternalURL: useExternalURL, path: "/api/services/input_boolean/turn_on")
+    }
+
+    func turnOffBoolEntity(_ entityID: EntityId, useExternalURL: Bool) {
+        setBoolEntity(entityID, useExternalURL: useExternalURL, path: "/api/services/input_boolean/turn_off")
+    }
+
+    private func setBoolEntity(_ entityID: EntityId, useExternalURL: Bool, path: String) {
+        Task {
+            let jsonData = createJSONData(json: [.entityID: entityID.rawValue])
+            let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
+                                                            path: path,
+                                                            jsonData: jsonData,
+                                                            method: .post,
+                                                            timeout: 1.0)
+            let request = createURLRequest(urlRequestParameters: urlRequestParameters)
+            if let request {
+                await sendRequest(request: request)
+            }
+        }
     }
 }

@@ -28,7 +28,8 @@ struct HorizontalButtonView: View {
             Group {
                 if let buttonTitle = buttonTitle {
                     if buttonTitle.count > 5 {
-                        Text(buttonTitle).font(.caption)
+                        Text(buttonTitle)
+                            .font(.caption)
                             .frame(width: 100, height: horizontalButtonHeight, alignment: .center)
                     } else if buttonTitle.count > 1 {
                         Text(buttonTitle).font(.body)
@@ -44,9 +45,10 @@ struct HorizontalButtonView: View {
                         .frame(width: 50, height: 50, alignment: .center)
                 }
             }
-            .background(isSelectedMode ? .yellow : .topBarColor)
-            .foregroundColor(isSelectedMode ? .black : .white)
-            .cornerRadius(horizontalButtonCornerRadius)
+            .foregroundColor(isSelectedMode ? .yellow : .white)
+            .overlay {
+                PrimaryContentBorderView(isSelected: isSelectedMode)
+            }
         }
     }
 

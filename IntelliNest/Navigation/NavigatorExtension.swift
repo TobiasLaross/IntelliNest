@@ -75,6 +75,12 @@ extension Navigator: WebSocketServiceDelegate {
         homeViewModel.reloadSonnenStatusBattery(sonnenStatusEntity)
         electricityViewModel.reloadSonnenStatusBattery(sonnenStatusEntity)
     }
+
+    func webSocketService(didReceiveCoodinates coordinates: Coordinates, for entityID: EntityId) {
+        if entityID == .homeLocation {
+            setHomeCoordinates(coordinates)
+        }
+    }
 }
 
 extension Navigator: URLCreatorDelegate {

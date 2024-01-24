@@ -22,7 +22,6 @@ struct ThermometerGroupView: View {
                 .padding(.horizontal)
             ThermometerView(thermometer: therm4)
         }
-        .background(Color.bodyColor)
     }
 }
 
