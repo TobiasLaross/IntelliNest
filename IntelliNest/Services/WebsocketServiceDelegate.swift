@@ -18,4 +18,5 @@ protocol WebSocketServiceDelegate: AnyObject {
     func webSocketService(didReceiveNordPoolEntity nordPoolEntity: NordPoolEntity)
     func webSocketService(didReceiveSonnenEntity sonnenEntity: SonnenEntity)
     func webSocketService(didReceiveSonnenStatusEntity sonnenStatusEntity: SonnenStatusEntity)
+    func webSocketService(didReceiveCoodinates: Coordinates, for entityID: EntityId)
 }

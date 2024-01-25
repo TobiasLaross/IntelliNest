@@ -30,21 +30,22 @@ struct FanModeButtonView: View {
                         image
                             .resizable()
                             .frame(width: imageSize, height: imageSize, alignment: .center)
-                            .colorMultiply(isSelectedFanMode ? .black : .white)
+                            .colorMultiply(isSelectedFanMode ? .yellow : .white)
                             .padding(.top)
                         Text(fanMode.rawValue.capitalized)
-                            .font(.system(size: dashboardButtonTitleSize))
+                            .font(.buttonFontLarge.bold())
                             .padding(.bottom)
                     }
                 } else {
                     Text(fanMode.rawValue)
-                        .font(.system(size: dashboardButtonBigTitleSize))
+                        .font(isSelectedFanMode ? .buttonFontExtraLarge.bold() : .buttonFontExtraLarge)
                 }
             }
             .frame(width: fanButtonSize, height: fanButtonSize, alignment: .center)
-            .background(isSelectedFanMode ? .yellow : .topBarColor)
-            .foregroundStyle(isSelectedFanMode ? .black : .white)
-            .cornerRadius(fanButtonCornerRadius)
+            .foregroundStyle(isSelectedFanMode ? .yellow : .white)
+            .overlay {
+                PrimaryContentBorderView(isSelected: isSelectedFanMode)
+            }
         }
     }
 }

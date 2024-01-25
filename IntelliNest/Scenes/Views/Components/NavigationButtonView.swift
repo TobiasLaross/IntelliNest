@@ -52,12 +52,12 @@ struct NavigationButtonView: View {
                     .foregroundColor(isActive ? .yellow : .white)
                 if buttonTitle.isNotEmpty {
                     Text(buttonTitle)
-                        .font(.circleButtonFontMedium)
+                        .font(.buttonFontMedium)
                         .foregroundColor(.white)
                 }
             }
             .frame(width: frameSize, height: frameSize, alignment: .center)
-            .background(Color.topBarColor)
+            .background(LinearGradient.buttonGradient)
             .cornerRadius(dashboardButtonCornerRadius)
         }
     }

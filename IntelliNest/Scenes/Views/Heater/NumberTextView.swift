@@ -22,8 +22,7 @@ struct NumberTextView: View {
                 selectedNewTarget = true
                 targetTemperature = index
             })
-            .foregroundColor(targetTemperature == index ?
-                .white : .gray)
+            .foregroundColor(targetTemperature == index ? .white : .white.opacity(0.667))
     }
 }
 

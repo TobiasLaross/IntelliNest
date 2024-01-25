@@ -27,7 +27,7 @@ private struct PowerView: View {
         }
         .overlay(alignment: .top) {
             Text(text)
-                .font(.circleButtonFontSmall)
+                .font(.buttonFontSmall)
                 .frame(width: 70)
                 .lineLimit(1)
                 .offset(y: -14)
@@ -119,7 +119,7 @@ struct ElectricityFlowView: View {
 
 #Preview {
     ElectricityFlowView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                         websocketService: .init(reloadConnectionAction: {})))
+                                         websocketService: PreviewProviderUtil.websocketService))
 }
 
 #Preview {

@@ -31,7 +31,6 @@ struct RoborockInfoView: View {
             })
             .padding(.leading)
         }
-        .background(Color.bodyColor)
     }
 }
 

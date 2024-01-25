@@ -8,15 +8,19 @@
 import SwiftUI
 
 extension Font {
-    static var circleButtonFontSmall: Font {
+    static var buttonFontSmall: Font {
         .system(size: 10)
     }
 
-    static var circleButtonFontMedium: Font {
+    static var buttonFontMedium: Font {
         .system(size: 12)
     }
 
-    static var circleButtonFontLarge: Font {
+    static var buttonFontLarge: Font {
         .system(size: 14)
+    }
+
+    static var buttonFontExtraLarge: Font {
+        .system(size: 24)
     }
 }

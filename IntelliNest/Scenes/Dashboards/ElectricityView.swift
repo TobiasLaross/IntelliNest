@@ -22,7 +22,7 @@ struct ElectricityView: View {
                     Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                     Mode: ***\(viewModel.sonnenBattery.operationMode.title)***
                     """)
-                    .font(.circleButtonFontMedium)
+                    .font(.buttonFontMedium)
                     .padding(.top, 8)
                     Spacer()
                 }
@@ -46,7 +46,7 @@ struct ElectricityView: View {
         FullScreenBackgroundOverlay()
         VStack {
             ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                             websocketService: .init(reloadConnectionAction: {})))
+                                             websocketService: PreviewProviderUtil.websocketService))
         }
     }
 }

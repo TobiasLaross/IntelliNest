@@ -38,7 +38,7 @@ struct ServiceButtonView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .frame(width: buttonWidth, height: buttonHeight)
-                    .foregroundStyle(Color.topBarColor)
+                    .foregroundStyle(LinearGradient.buttonGradient)
                     .overlay {
                         VStack {
                             if isLoading {
@@ -82,7 +82,7 @@ struct ServiceButtonView: View {
     }
 
     init(buttonTitle: String,
-         customFont: Font = .circleButtonFontMedium,
+         customFont: Font = .buttonFontMedium,
          isActive: Bool = false,
          activeColor: Color = .yellow,
          buttonWidth: CGFloat = 80,
@@ -110,7 +110,7 @@ struct ServiceButtonView: View {
     }
 
     init(buttonTitle: String,
-         customFont: Font = .circleButtonFontMedium,
+         customFont: Font = .buttonFontMedium,
          isActive: Bool = false,
          activeColor: Color = .yellow,
          buttonSize: CGFloat = 80,
@@ -137,7 +137,7 @@ struct ServiceButtonView: View {
     }
 
     init(buttonTitle: String,
-         customFont: Font = .circleButtonFontMedium,
+         customFont: Font = .buttonFontMedium,
          isActive: Bool = false,
          activeColor: Color = .yellow,
          buttonSize: CGFloat = 80,

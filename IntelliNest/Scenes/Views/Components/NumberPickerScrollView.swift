@@ -27,35 +27,37 @@ struct NumberPickerScrollView: View {
     var body: some View {
         HStack {
             ScrollViewReader { scrollView in
-                ZStack {
-                    Rectangle()
-                        .foregroundStyle(Color.topBarColor)
-                        .cornerRadius(dashboardButtonCornerRadius)
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(Array(stride(from: strideFrom,
-                                                 to: strideTo,
-                                                 by: strideStep)), id: \.self) { index in
-                                NumberTextView(pickerTextWidth: pickerTextWidth,
-                                               targetTemperature: $targetTemperature,
-                                               selectedNewTarget: $selectedNewNumber,
-                                               index: index, numberPickerFormat: NumberPickerScrollView.numberFormat)
-                                Rectangle().padding([.top, .bottom], 14).frame(width: 2).foregroundColor(.gray)
-                            }
-                        }
-                    }
-                    .onAppear {
-                        scrollView.scrollTo(targetTemperature, anchor: .center)
-                    }
-                    .onChange(of: targetTemperature) {
-                        scrollView.scrollTo(targetTemperature, anchor: .center)
-                        if selectedNewNumber {
-                            selectedNewNumber = false
-                            numberSelectedCallback(entityId, targetTemperature)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(Array(stride(from: strideFrom,
+                                             to: strideTo,
+                                             by: strideStep)), id: \.self) { index in
+                            NumberTextView(pickerTextWidth: pickerTextWidth,
+                                           targetTemperature: $targetTemperature,
+                                           selectedNewTarget: $selectedNewNumber,
+                                           index: index,
+                                           numberPickerFormat: NumberPickerScrollView.numberFormat)
+                            Rectangle()
+                                .padding([.top, .bottom], 14)
+                                .frame(width: 2)
+                                .foregroundColor(.gray)
                         }
                     }
                 }
                 .frame(width: pickerTextWidth * 3, height: 70, alignment: .leading)
+                .overlay {
+                    PrimaryContentBorderView(isSelected: false)
+                }
+                .onAppear {
+                    scrollView.scrollTo(targetTemperature, anchor: .center)
+                }
+                .onChange(of: targetTemperature) {
+                    scrollView.scrollTo(targetTemperature, anchor: .center)
+                    if selectedNewNumber {
+                        selectedNewNumber = false
+                        numberSelectedCallback(entityId, targetTemperature)
+                    }
+                }
             }
         }
     }

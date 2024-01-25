@@ -30,11 +30,11 @@ struct BatteryView: View {
                     Rectangle()
                         .frame(width: 0.25 * width, height: 0.07 * height, alignment: .center)
                         .padding(.bottom, -4)
-                        .foregroundStyle(Color.topBarColor)
+                        .foregroundStyle(.gray.opacity(0.4))
                     Rectangle()
-                        .fill(Color.topBarColor)
                         .frame(width: width, height: height, alignment: .bottom)
                         .cornerRadius(batteryCornerRadius)
+                        .foregroundStyle(.gray.opacity(0.4))
                         .padding(.top, -4)
                 }
                 Rectangle()
@@ -47,7 +47,8 @@ struct BatteryView: View {
             .rotationEffect(.degrees(degreeRotation))
             VStack {
                 if isCharging {
-                    Image(systemName: "bolt").foregroundColor(.yellow)
+                    Image(systemName: "bolt")
+                        .foregroundColor(.yellow)
                 }
                 Text("\(level)%")
                     .font(Font.headline.weight(.semibold))

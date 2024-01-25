@@ -9,7 +9,7 @@ import SwiftUI
 struct VerticalSlider<T: Slideable>: View {
     private let maxValue: Int = 254
     private let dragCoefficient: CGFloat = 1.8
-    private let darkGrayColorIntensity = 37.0
+    private let darkGrayColorIntensity = 57.0
     private let lightGrayColorIntensity = 201.0
     private var darkGrayColor: Color {
         Color(red: darkGrayColorIntensity / 255,
@@ -54,8 +54,12 @@ struct VerticalSlider<T: Slideable>: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
-                darkGrayColor
+                darkGrayColor.opacity(0.1)
                     .frame(width: geometry.size.width, height: geometry.size.height)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: geometry.size.width / 3.3)
+                            .stroke(.black, lineWidth: 1.0)
+                    }
                 lightGrayColor
                     .frame(width: geometry.size.width,
                            height: geometry.size.height * max(CGFloat(slideable.value(isSliding: isSliding)),

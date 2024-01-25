@@ -51,7 +51,7 @@ struct NordPoolHistoryView: View {
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                         }
-                        .foregroundStyle(Color.topBarColor)
+                        .foregroundStyle(Color.primaryContentBackground)
                         .frame(width: 75, height: 60)
                         .position(x: 170, y: -40)
                 }
@@ -66,7 +66,7 @@ struct NordPoolHistoryView: View {
                 }
             }
         }
-        .background(Color.topBarColor)
+        .background(Color.primaryContentBackground)
         .opacity(0.9)
     }
 

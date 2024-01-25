@@ -22,7 +22,7 @@ struct SonnenSettingsView: View {
                     viewModel.isShowingSonnenSettings = false
                 }
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.topBarColor, lineWidth: 8)
+                .stroke(Color.primaryContentBackground, lineWidth: 8)
                 .fill(Color.bodyColor)
                 .frame(width: 300, height: 180)
                 .overlay {
@@ -91,5 +91,5 @@ struct SonnenSettingsView: View {
 
 #Preview {
     SonnenSettingsView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                        websocketService: .init(reloadConnectionAction: {})))
+                                        websocketService: PreviewProviderUtil.websocketService))
 }

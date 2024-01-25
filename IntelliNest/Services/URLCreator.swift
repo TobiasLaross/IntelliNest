@@ -17,12 +17,15 @@ enum ConnectionState {
 }
 
 class URLCreator: ObservableObject, URLRequestBuilder {
-    @Published var connectionState = ConnectionState.unset { didSet {
-        delegate?.connectionStateChanged(state: connectionState)
-        if connectionState == .local {
-            delegate?.baseURLChanged(urlString: GlobalConstants.baseInternalUrlString)
+    @Published var connectionState = ConnectionState.unset {
+        didSet {
+            delegate?.connectionStateChanged(state: connectionState)
+            if connectionState == .local {
+                delegate?.baseURLChanged(urlString: GlobalConstants.baseInternalUrlString)
+            }
         }
-    }}
+    }
+
     weak var delegate: URLCreatorDelegate?
 
     var nextUpdate = Date().addingTimeInterval(-1)
@@ -39,7 +42,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
     }
 
     @MainActor
-    func updateConnectionState() async {
+    func updateConnectionState(ignoreLocalSSID: Bool = false) async {
         guard connectionState != .loading else {
             return
         }
@@ -50,7 +53,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
         connectionState = .loading
         nextUpdate = Date().addingTimeInterval(1)
 
-        if GlobalConstants.shouldUseLocalSSID {
+        if GlobalConstants.shouldUseLocalSSID && !ignoreLocalSSID {
             let ssid = await SSIDUtil.getCurrentSSID()
             if ssid == GlobalConstants.localSSID {
                 connectionState = .local
@@ -112,7 +115,6 @@ class URLCreator: ObservableObject, URLRequestBuilder {
                     try await self.session.data(for: request)
                 }
                 connectionState = .local
-
             } catch {
                 retryWithExternalURL()
             }
