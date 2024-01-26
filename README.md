@@ -1,8 +1,9 @@
 # IntelliNest
 
 ## Description
-IntelliNest is a native iOS application that leverages the power of the popular open-source home automation platform, Home Assistant, to control a variety of smart home devices and aims to replace the web-based Home Assitant app. The application is written in Swift/SwiftUI. My hope is that this repo will help you create your own native iOS app, I think the easiest approach is to familiarise yourself with this repo and then remove the views/viewmodels and start building your own based on the same architecture as this app. 
-With chatGPT I think this would be doable even if you are not a iOS developer but you will need some experience in software development.
+<img align="right" src="Images/Icon.png" alt="App icon" width="200" height="200"/>
+IntelliNest is a native iOS application that leverages the power of the popular open-source home automation platform, Home Assistant, to control various smart home devices. It aims to replace the web-based Home Assitant app. The application is written in Swift/SwiftUI. I hope that this repo will help you create your own native iOS app, I think the easiest approach is to familiarise yourself with this repo and then remove the views/viewmodels and start building your own based on the same architecture as this app. With chatGPT, I think this would be doable even if you are not an iOS developer but will need some software development experience.
+
 
 ## Code statistics
 | Indicators                          | Now  | Desired |
