@@ -70,7 +70,7 @@ Sliders to set the brightness, tappable sliders, and bulb button above each room
 ### Widgets
 Launch home screen or start car climate
  <div style="display: flex; justify-content: space-around;">
-  <img src="Images/Widget.PNG" alt="Widget Image" width="120" height="50"/>
+  <img src="Images/Widget.jpg" alt="Widget Image" width="120" height="50"/>
  </div>
 ### NFC tags
 Set up automation in Shortcuts that call the intent in app (Storage lock and toggle monitor)
