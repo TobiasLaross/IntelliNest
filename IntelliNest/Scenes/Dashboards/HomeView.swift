@@ -232,7 +232,7 @@ private struct ServiceButtonsView: View {
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
         let hassApiService = HassApiService(urlCreator: URLCreator())
-        let viewModel = HomeViewModel(websocketService: .init(reloadConnectionAction: {}, reloadBaseURLAction: {}),
+        let viewModel = HomeViewModel(websocketService: PreviewProviderUtil.websocketService,
                                       yaleApiService: YaleApiService(hassApiService: hassApiService),
                                       urlCreator: URLCreator(),
                                       showHeatersAction: {},

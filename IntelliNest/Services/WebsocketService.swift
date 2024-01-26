@@ -36,15 +36,20 @@ class WebSocketService {
         }
     }
 
-    var isAuthenticated = false
+    var isAuthenticated = false {
+        didSet {
+            if isAuthenticated {
+                sendGetStatesRequest()
+            }
+        }
+    }
+
     var baseURLString = ""
     private let ignoredErrorMessages = ["The network connection was lost", "abort", "Socket is not connected"]
 
     private var reloadConnectionAction: VoidClosure
-    private var reloadBaseURLAction: VoidClosure
-    init(reloadConnectionAction: @escaping VoidClosure, reloadBaseURLAction: @escaping VoidClosure) {
+    init(reloadConnectionAction: @escaping VoidClosure) {
         self.reloadConnectionAction = reloadConnectionAction
-        self.reloadBaseURLAction = reloadBaseURLAction
     }
 
     func baseURLChanged(urlString: String) {
@@ -66,12 +71,22 @@ class WebSocketService {
             socket = WebSocket(request: request)
             socket?.delegate = self
             socket?.connect()
+        } else if !isAuthenticated {
+            socket?.connect()
         }
     }
 
     func getNextRequestID() -> Int {
         requestID += 1
         return requestID
+    }
+
+    func connect() {
+        socket?.connect()
+    }
+
+    func disconnect() {
+        socket?.disconnect()
     }
 
     private func sendJSONCommand<T: Encodable>(_ command: T, requestID: Int? = nil) {
@@ -97,37 +112,33 @@ class WebSocketService {
 }
 
 extension WebSocketService: WebSocketDelegate {
-    func didReceive(event: WebSocketEvent, client: WebSocket) {
+    func didReceive(event: WebSocketEvent, client: WebSocketClient) {
         switch event {
         case .text(let string):
             didReceive(text: string)
         case .disconnected:
+            isAuthenticated = false
             socket?.connect()
-        case .ping(let data):
-            if let data {
-                socket?.write(pong: data)
-                recentlySentRequests.append("Pong")
-            } else {
-                Log.error("Received ping with data set to nil")
-            }
         case .error(let error):
+            isAuthenticated = false
             handleWebSocketError(error)
-        default:
-            print("Unhandled websocket log: \(event)")
+        case .binary(let data):
+            print("Received data: \(data.count)")
+        case .cancelled, .peerClosed:
+            isAuthenticated = false
+        case .reconnectSuggested, .connected, .ping, .pong, .viabilityChanged:
+            break
         }
     }
 
     private func handleWebSocketError(_ error: Error?) {
-        isAuthenticated = false
         reloadConnectionAction()
-        socket?.connect()
         let errorMessage = String(describing: error)
         if let wsError = error as? Starscream.WSError, wsError.type == .securityError {
             Log.error("Websocket security error: \(wsError.message)")
             logRecentlySentRequests()
         } else if let darwinError = error as? POSIXError, darwinError.code == .ECONNABORTED {
             recentlySentRequests.removeAll()
-            reloadBaseURLAction()
         } else if let darwinError = error as? POSIXError, darwinError.code == .ENOTCONN {
             let lastSentRequest = recentlySentRequests.removeLast()
             requests.append(lastSentRequest)
@@ -195,7 +206,6 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     private func onAuthenticationSuccessful() {
-        sendGetStatesRequest()
         isAuthenticated = true
         sendRequests()
         subscribe()
