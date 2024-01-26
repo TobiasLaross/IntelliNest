@@ -61,7 +61,7 @@ struct ToolbarReloadButtonView: View {
                 if let reloadAction {
                     await reloadAction()
                 } else if let navigator {
-                    await navigator.updateConnectionState()
+                    await navigator.reloadConnection()
                     await navigator.reload(for: destination)
                 } else {
                     Log.error("Missing reload action in ToolbarReloadButton for \(destination)")

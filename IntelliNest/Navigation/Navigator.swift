@@ -19,7 +19,6 @@ class Navigator: ObservableObject {
         navigationPath.last ?? .home
     }
 
-    private var reloadedConnectionDate = Date.distantPast
     private var homeCoordinates: Coordinates?
     private lazy var geoFenceManager = GeofenceManager(didEnterHomeAction: { [weak self] in
                                                            self?.didEnterHome()
@@ -29,13 +28,10 @@ class Navigator: ObservableObject {
                                                        })
 
     lazy var webSocketService = WebSocketService(reloadConnectionAction: { [weak self] in
-                                                     self?.reloadConnection()
-                                                 },
-                                                 reloadBaseURLAction: { [weak self] in
-                                                     Task {
-                                                         await self?.urlCreator.updateConnectionState(ignoreLocalSSID: true)
-                                                     }
-                                                 })
+        Task { [weak self] in
+            await self?.urlCreator.updateConnectionState(ignoreLocalSSID: true)
+        }
+    })
     lazy var hassApiService = HassApiService(urlCreator: urlCreator)
     lazy var yaleApiService = YaleApiService(hassApiService: hassApiService)
     lazy var homeViewModel = HomeViewModel(websocketService: webSocketService,
@@ -133,7 +129,7 @@ class Navigator: ObservableObject {
                 } else {
                     navigationPath.append(destination)
                 }
-                async let updateConnectionStateTask = Task { await updateConnectionState() }
+                async let updateConnectionStateTask = Task { await urlCreator.updateConnectionState() }
                 async let reloadCurrentModelTask = Task { await reloadCurrentModel() }
 
                 await updateConnectionStateTask.value
@@ -175,23 +171,20 @@ class Navigator: ObservableObject {
     func didEnterForeground() {
         electricityViewModel.isViewActive = currentDestination == .electricity
         Task {
-            await reloadCurrentModel()
+            await reloadConnection()
+            await reload(for: currentDestination)
         }
     }
 
     func didResignForeground() {
         electricityViewModel.isViewActive = false
+        webSocketService.disconnect()
     }
 
     @MainActor
     func reloadCurrentModel() async {
-        reloadConnection()
+        await reloadConnection()
         await reload(for: currentDestination)
-    }
-
-    @MainActor
-    func updateConnectionState() async {
-        await urlCreator.updateConnectionState()
     }
 
     func setHomeCoordinates(_ homeCoordinates: Coordinates) {
@@ -200,6 +193,11 @@ class Navigator: ObservableObject {
             self.homeCoordinates = homeCoordinates
             UserDefaults.standard.setCoordinates(homeCoordinates, forKey: StorageKeys.homeCoordinates)
         }
+    }
+
+    @MainActor
+    func reloadConnection(ignoreLocalSSID: Bool = false) async {
+        await urlCreator.updateConnectionState(ignoreLocalSSID: false)
     }
 
     private func showCamerasView() -> CamerasView {
@@ -273,18 +271,6 @@ class Navigator: ObservableObject {
                                                      message: errorMessage,
                                                      identifier: "Geofence-yale-failure")
             }
-        }
-    }
-
-    @MainActor
-    private func reloadConnection() {
-        Task {
-            if reloadedConnectionDate.timeIntervalSinceNow > -0.5 {
-                try? await Task.sleep(seconds: 0.5)
-            }
-
-            await updateConnectionState()
-            reloadedConnectionDate = Date()
         }
     }
 }

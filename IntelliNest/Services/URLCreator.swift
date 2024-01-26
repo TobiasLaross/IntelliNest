@@ -74,12 +74,13 @@ class URLCreator: ObservableObject, URLRequestBuilder {
     }
 
     private func retryWithExternalURL() {
+        delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
+
         Task { @MainActor in
             let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
                                                             path: apiPath,
                                                             method: .get,
                                                             timeout: 3)
-            delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
             let remoteRequest = createURLRequest(urlRequestParameters: urlRequestParameters)
             if let remoteRequest {
                 do {

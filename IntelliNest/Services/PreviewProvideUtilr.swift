@@ -8,7 +8,7 @@
 import Foundation
 
 class PreviewProviderUtil {
-    static var websocketService = WebSocketService(reloadConnectionAction: {}, reloadBaseURLAction: {})
+    static var websocketService = WebSocketService(reloadConnectionAction: {})
 
     private init() {}
 }
