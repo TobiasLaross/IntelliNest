@@ -243,9 +243,7 @@ struct Home_Previews: PreviewProvider {
                                       showLightsAction: {},
                                       toolbarReloadAction: {})
 
-        VStack {
-            HomeView(viewModel: viewModel)
-                .backgroundModifier()
-        }
+        HomeView(viewModel: viewModel)
+            .backgroundModifier()
     }
 }

@@ -17,12 +17,14 @@ struct ElectricityView: View {
                     ElectricityFlowView(viewModel: viewModel)
                         .frame(width: 230)
                         .padding([.top, .leading], 16)
-                    Text("""
-                    Kostnad idag: ***\(viewModel.tibberCostToday.state.toKr)***
-                    Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
-                    Mode: ***\(viewModel.sonnenBattery.operationMode.title)***
-                    """)
+                    Group {
+                        Text("Kostnad idag: ") + Text("\(viewModel.tibberCostToday.state.toKr)").bold() +
+                            Text("\nKöpt idag: ") + Text("\(viewModel.pulseConsumptionToday.state.toKWh)").bold() +
+                            Text("\nMode: ") + Text("\(viewModel.sonnenBattery.operationMode.title)").bold()
+                    }
                     .font(.buttonFontMedium)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.1)
                     .padding(.top, 8)
                     Spacer()
                 }
@@ -42,11 +44,9 @@ struct ElectricityView: View {
 }
 
 #Preview {
-    ZStack {
-        FullScreenBackgroundOverlay()
-        VStack {
-            ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                             websocketService: PreviewProviderUtil.websocketService))
-        }
+    VStack {
+        ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
+                                         websocketService: PreviewProviderUtil.websocketService))
+            .backgroundModifier()
     }
 }

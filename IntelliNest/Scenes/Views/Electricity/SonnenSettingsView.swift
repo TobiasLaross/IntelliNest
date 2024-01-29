@@ -22,9 +22,8 @@ struct SonnenSettingsView: View {
                     viewModel.isShowingSonnenSettings = false
                 }
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.primaryContentBackground, lineWidth: 8)
-                .fill(Color.bodyColor)
-                .frame(width: 300, height: 180)
+                .fill(Color.primaryContentBackground)
+                .frame(width: 300, height: 200)
                 .overlay {
                     VStack(spacing: 8) {
                         Group {

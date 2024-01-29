@@ -10,7 +10,7 @@ import SwiftUI
 struct FullScreenBackgroundOverlay: View {
     var body: some View {
         Rectangle()
-            .foregroundColor(Color.bodyColor)
+            .foregroundStyle(Color.bodyColor)
             .opacity(0.5)
             .edgesIgnoringSafeArea(.bottom)
     }

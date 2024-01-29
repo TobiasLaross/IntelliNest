@@ -17,7 +17,6 @@ struct DashboardButtonView: View {
     var iconWidth: CGFloat
     var iconHeight: CGFloat
     var iconForegroundColor: Color
-    var backgroundColor: Color
     var isLoading: Bool
     let indicatorIcon: Image?
     let buttonFrameWidth: CGFloat
@@ -32,7 +31,6 @@ struct DashboardButtonView: View {
          iconWidth: CGFloat = dashboardButtonImageSize,
          iconHeight: CGFloat = dashboardButtonImageSize,
          iconForegroundColor: Color = .white,
-         backgroundColor: Color = .primaryContentBackground,
          circleSize: CGFloat = dashboardCircleButtonFrameSize,
          isLoading: Bool = false,
          indicatorIcon: Image? = nil,
@@ -47,7 +45,6 @@ struct DashboardButtonView: View {
         self.iconWidth = iconWidth
         self.iconHeight = iconHeight
         self.iconForegroundColor = iconForegroundColor
-        self.backgroundColor = backgroundColor
         self.isLoading = isLoading
         self.indicatorIcon = indicatorIcon
         self.buttonFrameWidth = buttonFrameWidth
