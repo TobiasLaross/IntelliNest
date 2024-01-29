@@ -19,7 +19,7 @@ extension Color {
     static let backgroundOverlay = Color.black.opacity(0.4)
     static let bodyColor = appIconBlue.opacity(0.1)
 
-    static let primaryContentBackground = Color.clear
+    static let primaryContentBackground = blend(appIconDark, with: .black, ratio: 0.3)
     static let primaryContentBorder = Color.black.opacity(0.4)
     static let primaryContentSelectedBorder = Color.yellow
 

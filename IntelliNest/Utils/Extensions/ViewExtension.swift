@@ -15,8 +15,11 @@ extension View {
                                          .init(color: .appIconBlue.opacity(0.5), location: 0.9),
                                          .init(color: .appIconGreen.opacity(0.4), location: 1.1)])
         return background(
-            LinearGradient(gradient: gradients, startPoint: .top, endPoint: .bottom)
-                .edgesIgnoringSafeArea(.all)
+            ZStack {
+                Color.black
+                LinearGradient(gradient: gradients, startPoint: .top, endPoint: .bottom)
+            }
+            .edgesIgnoringSafeArea(.all)
         )
     }
 }
