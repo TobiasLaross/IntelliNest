@@ -46,7 +46,7 @@ struct ElectricityView: View {
 #Preview {
     VStack {
         ElectricityView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                         websocketService: PreviewProviderUtil.websocketService))
+                                         restAPIService: PreviewProviderUtil.restAPIService))
             .backgroundModifier()
     }
 }

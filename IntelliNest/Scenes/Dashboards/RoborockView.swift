@@ -8,11 +8,7 @@
 import SwiftUI
 
 struct RoborockView: View {
-    @ObservedObject private var viewModel: RoborockViewModel
-
-    init(viewModel: RoborockViewModel) {
-        self.viewModel = viewModel
-    }
+    @ObservedObject var viewModel: RoborockViewModel
 
     var body: some View {
         ZStack {
@@ -96,6 +92,6 @@ struct RoborockView: View {
 
 struct Roborock_Previews: PreviewProvider {
     static var previews: some View {
-        RoborockView(viewModel: .init(websocketService: PreviewProviderUtil.websocketService))
+        RoborockView(viewModel: .init(restAPIService: PreviewProviderUtil.restAPIService))
     }
 }

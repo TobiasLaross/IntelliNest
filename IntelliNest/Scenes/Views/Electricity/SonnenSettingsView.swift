@@ -66,7 +66,7 @@ struct SonnenSettingsView: View {
                                     viewModel.charge(watt: selectedWatt)
                                 })
                                 ServiceButtonView(buttonTitle: "Discharge", buttonWidth: 75, buttonHeight: 40, cornerRadius: 20, action: {
-                                    viewModel.charge(watt: selectedWatt)
+                                    viewModel.discharge(watt: selectedWatt)
                                 })
 
                                 Spacer()
@@ -90,5 +90,5 @@ struct SonnenSettingsView: View {
 
 #Preview {
     SonnenSettingsView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                        websocketService: PreviewProviderUtil.websocketService))
+                                        restAPIService: PreviewProviderUtil.restAPIService))
 }

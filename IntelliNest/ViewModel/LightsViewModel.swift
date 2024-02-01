@@ -36,9 +36,9 @@ class LightsViewModel: ObservableObject {
     let guestroomName = "Gästrummet"
     let laundryRoomName = "Tvättstugan"
 
-    private var websocketService: WebSocketService
-    init(websocketService: WebSocketService) {
-        self.websocketService = websocketService
+    private var restAPIService: RestAPIService
+    init(restAPIService: RestAPIService) {
+        self.restAPIService = restAPIService
     }
 
     @MainActor
@@ -90,7 +90,7 @@ class LightsViewModel: ObservableObject {
                 lightIDs.insert(contentsOf: groupedLightIDs, at: 0)
             }
 
-            websocketService.updateLights(lightIDs: lightIDs, action: action, brightness: light.brightness)
+            restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness)
         }
     }
 
@@ -104,7 +104,12 @@ class LightsViewModel: ObservableObject {
                 action = .turnOff
             }
 
-            websocketService.updateLights(lightIDs: [light.entityId], action: action, brightness: light.brightness)
+            var lightIDs = [light.entityId]
+            if let groupedLightIDs = light.groupedLightIDs {
+                lightIDs.insert(contentsOf: groupedLightIDs, at: 0)
+            }
+
+            restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness)
         }
     }
 }

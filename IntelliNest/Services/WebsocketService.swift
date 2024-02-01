@@ -145,10 +145,6 @@ extension WebSocketService: WebSocketDelegate {
         } else if !ignoredErrorMessages.contains(errorMessage) {
             Log.error("Websocket error: \(String(describing: error))")
             logRecentlySentRequests()
-        } else { // TODO: Temporarily log ignored messages
-            let lastSentRequest = recentlySentRequests.removeLast()
-            requests.append(lastSentRequest)
-            Log.error("Websocket error: \(String(describing: error)), last sent request: \(lastSentRequest)")
         }
     }
 

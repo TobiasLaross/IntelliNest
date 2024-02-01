@@ -44,7 +44,7 @@ class HomeViewModel: ObservableObject {
                                  .dryerCompletionTime, .washerState, .dryerState, .easeeCharger,
                                  .generalWasteDate, .plasticWasteDate]
 
-    private var websocketService: WebSocketService
+    private var restAPIService: RestAPIService
     private let locationManager = CLLocationManager()
     let yaleApiService: YaleApiService
     var urlCreator: URLCreator
@@ -56,7 +56,7 @@ class HomeViewModel: ObservableObject {
     let showLightsAction: MainActorVoidClosure
     private(set) var toolbarReloadAction: MainActorAsyncVoidClosure
 
-    init(websocketService: WebSocketService,
+    init(restAPIService: RestAPIService,
          yaleApiService: YaleApiService,
          urlCreator: URLCreator,
          showHeatersAction: @escaping MainActorVoidClosure,
@@ -66,7 +66,7 @@ class HomeViewModel: ObservableObject {
          showCamerasAction: @escaping MainActorVoidClosure,
          showLightsAction: @escaping MainActorVoidClosure,
          toolbarReloadAction: @escaping MainActorAsyncVoidClosure) {
-        self.websocketService = websocketService
+        self.restAPIService = restAPIService
         self.yaleApiService = yaleApiService
         self.urlCreator = urlCreator
         self.showHeatersAction = showHeatersAction
@@ -93,58 +93,53 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    func toggle(light: LightEntity) {
-        let action: Action = light.isActive ? .turnOff : .turnOn
-        websocketService.updateLights(lightIDs: [light.entityId], action: action, brightness: light.brightness)
-    }
-
-    func turnOffLight(_ light: LightEntity) {
-        websocketService.updateLights(lightIDs: [light.entityId], action: .turnOff, brightness: 0)
+    func turnOffAllLights() {
+        restAPIService.update(lightIDs: [.allLights], action: .turnOff, brightness: 0)
     }
 
     func toggleStateForSarahsIphone() {
         let action: Action = sarahsIphone.isActive ? .turnOff : .turnOn
-        websocketService.updateEntity(entityID: .hittaSarahsIphone, domain: .script, action: action)
+        restAPIService.update(entityID: .hittaSarahsIphone, domain: .script, action: action)
     }
 
     func toggleCoffeeMachine() {
         let action: Action = coffeeMachine.isActive ? .turnOff : .turnOn
-        websocketService.updateEntity(entityID: .coffeeMachine, domain: .switchDomain, action: action)
+        restAPIService.update(entityID: .coffeeMachine, domain: .switchDomain, action: action)
     }
 
     func showCoffeeMachineScheduling() {
-        if !coffeeMachineStartTimeEnabled.isActive {
-            toggleCoffeeMachineStarTimeEnabled()
-        }
+        Task { @MainActor in
+            if !coffeeMachineStartTimeEnabled.isActive {
+                toggleCoffeeMachineStarTimeEnabled()
+            }
 
-        shouldShowCoffeeMachineScheduling = true
+            shouldShowCoffeeMachineScheduling = true
+        }
     }
 
     func updateDateTimeEntity(entity: Entity) {
-        websocketService.updateDateTimeEntity(entity: entity)
+        restAPIService.update(dateEntityID: entity.entityId, date: entity.date)
     }
 
     func toggleCoffeeMachineStarTimeEnabled() {
         let action: Action = coffeeMachineStartTimeEnabled.isActive ? .turnOff : .turnOn
-        websocketService.updateEntity(entityID: .coffeeMachineStartTimeEnabled, domain: .inputBoolean, action: action)
+        restAPIService.update(entityID: .coffeeMachineStartTimeEnabled, domain: .inputBoolean, action: action)
     }
 
     func toggleStateForStorageLock() {
         let action: Action = storageLock.lockState == .unlocked ? .lock : .unlock
         storageLock.expectedState = action == .lock ? .locked : .unlocked
-        websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
+        restAPIService.update(entityID: .storageLock, domain: .lock, action: action)
     }
 
     func lockStorage() {
-        let action: Action = .lock
         storageLock.expectedState = .locked
-        websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
+        restAPIService.update(entityID: .storageLock, domain: .lock, action: .lock)
     }
 
     func unlockStorage() {
-        let action: Action = .unlock
         storageLock.expectedState = .unlocked
-        websocketService.updateEntity(entityID: .storageLock, domain: .lock, action: action)
+        restAPIService.update(entityID: .storageLock, domain: .lock, action: .unlock)
     }
 
     func checkLocationAccess() {

@@ -49,7 +49,7 @@ extension URLRequestBuilder {
                 }
                 jsonStringKeys[key.rawValue] = nestedJsonStringKeys
             } else {
-                jsonStringKeys[key.rawValue] = json[key]
+                jsonStringKeys[key.rawValue] = stringifyDateIfNeeded(value: json[key])
             }
         }
         return try? JSONSerialization.data(withJSONObject: jsonStringKeys)
@@ -91,8 +91,27 @@ extension URLRequestBuilder {
         return request
     }
 
-    func createURLRequest(path: String, jsonData: Data? = nil, queryParams: [String: String]? = nil, method: HTTPMethod) -> URLRequest? {
-        let urlRequestParameters = URLRequestParameters(path: path, jsonData: jsonData, queryParams: queryParams, method: method)
+    func createURLRequest(shouldForceExternalURL: Bool = false,
+                          path: String,
+                          jsonData: Data? = nil,
+                          queryParams: [String: String]? = nil,
+                          method: HTTPMethod) -> URLRequest? {
+        let forceExternalURLString = shouldForceExternalURL ? GlobalConstants.baseExternalUrlString : nil
+        let urlRequestParameters = URLRequestParameters(forceURLString: forceExternalURLString,
+                                                        path: path,
+                                                        jsonData: jsonData,
+                                                        queryParams: queryParams,
+                                                        method: method)
         return createURLRequest(urlRequestParameters: urlRequestParameters)
+    }
+
+    private func stringifyDateIfNeeded(value: Any?) -> Any? {
+        if let date = value as? Date {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+            return formatter.string(from: date)
+        }
+
+        return value
     }
 }

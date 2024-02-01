@@ -20,10 +20,11 @@ enum AppLauncher {
 
 struct AppMain: App {
     @State var shouldShowSelectUserActionSheet = false
+    @State private var bannerOffset = -200.0
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    private let actionService = QuickActionService.shared
     @Environment(\.scenePhase) var scenePhase
     @StateObject private var navigator = Navigator()
+    private let actionService = QuickActionService.shared
 
     var body: some Scene {
         WindowGroup {
@@ -47,32 +48,56 @@ struct AppMain: App {
                             .navigationBarItems(leading: ToolbarBackButton())
                     }
                     .navigationBarTitleDisplayMode(.inline)
-                    .onChange(of: scenePhase) {
-                        if scenePhase == .active {
-                            navigator.didEnterForeground()
-                            performActionIfNeeded()
-                        } else {
-                            navigator.didResignForeground()
-                        }
+            }
+            .overlay {
+                VStack {
+                    if let errorBannerTitle = navigator.errorBannerTitle,
+                       let errorBannerMessage = navigator.errorBannerMessage {
+                        ErrorBannerView(title: errorBannerTitle, message: errorBannerMessage)
+                            .offset(y: bannerOffset)
+                            .animation(.spring(), value: bannerOffset)
+                            .onTapGesture {
+                                dismissBanner()
+                            }
+                            .gesture(
+                                DragGesture(minimumDistance: 10)
+                                    .onEnded { _ in
+                                        dismissBanner()
+                                    })
+                            .onAppear {
+                                withAnimation {
+                                    bannerOffset = 0
+                                }
+                            }
+                        Spacer()
                     }
-                    .onAppear {
+                }
+            }
+            .onChange(of: scenePhase) {
+                if scenePhase == .active {
+                    navigator.didEnterForeground()
+                    performActionIfNeeded()
+                } else {
+                    navigator.didResignForeground()
+                }
+            }
+            .onAppear {
+                Task {
+                    await navigator.reloadCurrentModel()
+                }
+                if UserManager.shared.isUserNotSet {
+                    shouldShowSelectUserActionSheet = true
+                }
+            }
+            .actionSheet(isPresented: $shouldShowSelectUserActionSheet) {
+                ActionSheet(title: Text("Välj användare"), buttons: User.allCases.filter { $0 != .unknownUser }.map { user in
+                    .default(Text(user.name)) {
+                        UserManager.shared.setUser(user)
                         Task {
                             await navigator.reloadCurrentModel()
                         }
-                        if UserManager.shared.isUserNotSet {
-                            shouldShowSelectUserActionSheet = true
-                        }
                     }
-                    .actionSheet(isPresented: $shouldShowSelectUserActionSheet) {
-                        ActionSheet(title: Text("Välj användare"), buttons: User.allCases.filter({ $0 != .unknownUser }).map { user in
-                            .default(Text(user.name)) {
-                                UserManager.shared.setUser(user)
-                                Task {
-                                    await navigator.reloadCurrentModel()
-                                }
-                            }
-                        } + [.cancel()])
-                    }
+                } + [.cancel()])
             }
             .onOpenURL { url in
                 if url.scheme == "IntelliNest", let path = url.host {
@@ -102,6 +127,17 @@ struct AppMain: App {
 
         // 3
         actionService.action = nil
+    }
+
+    private func dismissBanner() {
+        withAnimation {
+            bannerOffset = -200
+        }
+        Task { @MainActor in
+            try? await Task.sleep(seconds: 0.5)
+            navigator.errorBannerTitle = nil
+            navigator.errorBannerMessage = nil
+        }
     }
 }
 

@@ -9,9 +9,11 @@ import Foundation
 
 typealias VoidClosure = () -> Void
 typealias MainActorVoidClosure = @MainActor () -> Void
+typealias MainActorEntityIDClosure = @MainActor (EntityId) -> Void
 typealias AsyncVoidClosure = () async -> Void
 typealias MainActorAsyncVoidClosure = @MainActor () async -> Void
 typealias StringClosure = (String) -> Void
+typealias StringStringClosure = (String, String) -> Void
 typealias DoubleClosure = (Double) -> Void
 typealias HeaterDoubleClosure = @MainActor (HeaterEntity, Double) -> Void
 typealias HeaterStringClosure = @MainActor (HeaterEntity, HvacMode) -> Void

@@ -17,9 +17,9 @@ class CamerasViewModel: ObservableObject {
     }}
     var snapshotTask: Task<Void, Error>?
     let websocketService: WebsocketServiceProtocol
-    let apiService: HassApiService
+    let apiService: RestAPIService
 
-    init(urlCreator: URLCreator, websocketService: WebsocketServiceProtocol, apiService: HassApiService) {
+    init(urlCreator: URLCreator, websocketService: WebsocketServiceProtocol, apiService: RestAPIService) {
         self.urlCreator = urlCreator
         self.websocketService = websocketService
         self.apiService = apiService

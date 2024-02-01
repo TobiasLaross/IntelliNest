@@ -23,16 +23,14 @@ enum Action: String, Codable {
     case stop
     case start
     case setDateTime = "set_datetime"
+    case setValue = "set_value"
     case setVaneHorizontal = "set_vane_horizontal"
     case setVaneVertical = "set_vane_vertical"
-    case setValue = "set_value"
-}
-
-enum ClimateAction: String, Decodable {
+    case setFanMode = "set_fan_mode"
     case setTemperature = "set_temperature"
     case setHvacMode = "set_hvac_mode"
-}
-
-enum ClimateScheduleAction: String, Decodable {
-    case setDateTime = "set_datetime"
+    case updateEntity = "update_entity"
+    case sonnenOperationMode = "sonnen_put_config_operation_mode"
+    case sonnenCharge = "sonnen_charge"
+    case sonnenDischarge = "sonnen_discharge"
 }
