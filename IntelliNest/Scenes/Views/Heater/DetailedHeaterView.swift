@@ -18,11 +18,6 @@ struct DetailedHeaterView: View {
 
     var body: some View {
         VStack {
-            Text("\(heater.heaterName)")
-                .font(.title)
-                .padding([.top, .bottom])
-                .foregroundColor(.white)
-
             Text("Fläkt")
                 .font(.title2)
                 .foregroundColor(.white)

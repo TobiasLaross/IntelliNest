@@ -54,11 +54,11 @@ class EniroViewModel: ObservableObject {
         isAirConditionActive ? .yellow : .white
     }
 
-    var websocketService: WebSocketService
+    var restAPIService: RestAPIService
     let showClimateSchedulingAction: MainActorVoidClosure
 
-    init(websocketService: WebSocketService, showClimateSchedulingAction: @escaping MainActorVoidClosure) {
-        self.websocketService = websocketService
+    init(restAPIService: RestAPIService, showClimateSchedulingAction: @escaping MainActorVoidClosure) {
+        self.restAPIService = restAPIService
         self.showClimateSchedulingAction = showClimateSchedulingAction
     }
 
@@ -108,7 +108,7 @@ class EniroViewModel: ObservableObject {
 
     func toggleForceCharging() {
         let action: Action = forceCharging.isActive ? .turnOff : .turnOn
-        websocketService.updateEntity(entityID: forceCharging.entityId, domain: .inputBoolean, action: action)
+        restAPIService.update(entityID: forceCharging.entityId, domain: .inputBoolean, action: action)
     }
 
     func toggleClimate() {
@@ -121,49 +121,49 @@ class EniroViewModel: ObservableObject {
 
     func toggleState(for entity: Entity) {
         let action: Action = entity.isActive ? .turnOff : .turnOn
-        websocketService.updateEntity(entityID: entity.entityId, domain: .inputBoolean, action: action)
+        restAPIService.update(entityID: entity.entityId, domain: .inputBoolean, action: action)
     }
 
     private func startClimate() {
-        websocketService.callScript(scriptID: .eniroStartClimate)
+        restAPIService.callScript(scriptID: .eniroStartClimate)
     }
 
     private func stopClimate() {
-        websocketService.callScript(scriptID: .eniroTurnOffStartClimate)
+        restAPIService.callScript(scriptID: .eniroTurnOffStartClimate)
     }
 
     func numberSelectedCallback(_: EntityId, temperature: Double) {
-        websocketService.updateInputNumberEntity(entityId: .eniroClimateTemperature, value: temperature)
+        restAPIService.update(numberEntityID: .eniroClimateTemperature, number: temperature)
     }
 
     func update() {
-        websocketService.callService(serviceID: .kiaUpdate, data: [.deviceID: DeviceID.eniro.rawValue])
+        restAPIService.callService(serviceID: .kiaUpdate, domain: .kiaUvo, json: [.deviceID: DeviceID.eniro.rawValue])
     }
 
     func initiateForceUpdate() {
         lastUpdateInitialDate = eniroLastUpdate.date
-        websocketService.callService(serviceID: .kiaForceUpdate, data: [.deviceID: DeviceID.eniro.rawValue])
+        restAPIService.callService(serviceID: .kiaForceUpdate, domain: .kiaUvo, json: [.deviceID: DeviceID.eniro.rawValue])
     }
 
     func startCharging() {
-        websocketService.callService(serviceID: .kiaStartCharge, data: [.deviceID: DeviceID.eniro.rawValue])
+        restAPIService.callService(serviceID: .kiaStartCharge, domain: .kiaUvo, json: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
     func stopCharging() {
-        websocketService.callService(serviceID: .kiaStopCharge, data: [.deviceID: DeviceID.eniro.rawValue])
+        restAPIService.callService(serviceID: .kiaStopCharge, domain: .kiaUvo, json: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
     func unlock() {
         doorLock.expectedState = .unlocked
-        websocketService.callService(serviceID: .kiaUnlock, data: [.deviceID: DeviceID.eniro.rawValue])
+        restAPIService.callService(serviceID: .kiaUnlock, domain: .kiaUvo, json: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
     func lock() {
         doorLock.expectedState = .locked
-        websocketService.callService(serviceID: .kiaLock, data: [.deviceID: DeviceID.eniro.rawValue])
+        restAPIService.callService(serviceID: .kiaLock, domain: .kiaUvo, json: [.deviceID: DeviceID.eniro.rawValue])
         updateAfterShortDelay()
     }
 
@@ -181,10 +181,10 @@ class EniroViewModel: ObservableObject {
 
     func saveChargerLimit(entityID: EntityId, newLimit: Double) {
         if limitPickerEntity?.inputNumber != newLimit {
-            var variables: [ServiceDataKeys: ServiceValues] = [.deviceID: .string(DeviceID.eniro.rawValue)]
-            variables[.acLimit] = .double(entityID == .eniroACChargingLimit ? newLimit : eniroChargingACLimit.inputNumber)
-            variables[.dcLimit] = .double(entityID == .eniroDCChargingLimit ? newLimit : eniroChargingDCLimit.inputNumber)
-            websocketService.callService(serviceID: .kiaChargeLimit, data: variables)
+            var json: [JSONKey: Any] = [.deviceID: DeviceID.eniro.rawValue]
+            json[.acLimit] = entityID == .eniroACChargingLimit ? newLimit : eniroChargingACLimit.inputNumber
+            json[.dcLimit] = entityID == .eniroDCChargingLimit ? newLimit : eniroChargingDCLimit.inputNumber
+            restAPIService.callService(serviceID: .kiaChargeLimit, domain: .kiaUvo, json: json)
             updateAfterShortDelay()
         }
 
@@ -202,5 +202,3 @@ class EniroViewModel: ObservableObject {
         }
     }
 }
-
-// swiftlint:enable type_body_length

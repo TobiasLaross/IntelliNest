@@ -30,5 +30,7 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case variables
     case acLimit = "ac_limit"
     case dcLimit = "dc_limit"
+    case operationMode
     case yaleAccessTokenFull = "yale_access_token_full"
+    case watt
 }

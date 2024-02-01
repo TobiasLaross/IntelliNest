@@ -17,7 +17,7 @@ struct SimpleHeaterView: View {
     var therm3: Entity
     var therm4: Entity
     @Binding var heater: HeaterEntity
-    @Binding var showDetails: Bool
+    var showDetailsAction: MainActorEntityIDClosure
     @Binding var resetClimateTimeEntity: Entity
     @Binding private var resetClimateTimeDate: Date
 
@@ -62,7 +62,7 @@ struct SimpleHeaterView: View {
                         Spacer()
                         VStack {
                             Button {
-                                showDetails = true
+                                showDetailsAction(heater.entityId)
                             } label: {
                                 Image(imageName: .settings)
                                     .resizable()
@@ -99,9 +99,9 @@ struct SimpleHeaterView: View {
 
     init(roomName: String, therm1: Entity, therm2: Entity, therm3: Entity, therm4: Entity,
          heater: Binding<HeaterEntity>,
-         showDetails: Binding<Bool>,
          resetClimateTimeEntity: Binding<Entity>,
          isTimerModeEnabled: Bool,
+         showDetailsAction: @escaping MainActorEntityIDClosure,
          setTargetTemperatureClosure: @escaping EntityIdDoubleClosure,
          setHvacModeClosure: @escaping HeaterStringClosure,
          toggleTimerModeAction: @escaping MainActorVoidClosure,
@@ -112,10 +112,10 @@ struct SimpleHeaterView: View {
         self.therm3 = therm3
         self.therm4 = therm4
         _heater = heater
-        _showDetails = showDetails
         _resetClimateTimeEntity = resetClimateTimeEntity
         _resetClimateTimeDate = _resetClimateTimeEntity.date
         self.isTimerModeEnabled = isTimerModeEnabled
+        self.showDetailsAction = showDetailsAction
         self.setTargetTemperatureClosure = setTargetTemperatureClosure
         self.setHvacModeClosure = setHvacModeClosure
         self.toggleTimerModeAction = toggleTimerModeAction
@@ -133,9 +133,9 @@ struct SimpleHeaterView_Previews: PreviewProvider {
                          therm3: therm,
                          therm4: therm,
                          heater: .constant(heater),
-                         showDetails: .constant(false),
                          resetClimateTimeEntity: .constant(.init(entityId: .eniroClimate)),
                          isTimerModeEnabled: true,
+                         showDetailsAction: { _ in },
                          setTargetTemperatureClosure: { _, _ in },
                          setHvacModeClosure: { _, _ in },
                          toggleTimerModeAction: {},

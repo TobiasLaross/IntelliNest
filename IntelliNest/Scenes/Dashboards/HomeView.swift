@@ -116,7 +116,7 @@ private struct NavigationButtonsView: View {
                                      action: viewModel.showLightsAction)
                     .contextMenu {
                         Button {
-                            viewModel.turnOffLight(viewModel.allLights)
+                            viewModel.turnOffAllLights()
                         } label: {
                             Text("Släck alla lampor")
                         }
@@ -186,11 +186,10 @@ private struct ServiceButtonsView: View {
                                   indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
                                   action: viewModel.toggleCoffeeMachine)
                     .contextMenu {
-                        Button(action: {
-                            viewModel.showCoffeeMachineScheduling()
-                        }, label: {
-                            Text("Schemalägg nästa start")
-                        })
+                        Button(action: viewModel.showCoffeeMachineScheduling,
+                               label: {
+                                   Text("Schemalägg nästa start")
+                               })
                     }
                 if UserManager.currentUser == .tobias {
                     ServiceButtonView(buttonTitle: "Hitta Sarah's iPhone?",
@@ -231,10 +230,9 @@ private struct ServiceButtonsView: View {
 
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
-        let hassApiService = HassApiService(urlCreator: URLCreator())
-        let viewModel = HomeViewModel(websocketService: PreviewProviderUtil.websocketService,
-                                      yaleApiService: YaleApiService(hassApiService: hassApiService),
-                                      urlCreator: URLCreator(),
+        let viewModel = HomeViewModel(restAPIService: PreviewProviderUtil.restAPIService,
+                                      yaleApiService: YaleApiService(hassAPIService: PreviewProviderUtil.restAPIService),
+                                      urlCreator: PreviewProviderUtil.urlCreator,
                                       showHeatersAction: {},
                                       showEniroAction: {},
                                       showRoborockAction: {},

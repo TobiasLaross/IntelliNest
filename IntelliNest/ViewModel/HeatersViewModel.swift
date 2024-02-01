@@ -25,61 +25,41 @@ class HeatersViewModel: HassAPIViewModelProtocol {
     @Published var heaterCorridorTimerMode = Entity(entityId: .heaterCorridorTimerMode)
     @Published var heaterPlayroomTimerMode = Entity(entityId: .heaterPlayroomTimerMode)
 
-    @Published var showCorridorDetails = false
-    @Published var showPlayroomDetails = false
     let entityIDs: [EntityId] = [.resetCorridorHeaterTime, .resetPlayroomHeaterTime, .heaterCorridorTimerMode, .heaterPlayroomTimerMode]
 
-    let websocketService: WebSocketService
-    let apiService: HassApiService
-    init(websocketService: WebSocketService, apiService: HassApiService) {
-        self.websocketService = websocketService
-        self.apiService = apiService
+    let restAPIService: RestAPIService
+    let showHeaterDetails: MainActorEntityIDClosure
+    init(restAPIService: RestAPIService, showHeaterDetails: @escaping MainActorEntityIDClosure) {
+        self.restAPIService = restAPIService
+        self.showHeaterDetails = showHeaterDetails
     }
 
     func setTargetTemperature(entityId: EntityId, temperature: Double) {
-        websocketService.callService(serviceID: .heaterTemperature,
-                                     target: [.entityID: .string(entityId.rawValue)],
-                                     data: [.temperature: .double(temperature)])
+        restAPIService.update(heaterID: entityId, action: .setTemperature, dataKey: .temperature, dataValue: "\(temperature)")
     }
 
     func setHvacMode(heater: HeaterEntity, hvacMode: HvacMode) {
-        websocketService.callService(serviceID: .heaterHvacMode,
-                                     target: [.entityID: .string(heater.entityId.rawValue)],
-                                     data: [.hvacMode: .string(hvacMode.rawValue)])
+        restAPIService.update(heaterID: heater.entityId, action: .setHvacMode, dataKey: .hvacMode, dataValue: hvacMode.rawValue)
     }
 
-    func fanModeSelectedCallback(heater: HeaterEntity, fanMode: HeaterFanMode) {
+    func setFanMode(heater: HeaterEntity, fanMode: HeaterFanMode) {
         if fanMode != heater.fanMode {
-            websocketService.callService(serviceID: .heaterFanMode,
-                                         target: [.entityID: .string(heater.entityId.rawValue)],
-                                         data: [.fanMode: .string(fanMode.rawValue)])
+            restAPIService.update(heaterID: heater.entityId, action: .setFanMode, dataKey: .fanMode, dataValue: fanMode.rawValue)
         }
     }
 
     func horizontalModeSelectedCallback(heater: HeaterEntity, horizontalMode: HeaterHorizontalMode) {
-        websocketService.callService(serviceID: .heaterHorizontal,
-                                     target: [.entityID: .string(heater.entityId.rawValue)],
-                                     data: [.position: .string(horizontalMode.rawValue)])
+        restAPIService.update(heaterID: heater.entityId, domain: .melcloud, action: .setVaneHorizontal, dataKey: .position,
+                              dataValue: horizontalMode.rawValue)
     }
 
     func verticalModeSelectedCallback(heater: HeaterEntity, verticalMode: HeaterVerticalMode) {
-        websocketService.callService(serviceID: .heaterVertical,
-                                     target: [.entityID: .string(heater.entityId.rawValue)],
-                                     data: [.position: .string(verticalMode.rawValue)])
+        restAPIService.update(heaterID: heater.entityId, domain: .melcloud, action: .setVaneVertical, dataKey: .position,
+                              dataValue: verticalMode.rawValue)
     }
 
     func setClimateSchedule(dateEntity: Entity) {
-        var data: [ServiceDataKeys: ServiceValues] = [:]
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        data[.date] = .string(dateFormatter.string(from: dateEntity.date))
-
-        dateFormatter.dateFormat = "HH:mm:ss"
-        data[.time] = .string(dateFormatter.string(from: dateEntity.date))
-        websocketService.callService(serviceID: .setDateTime,
-                                     target: [.entityID: .string(dateEntity.entityId.rawValue)],
-                                     data: data)
+        restAPIService.update(dateEntityID: dateEntity.entityId, date: dateEntity.date)
     }
 
     func toggleCorridorTimerMode() {
@@ -122,11 +102,12 @@ class HeatersViewModel: HassAPIViewModelProtocol {
             Log.error("HeatersViewModel doesn't update heater with entityID: \(heater.entityId)")
         }
     }
+}
 
-    private func toggleHeaterTimerMode(heaterEntityID: EntityId, heaterTimerModeEntityID: EntityId, dateEntity: Entity, action: Action) {
+private extension HeatersViewModel {
+    func toggleHeaterTimerMode(heaterEntityID: EntityId, heaterTimerModeEntityID: EntityId, dateEntity: Entity, action: Action) {
         var dateEntity = dateEntity
-        let serviceID: ServiceID = action == .turnOn ? .boolTurnOn : .boolTurnOff
-        websocketService.callService(serviceID: serviceID, data: [.entityID: heaterTimerModeEntityID.rawValue])
+        restAPIService.update(entityID: heaterTimerModeEntityID, domain: .inputBoolean, action: action)
 
         if action == .turnOn {
             let calendar = Calendar.current
@@ -134,7 +115,7 @@ class HeatersViewModel: HassAPIViewModelProtocol {
             if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
                 dateEntity.date = newDate
                 setClimateSchedule(dateEntity: dateEntity)
-                websocketService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
+                restAPIService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
             }
         }
     }

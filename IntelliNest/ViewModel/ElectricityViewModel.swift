@@ -29,11 +29,11 @@ class ElectricityViewModel: ObservableObject {
 
     let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberCostToday, .pulseConsumptionToday, .sonnenAutomation]
 
-    var websocketService: WebSocketService
+    var restAPIService: RestAPIService
 
-    init(sonnenBattery: SonnenEntity, websocketService: WebSocketService) {
+    init(sonnenBattery: SonnenEntity, restAPIService: RestAPIService) {
         self.sonnenBattery = sonnenBattery
-        self.websocketService = websocketService
+        self.restAPIService = restAPIService
     }
 
     func reload(entityID: EntityId, state: String) {
@@ -68,11 +68,12 @@ class ElectricityViewModel: ObservableObject {
 
     func updateSonnenContinously() {
         sonnenUpdateTask?.cancel()
-        let entityIDs = [EntityId.sonnenBattery.rawValue, EntityId.sonnenBatteryStatus.rawValue]
-        let variableValueEntities: ServiceValues = .stringArray(entityIDs)
         sonnenUpdateTask = Task {
             while isViewActive {
-                websocketService.callService(serviceID: .updateEntity, data: [.entityID: variableValueEntities])
+                restAPIService.callService(serviceID: .updateEntity, domain: .homeassistant,
+                                           json: [.entityID: EntityId.sonnenBattery.rawValue])
+                restAPIService.callService(serviceID: .updateEntity, domain: .homeassistant,
+                                           json: [.entityID: EntityId.sonnenBatteryStatus.rawValue])
                 try? await Task.sleep(seconds: 1)
             }
         }
@@ -83,7 +84,7 @@ class ElectricityViewModel: ObservableObject {
             return
         }
 
-        websocketService.callService(serviceID: .sonnenCharge, data: [.watt: .int(watt)])
+        restAPIService.callService(serviceID: .sonnenCharge, domain: .restCommand, json: [.watt: watt])
     }
 
     func discharge(watt: Int) {
@@ -91,7 +92,7 @@ class ElectricityViewModel: ObservableObject {
             return
         }
 
-        websocketService.callService(serviceID: .sonnenDischarge, data: [.watt: .int(watt)])
+        restAPIService.callService(serviceID: .sonnenDischarge, domain: .restCommand, json: [.watt: watt])
     }
 
     func setSonnenOperationMode(_ mode: SonnenOperationModes) {
@@ -99,11 +100,11 @@ class ElectricityViewModel: ObservableObject {
             return
         }
 
-        websocketService.callService(serviceID: .sonnenOperationMode, data: [.operationMode: .string(mode.rawValue)])
+        restAPIService.callService(serviceID: .sonnenOperationMode, domain: .restCommand, json: [.operationMode: mode.rawValue])
     }
 
     func setSonnenAutomationEnabled(_ isEnabled: Bool) {
-        websocketService.callService(serviceID: isEnabled ? .automationTurnOn : .automationTurnOff,
-                                     target: [.entityID: .string(EntityId.sonnenAutomation.rawValue)])
+        let action: Action = isEnabled ? .turnOn : .turnOff
+        restAPIService.update(entityID: EntityId.sonnenAutomation, domain: .automation, action: action)
     }
 }

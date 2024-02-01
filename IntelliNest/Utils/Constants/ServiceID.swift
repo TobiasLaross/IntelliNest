@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ShipBookSDK
 
 enum ServiceID: String, Decodable, CaseIterable {
     case kiaForceUpdate = "kia_uvo.force_update"
@@ -31,4 +32,13 @@ enum ServiceID: String, Decodable, CaseIterable {
     case sonnenOperationMode = "rest_command.sonnen_put_config_operation_mode"
     case sonnenCharge = "rest_command.sonnen_charge"
     case sonnenDischarge = "rest_command.sonnen_discharge"
+
+    var toAction: Action? {
+        if let action = Action(rawValue: self.rawValue.components(separatedBy: ".").last ?? "") {
+            return action
+        } else {
+            Log.error("Failed to create action from ServiceID: \(self.rawValue)")
+            return nil
+        }
+    }
 }

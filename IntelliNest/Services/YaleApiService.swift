@@ -10,14 +10,14 @@ import Security
 import ShipBookSDK
 
 class YaleApiService: URLRequestBuilder {
-    private let hassApiService: HassApiService
+    private let hassAPIService: RestAPIService
     private let session: URLSession
     private var accessToken = ""
     private var recentlyUpdatedRemoteAccessToken = false
     let urlString = GlobalConstants.secretYaleAPIURL
 
-    init(hassApiService: HassApiService, session: URLSession = .shared) {
-        self.hassApiService = hassApiService
+    init(hassAPIService: RestAPIService, session: URLSession = .shared) {
+        self.hassAPIService = hassAPIService
         self.session = session
         if let accessToken = getAccessToken(), !willAccessTokenExpireSoon(accessToken: accessToken) {
             self.accessToken = accessToken
@@ -118,11 +118,11 @@ class YaleApiService: URLRequestBuilder {
     private func fetchRemoteAccessToken() {
         Task {
             do {
-                async let part1 = hassApiService.get(entityId: .yaleAccessTokenPart1, entityType: Entity.self)
-                async let part2 = hassApiService.get(entityId: .yaleAccessTokenPart2, entityType: Entity.self)
-                async let part3 = hassApiService.get(entityId: .yaleAccessTokenPart3, entityType: Entity.self)
-                async let part4 = hassApiService.get(entityId: .yaleAccessTokenPart4, entityType: Entity.self)
-                async let part5 = hassApiService.get(entityId: .yaleAccessTokenPart5, entityType: Entity.self)
+                async let part1 = hassAPIService.get(entityId: .yaleAccessTokenPart1, entityType: Entity.self)
+                async let part2 = hassAPIService.get(entityId: .yaleAccessTokenPart2, entityType: Entity.self)
+                async let part3 = hassAPIService.get(entityId: .yaleAccessTokenPart3, entityType: Entity.self)
+                async let part4 = hassAPIService.get(entityId: .yaleAccessTokenPart4, entityType: Entity.self)
+                async let part5 = hassAPIService.get(entityId: .yaleAccessTokenPart5, entityType: Entity.self)
 
                 let parts = try await [part1, part2, part3, part4, part5]
                 accessToken = parts.map { $0.state }.joined()
@@ -201,7 +201,7 @@ class YaleApiService: URLRequestBuilder {
             json[JSONKey.yaleAccessTokenFull] = newAccessToken
             let jsonData = createJSONData(json: json)
 
-            guard let request = hassApiService.createURLRequest(path: path,
+            guard let request = hassAPIService.createURLRequest(path: path,
                                                                 jsonData: jsonData,
                                                                 method: .post) else {
                 Log.error("Failed to create request for path: \(path)")

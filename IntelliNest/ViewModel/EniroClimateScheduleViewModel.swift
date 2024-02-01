@@ -20,8 +20,8 @@ class EniroClimateScheduleViewModel: HassAPIViewModelProtocol {
     @Published var climateDayBool = Entity(entityId: .eniroClimateScheduleDayBool)
     var isReloading = false
 
-    private var apiService: HassApiService
-    init(apiService: HassApiService) {
+    private var apiService: RestAPIService
+    init(apiService: RestAPIService) {
         self.apiService = apiService
     }
 

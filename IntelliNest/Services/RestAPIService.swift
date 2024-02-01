@@ -1,5 +1,5 @@
 //
-//  LightApiService.swift
+//  RestAPIService.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-07-07.
@@ -10,36 +10,25 @@ import ShipBookSDK
 import SwiftUI
 import UIKit
 
-class HassApiService: URLRequestBuilder {
+// swiftlint: disable:next type_body_length
+class RestAPIService: URLRequestBuilder {
     var urlString: String {
         urlCreator.urlString
     }
 
-    var urlCreator: URLCreator
-    private let session: URLSession
+    private let statusCodeOK = 0
+    private let statusCodeBadRequest = 1
+    private let statusCodeBadResponse = 2
+    private let statusCodeFailedRequest = 3
 
-    init(urlCreator: URLCreator, session: URLSession = .shared) {
+    private let urlCreator: URLCreator
+    private let session: URLSession
+    private let setErrorBannerText: StringStringClosure
+
+    init(urlCreator: URLCreator, session: URLSession = .shared, setErrorBannerText: @escaping StringStringClosure) {
         self.urlCreator = urlCreator
         self.session = session
-    }
-
-    func reloadUntilUpdated<T: EntityProtocol>(hassEntity: T, entityType: T.Type) async -> T {
-        var counter = 0
-        var updatedEntity = hassEntity
-        var sleepSeconds = 0.1
-
-        repeat {
-            do {
-                try await Task.sleep(seconds: sleepSeconds)
-            } catch {
-                Log.error("Failed to sleep: \(error)")
-            }
-            updatedEntity = await reload(hassEntity: hassEntity, entityType: entityType)
-            counter += 1
-            sleepSeconds += 0.05
-        } while updatedEntity == hassEntity && counter < 20
-
-        return updatedEntity
+        self.setErrorBannerText = setErrorBannerText
     }
 
     func reload<T: EntityProtocol>(entityId: EntityId, entityType: T.Type) async throws -> T {
@@ -100,9 +89,9 @@ class HassApiService: URLRequestBuilder {
 
         /* Testing purposes
          if entityId == .roborockLastCleanArea {
-                 if let string = String(data: data, encoding: .utf8) {
-                 print(string)
-             }
+         if let string = String(data: data, encoding: .utf8) {
+         print(string)
+         }
          } */
 
         guard httpResponse.statusCode == 200 else {
@@ -113,14 +102,70 @@ class HassApiService: URLRequestBuilder {
         return try decoder.decode(entityType.self, from: data)
     }
 
-    func setState(light: LightEntity, action: Action) async {
-        var json = [JSONKey: Any]()
-        json[JSONKey.entityID] = light.entityId.rawValue
-        if action == .turnOn && light.brightness > 0 {
-            json[JSONKey.brightness] = light.brightness
-        }
+    // MARK: Post requests
 
-        await sendPostRequest(json: json, domain: Domain.light, action: action)
+    func update(entityID: EntityId, domain: Domain, action: Action) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+        }
+    }
+
+    func update(lightIDs: [EntityId], action: Action, brightness: Int) {
+        Task {
+            await withTaskGroup(of: Void.self) { group in
+                for lightID in lightIDs {
+                    group.addTask {
+                        var json = [JSONKey: Any]()
+                        json[.entityID] = lightID.rawValue
+                        if action == .turnOn && brightness > 0 {
+                            json[.brightness] = brightness
+                        }
+
+                        await self.sendPostRequest(json: json, domain: .light, action: action)
+                    }
+                }
+            }
+        }
+    }
+
+    func update(dateEntityID: EntityId, date: Date) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = dateEntityID.rawValue
+            json[.dateTime] = date
+            await sendPostRequest(json: json, domain: .inputDateTime, action: .setDateTime)
+        }
+    }
+
+    func update(heaterID: EntityId, domain: Domain = .climate, action: Action, dataKey: JSONKey, dataValue: String) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = heaterID.rawValue
+            json[dataKey] = dataValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+        }
+    }
+
+    func update(numberEntityID: EntityId, number: Double) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = numberEntityID.rawValue
+            json[.inputNumberValue] = number
+            await sendPostRequest(json: json, domain: .inputNumber, action: .setValue)
+        }
+    }
+
+    func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil) {
+        Task {
+            if let action = serviceID.toAction {
+                await sendPostRequest(json: json, domain: domain, action: action)
+            } else {
+                setErrorBannerText("Misslyckades med att anropa service",
+                                   "\(serviceID.rawValue) gick inte att konvertera till action")
+            }
+        }
     }
 
     func setStateFor(lock: LockEntity, action: Action) async {
@@ -144,18 +189,20 @@ class HassApiService: URLRequestBuilder {
         await sendPostRequest(json: json, domain: domain, action: action)
     }
 
-    func callScript(entityId: EntityId, variables: [ScriptVariableKeys: String]? = nil) async {
-        var json = [JSONKey: Any]()
-        json[.entityID] = entityId.rawValue
-        if let variables {
-            var variableDict = [String: String]()
-            for (key, value) in variables {
-                variableDict[key.rawValue] = value
-            }
+    func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = scriptID.rawValue
+            if let variables {
+                var variableDict = [String: String]()
+                for (key, value) in variables {
+                    variableDict[key.rawValue] = value
+                }
 
-            json[.variables] = variableDict
+                json[.variables] = variableDict
+            }
+            await sendPostRequest(json: json, domain: .script, action: .turnOn)
         }
-        await sendPostRequest(json: json, domain: .script, action: .turnOn)
     }
 
     func setDateTimeEntity(dateEntity: Entity) async {
@@ -175,41 +222,67 @@ class HassApiService: URLRequestBuilder {
                               action: Action.setDateTime)
     }
 
-    func sendPostRequest(json: [JSONKey: Any]?, domain: Domain, action: Action) async {
+    private func sendPostRequest(json: [JSONKey: Any]?, domain: Domain, action: Action) async {
+        let path = "/api/services/\(domain.rawValue)/\(action.rawValue)"
+        let errorBannerTitle = "Misslyckades med att skicka request"
+        let errorBannerMessageEnd = "(\(domain.rawValue), \(action.rawValue))"
         var jsonData: Data?
         if let json {
             jsonData = createJSONData(json: json)
         }
 
-        guard let request = createURLRequest(path: "/api/services/\(domain.rawValue)/\(action.rawValue)",
+        guard let request = createURLRequest(path: path,
                                              jsonData: jsonData,
                                              method: .post) else {
-            Log.error("""
-            Failed to create request \(json ?? [.invalid: ""]),
-            \(jsonData?.debugDescription ?? "Bad JSON data"),
-            \(domain), \(action)
-            """)
+            logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
             return
         }
 
-        await sendRequest(request: request)
+        let statusCode = await sendRequest(request: request)
+        var statusCodeExternal = statusCodeOK
+        let url = request.url?.absoluteString ?? ""
+        if statusCode != statusCodeOK {
+            if !url.contains(GlobalConstants.baseExternalUrlString) {
+                guard let request = createURLRequest(shouldForceExternalURL: true, path: path, jsonData: jsonData, method: .post) else {
+                    logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
+                    setErrorBannerText("Misslyckades med att skapa external http request", "POST: \(path). \(statusCode.errorDescription)")
+                    return
+                }
+
+                statusCodeExternal = await sendRequest(request: request)
+                if statusCodeExternal != statusCodeOK {
+                    setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
+                }
+            }
+            if statusCode != statusCodeOK || statusCodeExternal != statusCodeOK {
+                let errorCode = statusCode != statusCodeOK ? statusCode : statusCodeExternal
+                setErrorBannerText(errorBannerTitle, "\(errorCode.errorDescription) \(errorBannerMessageEnd)")
+            }
+        }
     }
 
-    func sendRequest(request: URLRequest) async {
+    func sendRequest(request: URLRequest) async -> Int {
         do {
             let (_, response) = try await session.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse else {
                 Log.error("Response was not httpResponse, for \(request.url?.absoluteString ?? "")")
-                return
+                return statusCodeBadResponse
             }
 
-            if httpResponse.statusCode > 299 {
+            if httpResponse.statusCode >= 300 {
                 Log.error("Api status: \(httpResponse.statusCode), for \(request.url?.absoluteString ?? "Missing url")")
-                return
+                return httpResponse.statusCode
             }
         } catch {
-            Log.error("Request failed with error: \(error)")
+            Log.error("Failed to send request: \(request.debugDescription) with error: \(error)")
+            if let urlError = error as? URLError {
+                return urlError.errorCode
+            } else {
+                return statusCodeFailedRequest
+            }
         }
+
+        return statusCodeOK
     }
 
     func getRequestHeaders() -> [String: String] {
@@ -273,16 +346,10 @@ class HassApiService: URLRequestBuilder {
 
         return UIImage(data: data)
     }
+}
 
-    func turnOnBoolEntity(_ entityID: EntityId, useExternalURL: Bool) {
-        setBoolEntity(entityID, useExternalURL: useExternalURL, path: "/api/services/input_boolean/turn_on")
-    }
-
-    func turnOffBoolEntity(_ entityID: EntityId, useExternalURL: Bool) {
-        setBoolEntity(entityID, useExternalURL: useExternalURL, path: "/api/services/input_boolean/turn_off")
-    }
-
-    private func setBoolEntity(_ entityID: EntityId, useExternalURL: Bool, path: String) {
+private extension RestAPIService {
+    func setBoolEntity(_ entityID: EntityId, path: String) {
         Task {
             let jsonData = createJSONData(json: [.entityID: entityID.rawValue])
             let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
@@ -292,8 +359,35 @@ class HassApiService: URLRequestBuilder {
                                                             timeout: 1.0)
             let request = createURLRequest(urlRequestParameters: urlRequestParameters)
             if let request {
-                await sendRequest(request: request)
+                _ = await sendRequest(request: request)
             }
+        }
+    }
+
+    func logCreateRequestFailed(path: String, domain: Domain, action: Action, json: [JSONKey: Any]? = nil, jsonData: Data? = nil) {
+        Log.error("""
+        Failed to create request \(json ?? [.invalid: ""]),
+        \(jsonData?.debugDescription ?? "Bad JSON data"),
+        \(domain), \(action)
+        """)
+    }
+}
+
+private extension Int {
+    var errorDescription: String {
+        switch self {
+        case -1001:
+            return "Förfrågan tog för lång tid"
+        case -1003:
+            return "Kan inte hitta servern"
+        case -1004:
+            return "Kan inte ansluta till servern"
+        case -1009:
+            return "Ingen nätverksåtkomst"
+        case 400:
+            return "Felaktikt request: 400"
+        default:
+            return "Ohanterad felkod: \(self)"
         }
     }
 }

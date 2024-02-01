@@ -21,7 +21,7 @@ class RoborockViewModel: ObservableObject {
     @Published var isShowingrooms = false
 
     private var baseURLString: String {
-        websocketService.baseURLString
+        restAPIService.urlString
     }
 
     var imagageURLString: String {
@@ -42,10 +42,10 @@ class RoborockViewModel: ObservableObject {
 
     let entityIDs: [EntityId] = [.roborock, .roborockAutomation, .roborockWaterShortage, .roborockEmptiedAtDate, .roborockLastCleanArea,
                                  .roborockAreaSinceEmptied, .roborockMapImage]
-    private var websocketService: WebSocketService
+    private var restAPIService: RestAPIService
 
-    init(websocketService: WebSocketService) {
-        self.websocketService = websocketService
+    init(restAPIService: RestAPIService) {
+        self.restAPIService = restAPIService
     }
 
     func reload(entityID: EntityId, state: String) {
@@ -82,33 +82,33 @@ class RoborockViewModel: ObservableObject {
     }
 
     func locateRoborock() {
-        websocketService.updateEntity(entityID: .roborock, domain: .vacuum, action: .locate)
+        restAPIService.update(entityID: .roborock, domain: .vacuum, action: .locate)
     }
 
     func manualEmpty() {
-        websocketService.callScript(scriptID: .roborockManualEmpty)
+        restAPIService.callScript(scriptID: .roborockManualEmpty)
     }
 
     func toggleCleaning() {
         let action: Action = roborock.isActive ? .stop : .start
-        websocketService.updateEntity(entityID: .roborock, domain: .vacuum, action: action)
+        restAPIService.update(entityID: .roborock, domain: .vacuum, action: action)
     }
 
     func dockRoborock() {
-        websocketService.callScript(scriptID: .roborockDock)
+        restAPIService.callScript(scriptID: .roborockDock)
     }
 
     func sendRoborockToBin() {
-        websocketService.callScript(scriptID: .roborockSendToBin)
+        restAPIService.callScript(scriptID: .roborockSendToBin)
     }
 
     func callScript(scriptID: ScriptID) {
-        websocketService.callScript(scriptID: scriptID)
+        restAPIService.callScript(scriptID: scriptID)
     }
 
     func toggleRoborockAutomation() {
         let action: Action = roborockAutomation.isActive ? .turnOff : .turnOn
         roborockAutomation.isActive.toggle()
-        websocketService.updateEntity(entityID: .roborockAutomation, domain: .automation, action: action)
+        restAPIService.update(entityID: .roborockAutomation, domain: .automation, action: action)
     }
 }
