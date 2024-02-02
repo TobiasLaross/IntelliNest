@@ -118,8 +118,7 @@ struct ElectricityFlowView: View {
 }
 
 #Preview {
-    ElectricityFlowView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                         restAPIService: PreviewProviderUtil.restAPIService))
+    ElectricityFlowView(viewModel: PreviewProviderUtil.electricityViewModel)
 }
 
 #Preview {

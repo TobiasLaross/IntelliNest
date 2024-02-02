@@ -30,10 +30,12 @@ class ElectricityViewModel: ObservableObject {
     let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberCostToday, .pulseConsumptionToday, .sonnenAutomation]
 
     var restAPIService: RestAPIService
+    var websocketService: WebSocketService
 
-    init(sonnenBattery: SonnenEntity, restAPIService: RestAPIService) {
+    init(sonnenBattery: SonnenEntity, restAPIService: RestAPIService, websocketService: WebSocketService) {
         self.sonnenBattery = sonnenBattery
         self.restAPIService = restAPIService
+        self.websocketService = websocketService
     }
 
     func reload(entityID: EntityId, state: String) {
@@ -68,12 +70,11 @@ class ElectricityViewModel: ObservableObject {
 
     func updateSonnenContinously() {
         sonnenUpdateTask?.cancel()
+        let entityIDs = [EntityId.sonnenBattery.rawValue, EntityId.sonnenBatteryStatus.rawValue]
+        let variableValueEntities: ServiceValues = .stringArray(entityIDs)
         sonnenUpdateTask = Task {
             while isViewActive {
-                restAPIService.callService(serviceID: .updateEntity, domain: .homeassistant,
-                                           json: [.entityID: EntityId.sonnenBattery.rawValue])
-                restAPIService.callService(serviceID: .updateEntity, domain: .homeassistant,
-                                           json: [.entityID: EntityId.sonnenBatteryStatus.rawValue])
+                websocketService.callService(serviceID: .updateEntity, data: [.entityID: variableValueEntities])
                 try? await Task.sleep(seconds: 1)
             }
         }

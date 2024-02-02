@@ -18,13 +18,14 @@ struct RoborockMainButtons: View {
     var body: some View {
         HStack {
             Group {
-                ServiceButtonView(buttonTitle: "Dammsug",
-                                  isActive: roborock.isActive,
-                                  icon: roborock.icon,
+                ServiceButtonView(buttonTitle: roborock.cleanButtonTitle,
+                                  isActive: roborock.isCleaning,
+                                  icon: roborock.cleanIcon,
                                   iconHeight: 25,
                                   action: toggleCleaningClosure)
-                ServiceButtonView(buttonTitle: "Docka",
-                                  icon: .init(systemImageName: .house),
+                ServiceButtonView(buttonTitle: roborock.returnButtonTitle,
+                                  isActive: roborock.isReturning,
+                                  icon: roborock.returningIcon,
                                   imageSize: 25,
                                   action: dockRoborockClosure)
                 ServiceButtonView(buttonTitle: "Hitta",

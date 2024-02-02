@@ -89,6 +89,5 @@ struct SonnenSettingsView: View {
 }
 
 #Preview {
-    SonnenSettingsView(viewModel: .init(sonnenBattery: .init(entityID: .sonnenBattery),
-                                        restAPIService: PreviewProviderUtil.restAPIService))
+    SonnenSettingsView(viewModel: PreviewProviderUtil.electricityViewModel)
 }
