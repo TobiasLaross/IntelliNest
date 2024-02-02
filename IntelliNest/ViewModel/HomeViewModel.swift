@@ -27,6 +27,7 @@ class HomeViewModel: ObservableObject {
     @Published var pulsePower = Entity(entityId: .pulsePower)
     @Published var tibberPrice = Entity(entityId: .tibberPrice)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
+    @Published var solarProducdtionToday = Entity(entityId: .solarProducdtionToday)
     @Published var washerCompletionTime = Entity(entityId: .washerCompletionTime)
     @Published var washerState = Entity(entityId: .washerState)
     @Published var dryerCompletionTime = Entity(entityId: .dryerCompletionTime)
@@ -41,7 +42,7 @@ class HomeViewModel: ObservableObject {
     var isReloading = false
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
                                  .sonnenBattery, .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
-                                 .dryerCompletionTime, .washerState, .dryerState, .easeeCharger,
+                                 .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeeCharger,
                                  .generalWasteDate, .plasticWasteDate]
 
     private var restAPIService: RestAPIService
@@ -184,6 +185,8 @@ class HomeViewModel: ObservableObject {
             tibberPrice.state = state
         case .pulseConsumptionToday:
             pulseConsumptionToday.state = state
+        case .solarProducdtionToday:
+            solarProducdtionToday.state = state
         case .washerCompletionTime:
             washerCompletionTime.state = state
         case .washerState:

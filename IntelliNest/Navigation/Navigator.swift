@@ -78,7 +78,8 @@ class Navigator: ObservableObject {
                                            toolbarReloadAction: reloadCurrentModel)
     lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: restAPIService)
     lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
-                                                         restAPIService: restAPIService)
+                                                         restAPIService: restAPIService,
+                                                         websocketService: webSocketService)
     lazy var heatersViewModel = HeatersViewModel(restAPIService: restAPIService,
                                                  showHeaterDetails: { [weak self] heaterID in
                                                      if heaterID == .heaterCorridor {

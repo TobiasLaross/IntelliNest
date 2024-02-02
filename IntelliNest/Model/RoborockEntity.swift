@@ -10,21 +10,38 @@ import SwiftUI
 struct RoborockEntity: EntityProtocol {
     let entityId: EntityId
     var state: String
+
     var nextUpdate = NSDate().addingTimeInterval(-1)
     var isActive: Bool {
-        if status.lowercased() == "cleaning" ||
-            ["cleaning", "segment cleaning", "returning home"].contains(status.lowercased()) {
-            return true
-        } else {
-            return false
-        }
+        isCleaning || isReturning
     }
 
-    var icon: Image {
-        isActive ? .init(systemImageName: .pause) : .init(systemImageName: .play)
+    var isCleaning: Bool {
+        ["cleaning", "segment cleaning"].contains { $0 == state.lowercased() || $0 == status.lowercased() }
+    }
+
+    var isReturning: Bool {
+        ["returning home", "returning"].contains { $0 == state.lowercased() || $0 == status.lowercased() }
+    }
+
+    var cleanIcon: Image {
+        isCleaning ? .init(systemImageName: .pause) : .init(systemImageName: .play)
+    }
+
+    var cleanButtonTitle: String {
+        isCleaning ? "Pausa" : "Dammsug"
+    }
+
+    var returningIcon: Image {
+        isReturning ? .init(systemImageName: .pause) : .init(systemImageName: .house)
+    }
+
+    var returnButtonTitle: String {
+        isReturning ? "Pausa" : "Docka"
     }
 
     var status: String = ""
+
     var batteryLevel: Int = -1
     var error: String = ""
 
@@ -51,10 +68,10 @@ struct RoborockEntity: EntityProtocol {
     }
 
     static func == (lhs: RoborockEntity, rhs: RoborockEntity) -> Bool {
-        (lhs.entityId == rhs.entityId &&
+        lhs.entityId == rhs.entityId &&
             lhs.isActive == rhs.isActive &&
             lhs.state == rhs.state &&
-            lhs.status == rhs.status)
+            lhs.status == rhs.status
     }
 }
 

@@ -16,7 +16,7 @@ struct HomeView: View {
                 HouseInfoView(viewModel: viewModel)
                     .padding(.vertical, 50)
                 NavigationButtonsView(viewModel: viewModel)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 40)
                 ServiceButtonsView(viewModel: viewModel)
                 Spacer(minLength: 40)
             }
@@ -73,7 +73,7 @@ private struct HouseInfoView: View {
                 Text("""
                 Elnät: ***\(viewModel.pulsePower.state.toKW)***
                 Pris: ***\(viewModel.tibberPrice.state.toOre)***
-                Producerar: ***\(viewModel.sonnenBattery.solarProduction.toKW)***
+                Producerat idag: ***\(viewModel.solarProducdtionToday.state.toKWh)***
                 Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)
                 .font(.buttonFontMedium)

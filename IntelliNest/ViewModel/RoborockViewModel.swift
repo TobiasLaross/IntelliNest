@@ -90,7 +90,7 @@ class RoborockViewModel: ObservableObject {
     }
 
     func toggleCleaning() {
-        let action: Action = roborock.isActive ? .stop : .start
+        let action: Action = roborock.isCleaning ? .stop : .start
         restAPIService.update(entityID: .roborock, domain: .vacuum, action: action)
     }
 
