@@ -39,6 +39,7 @@ class Navigator: ObservableObject {
     }
 
     private var homeCoordinates: Coordinates?
+    private var webhookID: String?
     private var errorBannerDismissTask: Task<Void, Error>?
     private lazy var geoFenceManager = GeofenceManager(didEnterHomeAction: { [weak self] in
                                                            self?.didEnterHome()
@@ -114,9 +115,11 @@ class Navigator: ObservableObject {
             await urlCreator.updateConnectionState()
         }
 
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
-            // Register for remote push { granted, error in
+        if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
+            self.webhookID = webhookID
         }
+
+        handlePushNotificationPermissions()
     }
 
     func pop() {
@@ -304,7 +307,7 @@ private extension Navigator {
         Task {
             async let tmpFrontDoorSuccess = yaleApiService.setLockState(lockID: .frontDoor, action: action)
             async let tmpSideDoorSuccess = yaleApiService.setLockState(lockID: .sideDoor, action: action)
-            let (frontDoorSuccess, sideDoorSuccess) = await(tmpFrontDoorSuccess, tmpSideDoorSuccess)
+            let (frontDoorSuccess, sideDoorSuccess) = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
             if !frontDoorSuccess || !sideDoorSuccess {
                 var errorMessage = "Lyckades inte låsa".appending(action == .unlock ? " upp" : "")
                 if !frontDoorSuccess && !sideDoorSuccess {
@@ -327,5 +330,41 @@ private extension Navigator {
             errorBannerTitle = title
             errorBannerMessage = message
         }
+    }
+
+    func handlePushNotificationPermissions() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, error in
+            if granted {
+                Task { @MainActor in
+                    UIApplication.shared.registerForRemoteNotifications()
+                    if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
+                        self?.webhookID = webhookID
+                    }
+
+                    if UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) == nil {
+                        try? await Task.sleep(seconds: 5)
+                    }
+
+                    if let apnsToken = UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) {
+                        self?.registerAPNSToken(apnsToken)
+                    }
+                }
+            } else if let error {
+                Log.error("Failed to requestAuthorization for push, \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func registerAPNSToken(_ apnsToken: String) {
+        let user = UserManager.currentUser
+        #if DEBUG
+            if user == .tobias {
+                restAPIService.registerAPNSToken(apnsToken)
+            }
+        #else
+            if user == .sarah || user == .tobias {
+                restAPIService.registerAPNSToken(apnsToken)
+            }
+        #endif
     }
 }

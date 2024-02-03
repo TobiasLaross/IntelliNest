@@ -9,11 +9,20 @@ import Foundation
 
 enum JSONKey: String, Equatable, Codable, Hashable {
     case invalid
+    case appData = "app_data"
+    case appID = "app_id"
+    case appName = "app_name"
+    case appVersion = "app_version"
     case data
     case entityID = "entity_id"
     case deviceID = "device_id"
+    case deviceName = "device_name"
     case brightness = "brightness"
     case dateTime = "datetime"
+    case manufacturer
+    case model
+    case osName = "os_name"
+    case osVersion = "os_version"
     case time = "time"
     case inputNumberValue = "value"
     case temperature
@@ -30,6 +39,9 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case variables
     case acLimit = "ac_limit"
     case dcLimit = "dc_limit"
+    case supportsEncryption = "supports_encryption"
+    case pushToken = "push_token"
+    case pushURL = "push_url"
     case operationMode
     case yaleAccessTokenFull = "yale_access_token_full"
     case watt
