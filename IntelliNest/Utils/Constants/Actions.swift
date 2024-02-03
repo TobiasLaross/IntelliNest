@@ -19,6 +19,7 @@ enum Action: String, Codable {
     case turnOn = "turn_on"
     case turnOff = "turn_off"
     case locate
+    case register
     case snapshot
     case stop
     case start

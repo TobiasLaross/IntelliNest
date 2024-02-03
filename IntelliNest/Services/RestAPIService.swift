@@ -222,67 +222,28 @@ class RestAPIService: URLRequestBuilder {
                               action: Action.setDateTime)
     }
 
-    private func sendPostRequest(json: [JSONKey: Any]?, domain: Domain, action: Action) async {
-        let path = "/api/services/\(domain.rawValue)/\(action.rawValue)"
-        let errorBannerTitle = "Misslyckades med att skicka request"
-        let errorBannerMessageEnd = "(\(domain.rawValue), \(action.rawValue))"
-        var jsonData: Data?
-        if let json {
-            jsonData = createJSONData(json: json)
-        }
-
-        guard let request = createURLRequest(path: path,
-                                             jsonData: jsonData,
-                                             method: .post) else {
-            logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
-            return
-        }
-
-        let statusCode = await sendRequest(request: request)
-        var statusCodeExternal = statusCodeOK
-        let url = request.url?.absoluteString ?? ""
-        if statusCode != statusCodeOK {
-            if !url.contains(GlobalConstants.baseExternalUrlString) {
-                guard let request = createURLRequest(shouldForceExternalURL: true, path: path, jsonData: jsonData, method: .post) else {
-                    logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
-                    setErrorBannerText("Misslyckades med att skapa external http request", "POST: \(path). \(statusCode.errorDescription)")
-                    return
-                }
-
-                statusCodeExternal = await sendRequest(request: request)
-                if statusCodeExternal != statusCodeOK {
-                    setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
-                }
-            }
-            if statusCode != statusCodeOK || statusCodeExternal != statusCodeOK {
-                let errorCode = statusCode != statusCodeOK ? statusCode : statusCodeExternal
-                setErrorBannerText(errorBannerTitle, "\(errorCode.errorDescription) \(errorBannerMessageEnd)")
-            }
-        }
-    }
-
-    func sendRequest(request: URLRequest) async -> Int {
+    func sendRequest(_ request: URLRequest) async -> (Int, Data?) {
         do {
-            let (_, response) = try await session.data(for: request)
+            let (data, response) = try await session.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse else {
                 Log.error("Response was not httpResponse, for \(request.url?.absoluteString ?? "")")
-                return statusCodeBadResponse
+                return (statusCodeBadResponse, nil)
             }
 
             if httpResponse.statusCode >= 300 {
                 Log.error("Api status: \(httpResponse.statusCode), for \(request.url?.absoluteString ?? "Missing url")")
-                return httpResponse.statusCode
+                return (httpResponse.statusCode, nil)
             }
+
+            return (statusCodeOK, data)
         } catch {
             Log.error("Failed to send request: \(request.debugDescription) with error: \(error)")
             if let urlError = error as? URLError {
-                return urlError.errorCode
+                return (urlError.errorCode, nil)
             } else {
-                return statusCodeFailedRequest
+                return (statusCodeFailedRequest, nil)
             }
         }
-
-        return statusCodeOK
     }
 
     func getRequestHeaders() -> [String: String] {
@@ -346,6 +307,28 @@ class RestAPIService: URLRequestBuilder {
 
         return UIImage(data: data)
     }
+
+    func registerAPNSToken(_ apnsToken: String) {
+        let path = "/api/mobile_app/registrations"
+        let user = UserManager.currentUser
+        var json: [JSONKey: Any] = [:]
+        json[.deviceID] = "intellinest_\(user.name)"
+        json[.appID] = "intellinest"
+        json[.appName] = "IntelliNest"
+        json[.appVersion] = "1.0"
+        json[.deviceName] = user == .sarah ? "Sarah's iPhone IntelliNest" : user == .tobias ? "Tobias iPhone IntelliNest" : ""
+        json[.manufacturer] = "Apple"
+        json[.model] = "iPhone"
+        json[.osName] = "iOS"
+        json[.osVersion] = "1.0"
+        json[.supportsEncryption] = false
+        let appData = [JSONKey.pushToken: apnsToken, .pushURL: "http://192.168.1.203:3000/notify"]
+        json[.appData] = appData
+        let capturedJSON = json
+        Task {
+            await sendPostRequest(customPath: path, json: capturedJSON, domain: .apnsToken, action: .register)
+        }
+    }
 }
 
 private extension RestAPIService {
@@ -359,7 +342,7 @@ private extension RestAPIService {
                                                             timeout: 1.0)
             let request = createURLRequest(urlRequestParameters: urlRequestParameters)
             if let request {
-                _ = await sendRequest(request: request)
+                _ = await sendRequest(request)
             }
         }
     }
@@ -370,6 +353,72 @@ private extension RestAPIService {
         \(jsonData?.debugDescription ?? "Bad JSON data"),
         \(domain), \(action)
         """)
+    }
+
+    private func sendPostRequest(customPath: String? = nil, json: [JSONKey: Any]?, domain: Domain, action: Action) async {
+        let path: String
+        if let customPath {
+            path = customPath
+        } else {
+            path = "/api/services/\(domain.rawValue)/\(action.rawValue)"
+        }
+        let errorBannerTitle = "Misslyckades med att skicka request"
+        let errorBannerMessageEnd = "(\(domain.rawValue), \(action.rawValue))"
+        var jsonData: Data?
+        if let json {
+            jsonData = createJSONData(json: json)
+        }
+
+        guard let request = createURLRequest(path: path,
+                                             jsonData: jsonData,
+                                             method: .post) else {
+            logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
+            return
+        }
+
+        var (statusCodeExternal, externalData): (Int, Data?) = (-1, nil)
+        let (statusCode, data) = await sendRequest(request)
+        let url = request.url?.absoluteString ?? ""
+        if statusCode != statusCodeOK {
+            if !url.contains(GlobalConstants.baseExternalUrlString) {
+                guard let request = createURLRequest(shouldForceExternalURL: true, path: path, jsonData: jsonData, method: .post) else {
+                    logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
+                    setErrorBannerText("Misslyckades med att skapa external http request", "POST: \(path). \(statusCode.errorDescription)")
+                    return
+                }
+
+                (statusCodeExternal, externalData) = await sendRequest(request)
+                if statusCodeExternal != statusCodeOK {
+                    setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
+                } else if let externalData {
+                    handleSuccessfulResponse(domain: domain, action: action, data: externalData)
+                }
+            }
+            if statusCode != statusCodeOK, statusCodeExternal != statusCodeOK {
+                let errorCode = statusCode != statusCodeOK ? statusCode : statusCodeExternal
+                setErrorBannerText(errorBannerTitle, "\(errorCode.errorDescription) \(errorBannerMessageEnd)")
+            }
+        } else if let data {
+            handleSuccessfulResponse(domain: domain, action: action, data: data)
+        }
+    }
+
+    func handleSuccessfulResponse(domain: Domain, action: Action, data: Data) {
+        if domain == .apnsToken, action == .register {
+            do {
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    // Extract the webhook_id from the JSON response
+                    if let webhookId = jsonResponse["webhook_id"] as? String {
+                        // Store the webhook_id for future use, e.g., in UserDefaults
+                        UserDefaults.standard.setValue(webhookId, forKey: StorageKeys.webhookID.rawValue)
+                    } else {
+                        Log.error("webhook_id not found in response")
+                    }
+                }
+            } catch {
+                Log.error("Error parsing response JSON: \(error)")
+            }
+        }
     }
 }
 

@@ -8,6 +8,7 @@
 import Foundation
 
 enum Domain: String, Encodable {
+    case apnsToken
     case camera
     case climate
     case melcloud
