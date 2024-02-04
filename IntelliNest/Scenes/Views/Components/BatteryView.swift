@@ -52,6 +52,8 @@ struct BatteryView: View {
                 }
                 Text("\(level)%")
                     .font(Font.headline.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.2)
                     .foregroundColor(.white)
             }
         }
