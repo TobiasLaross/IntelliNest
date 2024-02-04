@@ -307,7 +307,7 @@ private extension Navigator {
         Task {
             async let tmpFrontDoorSuccess = yaleApiService.setLockState(lockID: .frontDoor, action: action)
             async let tmpSideDoorSuccess = yaleApiService.setLockState(lockID: .sideDoor, action: action)
-            let (frontDoorSuccess, sideDoorSuccess) = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
+            let (frontDoorSuccess, sideDoorSuccess) = await(tmpFrontDoorSuccess, tmpSideDoorSuccess)
             if !frontDoorSuccess || !sideDoorSuccess {
                 var errorMessage = "Lyckades inte låsa".appending(action == .unlock ? " upp" : "")
                 if !frontDoorSuccess && !sideDoorSuccess {
@@ -341,9 +341,7 @@ private extension Navigator {
                         self?.webhookID = webhookID
                     }
 
-                    if UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) == nil {
-                        try? await Task.sleep(seconds: 5)
-                    }
+                    try? await Task.sleep(seconds: 5)
 
                     if let apnsToken = UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) {
                         self?.registerAPNSToken(apnsToken)
