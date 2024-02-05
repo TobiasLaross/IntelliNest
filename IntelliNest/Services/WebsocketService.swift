@@ -40,6 +40,8 @@ class WebSocketService {
         didSet {
             if isAuthenticated {
                 sendGetStatesRequest()
+            } else if oldValue {
+                socket?.connect()
             }
         }
     }
@@ -118,7 +120,6 @@ extension WebSocketService: WebSocketDelegate {
             didReceive(text: string)
         case .disconnected:
             isAuthenticated = false
-            socket?.connect()
         case .error(let error):
             isAuthenticated = false
             handleWebSocketError(error)
@@ -126,7 +127,13 @@ extension WebSocketService: WebSocketDelegate {
             print("Received data: \(data.count)")
         case .cancelled, .peerClosed:
             isAuthenticated = false
-        case .reconnectSuggested, .connected, .ping, .pong, .viabilityChanged:
+        case .viabilityChanged(let isViable):
+            if !isViable {
+                isAuthenticated = false
+            }
+        case .reconnectSuggested:
+            isAuthenticated = false
+        case .connected, .ping, .pong:
             break
         }
     }

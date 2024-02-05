@@ -341,7 +341,7 @@ private extension Navigator {
                         self?.webhookID = webhookID
                     }
 
-                    try? await Task.sleep(seconds: 5)
+                    try? await Task.sleep(seconds: 1.5)
 
                     if let apnsToken = UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) {
                         self?.registerAPNSToken(apnsToken)
