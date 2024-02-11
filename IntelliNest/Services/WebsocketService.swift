@@ -27,6 +27,17 @@ class WebSocketService {
     private var socket: WebSocket?
     private var requestID = 0
     private var requests: [String] = []
+    private var isExpectingTextResponse = false {
+        didSet {
+            if !isExpectingTextResponse {
+                expectingTextTask?.cancel()
+                expectingTextTask = nil
+            }
+        }
+    }
+
+    private var shouldRetryConnection = true
+    private var expectingTextTask: Task<Void, Error>?
     private var recentlySentRequests: [String] = [] {
         didSet {
             let count = recentlySentRequests.count
@@ -47,11 +58,18 @@ class WebSocketService {
     }
 
     var baseURLString = ""
+    private var isLocalConnection: Bool {
+        baseURLString == GlobalConstants.baseInternalUrlString
+    }
+
     private let ignoredErrorMessages = ["The network connection was lost", "abort", "Socket is not connected"]
 
     private var reloadConnectionAction: VoidClosure
-    init(reloadConnectionAction: @escaping VoidClosure) {
+    private let setErrorBannerText: StringStringClosure
+
+    init(reloadConnectionAction: @escaping VoidClosure, setErrorBannerText: @escaping StringStringClosure) {
         self.reloadConnectionAction = reloadConnectionAction
+        self.setErrorBannerText = setErrorBannerText
     }
 
     func baseURLChanged(urlString: String) {
@@ -75,6 +93,8 @@ class WebSocketService {
             socket?.connect()
         } else if !isAuthenticated {
             socket?.connect()
+        } else {
+            sendGetStatesRequest()
         }
     }
 
@@ -89,6 +109,8 @@ class WebSocketService {
 
     func disconnect() {
         socket?.disconnect()
+        expectingTextTask?.cancel()
+        expectingTextTask = nil
     }
 
     private func sendJSONCommand<T: Encodable>(_ command: T, requestID: Int? = nil) {
@@ -117,6 +139,7 @@ extension WebSocketService: WebSocketDelegate {
     func didReceive(event: WebSocketEvent, client: WebSocketClient) {
         switch event {
         case .text(let string):
+            isExpectingTextResponse = false
             didReceive(text: string)
         case .disconnected:
             isAuthenticated = false
@@ -215,6 +238,7 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     func sendGetStatesRequest() {
+        expectTextResponse()
         let getStatesRequest = ["type": "get_states"]
         sendJSONCommand(getStatesRequest)
     }
@@ -333,6 +357,26 @@ extension WebSocketService: WebSocketDelegate {
             let request = requests.removeFirst()
             writeToSocket(string: request)
             recentlySentRequests.append(request)
+        }
+    }
+
+    private func expectTextResponse() {
+        expectingTextTask = Task {
+            isExpectingTextResponse = true
+            do {
+                let sleepTime = isLocalConnection ? 0.2 : 1.0
+                try await Task.sleep(seconds: sleepTime)
+                if isExpectingTextResponse {
+                    Log.warning("Websocket did not get expected text response, internal: \(isLocalConnection)")
+                    if shouldRetryConnection {
+                        shouldRetryConnection = false
+                        baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
+                    } else {
+                        setErrorBannerText("Websocket error", "Fick inte uppdatering från websocket")
+                        shouldRetryConnection = true
+                    }
+                }
+            } catch {}
         }
     }
 }
