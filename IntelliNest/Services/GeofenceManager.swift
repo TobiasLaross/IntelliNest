@@ -60,11 +60,6 @@ extension GeofenceManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
         if region is CLCircularRegion {
             didExitHomeAction()
-            if UserManager.currentUser == .tobias {
-                NotificationService.sendNotification(title: "Hej då",
-                                                     message: "",
-                                                     identifier: "Geofence-did-exit-home")
-            }
         }
     }
 

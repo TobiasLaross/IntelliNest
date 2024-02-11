@@ -20,7 +20,7 @@ class Navigator: ObservableObject {
                 errorBannerDismissTask?.cancel()
                 errorBannerDismissTask = Task { @MainActor in
                     do {
-                        try await Task.sleep(seconds: 5)
+                        try await Task.sleep(seconds: 6)
                         errorBannerTitle = nil
                         errorBannerMessage = nil
                     } catch {}
@@ -49,11 +49,17 @@ class Navigator: ObservableObject {
                                                        })
 
     lazy var webSocketService = WebSocketService(reloadConnectionAction: { [weak self] in
-        Task { [weak self] in
-            await self?.urlCreator.updateConnectionState(ignoreLocalSSID: true)
-        }
-    })
-    lazy var restAPIService = RestAPIService(urlCreator: urlCreator, setErrorBannerText: setErrorBannerText)
+                                                     Task { [weak self] in
+                                                         await self?.urlCreator.updateConnectionState(ignoreLocalSSID: true)
+                                                     }
+                                                 },
+                                                 setErrorBannerText: { [weak self] title, message in
+                                                     self?.setErrorBannerText(title: title, message: message)
+                                                 })
+    lazy var restAPIService = RestAPIService(urlCreator: urlCreator,
+                                             setErrorBannerText: { [weak self] title, message in
+                                                 self?.setErrorBannerText(title: title, message: message)
+                                             })
     lazy var yaleApiService = YaleApiService(hassAPIService: restAPIService)
     lazy var homeViewModel = HomeViewModel(restAPIService: restAPIService,
                                            yaleApiService: yaleApiService,
@@ -212,6 +218,7 @@ class Navigator: ObservableObject {
 
     @MainActor
     func reloadCurrentModel() async {
+        print("reloading")
         await reloadConnection()
         await reload(for: currentDestination)
     }
