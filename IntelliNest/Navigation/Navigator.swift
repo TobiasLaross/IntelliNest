@@ -40,6 +40,7 @@ class Navigator: ObservableObject {
 
     private var homeCoordinates: Coordinates?
     private var webhookID: String?
+    private var isAppInForeground = true
     private var errorBannerDismissTask: Task<Void, Error>?
     private lazy var geoFenceManager = GeofenceManager(didEnterHomeAction: { [weak self] in
                                                            self?.didEnterHome()
@@ -83,10 +84,10 @@ class Navigator: ObservableObject {
                                                self?.push(.lights)
                                            },
                                            toolbarReloadAction: reloadCurrentModel)
-    lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: restAPIService)
     lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
                                                          restAPIService: restAPIService,
                                                          websocketService: webSocketService)
+    lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: restAPIService)
     lazy var heatersViewModel = HeatersViewModel(restAPIService: restAPIService,
                                                  showHeaterDetails: { [weak self] heaterID in
                                                      if heaterID == .heaterCorridor {
@@ -184,6 +185,12 @@ class Navigator: ObservableObject {
         restAPIService.callScript(scriptID: .eniroStartClimate)
     }
 
+    func snoozeWashingMachine() {
+        Task {
+            await restAPIService.setState(for: .snoozeWashingMachine, in: .inputBoolean, using: .turnOn)
+        }
+    }
+
     @MainActor
     func reload(for destination: Destination) async {
         switch destination {
@@ -204,6 +211,7 @@ class Navigator: ObservableObject {
     }
 
     func didEnterForeground() {
+        isAppInForeground = true
         electricityViewModel.isViewActive = currentDestination == .electricity
         Task {
             await reloadConnection()
@@ -212,13 +220,14 @@ class Navigator: ObservableObject {
     }
 
     func didResignForeground() {
+        isAppInForeground = false
         electricityViewModel.isViewActive = false
+        webSocketService.isExpectingTextResponse = false
         webSocketService.disconnect()
     }
 
     @MainActor
     func reloadCurrentModel() async {
-        print("reloading")
         await reloadConnection()
         await reload(for: currentDestination)
     }
@@ -232,14 +241,16 @@ class Navigator: ObservableObject {
     }
 
     @MainActor
-    func reloadConnection(ignoreLocalSSID: Bool = false) async {
+    func reloadConnection(ignoreLocalSSID _: Bool = false) async {
         await urlCreator.updateConnectionState(ignoreLocalSSID: false)
     }
 }
 
 private extension Navigator {
     func showCamerasView() -> CamerasView {
+        // swiftformat:disable all
         CamerasView(viewModel: self.camerasViewModel)
+        // swiftformat:enable all
     }
 
     func showElectricityView() -> ElectricityView {
@@ -333,9 +344,11 @@ private extension Navigator {
     }
 
     func setErrorBannerText(title: String, message: String) {
-        Task { @MainActor in
-            errorBannerTitle = title
-            errorBannerMessage = message
+        if isAppInForeground {
+            Task { @MainActor in
+                errorBannerTitle = title
+                errorBannerMessage = message
+            }
         }
     }
 

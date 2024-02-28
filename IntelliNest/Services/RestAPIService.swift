@@ -250,7 +250,7 @@ class RestAPIService: URLRequestBuilder {
         [
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": "Bearer \(GlobalConstants.secretHassToken)"
+            "Authorization": "Bearer \(GlobalConstants.secretHassToken)",
         ]
     }
 
@@ -332,22 +332,7 @@ class RestAPIService: URLRequestBuilder {
 }
 
 private extension RestAPIService {
-    func setBoolEntity(_ entityID: EntityId, path: String) {
-        Task {
-            let jsonData = createJSONData(json: [.entityID: entityID.rawValue])
-            let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
-                                                            path: path,
-                                                            jsonData: jsonData,
-                                                            method: .post,
-                                                            timeout: 1.0)
-            let request = createURLRequest(urlRequestParameters: urlRequestParameters)
-            if let request {
-                _ = await sendRequest(request)
-            }
-        }
-    }
-
-    func logCreateRequestFailed(path: String, domain: Domain, action: Action, json: [JSONKey: Any]? = nil, jsonData: Data? = nil) {
+    func logCreateRequestFailed(path _: String, domain: Domain, action: Action, json: [JSONKey: Any]? = nil, jsonData: Data? = nil) {
         Log.error("""
         Failed to create request \(json ?? [.invalid: ""]),
         \(jsonData?.debugDescription ?? "Bad JSON data"),
@@ -355,7 +340,7 @@ private extension RestAPIService {
         """)
     }
 
-    private func sendPostRequest(customPath: String? = nil, json: [JSONKey: Any]?, domain: Domain, action: Action) async {
+    func sendPostRequest(customPath: String? = nil, json: [JSONKey: Any]?, domain: Domain, action: Action) async {
         let path: String
         if let customPath {
             path = customPath

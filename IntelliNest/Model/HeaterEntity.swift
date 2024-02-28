@@ -1,5 +1,5 @@
 //
-//  Heater.swift
+//  HeaterEntity.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-12.
@@ -79,8 +79,8 @@ struct HeaterEntity: EntityProtocol {
     }
 
     static func == (lhs: HeaterEntity, rhs: HeaterEntity) -> Bool {
-        return (lhs.entityId == rhs.entityId &&
-            lhs.state == rhs.state)
+        return lhs.entityId == rhs.entityId &&
+            lhs.state == rhs.state
     }
 
     private mutating func configureWith(attributes: [String: Any]) {
