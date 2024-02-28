@@ -1,5 +1,5 @@
 //
-//  Home.swift
+//  HomeView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-01.
@@ -210,7 +210,8 @@ private struct ServiceButtonsView: View {
                                                   Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
                                                       viewModel.toggleStateForSarahsIphone()
                                                   },
-                                              secondaryButton: .cancel())
+                                              secondaryButton: .cancel()
+                                          )
                                       }
                 } else if UserManager.currentUser == .sarah && !viewModel.isSarahsPillsTaken {
                     ServiceButtonView(buttonTitle: "Tagit medicin",

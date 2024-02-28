@@ -26,6 +26,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case framdorren = "lock.framdorren"
     case storageLock = "lock.forradet"
     case hittaSarahsIphone = "script.hitta_sarahs_iphone"
+    case snoozeWashingMachine = "input_boolean.washer_snooze"
     case washerCompletionTime = "sensor.washing_machine_washer_completion_time"
     case washerState = "sensor.washing_machine_washer_job_state"
     case dryerCompletionTime = "sensor.tumble_dryer_dryer_completion_time"
@@ -35,6 +36,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case homeLocation = "zone.home"
     case tobiasIsAway = "input_boolean.tobias_is_away"
     case sarahIsAway = "input_boolean.sarah_is_away"
+    case personTobias = "person.tobias_laross"
     // Electricity
     case nordPool = "sensor.nordpool_kwh_se4_sek_0_10_0"
     case sonnenAutomation = "automation.battery_charger"
@@ -145,7 +147,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case yaleAccessTokenPart5 = "input_text.yale_access_token_part5"
 
     var type: EntityType {
-        if let rawType = self.rawValue.components(separatedBy: ".").first {
+        if let rawType = rawValue.components(separatedBy: ".").first {
             switch rawType.lowercased() {
             case "light":
                 return .light
@@ -159,6 +161,6 @@ enum EntityId: String, Decodable, CaseIterable {
     }
 
     func domain() -> Domain {
-        return Domain(rawValue: self.rawValue.components(separatedBy: ".").first!) ?? .unknown
+        return Domain(rawValue: rawValue.components(separatedBy: ".").first!) ?? .unknown
     }
 }

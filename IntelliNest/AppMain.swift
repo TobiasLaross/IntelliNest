@@ -1,5 +1,5 @@
 //
-//  IntelliNestApp.swift
+//  AppMain.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-01-26.
@@ -106,6 +106,12 @@ struct AppMain: App {
                         Task {
                             try? await Task.sleep(seconds: 0.5)
                             navigator.startKiaHeater()
+                        }
+                    } else if path == NotificationActionIdentifier.snoozeWashingMachine.rawValue {
+                        navigator.navigationPath = []
+                        Task {
+                            try? await Task.sleep(seconds: 1.0)
+                            navigator.snoozeWashingMachine()
                         }
                     } else {
                         navigator.navigationPath = []

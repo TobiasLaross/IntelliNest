@@ -1,0 +1,19 @@
+{
+	"name": "xcode build server",
+	"version": "0.2",
+	"bspVersion": "2.0",
+	"languages": [
+		"c",
+		"cpp",
+		"objective-c",
+		"objective-cpp",
+		"swift"
+	],
+	"argv": [
+		"/usr/local/bin/xcode-build-server"
+	],
+	"workspace": "/Users/tobias/Developer/Tobias/IntelliNest/IntelliNest.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/tobias/Library/Developer/Xcode/DerivedData/IntelliNest-cbwiubgqcokqaibodmnmmfcjdzzu",
+	"scheme": "IntelliNest",
+	"kind": "xcode"
+}

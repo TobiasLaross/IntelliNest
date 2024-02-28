@@ -27,15 +27,6 @@ class WebSocketService {
     private var socket: WebSocket?
     private var requestID = 0
     private var requests: [String] = []
-    private var isExpectingTextResponse = false {
-        didSet {
-            if !isExpectingTextResponse {
-                expectingTextTask?.cancel()
-                expectingTextTask = nil
-            }
-        }
-    }
-
     private var shouldRetryConnection = true
     private var expectingTextTask: Task<Void, Error>?
     private var recentlySentRequests: [String] = [] {
@@ -43,6 +34,15 @@ class WebSocketService {
             let count = recentlySentRequests.count
             if count > 10 {
                 recentlySentRequests.removeFirst(count - 10)
+            }
+        }
+    }
+
+    var isExpectingTextResponse = false {
+        didSet {
+            if !isExpectingTextResponse {
+                expectingTextTask?.cancel()
+                expectingTextTask = nil
             }
         }
     }
@@ -136,21 +136,21 @@ class WebSocketService {
 }
 
 extension WebSocketService: WebSocketDelegate {
-    func didReceive(event: WebSocketEvent, client: WebSocketClient) {
+    func didReceive(event: WebSocketEvent, client _: WebSocketClient) {
         switch event {
-        case .text(let string):
+        case let .text(string):
             isExpectingTextResponse = false
             didReceive(text: string)
         case .disconnected:
             isAuthenticated = false
-        case .error(let error):
+        case let .error(error):
             isAuthenticated = false
             handleWebSocketError(error)
-        case .binary(let data):
+        case let .binary(data):
             print("Received data: \(data.count)")
         case .cancelled, .peerClosed:
             isAuthenticated = false
-        case .viabilityChanged(let isViable):
+        case let .viabilityChanged(isViable):
             if !isViable {
                 isAuthenticated = false
             }
@@ -216,7 +216,7 @@ extension WebSocketService: WebSocketDelegate {
     private func sendAuthenticationMessage() {
         let authMessage: [String: Any] = [
             "type": "auth",
-            "access_token": "\(GlobalConstants.secretHassToken)"
+            "access_token": "\(GlobalConstants.secretHassToken)",
         ]
 
         if let jsonData = try? JSONSerialization.data(withJSONObject: authMessage, options: []),

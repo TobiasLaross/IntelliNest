@@ -5,4 +5,4 @@ xcdebugger
 IntelliNest-Info.xcconfig
 # CocoaPods
 Pods/
-
+.nvim/
