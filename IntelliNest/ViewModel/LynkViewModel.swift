@@ -1,5 +1,5 @@
 //
-//  EniroViewModel.swift
+//  LynkViewModel.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-08-24.
@@ -10,7 +10,7 @@ import ShipBookSDK
 import SwiftUI
 
 @MainActor
-class EniroViewModel: ObservableObject {
+class LynkViewModel: ObservableObject {
     @Published var doorLock = LockEntity(entityId: .eniroDoorLock)
     @Published var climateTemperature = InputNumberEntity(entityId: .eniroClimateTemperature)
     @Published var climateHeating = Entity(entityId: .eniroClimateHeating)
@@ -40,9 +40,7 @@ class EniroViewModel: ObservableObject {
         -eniroLastUpdate.date.timeIntervalSinceNow < 15 * 60
     }
 
-    var isAirConditionActive: Bool {
-        (eniroAirConditioner.isActive && recentlyUpdated && eniroAirConditioner.recentlyUpdated()) || climateControlScript.isActive
-    }
+    var isAirConditionActive = false
 
     var lastUpdated: String {
         let formatter = DateFormatter()
@@ -125,7 +123,7 @@ class EniroViewModel: ObservableObject {
     }
 
     private func startClimate() {
-        restAPIService.callScript(scriptID: .eniroStartClimate)
+        restAPIService.callScript(scriptID: .lynkStartClimate)
     }
 
     private func stopClimate() {

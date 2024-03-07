@@ -24,4 +24,5 @@ enum ScriptID: String, Decodable, CaseIterable {
     case saveClimateState = "script.save_climate_state"
     case eniroStartClimate = "script.kia_climate_control"
     case eniroTurnOffStartClimate = "script.turn_off_kia_climate_control"
+    case lynkStartClimate = "script.lynk_start_climate"
 }

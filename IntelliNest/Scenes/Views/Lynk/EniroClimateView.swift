@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EniroClimateView: View {
-    @ObservedObject var viewModel: EniroViewModel
+    @ObservedObject var viewModel: LynkViewModel
 
     var body: some View {
         let climateButtonImageSize: CGFloat = 30

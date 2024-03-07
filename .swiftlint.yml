@@ -2,7 +2,7 @@ line_length:
   warning: 140
   error: 160
 disabled_rules: 
-   - blanket_disable_command
+   - blanket_disable_command, trailing_comma
 excluded: # paths to ignore during linting. Takes precedence over `included`.
   - Pods
   - R.generated.swift

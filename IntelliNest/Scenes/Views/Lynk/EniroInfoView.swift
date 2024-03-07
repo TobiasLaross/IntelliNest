@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EniroInfoView: View {
-    @ObservedObject var viewModel: EniroViewModel
+    @ObservedObject var viewModel: LynkViewModel
 
     var body: some View {
         VStack {

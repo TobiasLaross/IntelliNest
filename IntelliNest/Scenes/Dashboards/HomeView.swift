@@ -92,7 +92,7 @@ private struct NavigationButtonsView: View {
         VStack {
             HStack(spacing: 15) {
                 NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), action: viewModel.showHeatersAction)
-                NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.fill"), action: viewModel.showEniroAction)
+                NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.fill"), action: viewModel.showLynkAction)
                 NavigationButtonView(buttonTitle: "",
                                      image: Image("roborocks7"),
                                      buttonImageWidth: 50,
@@ -235,7 +235,7 @@ struct Home_Previews: PreviewProvider {
                                       yaleApiService: YaleApiService(hassAPIService: PreviewProviderUtil.restAPIService),
                                       urlCreator: PreviewProviderUtil.urlCreator,
                                       showHeatersAction: {},
-                                      showEniroAction: {},
+                                      showLynkAction: {},
                                       showRoborockAction: {},
                                       showPowerGridAction: {},
                                       showCamerasAction: {},

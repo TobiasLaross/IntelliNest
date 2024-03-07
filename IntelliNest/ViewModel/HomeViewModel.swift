@@ -50,7 +50,7 @@ class HomeViewModel: ObservableObject {
     let yaleApiService: YaleApiService
     var urlCreator: URLCreator
     let showHeatersAction: MainActorVoidClosure
-    let showEniroAction: MainActorVoidClosure
+    let showLynkAction: MainActorVoidClosure
     let showRoborockAction: MainActorVoidClosure
     let showPowerGridAction: MainActorVoidClosure
     let showCamerasAction: MainActorVoidClosure
@@ -61,7 +61,7 @@ class HomeViewModel: ObservableObject {
          yaleApiService: YaleApiService,
          urlCreator: URLCreator,
          showHeatersAction: @escaping MainActorVoidClosure,
-         showEniroAction: @escaping MainActorVoidClosure,
+         showLynkAction: @escaping MainActorVoidClosure,
          showRoborockAction: @escaping MainActorVoidClosure,
          showPowerGridAction: @escaping MainActorVoidClosure,
          showCamerasAction: @escaping MainActorVoidClosure,
@@ -71,7 +71,7 @@ class HomeViewModel: ObservableObject {
         self.yaleApiService = yaleApiService
         self.urlCreator = urlCreator
         self.showHeatersAction = showHeatersAction
-        self.showEniroAction = showEniroAction
+        self.showLynkAction = showLynkAction
         self.showRoborockAction = showRoborockAction
         self.showPowerGridAction = showPowerGridAction
         self.showCamerasAction = showCamerasAction

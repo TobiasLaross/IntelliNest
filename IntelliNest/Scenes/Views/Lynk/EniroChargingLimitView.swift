@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EniroChargingLimitView: View {
-    @ObservedObject var viewModel: EniroViewModel
+    @ObservedObject var viewModel: LynkViewModel
     let iconWidth = 35.0
     let iconHeight = 35.0
 
