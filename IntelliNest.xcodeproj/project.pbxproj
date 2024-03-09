@@ -12,7 +12,7 @@
 		F60345C927A9379200212D04 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C827A9379200212D04 /* HomeView.swift */; };
 		F60345CC27A93BD700212D04 /* URLCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345CB27A93BD700212D04 /* URLCreator.swift */; };
 		F60345CE27AAF84E00212D04 /* HeatersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345CD27AAF84E00212D04 /* HeatersView.swift */; };
-		F60345D027ABB46900212D04 /* EniroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345CF27ABB46900212D04 /* EniroView.swift */; };
+		F60345D027ABB46900212D04 /* LynkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345CF27ABB46900212D04 /* LynkView.swift */; };
 		F60345D427ABE49100212D04 /* LightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D327ABE49100212D04 /* LightsView.swift */; };
 		F60345D627ABE49700212D04 /* RoborockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345D527ABE49700212D04 /* RoborockView.swift */; };
 		F6035045287F5DB10028DA57 /* SingleRoomLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6035044287F5DB10028DA57 /* SingleRoomLight.swift */; };
@@ -180,7 +180,7 @@
 		F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F1D08529A94E8900A3292E /* LimitPickerView.swift */; };
 		F6F60E5F27F1FBE3009F3966 /* InputNumberEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */; };
 		F6F8556128DF9EE8004B9517 /* HeatersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */; };
-		F6F94B5E28B60DED006B1F12 /* EniroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */; };
+		F6F94B5E28B60DED006B1F12 /* LynkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6F94B5D28B60DED006B1F12 /* LynkViewModel.swift */; };
 		F6FAD81A2A2A472000C0B364 /* CamerasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */; };
 		F6FAD81C2A2A654900C0B364 /* WebsocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FAD81B2A2A654900C0B364 /* WebsocketService.swift */; };
 		F6FAD81E2A2A695600C0B364 /* WebsocketServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FAD81D2A2A695600C0B364 /* WebsocketServiceDelegate.swift */; };
@@ -234,7 +234,7 @@
 		F60345C827A9379200212D04 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		F60345CB27A93BD700212D04 /* URLCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreator.swift; sourceTree = "<group>"; };
 		F60345CD27AAF84E00212D04 /* HeatersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersView.swift; sourceTree = "<group>"; };
-		F60345CF27ABB46900212D04 /* EniroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroView.swift; sourceTree = "<group>"; };
+		F60345CF27ABB46900212D04 /* LynkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LynkView.swift; sourceTree = "<group>"; };
 		F60345D327ABE49100212D04 /* LightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsView.swift; sourceTree = "<group>"; };
 		F60345D527ABE49700212D04 /* RoborockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockView.swift; sourceTree = "<group>"; };
 		F6035044287F5DB10028DA57 /* SingleRoomLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleRoomLight.swift; sourceTree = "<group>"; };
@@ -403,7 +403,7 @@
 		F6F1D08529A94E8900A3292E /* LimitPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitPickerView.swift; sourceTree = "<group>"; };
 		F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputNumberEntity.swift; sourceTree = "<group>"; };
 		F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModel.swift; sourceTree = "<group>"; };
-		F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroViewModel.swift; sourceTree = "<group>"; };
+		F6F94B5D28B60DED006B1F12 /* LynkViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LynkViewModel.swift; sourceTree = "<group>"; };
 		F6FAD8192A2A472000C0B364 /* CamerasViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CamerasViewModel.swift; sourceTree = "<group>"; };
 		F6FAD81B2A2A654900C0B364 /* WebsocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketService.swift; sourceTree = "<group>"; };
 		F6FAD81D2A2A695600C0B364 /* WebsocketServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketServiceDelegate.swift; sourceTree = "<group>"; };
@@ -508,7 +508,7 @@
 				F624EF672A2B4AAB004AC6BA /* CamerasView.swift */,
 				F685F8042B2C4F2E008E47AF /* ElectricityView.swift */,
 				F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */,
-				F60345CF27ABB46900212D04 /* EniroView.swift */,
+				F60345CF27ABB46900212D04 /* LynkView.swift */,
 				F60345CD27AAF84E00212D04 /* HeatersView.swift */,
 				F60345C827A9379200212D04 /* HomeView.swift */,
 				F60345D327ABE49100212D04 /* LightsView.swift */,
@@ -573,7 +573,7 @@
 			children = (
 				F68DA61528B0D12B00601726 /* HomeViewModel.swift */,
 				F62CD2E228770D5500462092 /* LightsViewModel.swift */,
-				F6F94B5D28B60DED006B1F12 /* EniroViewModel.swift */,
+				F6F94B5D28B60DED006B1F12 /* LynkViewModel.swift */,
 				F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */,
 				F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */,
 				F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */,
@@ -679,7 +679,7 @@
 				F655F6512B57D7BE00620BCD /* Components */,
 				F6225E2A2AE1351D00D32EF4 /* Home */,
 				F6BD968D2B32DD2200A46C8F /* Electricity */,
-				F67F6B4928D8FB780003CE9F /* Eniro */,
+				F67F6B4928D8FB780003CE9F /* Lynk */,
 				F62CD2E92877275400462092 /* Light */,
 				F6633F2A286324DE004D0B76 /* Heater */,
 				F6633F3B28632BF1004D0B76 /* Roborock */,
@@ -752,7 +752,7 @@
 			path = IntelliWidget;
 			sourceTree = "<group>";
 		};
-		F67F6B4928D8FB780003CE9F /* Eniro */ = {
+		F67F6B4928D8FB780003CE9F /* Lynk */ = {
 			isa = PBXGroup;
 			children = (
 				F67F6B4A28D8FB7F0003CE9F /* EniroInfoView.swift */,
@@ -762,7 +762,8 @@
 				F6F1D079299110EC00A3292E /* NordPoolHistoryView.swift */,
 				F6F1D08529A94E8900A3292E /* LimitPickerView.swift */,
 			);
-			path = Eniro;
+			name = Lynk;
+			path = Lynk;
 			sourceTree = "<group>";
 		};
 		F680EE5C2B0F4CBA0055334C /* ViewModels */ = {
@@ -999,7 +1000,7 @@
 			);
 			mainGroup = F67023EE27A177320070FFBB;
 			packageReferences = (
-				F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */,
+				F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */,
 				F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			productRefGroup = F67023F827A177320070FFBB /* Products */;
@@ -1219,7 +1220,7 @@
 				F6FDBE2D2A1A2F970081BC3D /* URLRequestBuilder.swift in Sources */,
 				F6C4CA912B612E7C0037B777 /* ViewExtension.swift in Sources */,
 				F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */,
-				F60345D027ABB46900212D04 /* EniroView.swift in Sources */,
+				F60345D027ABB46900212D04 /* LynkView.swift in Sources */,
 				F63F1A782B6255EF006D8906 /* NotificationService.swift in Sources */,
 				F6FAD81A2A2A472000C0B364 /* CamerasViewModel.swift in Sources */,
 				F6633F3F28632C81004D0B76 /* RoborockInfoView.swift in Sources */,
@@ -1280,7 +1281,7 @@
 				F669C72E2A23C08000458165 /* CameraViewModel.swift in Sources */,
 				F62750A129FE39B100C1253F /* Destination.swift in Sources */,
 				F63F1A722B615A8E006D8906 /* Coordinates.swift in Sources */,
-				F6F94B5E28B60DED006B1F12 /* EniroViewModel.swift in Sources */,
+				F6F94B5E28B60DED006B1F12 /* LynkViewModel.swift in Sources */,
 				F6EF35AF2A3A33BE00895250 /* DateTimePickerView.swift in Sources */,
 				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
 			);
@@ -1481,7 +1482,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1503,7 +1504,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1523,7 +1524,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1545,7 +1546,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1564,7 +1565,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1573,7 +1574,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1591,7 +1592,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1600,7 +1601,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1618,7 +1619,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1634,7 +1635,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1653,7 +1654,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1669,7 +1670,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1687,7 +1688,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1703,7 +1704,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1782,7 +1783,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1804,7 +1805,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1823,7 +1824,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1832,7 +1833,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1848,7 +1849,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1862,7 +1863,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1878,7 +1879,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1892,7 +1893,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1908,7 +1909,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 37;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1922,7 +1923,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2024.02.28;
+				MARKETING_VERSION = 2024.03.09;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1996,7 +1997,7 @@
 				minimumVersion = 4.0.6;
 			};
 		};
-		F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */ = {
+		F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ShipBook/ShipBookSDK-iOS.git";
 			requirement = {
@@ -2009,7 +2010,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		F63F1A732B615D92006D8906 /* ShipBookSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
+			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */;
 			productName = ShipBookSDK;
 		};
 		F669C7302A23D6DA00458165 /* Starscream */ = {
@@ -2019,7 +2020,7 @@
 		};
 		F6DE990829BD13B500B8AABB /* ShipBookSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
+			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */;
 			productName = ShipBookSDK;
 		};
 /* End XCSwiftPackageProductDependency section */

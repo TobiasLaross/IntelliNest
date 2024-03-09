@@ -68,8 +68,8 @@ class Navigator: ObservableObject {
                                            showHeatersAction: { [weak self] in
                                                self?.push(.heaters)
                                            },
-                                           showEniroAction: { [weak self] in
-                                               self?.push(.eniro)
+                                           showLynkAction: { [weak self] in
+                                               self?.push(.lynk)
                                            },
                                            showRoborockAction: { [weak self] in
                                                self?.push(.roborock)
@@ -96,10 +96,10 @@ class Navigator: ObservableObject {
                                                          self?.push(.playroomHeaterDetails)
                                                      }
                                                  })
-    lazy var eniroViewModel = EniroViewModel(restAPIService: restAPIService,
-                                             showClimateSchedulingAction: { [weak self] in
-                                                 self?.push(.eniroClimateSchedule)
-                                             })
+    lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService,
+                                           showClimateSchedulingAction: { [weak self] in
+                                               self?.push(.eniroClimateSchedule)
+                                           })
     lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: restAPIService)
     lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService)
     lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService)
@@ -144,12 +144,12 @@ class Navigator: ObservableObject {
                 Text("Not implemented for home")
             case .heaters:
                 showHeatersView()
+            case .lynk:
+                showLynkView()
             case .corridorHeaterDetails:
                 showHeaterDetailsView(heaterID: .heaterCorridor)
             case .playroomHeaterDetails:
                 showHeaterDetailsView(heaterID: .heaterPlayroom)
-            case .eniro:
-                showEniroView()
             case .eniroClimateSchedule:
                 showEniroClimateScheduleView()
             case .roborock:
@@ -181,8 +181,8 @@ class Navigator: ObservableObject {
         }
     }
 
-    func startKiaHeater() {
-        restAPIService.callScript(scriptID: .eniroStartClimate)
+    func lynkStartClimate() {
+        restAPIService.callScript(scriptID: .lynkStartClimate)
     }
 
     func snoozeWashingMachine() {
@@ -201,7 +201,7 @@ class Navigator: ObservableObject {
             break
         case .heaters:
             await heatersViewModel.reload()
-        case .eniro:
+        case .lynk:
             break
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
@@ -265,6 +265,10 @@ private extension Navigator {
         HeatersView(viewModel: heatersViewModel)
     }
 
+    func showLynkView() -> LynkView {
+        LynkView(viewModel: lynkViewModel)
+    }
+
     func showHeaterDetailsView(heaterID: EntityId) -> DetailedHeaterView {
         if heaterID == .heaterCorridor {
             DetailedHeaterView(heater: heatersViewModel.heaterCorridor,
@@ -283,10 +287,6 @@ private extension Navigator {
                                horizontalModeSelectedCallback: heatersViewModel.horizontalModeSelectedCallback,
                                verticalModeSelectedCallback: heatersViewModel.verticalModeSelectedCallback)
         }
-    }
-
-    func showEniroView() -> EniroView {
-        EniroView(viewModel: eniroViewModel)
     }
 
     func showEniroClimateScheduleView() -> EniroClimateScheduleView {
@@ -336,9 +336,11 @@ private extension Navigator {
                     errorMessage.append(sideDoorSuccess ? "" : " sidodörren.")
                 }
 
-                NotificationService.sendNotification(title: "Geofence",
-                                                     message: errorMessage,
-                                                     identifier: "Geofence-yale-failure")
+                if UserManager.currentUser == .tobias {
+                    NotificationService.sendNotification(title: "Geofence",
+                                                         message: errorMessage,
+                                                         identifier: "Geofence-yale-failure")
+                }
             }
         }
     }

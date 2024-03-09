@@ -327,10 +327,6 @@ extension WebSocketService: WebSocketDelegate {
             } else if entityID == .heaterCorridor || entityID == .heaterPlayroom {
                 let heater = HeaterEntity(entityID: entityID, state: state, attributes: newState)
                 delegate?.webSocketService(didReceiveHeater: heater)
-            } else if entityID == .eniroGeoLocation {
-                let addressDict = attributes["address"] as? [String: Any] ?? [:]
-                let eniroGeoEntity = EniroGeoEntity(entityId: .eniroGeoLocation, state: state, addressDict: addressDict)
-                delegate?.webSocketService(didReceiveEniroGeoEntity: eniroGeoEntity)
             } else if entityID == .nordPool {
                 let nordPoolEntity = NordPoolEntity(entityId: entityID, state: state, attributes: attributes)
                 delegate?.webSocketService(didReceiveNordPoolEntity: nordPoolEntity)

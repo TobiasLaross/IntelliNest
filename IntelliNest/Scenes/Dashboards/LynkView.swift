@@ -1,5 +1,5 @@
 //
-//  Eniro.swift
+//  LynkView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-03.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct EniroView: View {
-    @ObservedObject var viewModel: EniroViewModel
+struct LynkView: View {
+    @ObservedObject var viewModel: LynkViewModel
 
     var body: some View {
         ZStack {
@@ -88,7 +88,7 @@ struct EniroView: View {
 
 struct Eniro_Previews: PreviewProvider {
     static var previews: some View {
-        EniroView(viewModel: EniroViewModel(restAPIService: PreviewProviderUtil.restAPIService,
-                                            showClimateSchedulingAction: {}))
+        LynkView(viewModel: LynkViewModel(restAPIService: PreviewProviderUtil.restAPIService,
+                                          showClimateSchedulingAction: {}))
     }
 }

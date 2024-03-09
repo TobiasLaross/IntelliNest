@@ -102,10 +102,10 @@ struct AppMain: App {
             .onOpenURL { url in
                 if url.scheme == "IntelliNest", let path = url.host {
                     if path == "start-car-heater" {
-                        navigator.navigationPath = [.eniro]
+                        navigator.navigationPath = [.lynk]
                         Task {
                             try? await Task.sleep(seconds: 0.5)
-                            navigator.startKiaHeater()
+                            navigator.lynkStartClimate()
                         }
                     } else if path == NotificationActionIdentifier.snoozeWashingMachine.rawValue {
                         navigator.navigationPath = []
@@ -128,7 +128,7 @@ struct AppMain: App {
         // 2
         switch action {
         case .carheater:
-            navigator.startKiaHeater()
+            navigator.lynkStartClimate()
         }
 
         // 3
