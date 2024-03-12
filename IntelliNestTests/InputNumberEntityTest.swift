@@ -3,9 +3,9 @@ import XCTest
 
 class InputNumberEntityTests: XCTestCase {
     func testInit() {
-        let entity = InputNumberEntity(entityId: entityId)
+        let entity = InputNumberEntity(entityId: .thermKitchen)
 
-        XCTAssertEqual(entity.entityId, entityId)
+        XCTAssertEqual(entity.entityId, .thermKitchen)
         XCTAssertEqual(entity.state, "Loading")
         XCTAssertEqual(entity.lastChanged, .distantPast)
         XCTAssertEqual(entity.lastUpdated, .distantPast)
