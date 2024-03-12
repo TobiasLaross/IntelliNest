@@ -27,8 +27,6 @@ struct LimitPickerView: View {
                     saveChargerLimit(limitEntity.entityId, currentLimit)
                 }
             VStack {
-                Text("Begränsa \(limitEntity.entityId == .eniroDCChargingLimit ? "snabb" : "långsam ")laddning")
-                    .padding()
                 NumberPickerScrollView(entityId: limitEntity.entityId,
                                        targetTemperature: $currentLimit,
                                        numberSelectedCallback: saveChargerLimit,
@@ -43,6 +41,6 @@ struct LimitPickerView: View {
 
 struct LimitPickerView_Previews: PreviewProvider {
     static var previews: some View {
-        LimitPickerView(limitEntity: .init(entityId: .eniroDCChargingLimit), saveChargerLimit: { _, _ in }, currentLimit: 50)
+        LimitPickerView(limitEntity: .init(entityId: .lynkDoorLock), saveChargerLimit: { _, _ in }, currentLimit: 50)
     }
 }

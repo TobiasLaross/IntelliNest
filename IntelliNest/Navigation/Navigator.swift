@@ -131,6 +131,9 @@ class Navigator: ObservableObject {
 
     func pop() {
         navigationPath.removeLast()
+        camerasViewModel.setIsActiveScreen(currentDestination == .cameras)
+        electricityViewModel.isViewActive = currentDestination == .electricity
+        lynkViewModel.isViewActive = currentDestination == .lynk
     }
 
     func show(destination: Destination) -> some View {
@@ -177,6 +180,7 @@ class Navigator: ObservableObject {
 
                 camerasViewModel.setIsActiveScreen(destination == .cameras)
                 electricityViewModel.isViewActive = destination == .electricity
+                lynkViewModel.isViewActive = destination == .lynk
             }
         }
     }
@@ -202,7 +206,7 @@ class Navigator: ObservableObject {
         case .heaters:
             await heatersViewModel.reload()
         case .lynk:
-            break
+            await lynkViewModel.reload()
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
         case .roborock, .cameras, .lights, .playroomHeaterDetails, .corridorHeaterDetails:
@@ -213,6 +217,7 @@ class Navigator: ObservableObject {
     func didEnterForeground() {
         isAppInForeground = true
         electricityViewModel.isViewActive = currentDestination == .electricity
+        lynkViewModel.isViewActive = currentDestination == .lynk
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
@@ -222,6 +227,7 @@ class Navigator: ObservableObject {
     func didResignForeground() {
         isAppInForeground = false
         electricityViewModel.isViewActive = false
+        lynkViewModel.isViewActive = false
         webSocketService.isExpectingTextResponse = false
         webSocketService.disconnect()
     }

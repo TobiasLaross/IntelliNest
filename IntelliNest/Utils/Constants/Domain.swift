@@ -19,6 +19,7 @@ enum Domain: String, Encodable {
     case homeassistant
     case restCommand = "rest_command"
     case light
+    case lynkco
     case inputBoolean = "input_boolean"
     case inputDateTime = "input_datetime"
     case inputNumber = "input_number"

@@ -266,3 +266,5 @@ class HomeViewModel: ObservableObject {
         isSarahsPillsTaken = Calendar.current.isDateInToday(lastTakenPillsDate ?? .distantPast)
     }
 }
+
+// swiftlint:enable cyclomatic_complexity

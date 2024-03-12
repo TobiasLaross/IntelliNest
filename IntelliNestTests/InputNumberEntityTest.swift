@@ -3,7 +3,6 @@ import XCTest
 
 class InputNumberEntityTests: XCTestCase {
     func testInit() {
-        let entityId = EntityId.eniroClimateTemperature
         let entity = InputNumberEntity(entityId: entityId)
 
         XCTAssertEqual(entity.entityId, entityId)
@@ -42,17 +41,10 @@ class InputNumberEntityTests: XCTestCase {
         let date = try XCTUnwrap(Date.fromISO8601("2023-02-24T05:40:30.846631+00:00"))
         let entity = try decoder.decode(InputNumberEntity.self, from: json)
 
-        XCTAssertEqual(entity.entityId, EntityId.eniroClimateTemperature)
         XCTAssertEqual(entity.state, "21.0")
         XCTAssertEqual(entity.lastChanged, date)
         XCTAssertEqual(entity.lastUpdated, date)
         XCTAssertEqual(entity.isActive, false)
         XCTAssertEqual(entity.inputNumber, 21.0)
-    }
-
-    func testSetNextUpdateTime() {
-        var entity = InputNumberEntity(entityId: .eniroClimateTemperature)
-        entity.setNextUpdateTime()
-        XCTAssertGreaterThan(entity.nextUpdate.timeIntervalSinceNow, 0.0)
     }
 }

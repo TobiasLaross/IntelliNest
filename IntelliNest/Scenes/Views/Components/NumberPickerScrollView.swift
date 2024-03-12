@@ -85,7 +85,7 @@ private func previewHelperCallback(_: EntityId, _: Double) {}
 
 struct NumberPickerScrollView_Previews: PreviewProvider {
     static var previews: some View {
-        NumberPickerScrollView(entityId: .eniroClimateTemperature,
+        NumberPickerScrollView(entityId: .lynkClimateHeating,
                                targetTemperature: .constant(22),
                                numberSelectedCallback: previewHelperCallback)
     }

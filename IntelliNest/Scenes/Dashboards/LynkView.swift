@@ -28,19 +28,13 @@ struct LynkView: View {
                         ServiceButtonView(buttonTitle: "Ladda ner från bil",
                                           icon: .init(systemImageName: .arrowDown),
                                           imageSize: 20,
-                                          isLoading: viewModel.updateIsloading,
+                                          isLoading: false,
                                           action: viewModel.update)
-                            .disabled(viewModel.updateIsloading)
-                        ServiceButtonView(buttonTitle: "Ladda upp från bil",
-                                          icon: .init(systemImageName: .arrowUp),
-                                          imageSize: 20,
-                                          action: viewModel.initiateForceUpdate)
-
                         ServiceButtonView(buttonTitle: "Starta laddning",
                                           icon: .init(systemImageName: .boltCar),
                                           imageSize: 20,
                                           action: viewModel.startCharging)
-                        ServiceButtonView(buttonTitle: "Avbryt laddning",
+                        ServiceButtonView(buttonTitle: "Pausa laddning",
                                           icon: .init(systemImageName: .xmarkCircle),
                                           imageSize: 20,
                                           action: viewModel.stopCharging)
@@ -55,14 +49,6 @@ struct LynkView: View {
                                           icon: .init(systemImageName: .unlocked),
                                           imageSize: 25,
                                           action: viewModel.unlock)
-                        ServiceButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
-                                          icon: .init(imageName: .evPlugType2),
-                                          imageSize: 35,
-                                          action: viewModel.showACLimitPicker)
-                        ServiceButtonView(buttonTitle: "\(viewModel.eniroChargingACLimit.state)%",
-                                          icon: .init(imageName: .evPlugCCS2),
-                                          imageSize: 35,
-                                          action: viewModel.showDCLimitPicker)
                     }
                     .padding(.horizontal)
                 }
@@ -76,11 +62,6 @@ struct LynkView: View {
                     .font(Font.system(size: 12).italic())
                     .foregroundColor(.white)
                     .padding(.bottom)
-            }
-            if let limitPickerEntity = viewModel.limitPickerEntity {
-                LimitPickerView(limitEntity: limitPickerEntity,
-                                saveChargerLimit: viewModel.saveChargerLimit,
-                                currentLimit: limitPickerEntity.inputNumber)
             }
         }
     }
