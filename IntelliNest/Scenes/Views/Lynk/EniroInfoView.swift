@@ -12,22 +12,15 @@ struct EniroInfoView: View {
 
     var body: some View {
         VStack {
-            Text("Bilen är **\(viewModel.doorLock.stateToString())** på: \(viewModel.getAddress())")
+            Text("Bilen är **\(viewModel.lynkDoorLock.stateToString())**")
                 .foregroundColor(.white)
             Spacer()
                 .frame(height: 20)
             HStack {
-                BatteryView(level: Int(viewModel.batteryLevel.state) ?? 100,
-                            isCharging: viewModel.isCharging.isActive, degreeRotation: 90)
-                    .padding(.trailing, 30)
-
-                ServiceButtonView(buttonTitle: "Smart laddning",
-                                  isActive: !viewModel.forceCharging.isActive,
-                                  icon: .init(systemImageName: .powerplug),
-                                  iconWidth: 25,
-                                  iconHeight: 20,
-                                  isLoading: false,
-                                  action: viewModel.toggleForceCharging)
+                /*BatteryView(level: Int(viewModel.batteryLevel.state) ?? 100,
+                         isCharging: viewModel.isCharging.isActive, degreeRotation: 90)
+                 .padding(.trailing, 30)
+                 */
             }
         }
     }
