@@ -13,12 +13,18 @@ import SwiftUI
 class LynkViewModel: ObservableObject {
     @Published var forceCharging = Entity(entityId: .eniroForceCharge)
     @Published var climateHeating = Entity(entityId: .lynkClimateHeating)
+    @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
     @Published var limitPickerEntity: InputNumberEntity?
 
     var lynkUpdateTask: Task<Void, Error>?
-    let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating]
+    let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkDoorLock, .easeeIsEnabled]
     var isReloading = false
+    var airConditionInitiatedTime: Date?
+    var isEaseeCharging: Bool {
+        easeeIsEnabled.isActive
+    }
+
     var isViewActive = false {
         didSet {
             if isViewActive {
@@ -27,8 +33,36 @@ class LynkViewModel: ObservableObject {
         }
     }
 
+    var climateTitle: String {
+        isAirConditionActive || isAirConditionLoading ? "Stäng av" : "Starta"
+    }
+
     var isAirConditionActive: Bool {
-        climateHeating.state == "on"
+        climateHeating.isActive
+    }
+
+    var isLynkUnlocked: Bool {
+        lynkDoorLock.lockState == .unlocked
+    }
+
+    var isAirConditionLoading: Bool {
+        !isAirConditionActive && (airConditionInitiatedTime?.addingTimeInterval(5 * 60) ?? Date.distantPast) > Date()
+    }
+
+    var doorLockTitle: String {
+        isLynkUnlocked ? "Lås dörrarna" : "Lås upp dörrarna"
+    }
+
+    var doorLockIcon: Image {
+        isLynkUnlocked ? .init(systemImageName: .unlocked) : .init(systemImageName: .locked)
+    }
+
+    var chargingTitle: String {
+        isEaseeCharging ? "Pausa Easee" : "Starta Easee"
+    }
+
+    var chargingIcon: Image {
+        isEaseeCharging ? .init(systemImageName: .xmarkCircle) : .init(systemImageName: .boltCar)
     }
 
     var lastUpdated: String {
@@ -54,12 +88,16 @@ class LynkViewModel: ObservableObject {
         restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
     }
 
-    func reload(entityID: EntityId, state: String) {
+    func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         switch entityID {
         case .eniroForceCharge:
             forceCharging.state = state
         case .lynkClimateHeating:
             climateHeating.state = state
+        case .lynkDoorLock:
+            lynkDoorLock.state = state
+        case .easeeIsEnabled:
+            easeeIsEnabled.state = state
         default:
             Log.error("EniroViewModel doesn't reload entityID: \(entityID)")
         }
@@ -73,15 +111,25 @@ class LynkViewModel: ObservableObject {
         }
     }
 
-    func update() {}
+    func toggleEaseeCharging() {
+        restAPIService.callScript(scriptID: .easeeToggle)
+    }
 
-    func startCharging() {}
+    func toggleDoorLock() {
+        if isLynkUnlocked {
+            lockDoors()
+        } else {
+            unlockDoors()
+        }
+    }
 
-    func stopCharging() {}
+    func lockDoors() {
+        restAPIService.callService(serviceID: .lynkLockDoors, domain: .lynkco)
+    }
 
-    func lock() {}
-
-    func unlock() {}
+    func unlockDoors() {
+        restAPIService.callService(serviceID: .lynkUnlockDoors, domain: .lynkco)
+    }
 
     func toggleState(for entity: Entity) {
         let action: Action = entity.isActive ? .turnOff : .turnOn
@@ -91,11 +139,13 @@ class LynkViewModel: ObservableObject {
 
 private extension LynkViewModel {
     func startClimate() {
+        airConditionInitiatedTime = Date()
         restAPIService.callScript(scriptID: .lynkStartClimate)
     }
 
     func stopClimate() {
-        // restAPIService.callScript(scriptID: .eniroTurnOffStartClimate)
+        airConditionInitiatedTime = nil
+        restAPIService.callScript(scriptID: .lynkStopClimate)
     }
 
     func updateLynkContinously() {

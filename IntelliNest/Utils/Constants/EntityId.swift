@@ -47,7 +47,11 @@ enum EntityId: String, Decodable, CaseIterable {
     case tibberCostToday = "sensor.accumulated_cost_hem"
     case pulseConsumptionToday = "sensor.pulse_consumption_today"
     case solarProducdtionToday = "sensor.solaredge_energy_today"
-    case easeeCharger = "sensor.eh4ngpuj_power"
+    /* Easee */
+    case easeePower = "sensor.eh4ngpuj_power"
+    case easeeIsEnabled = "switch.eh4ngpuj_is_enabled"
+    case easeeNoCurrentReason = "sensor.eh4ngpuj_reason_for_no_current"
+
     /* Lights */
     case sofa = "light.soffbordet"
     case cozyCorner = "light.myshornan"

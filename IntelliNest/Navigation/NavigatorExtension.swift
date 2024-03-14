@@ -29,6 +29,10 @@ extension Navigator: WebSocketServiceDelegate {
         if electricityViewModel.entityIDs.contains(entityID) {
             electricityViewModel.reload(entityID: entityID, state: state)
         }
+
+        if lynkViewModel.entityIDs.contains(entityID) {
+            lynkViewModel.reload(entityID: entityID, state: state, lastChanged: lastChanged)
+        }
     }
 
     func webSocketService(didReceiveImage entityID: EntityId, state: String, urlPath: String) {
@@ -78,5 +82,6 @@ extension Navigator: WebSocketServiceDelegate {
 extension Navigator: URLCreatorDelegate {
     func baseURLChanged(urlString: String) {
         webSocketService.baseURLChanged(urlString: urlString)
+        restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
     }
 }
