@@ -58,7 +58,8 @@ struct ServiceButtonView: View {
                                     .lineLimit(2)
                                     .font(customFont)
                                     .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 7)
+                                    .padding(.horizontal, 8)
+                                    .minimumScaleFactor(0.5)
                             }
                         }
                         .foregroundColor(.white)

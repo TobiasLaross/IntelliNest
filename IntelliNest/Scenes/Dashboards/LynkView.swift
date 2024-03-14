@@ -13,51 +13,52 @@ struct LynkView: View {
     var body: some View {
         ZStack {
             VStack {
-                VStack {
-                    Text("Klimathantering")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    EniroClimateView(viewModel: viewModel)
+                HStack {
+                    ServiceButtonView(buttonTitle: viewModel.climateTitle,
+                                      isActive: viewModel.isAirConditionActive,
+                                      activeColor: viewModel.climateIconColor,
+                                      buttonSize: 90,
+                                      icon: .init(systemImageName: .thermometer),
+                                      iconWidth: 25,
+                                      iconHeight: 35,
+                                      isLoading: false,
+                                      action: viewModel.toggleClimate)
+                        .padding(.trailing, 32)
+
+                    ServiceButtonView(buttonTitle: viewModel.doorLockTitle,
+                                      isActive: viewModel.isLynkUnlocked,
+                                      buttonSize: 90,
+                                      icon: viewModel.doorLockIcon,
+                                      iconWidth: viewModel.isLynkUnlocked ? 30 : 20,
+                                      iconHeight: 30,
+                                      action: viewModel.toggleDoorLock)
+                        .disabled(viewModel.lynkDoorLock.isLoading)
+                        .contextMenu {
+                            Button(action: viewModel.lockDoors, label: {
+                                Text("Lås")
+                            })
+                            Button(action: viewModel.unlockDoors, label: {
+                                Text("Lås upp")
+                            })
+                        }
                 }
-                .padding()
+                .padding(.top, 72)
+                .padding(.bottom, 32)
 
-                Divider()
+                Text("Bilen är **\(viewModel.lynkDoorLock.stateToString())**")
+                    .foregroundColor(.white)
 
-                VStack {
-                    HStack {
-                        ServiceButtonView(buttonTitle: "Ladda ner från bil",
-                                          icon: .init(systemImageName: .arrowDown),
-                                          imageSize: 20,
-                                          isLoading: false,
-                                          action: viewModel.update)
-                        ServiceButtonView(buttonTitle: "Starta laddning",
-                                          icon: .init(systemImageName: .boltCar),
-                                          imageSize: 20,
-                                          action: viewModel.startCharging)
-                        ServiceButtonView(buttonTitle: "Pausa laddning",
-                                          icon: .init(systemImageName: .xmarkCircle),
-                                          imageSize: 20,
-                                          action: viewModel.stopCharging)
-                    }
+                Spacer()
 
-                    HStack {
-                        ServiceButtonView(buttonTitle: "Lås dörrarna",
-                                          icon: .init(systemImageName: .locked),
-                                          iconHeight: 25,
-                                          action: viewModel.lock)
-                        ServiceButtonView(buttonTitle: "Lås upp dörrarna",
-                                          icon: .init(systemImageName: .unlocked),
-                                          imageSize: 25,
-                                          action: viewModel.unlock)
-                    }
-                    .padding(.horizontal)
-                }
-
+                ServiceButtonView(buttonTitle: viewModel.chargingTitle,
+                                  isActive: viewModel.isEaseeCharging,
+                                  buttonSize: 90,
+                                  icon: viewModel.chargingIcon,
+                                  imageSize: 40,
+                                  action: viewModel.toggleEaseeCharging)
+                    .padding(.bottom, 64)
                 Divider()
                     .padding(.top)
-                EniroInfoView(viewModel: viewModel)
-                    .padding(.horizontal)
-                Spacer()
                 Text("Senast uppdaterad: \(viewModel.lastUpdated)")
                     .font(Font.system(size: 12).italic())
                     .foregroundColor(.white)
@@ -71,5 +72,6 @@ struct Eniro_Previews: PreviewProvider {
     static var previews: some View {
         LynkView(viewModel: LynkViewModel(restAPIService: PreviewProviderUtil.restAPIService,
                                           showClimateSchedulingAction: {}))
+            .backgroundModifier()
     }
 }
