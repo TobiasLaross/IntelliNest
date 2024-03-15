@@ -217,6 +217,7 @@ class Navigator: ObservableObject {
     func didEnterForeground() {
         isAppInForeground = true
         electricityViewModel.isViewActive = currentDestination == .electricity
+        homeViewModel.resetExpectedLockStates()
         lynkViewModel.isViewActive = currentDestination == .lynk
         Task {
             await reloadConnection()

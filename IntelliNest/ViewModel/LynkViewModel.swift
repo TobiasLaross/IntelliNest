@@ -20,6 +20,7 @@ class LynkViewModel: ObservableObject {
     var lynkUpdateTask: Task<Void, Error>?
     let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkDoorLock, .easeeIsEnabled]
     var isReloading = false
+    var isLynkFlashing = false
     var airConditionInitiatedTime: Date?
     var isEaseeCharging: Bool {
         easeeIsEnabled.isActive
@@ -57,6 +58,14 @@ class LynkViewModel: ObservableObject {
         isLynkUnlocked ? .init(systemImageName: .unlocked) : .init(systemImageName: .locked)
     }
 
+    var flashLightTitle: String {
+        isLynkFlashing ? "Stäng av lamporna" : "Starta lamporna"
+    }
+
+    var flashLightIcon: Image {
+        isLynkFlashing ? .init(systemImageName: .lightbulbSlash) : .init(systemImageName: .headLightBeam)
+    }
+
     var chargingTitle: String {
         isEaseeCharging ? "Pausa Easee" : "Starta Easee"
     }
@@ -88,7 +97,7 @@ class LynkViewModel: ObservableObject {
         restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
     }
 
-    func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
+    func reload(entityID: EntityId, state: String, lastChanged _: Date? = nil) {
         switch entityID {
         case .eniroForceCharge:
             forceCharging.state = state
@@ -129,6 +138,16 @@ class LynkViewModel: ObservableObject {
 
     func unlockDoors() {
         restAPIService.callService(serviceID: .lynkUnlockDoors, domain: .lynkco)
+    }
+
+    func startFlashLights() {
+        isLynkFlashing = true
+        restAPIService.callService(serviceID: .lynkFlashStart, domain: .lynkco)
+    }
+
+    func stopFlashLights() {
+        isLynkFlashing = false
+        restAPIService.callService(serviceID: .lynkFlashStop, domain: .lynkco)
     }
 
     func toggleState(for entity: Entity) {

@@ -35,6 +35,7 @@ enum ImageName: String {
     case washing
 }
 
+// SF Symbols
 enum SystemImageName: String {
     case arrowDown = "arrow.down"
     case arrowUp = "arrow.up"
@@ -57,6 +58,8 @@ enum SystemImageName: String {
     case powerplug
     case scope
     case thermometer
+    case headLightBeam = "headlight.high.beam"
+    case lightbulbSlash = "lightbulb.slash"
     case trash = "trash.fill"
     case unknown = "questionmark.circle"
     case unlocked = "lock.open.fill"
