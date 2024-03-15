@@ -9,11 +9,12 @@ import SwiftUI
 
 struct LynkView: View {
     @ObservedObject var viewModel: LynkViewModel
+    @State private var isShowingAlert = false
 
     var body: some View {
         ZStack {
             VStack {
-                HStack {
+                HStack(spacing: 16) {
                     ServiceButtonView(buttonTitle: viewModel.climateTitle,
                                       isActive: viewModel.isAirConditionActive,
                                       activeColor: viewModel.climateIconColor,
@@ -21,9 +22,8 @@ struct LynkView: View {
                                       icon: .init(systemImageName: .thermometer),
                                       iconWidth: 25,
                                       iconHeight: 35,
-                                      isLoading: false,
+                                      isLoading: viewModel.isAirConditionLoading,
                                       action: viewModel.toggleClimate)
-                        .padding(.trailing, 32)
 
                     ServiceButtonView(buttonTitle: viewModel.doorLockTitle,
                                       isActive: viewModel.isLynkUnlocked,
@@ -41,6 +41,39 @@ struct LynkView: View {
                                 Text("Lås upp")
                             })
                         }
+
+                    ServiceButtonView(buttonTitle: viewModel.flashLightTitle,
+                                      isActive: viewModel.isLynkFlashing,
+                                      buttonSize: 90,
+                                      icon: viewModel.flashLightIcon,
+                                      iconWidth: 30,
+                                      iconHeight: 30,
+                                      action: {
+                                          if !viewModel.isLynkFlashing {
+                                              isShowingAlert = true
+                                          } else {
+                                              viewModel.stopFlashLights()
+                                          }
+                                      })
+                                      .alert(isPresented: $isShowingAlert) {
+                                          Alert(
+                                              title: Text("Starta lampor"),
+                                              message: Text(""),
+                                              primaryButton: .destructive(Text("Ja")) {
+                                                  viewModel.startFlashLights()
+                                              },
+                                              secondaryButton: .cancel()
+                                          )
+                                      }
+                                      .disabled(viewModel.lynkDoorLock.isLoading)
+                                      .contextMenu {
+                                          Button(action: viewModel.startFlashLights, label: {
+                                              Text("Starta lamporna")
+                                          })
+                                          Button(action: viewModel.stopFlashLights, label: {
+                                              Text("Stäng av lamporna")
+                                          })
+                                      }
                 }
                 .padding(.top, 72)
                 .padding(.bottom, 32)

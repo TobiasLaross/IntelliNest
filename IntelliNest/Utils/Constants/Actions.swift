@@ -26,6 +26,8 @@ enum Action: String, Codable {
     case lynkReload = "manual_update_data"
     case lockDoors = "lock_doors"
     case unlockDoors = "unlock_doors"
+    case starFlashLights = "start_flash_lights"
+    case stopFlashLights = "stop_flash_lights"
     case setDateTime = "set_datetime"
     case setValue = "set_value"
     case setVaneHorizontal = "set_vane_horizontal"

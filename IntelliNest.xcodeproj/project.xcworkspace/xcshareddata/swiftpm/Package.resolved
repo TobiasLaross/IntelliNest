@@ -1,4 +1,5 @@
 {
+  "originHash" : "66d0e924887faeee4da8d3368133bc4c63f99389594ed32f1ce043232531e4e8",
   "pins" : [
     {
       "identity" : "shipbooksdk-ios",
@@ -14,10 +15,10 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/daltoniam/Starscream",
       "state" : {
-        "revision" : "ac6c0fc9da221873e01bd1a0d4818498a71eef33",
-        "version" : "4.0.6"
+        "revision" : "c6bfd1af48efcc9a9ad203665db12375ba6b145a",
+        "version" : "4.0.8"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

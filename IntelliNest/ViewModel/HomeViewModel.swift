@@ -89,7 +89,7 @@ class HomeViewModel: ObservableObject {
             async let tmpSideDoorState = await reload(lockID: sideDoor.id)
             async let tmpFrontDoorState = await reload(lockID: frontDoor.id)
 
-            (sideDoor.lockState, frontDoor.lockState) = await(tmpSideDoorState, tmpFrontDoorState)
+            (sideDoor.lockState, frontDoor.lockState) = await (tmpSideDoorState, tmpFrontDoorState)
             isReloading = false
         }
     }
@@ -141,6 +141,12 @@ class HomeViewModel: ObservableObject {
     func unlockStorage() {
         storageLock.expectedState = .unlocked
         restAPIService.update(entityID: .storageLock, domain: .lock, action: .unlock)
+    }
+
+    func resetExpectedLockStates() {
+        storageLock.expectedState = .unknown
+        frontDoor.expectedState = .unknown
+        sideDoor.expectedState = .unknown
     }
 
     func checkLocationAccess() {
