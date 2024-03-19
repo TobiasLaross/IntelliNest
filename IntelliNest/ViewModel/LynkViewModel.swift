@@ -13,12 +13,21 @@ import SwiftUI
 class LynkViewModel: ObservableObject {
     @Published var forceCharging = Entity(entityId: .eniroForceCharge)
     @Published var climateHeating = Entity(entityId: .lynkClimateHeating)
+    @Published var isEngineRunning = Entity(entityId: .lynkEngineRunning)
+    @Published var interiorTemperature = Entity(entityId: .lynkTemperatureInterior)
+    @Published var exteriorTemperature = Entity(entityId: .lynkTemperatureExterior)
+    @Published var battery = Entity(entityId: .lynkBattery)
+    @Published var batteryDistance = Entity(entityId: .lynkBatteryDistance)
+    @Published var fuel = Entity(entityId: .lynkFuel)
+    @Published var fuelDistance = Entity(entityId: .lynkFuelDistance)
     @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
-    @Published var limitPickerEntity: InputNumberEntity?
+    @Published var address = Entity(entityId: .lynkAddress)
 
     var lynkUpdateTask: Task<Void, Error>?
-    let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkDoorLock, .easeeIsEnabled]
+    let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
+                                 .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
+                                 .lynkDoorLock, .lynkAddress, .easeeIsEnabled]
     var isReloading = false
     var isLynkFlashing = false
     var airConditionInitiatedTime: Date?
@@ -30,6 +39,9 @@ class LynkViewModel: ObservableObject {
         didSet {
             if isViewActive {
                 updateLynkContinously()
+            } else {
+                lynkUpdateTask?.cancel()
+                lynkUpdateTask = nil
             }
         }
     }
@@ -97,6 +109,7 @@ class LynkViewModel: ObservableObject {
         restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func reload(entityID: EntityId, state: String, lastChanged _: Date? = nil) {
         switch entityID {
         case .eniroForceCharge:
@@ -107,10 +120,28 @@ class LynkViewModel: ObservableObject {
             lynkDoorLock.state = state
         case .easeeIsEnabled:
             easeeIsEnabled.state = state
+        case .lynkEngineRunning:
+            isEngineRunning.state = state
+        case .lynkTemperatureInterior:
+            interiorTemperature.state = state
+        case .lynkTemperatureExterior:
+            exteriorTemperature.state = state
+        case .lynkBattery:
+            battery.state = state
+        case .lynkBatteryDistance:
+            batteryDistance.state = state
+        case .lynkFuel:
+            fuel.state = state
+        case .lynkFuelDistance:
+            fuelDistance.state = state
+        case .lynkAddress:
+            address.state = state
         default:
             Log.error("EniroViewModel doesn't reload entityID: \(entityID)")
         }
     }
+
+    // swiftlint:enable cyclomatic_complexity
 
     func toggleClimate() {
         if isAirConditionActive {
@@ -133,10 +164,12 @@ class LynkViewModel: ObservableObject {
     }
 
     func lockDoors() {
+        lynkDoorLock.expectedState = .locked
         restAPIService.callService(serviceID: .lynkLockDoors, domain: .lynkco)
     }
 
     func unlockDoors() {
+        lynkDoorLock.expectedState = .unlocked
         restAPIService.callService(serviceID: .lynkUnlockDoors, domain: .lynkco)
     }
 
@@ -171,7 +204,9 @@ private extension LynkViewModel {
         lynkUpdateTask?.cancel()
         lynkUpdateTask = Task {
             while isViewActive {
-                try? await Task.sleep(seconds: 5)
+                do {
+                    try await Task.sleep(seconds: 6)
+                } catch {}
                 await reload()
             }
         }

@@ -79,7 +79,15 @@ enum EntityId: String, Decodable, CaseIterable {
     case eniroTurnOffClimateControl = "script.turn_off_kia_climate_control"
     /* Lynk */
     case lynkClimateHeating = "binary_sensor.lynk_co_pre_climate_active"
-    case lynkDoorLock = "sensor.lynk_co_door_lock_status"
+    case lynkDoorLock = "lock.lynk_co_locks"
+    case lynkEngineRunning = "binary_sensor.lynk_co_vehicle_is_running"
+    case lynkTemperatureExterior = "sensor.lynk_co_exterior_temperature"
+    case lynkTemperatureInterior = "sensor.lynk_co_interior_temperature"
+    case lynkBatteryDistance = "sensor.lynk_co_battery_distance"
+    case lynkBattery = "sensor.lynk_co_battery"
+    case lynkFuel = "sensor.lynk_co_fuel_level_status"
+    case lynkFuelDistance = "sensor.lynk_co_fuel_distance"
+    case lynkAddress = "sensor.lynk_co_address"
     /* Eniro climate schedule */
     case eniroClimateSchedule1Bool = "input_boolean.kia_climate"
     case eniroClimateSchedule1 = "input_datetime.kia_climate"
