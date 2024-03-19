@@ -12,7 +12,7 @@ struct LockEntity: Lockable, EntityProtocol {
     var entityId: EntityId
     var id: LockID = .storageDoor
     var state: String { didSet {
-        lockState = LockState(rawValue: state) ?? LockState(rawValue: state.fromLynkState) ?? .unknown
+        lockState = LockState(rawValue: state) ?? .unknown
         if lockState == expectedState || expectedStateIsOld {
             expectedState = .unknown
         }
@@ -46,9 +46,9 @@ struct LockEntity: Lockable, EntityProtocol {
     }
 
     static func == (lhs: LockEntity, rhs: LockEntity) -> Bool {
-        return (lhs.isActive == rhs.isActive &&
+        return lhs.isActive == rhs.isActive &&
             lhs.entityId == rhs.entityId &&
-            lhs.state == rhs.state)
+            lhs.state == rhs.state
     }
 
     func shouldReload() -> Bool {
@@ -57,17 +57,5 @@ struct LockEntity: Lockable, EntityProtocol {
 
     mutating func setNextUpdateTime() {
         nextUpdate = NSDate().addingTimeInterval(0.29)
-    }
-}
-
-private extension String {
-    var fromLynkState: String {
-        if self == "DOOR_LOCKS_STATUS_UNLOCKED" {
-            "unlocked"
-        } else if self == "DOOR_LOCKS_STATUS_LOCKED" || self == "DOOR_LOCKS_STATUS_SAFE_LOCKED" {
-            "locked"
-        } else {
-            "unknown"
-        }
     }
 }

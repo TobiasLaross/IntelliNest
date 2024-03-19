@@ -53,6 +53,14 @@ extension String {
         }
     }
 
+    var roundedWithOneDecimal: Double {
+        if let doubleValue = Double(self) {
+            return doubleValue.roundedWithOneDecimal
+        } else {
+            return 0
+        }
+    }
+
     mutating func addNewLineAndAppend(_ other: String) {
         if isNotEmpty {
             append("\n")

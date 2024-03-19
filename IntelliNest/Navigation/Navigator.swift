@@ -217,7 +217,6 @@ class Navigator: ObservableObject {
     func didEnterForeground() {
         isAppInForeground = true
         electricityViewModel.isViewActive = currentDestination == .electricity
-        homeViewModel.resetExpectedLockStates()
         lynkViewModel.isViewActive = currentDestination == .lynk
         Task {
             await reloadConnection()
@@ -229,6 +228,8 @@ class Navigator: ObservableObject {
         isAppInForeground = false
         electricityViewModel.isViewActive = false
         lynkViewModel.isViewActive = false
+        homeViewModel.resetExpectedLockStates()
+        lynkViewModel.lynkDoorLock.expectedState = .unknown
         webSocketService.isExpectingTextResponse = false
         webSocketService.disconnect()
     }
@@ -362,24 +363,25 @@ private extension Navigator {
     }
 
     func handlePushNotificationPermissions() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { [weak self] granted, error in
-            if granted {
-                Task { @MainActor in
-                    UIApplication.shared.registerForRemoteNotifications()
-                    if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
-                        self?.webhookID = webhookID
-                    }
+        UNUserNotificationCenter.current()
+            .requestAuthorization(options: [.alert, .sound, .badge, .criticalAlert]) { [weak self] granted, error in
+                if granted {
+                    Task { @MainActor in
+                        UIApplication.shared.registerForRemoteNotifications()
+                        if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
+                            self?.webhookID = webhookID
+                        }
 
-                    try? await Task.sleep(seconds: 1.5)
+                        try? await Task.sleep(seconds: 1.5)
 
-                    if let apnsToken = UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) {
-                        self?.registerAPNSToken(apnsToken)
+                        if let apnsToken = UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) {
+                            self?.registerAPNSToken(apnsToken)
+                        }
                     }
+                } else if let error {
+                    Log.error("Failed to requestAuthorization for push, \(error.localizedDescription)")
                 }
-            } else if let error {
-                Log.error("Failed to requestAuthorization for push, \(error.localizedDescription)")
             }
-        }
     }
 
     func registerAPNSToken(_ apnsToken: String) {
