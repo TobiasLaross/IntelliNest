@@ -1,5 +1,5 @@
 //
-//  HassViewModelProtocol.swift
+//  HassAPIViewModelProtocol.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-04-30.

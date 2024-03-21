@@ -67,7 +67,7 @@ struct Entity: EntityProtocol {
     }
 
     func recentlyUpdated() -> Bool {
-        return -lastUpdated.timeIntervalSinceNow < 20 * 60
+        -lastUpdated.timeIntervalSinceNow < 20 * 60
     }
 
     mutating func setNextUpdateTime() {
@@ -75,7 +75,7 @@ struct Entity: EntityProtocol {
     }
 
     static func == (lhs: Entity, rhs: Entity) -> Bool {
-        return lhs.entityId == rhs.entityId && lhs.state == rhs.state
+        lhs.entityId == rhs.entityId && lhs.state == rhs.state
     }
 
     private mutating func updateDate() {

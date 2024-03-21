@@ -137,7 +137,7 @@ class Navigator: ObservableObject {
     }
 
     func show(destination: Destination) -> some View {
-        return Group {
+        Group {
             switch destination {
             case .cameras:
                 showCamerasView()
@@ -333,7 +333,7 @@ private extension Navigator {
         Task {
             async let tmpFrontDoorSuccess = yaleApiService.setLockState(lockID: .frontDoor, action: action)
             async let tmpSideDoorSuccess = yaleApiService.setLockState(lockID: .sideDoor, action: action)
-            let (frontDoorSuccess, sideDoorSuccess) = await(tmpFrontDoorSuccess, tmpSideDoorSuccess)
+            let (frontDoorSuccess, sideDoorSuccess) = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
             if !frontDoorSuccess || !sideDoorSuccess {
                 var errorMessage = "Lyckades inte låsa".appending(action == .unlock ? " upp" : "")
                 if !frontDoorSuccess && !sideDoorSuccess {

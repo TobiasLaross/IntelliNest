@@ -74,11 +74,10 @@ class WebSocketService {
 
     func baseURLChanged(urlString: String) {
         baseURLString = urlString
-        let wsURLString: String
-        if urlString == GlobalConstants.baseInternalUrlString {
-            wsURLString = "ws://\(urlString.removingHTTPSchemeAndTrailingSlash)/api/websocket"
+        let wsURLString = if urlString == GlobalConstants.baseInternalUrlString {
+            "ws://\(urlString.removingHTTPSchemeAndTrailingSlash)/api/websocket"
         } else {
-            wsURLString = "wss://\(urlString.removingHTTPSchemeAndTrailingSlash)/api/websocket"
+            "wss://\(urlString.removingHTTPSchemeAndTrailingSlash)/api/websocket"
         }
         guard let url = URL(string: wsURLString) else {
             Log.error("Failed to create url for base url: \(wsURLString)")
@@ -113,7 +112,7 @@ class WebSocketService {
         expectingTextTask = nil
     }
 
-    private func sendJSONCommand<T: Encodable>(_ command: T, requestID: Int? = nil) {
+    private func sendJSONCommand(_ command: some Encodable, requestID: Int? = nil) {
         guard var dictionary = command.dictionary else {
             Log.error("Failed to encode command to JSON: \(command)")
             return
@@ -216,7 +215,7 @@ extension WebSocketService: WebSocketDelegate {
     private func sendAuthenticationMessage() {
         let authMessage: [String: Any] = [
             "type": "auth",
-            "access_token": "\(GlobalConstants.secretHassToken)",
+            "access_token": "\(GlobalConstants.secretHassToken)"
         ]
 
         if let jsonData = try? JSONSerialization.data(withJSONObject: authMessage, options: []),

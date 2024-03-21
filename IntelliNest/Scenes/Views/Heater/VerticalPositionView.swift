@@ -1,5 +1,5 @@
 //
-//  HeaterVerticalPositionView.swift
+//  VerticalPositionView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-06-22.

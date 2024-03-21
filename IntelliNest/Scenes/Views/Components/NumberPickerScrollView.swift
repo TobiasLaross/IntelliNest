@@ -71,7 +71,7 @@ struct NumberPickerScrollView: View {
          strideTo: CGFloat = 29,
          strideStep: CGFloat = 0.5) {
         self.entityId = entityId
-        self._targetTemperature = targetTemperature
+        _targetTemperature = targetTemperature
         self.numberSelectedCallback = numberSelectedCallback
         self.pickerTextWidth = pickerTextWidth
         self.selectedNewNumber = selectedNewNumber

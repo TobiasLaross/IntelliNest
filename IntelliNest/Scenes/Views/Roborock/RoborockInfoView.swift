@@ -1,5 +1,5 @@
 //
-//  RoborockInfo.swift
+//  RoborockInfoView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-06-22.
@@ -39,6 +39,7 @@ struct RoborockInfo_Previews: PreviewProvider {
         RoborockInfoView(
             lastCleanArea: "",
             batteryLevel: 3,
-            showingMapView: .constant(false))
+            showingMapView: .constant(false)
+        )
     }
 }

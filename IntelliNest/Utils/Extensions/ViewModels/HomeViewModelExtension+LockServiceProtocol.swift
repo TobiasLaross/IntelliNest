@@ -1,5 +1,5 @@
 //
-//  HomeViewModelExtension.swift
+//  HomeViewModelExtension+LockServiceProtocol.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-05-23.

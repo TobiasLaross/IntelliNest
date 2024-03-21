@@ -1,5 +1,5 @@
 //
-//  Airconditions.swift
+//  HeatersView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-02.

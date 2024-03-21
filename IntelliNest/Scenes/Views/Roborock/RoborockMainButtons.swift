@@ -54,6 +54,7 @@ struct RoborockMainButtons_Previews: PreviewProvider {
             dockRoborockClosure: {},
             sendRoborockToBinClosure: {},
             locateRoborockClosure: {},
-            manualEmptyClosure: {})
+            manualEmptyClosure: {}
+        )
     }
 }

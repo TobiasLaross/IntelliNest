@@ -10,9 +10,9 @@ import SwiftUI
 extension HomeViewModel {
     var sarahIphoneimage: Image {
         if sarahsIphone.isActive {
-            return Image(systemImageName: .iPhoneActive)
+            Image(systemImageName: .iPhoneActive)
         } else {
-            return Image(systemImageName: .iPhone)
+            Image(systemImageName: .iPhone)
         }
     }
 
@@ -55,6 +55,6 @@ extension HomeViewModel {
 
 private extension String {
     func isRunning() -> Bool {
-        self.lowercased() != "none"
+        lowercased() != "none"
     }
 }

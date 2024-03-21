@@ -5,8 +5,8 @@
 //  Created by Tobias on 2023-10-19.
 //
 
-import SwiftUI
 import ShipBookSDK
+import SwiftUI
 
 struct SwitchEntity: EntityProtocol {
     var image: Image {
@@ -40,9 +40,9 @@ struct SwitchEntity: EntityProtocol {
     var title: String {
         switch entityId {
         case .coffeeMachine:
-            return "Kaffemaskinen"
+            "Kaffemaskinen"
         default:
-            return ""
+            ""
         }
     }
 

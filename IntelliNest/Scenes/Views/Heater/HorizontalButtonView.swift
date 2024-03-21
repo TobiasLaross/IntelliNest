@@ -26,7 +26,7 @@ struct HorizontalButtonView: View {
             horizontalModeSelectedCallback(mode)
         } label: {
             Group {
-                if let buttonTitle = buttonTitle {
+                if let buttonTitle {
                     if buttonTitle.count > 5 {
                         Text(buttonTitle)
                             .font(.caption)
@@ -40,7 +40,7 @@ struct HorizontalButtonView: View {
                     }
                 }
 
-                if let buttonImageName = buttonImageName {
+                if let buttonImageName {
                     Image(systemName: buttonImageName)
                         .frame(width: 50, height: 50, alignment: .center)
                 }

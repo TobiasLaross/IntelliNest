@@ -993,7 +993,7 @@
 			);
 			mainGroup = F67023EE27A177320070FFBB;
 			packageReferences = (
-				F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */,
+				F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */,
 				F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			productRefGroup = F67023F827A177320070FFBB /* Products */;
@@ -1081,7 +1081,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --swiftversion 5 --indent 4 --rules indent,linebreaks,trailingSpace,consecutiveBlankLines,blankLinesAtEndOfScope,blankLinesAtStartOfScope,blankLinesBetweenScopes,consecutiveSpaces,duplicateImports,elseOnSameLine,emptyBraces,redundantBreak,redundantInit,redundantLetError,redundantNilInit,redundantType,redundantVoidReturnType,spaceAroundBraces,spaceAroundBrackets,spaceAroundComments,spaceAroundGenerics,spaceAroundOperators,spaceAroundParens,spaceInsideBraces,spaceInsideBrackets,spaceInsideGenerics,spaceInsideParens,void --quiet\n";
+			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --swiftversion 5.10 --indent 4\n";
 		};
 		F66F061A27B16F1D00270E71 /* Swiftlint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1988,7 +1988,7 @@
 				minimumVersion = 4.0.6;
 			};
 		};
-		F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */ = {
+		F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ShipBook/ShipBookSDK-iOS.git";
 			requirement = {
@@ -2001,7 +2001,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		F63F1A732B615D92006D8906 /* ShipBookSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */;
+			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
 			productName = ShipBookSDK;
 		};
 		F669C7302A23D6DA00458165 /* Starscream */ = {
@@ -2011,7 +2011,7 @@
 		};
 		F6DE990829BD13B500B8AABB /* ShipBookSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS.git" */;
+			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
 			productName = ShipBookSDK;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -1,5 +1,5 @@
 //
-//  NumberEntity.swift
+//  InputNumberEntity.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-03-28.

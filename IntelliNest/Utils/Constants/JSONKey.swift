@@ -17,13 +17,13 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case entityID = "entity_id"
     case deviceID = "device_id"
     case deviceName = "device_name"
-    case brightness = "brightness"
+    case brightness
     case dateTime = "datetime"
     case manufacturer
     case model
     case osName = "os_name"
     case osVersion = "os_version"
-    case time = "time"
+    case time
     case inputNumberValue = "value"
     case temperature
     case hvacMode = "hvac_mode"

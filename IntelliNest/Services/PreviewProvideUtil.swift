@@ -1,5 +1,5 @@
 //
-//  PreviewProviderUtil.swift
+//  PreviewProvideUtil.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2024-01-25.

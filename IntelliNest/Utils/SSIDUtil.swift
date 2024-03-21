@@ -36,7 +36,7 @@ struct SSIDUtil {
     }
 
     private static func requestLocationPermission() async -> Bool {
-        return await withCheckedContinuation { continuation in
+        await withCheckedContinuation { continuation in
             locationManager.delegate = locationManagerDelegate
 
             let status = locationManager.authorizationStatus

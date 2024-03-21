@@ -29,23 +29,23 @@ private extension EntityId {
     var roomTitle: String {
         switch self {
         case .thermCorridor:
-            return "Korridoren"
+            "Korridoren"
         case .thermBedroom:
-            return "Sovrummet"
+            "Sovrummet"
         case .thermVince:
-            return "Vince rum"
+            "Vince rum"
         case .thermGym:
-            return "Gymmet"
+            "Gymmet"
         case .thermPlayroom:
-            return "Lekrummet"
+            "Lekrummet"
         case .thermCommonarea:
-            return "Vardagsrummet"
+            "Vardagsrummet"
         case .thermGuest:
-            return "Gästrummet"
+            "Gästrummet"
         case .thermKitchen:
-            return "Köket"
+            "Köket"
         default:
-            return "Missing room"
+            "Missing room"
         }
     }
 }

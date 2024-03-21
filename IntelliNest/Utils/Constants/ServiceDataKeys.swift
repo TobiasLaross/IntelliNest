@@ -1,5 +1,5 @@
 //
-//  ServiceVariableKeys.swift
+//  ServiceDataKeys.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-11-17.
@@ -16,7 +16,7 @@ enum ServiceDataKeys: String, Equatable, Codable, Hashable, CodingKey {
     case temperature
     case hvacMode = "hvac_mode"
     case fanMode = "fan_mode"
-    case position = "position"
+    case position
     case date
     case time
     case datetime

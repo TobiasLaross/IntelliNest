@@ -39,7 +39,7 @@ extension Date {
 
     func minutesLeft() -> Int {
         let timeZoneOffset = TimeZone.current.secondsFromGMT()
-        let selfInLocalTimezone = self.addingTimeInterval(TimeInterval(timeZoneOffset))
+        let selfInLocalTimezone = addingTimeInterval(TimeInterval(timeZoneOffset))
         let now = Date().addingTimeInterval(TimeInterval(timeZoneOffset))
         return Calendar.current.dateComponents([.minute], from: now, to: selfInLocalTimezone).minute ?? -1
     }

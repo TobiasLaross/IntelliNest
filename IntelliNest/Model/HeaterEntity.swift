@@ -26,7 +26,7 @@ struct HeaterEntity: EntityProtocol {
 
     var currentTemperature: Double = 0
     var currentTemperatureFormatted: NSNumber {
-        return NSNumber(value: currentTemperature)
+        NSNumber(value: currentTemperature)
     }
 
     var targetTemperature: Double = 0
@@ -79,7 +79,7 @@ struct HeaterEntity: EntityProtocol {
     }
 
     static func == (lhs: HeaterEntity, rhs: HeaterEntity) -> Bool {
-        return lhs.entityId == rhs.entityId &&
+        lhs.entityId == rhs.entityId &&
             lhs.state == rhs.state
     }
 

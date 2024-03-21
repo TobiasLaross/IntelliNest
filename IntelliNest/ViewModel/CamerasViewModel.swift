@@ -45,11 +45,11 @@ class CamerasViewModel: ObservableObject {
     }
 
     func findCameraViewModel(for entiyID: EntityId) -> CameraViewModel? {
-        return cameraViewModels.first(where: { $0.entityID == entiyID })
+        cameraViewModels.first(where: { $0.entityID == entiyID })
     }
 
     private func findCameraViewModel(for resultID: Int) -> CameraViewModel? {
-        return cameraViewModels.first(where: { $0.hasRequestID(resultID) })
+        cameraViewModels.first(where: { $0.hasRequestID(resultID) })
     }
 
     private func requestRemoteCameraURLs() {

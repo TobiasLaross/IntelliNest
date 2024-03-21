@@ -1,5 +1,5 @@
 //
-//  IntelliWidget.swift
+//  CarHeaterWidget.swift
 //  IntelliWidget
 //
 //  Created by Tobias on 2024-01-12.

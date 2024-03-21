@@ -1,5 +1,5 @@
 //
-//  HeaterGropuViews.swift
+//  HvacModeView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-19.

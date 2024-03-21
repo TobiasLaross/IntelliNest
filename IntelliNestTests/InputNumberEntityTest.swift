@@ -1,5 +1,5 @@
-import XCTest
 @testable import IntelliNest
+import XCTest
 
 class InputNumberEntityTests: XCTestCase {
     func testInit() {

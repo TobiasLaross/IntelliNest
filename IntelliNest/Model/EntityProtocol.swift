@@ -20,9 +20,9 @@ protocol EntityProtocol: Decodable, Equatable {
 extension EntityProtocol {
     func canUpdate() -> Bool {
         if nextUpdate.timeIntervalSinceNow < 0 {
-            return true
+            true
         } else {
-            return false
+            false
         }
     }
 

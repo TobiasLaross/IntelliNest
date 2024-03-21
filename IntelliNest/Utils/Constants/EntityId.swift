@@ -152,6 +152,6 @@ enum EntityId: String, Decodable, CaseIterable {
     }
 
     func domain() -> Domain {
-        return Domain(rawValue: rawValue.components(separatedBy: ".").first!) ?? .unknown
+        Domain(rawValue: rawValue.components(separatedBy: ".").first!) ?? .unknown
     }
 }

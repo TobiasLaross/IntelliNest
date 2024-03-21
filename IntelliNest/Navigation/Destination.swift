@@ -22,25 +22,25 @@ enum Destination: String {
     var title: String {
         switch self {
         case .cameras:
-            return "Kameror"
+            "Kameror"
         case .electricity:
-            return "Ström"
+            "Ström"
         case .home:
-            return "Hem"
+            "Hem"
         case .heaters:
-            return "Värmepumpar"
+            "Värmepumpar"
         case .lynk:
-            return "Lynk"
+            "Lynk"
         case .corridorHeaterDetails:
-            return "Korridoren"
+            "Korridoren"
         case .playroomHeaterDetails:
-            return "Lekrummet"
+            "Lekrummet"
         case .eniroClimateSchedule:
-            return "E-niro"
+            "E-niro"
         case .roborock:
-            return "Roborock"
+            "Roborock"
         case .lights:
-            return "Lampor"
+            "Lampor"
         }
     }
 }

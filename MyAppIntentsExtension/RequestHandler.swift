@@ -20,7 +20,7 @@ class RequestHandler {
             request.addValue("application/json", forHTTPHeaderField: "Accept")
             request.setValue("Bearer \(GlobalConstants.secretHassToken)", forHTTPHeaderField: "Authorization")
 
-            URLSession.shared.dataTask(with: request) { (data, response, error) in
+            URLSession.shared.dataTask(with: request) { data, response, error in
                 if error != nil, let retryUrlString {
                     self.makeAPICall(urlString: retryUrlString, retryUrlString: nil, completion: completion)
                 } else {
