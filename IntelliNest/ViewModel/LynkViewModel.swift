@@ -23,11 +23,12 @@ class LynkViewModel: ObservableObject {
     @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
     @Published var address = Entity(entityId: .lynkAddress)
+    @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
 
     var lynkUpdateTask: Task<Void, Error>?
     let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
                                  .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
-                                 .lynkDoorLock, .lynkAddress, .easeeIsEnabled]
+                                 .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled]
     var isReloading = false
     var isLynkFlashing = false
     var airConditionInitiatedTime: Date?
@@ -98,8 +99,7 @@ class LynkViewModel: ObservableObject {
     var lastUpdated: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM HH:mm"
-        // return formatter.string(from: "00:00")
-        return "00:00"
+        return formatter.string(from: carUpdatedAt.date)
     }
 
     var climateIconColor: Color {
@@ -145,6 +145,8 @@ class LynkViewModel: ObservableObject {
             fuelDistance.state = state
         case .lynkAddress:
             address.state = state
+        case .lynkCarUpdatedAt:
+            carUpdatedAt.state = state
         default:
             Log.error("EniroViewModel doesn't reload entityID: \(entityID)")
         }
