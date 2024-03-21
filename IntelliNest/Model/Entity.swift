@@ -87,7 +87,7 @@ struct Entity: EntityProtocol {
 
         switch (hasDateComponent, hasTimeComponent) {
         case (true, true): // Date and Time
-            dateFormatter.dateFormat = state.contains("T") ? "yyyy-MM-dd'T'HH:mm:ssXXXXX" : "yyyy-MM-dd HH:mm:ss"
+            dateFormatter.dateFormat = state.contains("T") ? "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX" : "yyyy-MM-dd HH:mm:ss"
             dateFormatter.timeZone = state.contains("T") ? TimeZone(abbreviation: "UTC") : .current
             date = dateFormatter.date(from: state) ?? .distantPast
         case (false, true): // Only Time

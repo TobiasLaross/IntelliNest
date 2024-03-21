@@ -37,6 +37,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case tobiasIsAway = "input_boolean.tobias_is_away"
     case sarahIsAway = "input_boolean.sarah_is_away"
     case personTobias = "person.tobias_laross"
+    case personSarah = "person.sarah"
     // Electricity
     case nordPool = "sensor.nordpool_kwh_se4_sek_0_10_0"
     case sonnenAutomation = "automation.battery_charger"
@@ -88,6 +89,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case lynkFuel = "sensor.lynk_co_fuel_level"
     case lynkFuelDistance = "sensor.lynk_co_fuel_distance"
     case lynkAddress = "sensor.lynk_co_address"
+    case lynkCarUpdatedAt = "sensor.lynk_co_last_updated_by_car"
     /* Eniro climate schedule */
     case eniroClimateSchedule1Bool = "input_boolean.kia_climate"
     case eniroClimateSchedule1 = "input_datetime.kia_climate"
