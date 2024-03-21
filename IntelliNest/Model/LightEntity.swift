@@ -30,7 +30,7 @@ struct LightEntity: EntityProtocol {
     init(entityId: EntityId, state: String = "Loading", groupedLightIDs: [EntityId]? = nil) {
         self.entityId = entityId
         self.state = state
-        self.brightness = -1
+        brightness = -1
         self.groupedLightIDs = groupedLightIDs
     }
 
@@ -49,7 +49,7 @@ struct LightEntity: EntityProtocol {
 
         init(from decoder: Decoder) throws {
             let data = try decoder.container(keyedBy: AttributesCodingKeys.self)
-            self.brightness = try data.decodeIfPresent(Int.self, forKey: .brightness) ?? -1
+            brightness = try data.decodeIfPresent(Int.self, forKey: .brightness) ?? -1
         }
     }
 
@@ -58,9 +58,9 @@ struct LightEntity: EntityProtocol {
     }
 
     static func == (lhs: LightEntity, rhs: LightEntity) -> Bool {
-        return (lhs.entityId == rhs.entityId &&
+        lhs.entityId == rhs.entityId &&
             lhs.brightness == rhs.brightness &&
             lhs.isActive == rhs.isActive &&
-            lhs.state == rhs.state)
+            lhs.state == rhs.state
     }
 }

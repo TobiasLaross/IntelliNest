@@ -16,13 +16,13 @@ enum User: String, CaseIterable {
     var name: String {
         switch self {
         case .sarah:
-            return "Sarah"
+            "Sarah"
         case .tobias:
-            return "Tobias"
+            "Tobias"
         case .guest:
-            return "Gäst"
+            "Gäst"
         case .unknownUser:
-            return "Unknown User"
+            "Unknown User"
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  ClimateSchedule.swift
+//  EniroClimateScheduleView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-09.
@@ -78,7 +78,7 @@ struct ClimateAutomationsView: View {
     init(title: String, time: Date, climateBool: Binding<Entity>, updateToggle: @escaping AsyncEntityClosure) {
         self.title = title
         self.time = time
-        self._climateBool = climateBool
+        _climateBool = climateBool
         self.updateToggle = updateToggle
     }
 

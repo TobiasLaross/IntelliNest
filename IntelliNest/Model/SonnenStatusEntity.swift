@@ -16,13 +16,13 @@ enum SonnenOperationModes: String, CaseIterable {
     var title: String {
         switch self {
         case .manual:
-            return "Manual"
+            "Manual"
         case .selfConsumption:
-            return "Self consumption"
+            "Self consumption"
         case .timeOfUse:
-            return "Time of use"
+            "Time of use"
         case .unknown:
-            return "Unknown"
+            "Unknown"
         }
     }
 }
@@ -59,7 +59,7 @@ struct SonnenStatusEntity {
             self.hasFlowSolarToGrid = hasFlowSolarToGrid
         }
         if let gridIn = attributes["GridFeedIn_W"] as? Double {
-            self.gridPower = gridIn
+            gridPower = gridIn
         }
         if let operationMode = attributes["OperatingMode"] as? String {
             self.operationMode = SonnenOperationModes(rawValue: operationMode) ?? .unknown

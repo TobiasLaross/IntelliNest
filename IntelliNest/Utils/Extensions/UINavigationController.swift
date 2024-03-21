@@ -15,7 +15,7 @@ extension UINavigationController: UIGestureRecognizerDelegate {
     }
 
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        return viewControllers.count > 1
+        viewControllers.count > 1
     }
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,

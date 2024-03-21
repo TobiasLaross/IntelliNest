@@ -21,9 +21,9 @@ extension String {
 
     var toKW: String {
         if let doubleValue = Double(self) {
-            return doubleValue.toKW
+            doubleValue.toKW
         } else {
-            return "?kW"
+            "?kW"
         }
     }
 
@@ -47,17 +47,17 @@ extension String {
 
     var toKr: String {
         if let doubleValue = Double(self) {
-            return "\(doubleValue.roundedWithOneDecimal) Kr"
+            "\(doubleValue.roundedWithOneDecimal) Kr"
         } else {
-            return "? Kr"
+            "? Kr"
         }
     }
 
     var roundedWithOneDecimal: Double {
         if let doubleValue = Double(self) {
-            return doubleValue.roundedWithOneDecimal
+            doubleValue.roundedWithOneDecimal
         } else {
-            return 0
+            0
         }
     }
 

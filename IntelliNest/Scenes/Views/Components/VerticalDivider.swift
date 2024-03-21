@@ -1,5 +1,5 @@
 //
-//  Helpers.swift
+//  VerticalDivider.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-09.

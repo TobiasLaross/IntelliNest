@@ -13,11 +13,11 @@ struct LockEntity: Lockable, EntityProtocol {
     var id: LockID {
         switch entityId {
         case .storageLock:
-            return .storageDoor
+            .storageDoor
         case .lynkDoorLock:
-            return .lynkDoor
+            .lynkDoor
         default:
-            return .storageDoor
+            .storageDoor
         }
     }
 
@@ -56,13 +56,13 @@ struct LockEntity: Lockable, EntityProtocol {
     }
 
     static func == (lhs: LockEntity, rhs: LockEntity) -> Bool {
-        return lhs.isActive == rhs.isActive &&
+        lhs.isActive == rhs.isActive &&
             lhs.entityId == rhs.entityId &&
             lhs.state == rhs.state
     }
 
     func shouldReload() -> Bool {
-        return isActive || isLoading
+        isActive || isLoading
     }
 
     mutating func setNextUpdateTime() {

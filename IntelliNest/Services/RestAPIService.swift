@@ -183,7 +183,7 @@ class RestAPIService: URLRequestBuilder {
         await sendPostRequest(json: json, domain: domain, action: action)
     }
 
-    func setStateFor<T: EntityProtocol>(entity: T, domain: Domain, action: Action) async {
+    func setStateFor(entity: some EntityProtocol, domain: Domain, action: Action) async {
         var json = [JSONKey: Any]()
         json[JSONKey.entityID] = entity.entityId.rawValue
         await sendPostRequest(json: json, domain: domain, action: action)
@@ -250,7 +250,7 @@ class RestAPIService: URLRequestBuilder {
         [
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": "Bearer \(GlobalConstants.secretHassToken)",
+            "Authorization": "Bearer \(GlobalConstants.secretHassToken)"
         ]
     }
 
@@ -279,15 +279,14 @@ class RestAPIService: URLRequestBuilder {
         }
 
         let urlPathSeparated = urlPath.components(separatedBy: "?token=")
-        var request: URLRequest?
-        if urlPathSeparated.count == 2 {
-            request = createURLRequest(path: urlPathSeparated[0],
-                                       queryParams: ["token": urlPathSeparated[1]],
-                                       method: .get)
+        var request: URLRequest? = if urlPathSeparated.count == 2 {
+            createURLRequest(path: urlPathSeparated[0],
+                             queryParams: ["token": urlPathSeparated[1]],
+                             method: .get)
         } else {
-            request = createURLRequest(path: urlPath,
-                                       queryParams: queryParams,
-                                       method: .get)
+            createURLRequest(path: urlPath,
+                             queryParams: queryParams,
+                             method: .get)
         }
 
         guard let request else {
@@ -341,11 +340,10 @@ private extension RestAPIService {
     }
 
     func sendPostRequest(customPath: String? = nil, json: [JSONKey: Any]?, domain: Domain, action: Action) async {
-        let path: String
-        if let customPath {
-            path = customPath
+        let path: String = if let customPath {
+            customPath
         } else {
-            path = "/api/services/\(domain.rawValue)/\(action.rawValue)"
+            "/api/services/\(domain.rawValue)/\(action.rawValue)"
         }
         let errorBannerTitle = "Misslyckades med att skicka request"
         let errorBannerMessageEnd = "(\(domain.rawValue), \(action.rawValue))"
@@ -411,17 +409,17 @@ private extension Int {
     var errorDescription: String {
         switch self {
         case -1001:
-            return "Förfrågan tog för lång tid"
+            "Förfrågan tog för lång tid"
         case -1003:
-            return "Kan inte hitta servern"
+            "Kan inte hitta servern"
         case -1004:
-            return "Kan inte ansluta till servern"
+            "Kan inte ansluta till servern"
         case -1009:
-            return "Ingen nätverksåtkomst"
+            "Ingen nätverksåtkomst"
         case 400:
-            return "Felaktikt request: 400"
+            "Felaktikt request: 400"
         default:
-            return "Ohanterad felkod: \(self)"
+            "Ohanterad felkod: \(self)"
         }
     }
 }

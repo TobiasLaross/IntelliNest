@@ -56,28 +56,28 @@ private extension HeaterVerticalMode {
     var buttonTitle: String? {
         switch self {
         case .auto:
-            return "Auto"
+            "Auto"
         case .highest:
-            return "Upp"
+            "Upp"
         case .lowest:
-            return "Ner"
+            "Ner"
         case .swing:
-            return "Swing"
+            "Swing"
         default:
-            return nil
+            nil
         }
     }
 
     var buttonImageName: String? {
         switch self {
         case .position2:
-            return "arrow.up.forward"
+            "arrow.up.forward"
         case .position3:
-            return "arrow.right"
+            "arrow.right"
         case .position4:
-            return "arrow.down.forward"
+            "arrow.down.forward"
         default:
-            return nil
+            nil
         }
     }
 }

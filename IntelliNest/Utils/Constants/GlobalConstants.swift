@@ -1,5 +1,5 @@
 //
-//  Constants.swift
+//  GlobalConstants.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-01.
@@ -17,7 +17,7 @@ let dashboardButtonFrameWidth: CGFloat = 90
 let dashboardCircleButtonFrameSize: CGFloat = 80
 let dashboardButtonCornerRadius: CGFloat = 20
 
-struct GlobalConstants {
+enum GlobalConstants {
     static var baseExternalUrlString: String {
         if let externalUrl = Bundle.main.object(forInfoDictionaryKey: "EXTERNAL_URL") as? String {
             return "https://\(externalUrl)"
@@ -27,9 +27,9 @@ struct GlobalConstants {
 
     static var localSSID: String {
         if let localSSID = Bundle.main.object(forInfoDictionaryKey: "LOCAL_SSID") as? String {
-            return localSSID
+            localSSID
         } else {
-            return ""
+            ""
         }
     }
 
@@ -103,6 +103,6 @@ struct GlobalConstants {
     }
 
     static func isGithubActionsRunning() -> Bool {
-        return baseExternalUrlString == githubFakeUrlString
+        baseExternalUrlString == githubFakeUrlString
     }
 }

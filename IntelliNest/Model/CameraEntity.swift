@@ -46,7 +46,7 @@ struct CameraEntity: EntityProtocol {
     }
 
     static func == (lhs: CameraEntity, rhs: CameraEntity) -> Bool {
-        return false
+        false
     }
 }
 

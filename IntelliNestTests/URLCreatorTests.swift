@@ -5,8 +5,8 @@
 //  Created by Tobias on 2023-05-06.
 //
 
-import XCTest
 @testable import IntelliNest
+import XCTest
 
 class URLCreatorTestDelegate: URLCreatorDelegate {
     var expectation: XCTestExpectation?

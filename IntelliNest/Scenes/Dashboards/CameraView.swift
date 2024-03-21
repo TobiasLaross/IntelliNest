@@ -52,9 +52,9 @@ struct CameraView: View {
                                                   initialScale: viewModel.initialSnapshotScale)
                                     .edgesIgnoringSafeArea(.all)
                             }
-                            .transaction({ transaction in
+                            .transaction { transaction in
                                 transaction.disablesAnimations = true
-                            })
+                            }
                             .onDisappear {
                                 scale = viewModel.initialSnapshotScale
                             }

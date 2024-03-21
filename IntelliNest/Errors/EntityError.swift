@@ -1,5 +1,5 @@
 //
-//  LightException.swift
+//  EntityError.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-07-07.

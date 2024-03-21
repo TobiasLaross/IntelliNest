@@ -10,7 +10,7 @@ import ShipBookSDK
 
 extension Log {
     static var user: String {
-        return UserManager.currentUser.rawValue
+        UserManager.currentUser.rawValue
     }
 
     static func info(_ message: String,

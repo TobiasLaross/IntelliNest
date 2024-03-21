@@ -24,15 +24,15 @@ extension Lockable {
     var actionText: String {
         switch lockState {
         case .unlocked:
-            return "Lås"
+            "Lås"
         case .unlocking:
-            return "Låser upp"
+            "Låser upp"
         case .locking:
-            return "Låser"
+            "Låser"
         case .locked:
-            return "Lås upp"
+            "Lås upp"
         default:
-            return "Lås upp"
+            "Lås upp"
         }
     }
 
@@ -45,35 +45,35 @@ extension Lockable {
     }
 
     var expectedStateIsOld: Bool {
-        if let setDate = self.expectedStateSetDate {
-            return Date().timeIntervalSince(setDate) > 30
+        if let setDate = expectedStateSetDate {
+            Date().timeIntervalSince(setDate) > 30
         } else {
-            return false
+            false
         }
     }
 
     var image: Image {
         if lockState == .locked || lockState == .unlocking {
-            return Image(systemImageName: .locked)
+            Image(systemImageName: .locked)
         } else if lockState == .unlocked || lockState == .locking {
-            return Image(systemImageName: .unlocked)
+            Image(systemImageName: .unlocked)
         } else {
-            return Image(systemImageName: .lockSlash)
+            Image(systemImageName: .lockSlash)
         }
     }
 
     func stateToString() -> String {
         switch lockState {
         case .locked:
-            return "låst"
+            "låst"
         case .unlocked:
-            return "olåst"
+            "olåst"
         case .unlocking:
-            return "låser upp"
+            "låser upp"
         case .locking:
-            return "låser"
+            "låser"
         default:
-            return lockState.rawValue
+            lockState.rawValue
         }
     }
 }

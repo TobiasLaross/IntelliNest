@@ -37,7 +37,7 @@ class EniroClimateScheduleViewModel: HassAPIViewModelProtocol {
     }
 
     private func reload<T: EntityProtocol>(entity: T) async -> T {
-        return await apiService.reload(hassEntity: entity, entityType: T.self)
+        await apiService.reload(hassEntity: entity, entityType: T.self)
     }
 
     @MainActor

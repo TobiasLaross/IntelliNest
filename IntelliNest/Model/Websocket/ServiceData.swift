@@ -1,5 +1,5 @@
 //
-//  LightServiceData.swift
+//  ServiceData.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-07-10.
@@ -54,7 +54,7 @@ class DateTimeServiceData: ServiceData {
         self.date = dateFormatter.string(from: date)
 
         dateFormatter.dateFormat = "HH:mm:ss"
-        self.time = dateFormatter.string(from: date)
+        time = dateFormatter.string(from: date)
     }
 
     override func encode(to encoder: Encoder) throws {

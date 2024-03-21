@@ -50,6 +50,6 @@ extension HeatersViewModel: HeaterReloadable {
     }
 
     func reload<T: EntityProtocol>(entity: T) async -> T {
-        return await restAPIService.reload(hassEntity: entity, entityType: T.self)
+        await restAPIService.reload(hassEntity: entity, entityType: T.self)
     }
 }

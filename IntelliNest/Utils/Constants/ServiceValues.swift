@@ -1,5 +1,5 @@
 //
-//  VariableValue.swift
+//  ServiceValues.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-11-17.
@@ -16,13 +16,13 @@ enum ServiceValues: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
-        case .string(let stringValue):
+        case let .string(stringValue):
             try container.encode(stringValue)
-        case .int(let intValue):
+        case let .int(intValue):
             try container.encode(intValue)
-        case .double(let doubleValue):
+        case let .double(doubleValue):
             try container.encode(doubleValue)
-        case .stringArray(let stringArrayValue):
+        case let .stringArray(stringArrayValue):
             try container.encode(stringArrayValue)
         }
     }

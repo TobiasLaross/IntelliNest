@@ -13,7 +13,7 @@ class UnlockStoreHouseIntentHandler: NSObject, UnlockStoreHouseIntentHandling {
         let internalUrlString = GlobalConstants.baseInternalUrlString + path
         let externalUrlString = GlobalConstants.baseExternalUrlString + path
 
-        RequestHandler.shared.makeAPICall(urlString: internalUrlString, retryUrlString: externalUrlString) { (_, response, error) in
+        RequestHandler.shared.makeAPICall(urlString: internalUrlString, retryUrlString: externalUrlString) { _, response, error in
             if error != nil {
                 // Handle the error if both requests fail
                 let response = UnlockStoreHouseIntentResponse(code: .failure, userActivity: nil)

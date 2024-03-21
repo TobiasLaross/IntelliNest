@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  URLCreator.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2022-02-01.
@@ -128,7 +128,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
 
     private func async<R>(timeoutAfter maxDuration: TimeInterval,
                           do work: @escaping () async throws -> R) async throws -> R {
-        return try await withThrowingTaskGroup(of: Result<R, Error>.self) { group in
+        try await withThrowingTaskGroup(of: Result<R, Error>.self) { group in
             // Start actual work.
             group.addTask {
                 do {
@@ -149,9 +149,9 @@ class URLCreator: ObservableObject, URLRequestBuilder {
             }
             group.cancelAll()
             switch result {
-            case .success(let value):
+            case let .success(value):
                 return value
-            case .failure(let error):
+            case let .failure(error):
                 throw error
             }
         }

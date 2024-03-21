@@ -5,8 +5,8 @@
 //  Created by Tobias on 2023-06-17.
 //
 
-import XCTest
 @testable import IntelliNest
+import XCTest
 
 final class LightEntityTests: XCTestCase {
     var light: LightEntity!

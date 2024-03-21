@@ -43,8 +43,8 @@ struct FlowIndicatorView: View {
     }
 
     init(isFlowing: Binding<Bool>, flowIntensity: Double, arrowCount: Int) {
-        self._pulsate = State(initialValue: Array(repeating: false, count: arrowCount))
-        self._isFlowing = isFlowing
+        _pulsate = State(initialValue: Array(repeating: false, count: arrowCount))
+        _isFlowing = isFlowing
         self.flowIntensity = flowIntensity
         self.arrowCount = arrowCount
     }

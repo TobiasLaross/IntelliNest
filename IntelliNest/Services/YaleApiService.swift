@@ -1,5 +1,5 @@
 //
-//  YaleAccessService.swift
+//  YaleApiService.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-05-18.
@@ -125,7 +125,7 @@ class YaleApiService: URLRequestBuilder {
                 async let part5 = hassAPIService.get(entityId: .yaleAccessTokenPart5, entityType: Entity.self)
 
                 let parts = try await [part1, part2, part3, part4, part5]
-                accessToken = parts.map { $0.state }.joined()
+                accessToken = parts.map(\.state).joined()
                 updateLocalAccessToken(newAccessToken: accessToken)
             } catch {
                 Log.error("Failed to fetch access token \(error)")

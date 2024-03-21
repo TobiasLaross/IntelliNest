@@ -1,5 +1,5 @@
 //
-//  UpdateLightRequest.swift
+//  UpdateEntityRequest.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-06-25.
@@ -33,8 +33,8 @@ struct UpdateEntityRequest: Encodable {
 
     init(domain: Domain, action: Action, serviceData: ServiceData? = nil, entityIds: [EntityId]) {
         self.domain = domain
-        self.service = action
+        service = action
         self.serviceData = serviceData ?? EmptyServiceData()
-        self.target = Target(entityIds: entityIds.map { $0.rawValue })
+        target = Target(entityIds: entityIds.map(\.rawValue))
     }
 }
