@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9066A22629C1C0C6A469AFF1 /* .swiftformat in Sources */ = {isa = PBXBuildFile; fileRef = 64A22CB4FE13D0628B12F9F6 /* .swiftformat */; };
+		923B1B66ED3B56AEE3236623 /* .swift-version in Sources */ = {isa = PBXBuildFile; fileRef = 8337000DEB817B1114E96622 /* .swift-version */; };
 		EDA427791B9DF78634D7F957 /* LynkMiscView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA20B3409BB996ED12E461BF /* LynkMiscView.swift */; };
 		F60345C127A7F33700212D04 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C027A7F33700212D04 /* Entity.swift */; };
 		F60345C427A933D700212D04 /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C327A933D700212D04 /* GlobalConstants.swift */; };
@@ -228,6 +229,7 @@
 
 /* Begin PBXFileReference section */
 		64A22CB4FE13D0628B12F9F6 /* .swiftformat */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = .swiftformat; sourceTree = "<group>"; };
+		8337000DEB817B1114E96622 /* .swift-version */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = ".swift-version"; sourceTree = "<group>"; };
 		F60345C027A7F33700212D04 /* Entity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
 		F60345C327A933D700212D04 /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		F60345C827A9379200212D04 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -854,6 +856,7 @@
 				F67D77182B5130CA00F52EB0 /* WidgetKit.framework */,
 				F67D771A2B5130CA00F52EB0 /* SwiftUI.framework */,
 				64A22CB4FE13D0628B12F9F6 /* .swiftformat */,
+				8337000DEB817B1114E96622 /* .swift-version */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1081,7 +1084,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --swiftversion 5.10 --indent 4\n";
+			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --indent 4\n";
 		};
 		F66F061A27B16F1D00270E71 /* Swiftlint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1275,6 +1278,7 @@
 				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
 				EDA427791B9DF78634D7F957 /* LynkMiscView.swift in Sources */,
 				9066A22629C1C0C6A469AFF1 /* .swiftformat in Sources */,
+				923B1B66ED3B56AEE3236623 /* .swift-version in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
