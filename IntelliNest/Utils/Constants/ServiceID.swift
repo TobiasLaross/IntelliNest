@@ -22,6 +22,8 @@ enum ServiceID: String, Decodable, CaseIterable {
     case lynkUnlockDoors = "lynkco.unlock_doors"
     case lynkFlashStart = "lynkco.start_flash_lights"
     case lynkFlashStop = "lynkco.stop_flash_lights"
+    case lynkStartEngine = "lynkco.start_engine"
+    case lynkStopEngine = "lynkco.stop_engine"
     case cameraStream = "camera/stream"
     case automationTurnOn = "automation.turn_on"
     case automationTurnOff = "automation.turn_off"
@@ -39,10 +41,10 @@ enum ServiceID: String, Decodable, CaseIterable {
     case sonnenDischarge = "rest_command.sonnen_discharge"
 
     var toAction: Action? {
-        if let action = Action(rawValue: self.rawValue.components(separatedBy: ".").last ?? "") {
+        if let action = Action(rawValue: rawValue.components(separatedBy: ".").last ?? "") {
             return action
         } else {
-            Log.error("Failed to create action from ServiceID: \(self.rawValue)")
+            Log.error("Failed to create action from ServiceID: \(rawValue)")
             return nil
         }
     }

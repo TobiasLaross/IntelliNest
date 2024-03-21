@@ -14,6 +14,11 @@ extension Double {
         return temp / 10
     }
 
+    var toPercent: String {
+        let roundedPercent = roundedWithOneDecimal
+        return roundedPercent < 0.06 ? "0%" : "\(String(format: "%.1f", roundedPercent))%"
+    }
+
     var toKW: String {
         let kiloWatt = self / 1000.0
         let roundedKilowWatt = (abs(kiloWatt) < 0.06 ? 0 : kiloWatt).roundedWithOneDecimal

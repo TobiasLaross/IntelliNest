@@ -16,7 +16,7 @@ class LynkViewModel: ObservableObject {
     @Published var isEngineRunning = Entity(entityId: .lynkEngineRunning)
     @Published var interiorTemperature = Entity(entityId: .lynkTemperatureInterior)
     @Published var exteriorTemperature = Entity(entityId: .lynkTemperatureExterior)
-    @Published var battery = Entity(entityId: .lynkBattery)
+    @Published var battery = InputNumberEntity(entityId: .lynkBattery)
     @Published var batteryDistance = Entity(entityId: .lynkBatteryDistance)
     @Published var fuel = Entity(entityId: .lynkFuel)
     @Published var fuelDistance = Entity(entityId: .lynkFuelDistance)
@@ -31,6 +31,7 @@ class LynkViewModel: ObservableObject {
     var isReloading = false
     var isLynkFlashing = false
     var airConditionInitiatedTime: Date?
+    var engineInitiatedTime: Date?
     var isEaseeCharging: Bool {
         easeeIsEnabled.isActive
     }
@@ -50,6 +51,10 @@ class LynkViewModel: ObservableObject {
         isAirConditionActive || isAirConditionLoading ? "Stäng av" : "Starta"
     }
 
+    var engineTitle: String {
+        isEngineRunning.isActive || isEngineLoading ? "Stäng av" : "Starta"
+    }
+
     var isAirConditionActive: Bool {
         climateHeating.isActive
     }
@@ -60,6 +65,10 @@ class LynkViewModel: ObservableObject {
 
     var isAirConditionLoading: Bool {
         !isAirConditionActive && (airConditionInitiatedTime?.addingTimeInterval(5 * 60) ?? Date.distantPast) > Date()
+    }
+
+    var isEngineLoading: Bool {
+        !isEngineRunning.isActive && (engineInitiatedTime?.addingTimeInterval(5 * 60) ?? Date.distantPast) > Date()
     }
 
     var doorLockTitle: String {
@@ -183,6 +192,16 @@ class LynkViewModel: ObservableObject {
         restAPIService.callService(serviceID: .lynkFlashStop, domain: .lynkco)
     }
 
+    func startEngine() {
+        engineInitiatedTime = Date()
+        restAPIService.callService(serviceID: .lynkStartEngine, domain: .lynkco)
+    }
+
+    func stopEngine() {
+        engineInitiatedTime = nil
+        restAPIService.callService(serviceID: .lynkStopEngine, domain: .lynkco)
+    }
+
     func toggleState(for entity: Entity) {
         let action: Action = entity.isActive ? .turnOff : .turnOn
         restAPIService.update(entityID: entity.entityId, domain: .inputBoolean, action: action)
@@ -206,8 +225,8 @@ private extension LynkViewModel {
             while isViewActive {
                 do {
                     try await Task.sleep(seconds: 6)
+                    await reload()
                 } catch {}
-                await reload()
             }
         }
     }

@@ -1,5 +1,5 @@
 //
-//  CircleButtonView.swift
+//  ServiceButtonView.swift
 //  IntelliNest
 //
 //  Created by Tobias on 2023-11-19.
@@ -58,8 +58,8 @@ struct ServiceButtonView: View {
                                     .lineLimit(2)
                                     .font(customFont)
                                     .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 8)
-                                    .minimumScaleFactor(0.5)
+                                    .minimumScaleFactor(0.25)
+                                    .padding(.horizontal, 10)
                             }
                         }
                         .foregroundColor(.white)
