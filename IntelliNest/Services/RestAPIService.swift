@@ -279,7 +279,7 @@ class RestAPIService: URLRequestBuilder {
         }
 
         let urlPathSeparated = urlPath.components(separatedBy: "?token=")
-        var request: URLRequest? = if urlPathSeparated.count == 2 {
+        let request: URLRequest? = if urlPathSeparated.count == 2 {
             createURLRequest(path: urlPathSeparated[0],
                              queryParams: ["token": urlPathSeparated[1]],
                              method: .get)
