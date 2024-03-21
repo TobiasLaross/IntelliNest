@@ -10,7 +10,17 @@ import ShipBookSDK
 
 struct LockEntity: Lockable, EntityProtocol {
     var entityId: EntityId
-    var id: LockID = .storageDoor
+    var id: LockID {
+        switch entityId {
+        case .storageLock:
+            return .storageDoor
+        case .lynkDoorLock:
+            return .lynkDoor
+        default:
+            return .storageDoor
+        }
+    }
+
     var state: String { didSet {
         lockState = LockState(rawValue: state) ?? .unknown
         if lockState == expectedState || expectedStateIsOld {

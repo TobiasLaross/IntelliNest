@@ -12,6 +12,7 @@ struct LynkMiscView: View {
                               icon: viewModel.doorLockIcon,
                               iconWidth: viewModel.isLynkUnlocked ? 30 : 20,
                               iconHeight: 30,
+                              isLoading: viewModel.lynkDoorLock.isLoading,
                               action: viewModel.toggleDoorLock)
                 .disabled(viewModel.lynkDoorLock.isLoading)
                 .contextMenu {
