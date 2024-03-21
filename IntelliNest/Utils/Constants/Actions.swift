@@ -33,6 +33,8 @@ enum Action: String, Codable {
     case setVaneHorizontal = "set_vane_horizontal"
     case setVaneVertical = "set_vane_vertical"
     case setFanMode = "set_fan_mode"
+    case startEngine = "start_engine"
+    case stopEngine = "stop_engine"
     case setTemperature = "set_temperature"
     case setHvacMode = "set_hvac_mode"
     case updateEntity = "update_entity"
