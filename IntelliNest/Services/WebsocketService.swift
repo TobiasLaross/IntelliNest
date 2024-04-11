@@ -341,7 +341,15 @@ extension WebSocketService: WebSocketDelegate {
                 delegate?.webSocketService(didReceiveCoodinates: Coordinates(longitude: longitude, latitude: latitude), for: entityID)
             } else {
                 let lastChangedString = newState["last_changed"] as? String
-                let lastChanged = Date.fromISO8601(lastChangedString)
+                let lynkLastChangedString = attributes["car_updated_at"] as? String
+                let formatter = ISO8601DateFormatter()
+                var lastChanged: Date?
+
+                if let lynkLastChangedString {
+                    lastChanged = formatter.date(from: lynkLastChangedString)
+                } else if let lastChangedString {
+                    lastChanged = formatter.date(from: lastChangedString)
+                }
                 delegate?.webSocketService(didReceiveEntity: entityID, state: state, lastChanged: lastChanged)
             }
         }

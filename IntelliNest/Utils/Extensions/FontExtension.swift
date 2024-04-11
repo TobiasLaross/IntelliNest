@@ -8,6 +8,10 @@
 import SwiftUI
 
 extension Font {
+    static var buttonFontExtraSmall: Font {
+        .system(size: 8)
+    }
+
     static var buttonFontSmall: Font {
         .system(size: 10)
     }

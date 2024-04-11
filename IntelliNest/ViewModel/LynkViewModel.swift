@@ -24,6 +24,7 @@ class LynkViewModel: ObservableObject {
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
     @Published var address = Entity(entityId: .lynkAddress)
     @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
+    @Published var airConditionInitiatedTime: Date?
 
     var lynkUpdateTask: Task<Void, Error>?
     let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
@@ -31,7 +32,6 @@ class LynkViewModel: ObservableObject {
                                  .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled]
     var isReloading = false
     var isLynkFlashing = false
-    var airConditionInitiatedTime: Date?
     var engineInitiatedTime: Date?
     var isEaseeCharging: Bool {
         easeeIsEnabled.isActive
@@ -50,6 +50,12 @@ class LynkViewModel: ObservableObject {
 
     var climateTitle: String {
         isAirConditionActive || isAirConditionLoading ? "Stäng av" : "Starta"
+    }
+
+    var interiorTemperatureUpdatedAt: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM HH:mm"
+        return dateFormatter.string(from: interiorTemperature.lastChanged)
     }
 
     var engineTitle: String {
@@ -119,22 +125,34 @@ class LynkViewModel: ObservableObject {
     }
 
     // swiftlint:disable cyclomatic_complexity
-    func reload(entityID: EntityId, state: String, lastChanged _: Date? = nil) {
+    func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         switch entityID {
         case .eniroForceCharge:
             forceCharging.state = state
         case .lynkClimateHeating:
             climateHeating.state = state
+            if let lastChanged {
+                climateHeating.lastChanged = lastChanged
+            }
         case .lynkDoorLock:
             lynkDoorLock.state = state
         case .easeeIsEnabled:
             easeeIsEnabled.state = state
         case .lynkEngineRunning:
             isEngineRunning.state = state
+            if let lastChanged {
+                isEngineRunning.lastChanged = lastChanged
+            }
         case .lynkTemperatureInterior:
             interiorTemperature.state = state
+            if let lastChanged {
+                interiorTemperature.lastChanged = lastChanged
+            }
         case .lynkTemperatureExterior:
             exteriorTemperature.state = state
+            if let lastChanged {
+                exteriorTemperature.lastChanged = lastChanged
+            }
         case .lynkBattery:
             battery.state = state
         case .lynkBatteryDistance:
@@ -196,12 +214,12 @@ class LynkViewModel: ObservableObject {
 
     func startEngine() {
         engineInitiatedTime = Date()
-        restAPIService.callService(serviceID: .lynkStartEngine, domain: .lynkco)
+        restAPIService.callScript(scriptID: .lynkStartEngine)
     }
 
     func stopEngine() {
         engineInitiatedTime = nil
-        restAPIService.callService(serviceID: .lynkStopEngine, domain: .lynkco)
+        restAPIService.callScript(scriptID: .lynkStopEngine)
     }
 
     func toggleState(for entity: Entity) {
@@ -211,11 +229,13 @@ class LynkViewModel: ObservableObject {
 }
 
 private extension LynkViewModel {
+    @MainActor
     func startClimate() {
         airConditionInitiatedTime = Date()
         restAPIService.callScript(scriptID: .lynkStartClimate)
     }
 
+    @MainActor
     func stopClimate() {
         airConditionInitiatedTime = nil
         restAPIService.callScript(scriptID: .lynkStopClimate)
@@ -226,9 +246,11 @@ private extension LynkViewModel {
         lynkUpdateTask = Task {
             while isViewActive {
                 do {
-                    try await Task.sleep(seconds: 6)
+                    try await Task.sleep(seconds: 5)
                     await reload()
-                } catch {}
+                } catch {
+                    break
+                }
             }
         }
     }
