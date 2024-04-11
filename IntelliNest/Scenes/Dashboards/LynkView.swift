@@ -21,14 +21,21 @@ struct LynkView: View {
                 .minimumScaleFactor(0.5)
                 .padding()
             Text("Batteri: \(viewModel.battery.inputNumber.toPercent) - \(viewModel.batteryDistance.state)km")
+                .foregroundColor(.white)
             Text("Bensin: \(viewModel.fuel.state)l - \(viewModel.fuelDistance.state)km")
+                .foregroundColor(.white)
 
             Spacer()
                 .frame(height: 150)
             HStack {
                 VStack(alignment: .trailing) {
                     Text("Bilen \(String(format: "%.1f", viewModel.interiorTemperature.state.roundedWithOneDecimal))°C")
+                        .foregroundColor(.white)
                     Text("Ute \(String(format: "%.1f", viewModel.exteriorTemperature.state.roundedWithOneDecimal))°C")
+                        .foregroundColor(.white)
+                    Text(viewModel.interiorTemperatureUpdatedAt)
+                        .font(.buttonFontExtraSmall)
+                        .foregroundColor(.white)
                 }
                 .padding(.trailing, 16)
                 ServiceButtonView(buttonTitle: viewModel.climateTitle,

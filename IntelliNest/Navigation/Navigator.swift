@@ -13,7 +13,9 @@ import WidgetKit
 @MainActor
 class Navigator: ObservableObject {
     @ObservedObject var urlCreator = URLCreator()
-    @Published var navigationPath = [Destination]()
+    @Published var navigationPath = [Destination]() { didSet {
+        updateActiveView()
+    }}
     @Published var errorBannerTitle: String? {
         didSet {
             if errorBannerTitle != nil {
@@ -131,9 +133,7 @@ class Navigator: ObservableObject {
 
     func pop() {
         navigationPath.removeLast()
-        camerasViewModel.setIsActiveScreen(currentDestination == .cameras)
-        electricityViewModel.isViewActive = currentDestination == .electricity
-        lynkViewModel.isViewActive = currentDestination == .lynk
+        updateActiveView()
     }
 
     func show(destination: Destination) -> some View {
@@ -178,9 +178,7 @@ class Navigator: ObservableObject {
                 await updateConnectionStateTask.value
                 await reloadCurrentModelTask.value
 
-                camerasViewModel.setIsActiveScreen(destination == .cameras)
-                electricityViewModel.isViewActive = destination == .electricity
-                lynkViewModel.isViewActive = destination == .lynk
+                updateActiveView()
             }
         }
     }
@@ -216,8 +214,7 @@ class Navigator: ObservableObject {
 
     func didEnterForeground() {
         isAppInForeground = true
-        electricityViewModel.isViewActive = currentDestination == .electricity
-        lynkViewModel.isViewActive = currentDestination == .lynk
+        updateActiveView()
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
@@ -382,6 +379,12 @@ private extension Navigator {
                     Log.error("Failed to requestAuthorization for push, \(error.localizedDescription)")
                 }
             }
+    }
+
+    func updateActiveView() {
+        camerasViewModel.setIsActiveScreen(currentDestination == .cameras)
+        electricityViewModel.isViewActive = currentDestination == .electricity
+        lynkViewModel.isViewActive = currentDestination == .lynk
     }
 
     func registerAPNSToken(_ apnsToken: String) {
