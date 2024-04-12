@@ -247,6 +247,7 @@ class Navigator: ObservableObject {
         lynkViewModel.lynkDoorLock.expectedState = .unknown
         webSocketService.isExpectingTextResponse = false
         webSocketService.disconnect()
+        webSocketService.isAuthenticated = false
     }
 
     @MainActor
