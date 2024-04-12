@@ -7,43 +7,48 @@
 
 import SwiftUI
 
+enum HeaterType {
+    case corridor
+    case playroom
+}
+
+@MainActor
 struct DetailedHeaterView: View {
-    var heater: HeaterEntity
-    var fanMode: HeaterFanMode
-    var horizontalMode: HeaterHorizontalMode
-    var verticalMode: HeaterVerticalMode
-    let fanModeSelectedCallback: HeaterFanModeClosure
-    let horizontalModeSelectedCallback: HeaterHorizontalModeClosure
-    let verticalModeSelectedCallback: HeaterVerticalModeClosure
+    @ObservedObject var viewModel: HeatersViewModel
+    var selectedHeater: HeaterType
+
+    var heater: HeaterEntity {
+        selectedHeater == .corridor ? viewModel.heaterCorridor : viewModel.heaterPlayroom
+    }
 
     var body: some View {
         VStack {
             Text("Fläkt")
                 .font(.title2)
                 .foregroundColor(.white)
-            FanModeView(fanMode: fanMode,
+            FanModeView(fanMode: heater.fanMode,
                         fanModeSelectedCallback: { fanMode in
-                            fanModeSelectedCallback(heater, fanMode)
+                            viewModel.setFanMode(heater, fanMode)
                         })
                         .padding(.bottom)
 
             Text("Horisontellt läge")
                 .font(.title2)
                 .foregroundColor(.white)
-            HorizontalModeView(mode: horizontalMode,
+            HorizontalModeView(mode: heater.vaneHorizontal,
                                leftVaneTitle: heater.leftVaneTitle,
                                rightVaneTitle: heater.rightVaneTitle,
                                horizontalModeSelectedCallback: { horizontalMode in
-                                   horizontalModeSelectedCallback(heater, horizontalMode)
+                                   viewModel.horizontalModeSelectedCallback(heater, horizontalMode)
                                })
                                .padding(.bottom)
 
             Text("Vertikalt läge")
                 .font(.title2)
                 .foregroundColor(.white)
-            VerticalPositionView(mode: verticalMode,
+            VerticalPositionView(mode: heater.vaneVertical,
                                  verticalModeSelectedCallback: { verticalMode in
-                                     verticalModeSelectedCallback(heater, verticalMode)
+                                     viewModel.verticalModeSelectedCallback(heater, verticalMode)
                                  })
             Spacer()
         }
@@ -54,13 +59,6 @@ struct DetailedHeaterView: View {
 
 struct DetailedHeaterView_Previews: PreviewProvider {
     static var previews: some View {
-        let heater = HeaterEntity(entityId: EntityId.heaterCorridor, state: "22")
-        DetailedHeaterView(heater: heater,
-                           fanMode: .auto,
-                           horizontalMode: .auto,
-                           verticalMode: .auto,
-                           fanModeSelectedCallback: { _, _ in },
-                           horizontalModeSelectedCallback: { _, _ in },
-                           verticalModeSelectedCallback: { _, _ in })
+        DetailedHeaterView(viewModel: PreviewProviderUtil.heatersViewModel, selectedHeater: .corridor)
     }
 }

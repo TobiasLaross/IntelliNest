@@ -42,18 +42,18 @@ class HeatersViewModel: HassAPIViewModelProtocol {
         restAPIService.update(heaterID: heater.entityId, action: .setHvacMode, dataKey: .hvacMode, dataValue: hvacMode.rawValue)
     }
 
-    func setFanMode(heater: HeaterEntity, fanMode: HeaterFanMode) {
+    func setFanMode(_ heater: HeaterEntity, _ fanMode: HeaterFanMode) {
         if fanMode != heater.fanMode {
             restAPIService.update(heaterID: heater.entityId, action: .setFanMode, dataKey: .fanMode, dataValue: fanMode.rawValue)
         }
     }
 
-    func horizontalModeSelectedCallback(heater: HeaterEntity, horizontalMode: HeaterHorizontalMode) {
+    func horizontalModeSelectedCallback(_ heater: HeaterEntity, _ horizontalMode: HeaterHorizontalMode) {
         restAPIService.update(heaterID: heater.entityId, domain: .melcloud, action: .setVaneHorizontal, dataKey: .position,
                               dataValue: horizontalMode.rawValue)
     }
 
-    func verticalModeSelectedCallback(heater: HeaterEntity, verticalMode: HeaterVerticalMode) {
+    func verticalModeSelectedCallback(_ heater: HeaterEntity, _ verticalMode: HeaterVerticalMode) {
         restAPIService.update(heaterID: heater.entityId, domain: .melcloud, action: .setVaneVertical, dataKey: .position,
                               dataValue: verticalMode.rawValue)
     }

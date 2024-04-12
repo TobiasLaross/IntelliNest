@@ -82,13 +82,24 @@ struct Entity: EntityProtocol {
         date = .distantPast
 
         let dateFormatter = DateFormatter()
-        let hasTimeComponent = state.contains(":")
         let hasDateComponent = state.contains("T") || state.count > 8
+        let hasTimeComponent = state.contains(":")
 
         switch (hasDateComponent, hasTimeComponent) {
         case (true, true): // Date and Time
-            dateFormatter.dateFormat = state.contains("T") ? "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX" : "yyyy-MM-dd HH:mm:ss"
-            dateFormatter.timeZone = state.contains("T") ? TimeZone(abbreviation: "UTC") : .current
+            let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX") // Ensure the formatter is not affected by the user's locale
+            dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+
+            if state.contains(".") { // Checks for fractional seconds
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
+            } else if state.contains("Z") {
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+            } else {
+                dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                dateFormatter.timeZone = .current
+            }
+
             date = dateFormatter.date(from: state) ?? .distantPast
         case (false, true): // Only Time
             dateFormatter.dateFormat = "HH:mm:ss"

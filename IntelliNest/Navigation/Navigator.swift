@@ -10,6 +10,12 @@ import ShipBookSDK
 import SwiftUI
 import WidgetKit
 
+enum WebsocketConnectionInfo {
+    case unknown
+    case waitingForPong
+    case receivedPong
+}
+
 @MainActor
 class Navigator: ObservableObject {
     @ObservedObject var urlCreator = URLCreator()
@@ -35,6 +41,7 @@ class Navigator: ObservableObject {
     }
 
     @Published var errorBannerMessage: String?
+    @Published var websocketConnectionInfo: WebsocketConnectionInfo = .unknown
 
     var currentDestination: Destination {
         navigationPath.last ?? .home
@@ -58,6 +65,15 @@ class Navigator: ObservableObject {
                                                  },
                                                  setErrorBannerText: { [weak self] title, message in
                                                      self?.setErrorBannerText(title: title, message: message)
+                                                 },
+                                                 setConnectionInfo: { [weak self] info in
+                                                     Task { @MainActor in
+                                                         self?.websocketConnectionInfo = info
+                                                         if info == .receivedPong {
+                                                             try? await Task.sleep(seconds: 1)
+                                                             self?.websocketConnectionInfo = .unknown
+                                                         }
+                                                     }
                                                  })
     lazy var restAPIService = RestAPIService(urlCreator: urlCreator,
                                              setErrorBannerText: { [weak self] title, message in
@@ -218,6 +234,8 @@ class Navigator: ObservableObject {
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
+            try? await Task.sleep(seconds: 1)
+            webSocketService.sendPing()
         }
     }
 
@@ -235,6 +253,7 @@ class Navigator: ObservableObject {
     func reloadCurrentModel() async {
         await reloadConnection()
         await reload(for: currentDestination)
+        webSocketService.sendPing()
     }
 
     func setHomeCoordinates(_ homeCoordinates: Coordinates) {
@@ -276,21 +295,9 @@ private extension Navigator {
 
     func showHeaterDetailsView(heaterID: EntityId) -> DetailedHeaterView {
         if heaterID == .heaterCorridor {
-            DetailedHeaterView(heater: heatersViewModel.heaterCorridor,
-                               fanMode: heatersViewModel.heaterCorridor.fanMode,
-                               horizontalMode: heatersViewModel.heaterCorridor.vaneHorizontal,
-                               verticalMode: heatersViewModel.heaterCorridor.vaneVertical,
-                               fanModeSelectedCallback: heatersViewModel.setFanMode,
-                               horizontalModeSelectedCallback: heatersViewModel.horizontalModeSelectedCallback,
-                               verticalModeSelectedCallback: heatersViewModel.verticalModeSelectedCallback)
+            DetailedHeaterView(viewModel: heatersViewModel, selectedHeater: .corridor)
         } else {
-            DetailedHeaterView(heater: heatersViewModel.heaterPlayroom,
-                               fanMode: heatersViewModel.heaterPlayroom.fanMode,
-                               horizontalMode: heatersViewModel.heaterPlayroom.vaneHorizontal,
-                               verticalMode: heatersViewModel.heaterPlayroom.vaneVertical,
-                               fanModeSelectedCallback: heatersViewModel.setFanMode,
-                               horizontalModeSelectedCallback: heatersViewModel.horizontalModeSelectedCallback,
-                               verticalModeSelectedCallback: heatersViewModel.verticalModeSelectedCallback)
+            DetailedHeaterView(viewModel: heatersViewModel, selectedHeater: .playroom)
         }
     }
 
