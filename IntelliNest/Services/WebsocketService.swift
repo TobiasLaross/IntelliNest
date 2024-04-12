@@ -66,10 +66,14 @@ class WebSocketService {
 
     private var reloadConnectionAction: VoidClosure
     private let setErrorBannerText: StringStringClosure
+    private let setConnectionInfo: (WebsocketConnectionInfo) -> Void
 
-    init(reloadConnectionAction: @escaping VoidClosure, setErrorBannerText: @escaping StringStringClosure) {
+    init(reloadConnectionAction: @escaping VoidClosure,
+         setErrorBannerText: @escaping StringStringClosure,
+         setConnectionInfo: @escaping (WebsocketConnectionInfo) -> Void) {
         self.reloadConnectionAction = reloadConnectionAction
         self.setErrorBannerText = setErrorBannerText
+        self.setConnectionInfo = setConnectionInfo
     }
 
     func baseURLChanged(urlString: String) {
@@ -104,6 +108,11 @@ class WebSocketService {
 
     func connect() {
         socket?.connect()
+    }
+
+    func sendPing() {
+        setConnectionInfo(.waitingForPong)
+        socket?.write(ping: Data())
     }
 
     func disconnect() {
@@ -155,7 +164,9 @@ extension WebSocketService: WebSocketDelegate {
             }
         case .reconnectSuggested:
             isAuthenticated = false
-        case .connected, .ping, .pong:
+        case .pong:
+            setConnectionInfo(.receivedPong)
+        case .connected, .ping:
             break
         }
     }
@@ -341,13 +352,11 @@ extension WebSocketService: WebSocketDelegate {
                 delegate?.webSocketService(didReceiveCoodinates: Coordinates(longitude: longitude, latitude: latitude), for: entityID)
             } else {
                 let lastChangedString = newState["last_changed"] as? String
-                let lynkLastChangedString = attributes["car_updated_at"] as? String
-                let formatter = ISO8601DateFormatter()
                 var lastChanged: Date?
 
-                if let lynkLastChangedString {
-                    lastChanged = formatter.date(from: lynkLastChangedString)
-                } else if let lastChangedString {
+                if let lastChangedString {
+                    let formatter = ISO8601DateFormatter()
+                    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
                     lastChanged = formatter.date(from: lastChangedString)
                 }
                 delegate?.webSocketService(didReceiveEntity: entityID, state: state, lastChanged: lastChanged)

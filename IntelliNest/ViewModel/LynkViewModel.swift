@@ -24,12 +24,22 @@ class LynkViewModel: ObservableObject {
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
     @Published var address = Entity(entityId: .lynkAddress)
     @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
+
+    @Published var climateUpdatedAt = Entity(entityId: .lynkClimateUpdatedAt)
+    @Published var doorLockUpdatedAt = Entity(entityId: .lynkDoorLockUpdatedAt)
+    @Published var engineUpdatedAt = Entity(entityId: .lynkEngineUpdatedAt)
+    @Published var batteryUpdatedAt = Entity(entityId: .lynkBatteryUpdatedAt)
+    @Published var fuelUpdatedAt = Entity(entityId: .lynkFuelUpdatedAt)
+    @Published var addressUpdatedAt = Entity(entityId: .lynkAddressUpdatedAt)
+
     @Published var airConditionInitiatedTime: Date?
 
     var lynkUpdateTask: Task<Void, Error>?
     let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
                                  .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
-                                 .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled]
+                                 .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkClimateUpdatedAt,
+                                 .lynkDoorLockUpdatedAt, .lynkEngineUpdatedAt, .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt,
+                                 .lynkAddressUpdatedAt]
     var isReloading = false
     var isLynkFlashing = false
     var engineInitiatedTime: Date?
@@ -55,7 +65,7 @@ class LynkViewModel: ObservableObject {
     var interiorTemperatureUpdatedAt: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd/MM HH:mm"
-        return dateFormatter.string(from: interiorTemperature.lastChanged)
+        return dateFormatter.string(from: climateUpdatedAt.date)
     }
 
     var engineTitle: String {
@@ -165,8 +175,20 @@ class LynkViewModel: ObservableObject {
             address.state = state
         case .lynkCarUpdatedAt:
             carUpdatedAt.state = state
+        case .lynkClimateUpdatedAt:
+            climateUpdatedAt.state = state
+        case .lynkDoorLockUpdatedAt:
+            doorLockUpdatedAt.state = state
+        case .lynkEngineUpdatedAt:
+            doorLockUpdatedAt.state = state
+        case .lynkBatteryUpdatedAt:
+            batteryUpdatedAt.state = state
+        case .lynkFuelUpdatedAt:
+            fuelUpdatedAt.state = state
+        case .lynkAddressUpdatedAt:
+            addressUpdatedAt.state = state
         default:
-            Log.error("EniroViewModel doesn't reload entityID: \(entityID)")
+            Log.error("LynkViewModel doesn't reload entityID: \(entityID)")
         }
     }
 

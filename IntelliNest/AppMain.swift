@@ -73,6 +73,26 @@ struct AppMain: App {
                     }
                 }
             }
+            .overlay {
+                if UserManager.currentUser == .tobias && navigator.websocketConnectionInfo != .unknown {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            Group {
+                                if navigator.websocketConnectionInfo == .waitingForPong {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                } else if navigator.websocketConnectionInfo == .receivedPong {
+                                    Image(systemImageName: .bolt)
+                                }
+                            }
+                            .padding([.bottom, .trailing], 16)
+                            .frame(width: 32, height: 32)
+                        }
+                    }
+                }
+            }
             .onChange(of: scenePhase) {
                 if scenePhase == .active {
                     navigator.didEnterForeground()
