@@ -104,6 +104,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
         }
     }
 
+    @MainActor
     private func updateConnectionStateUsingRequest() async {
         let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseInternalUrlString,
                                                         path: apiPath,

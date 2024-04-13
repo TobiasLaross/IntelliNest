@@ -83,8 +83,6 @@ struct AppMain: App {
                                 if navigator.websocketConnectionInfo == .waitingForPong {
                                     ProgressView()
                                         .progressViewStyle(.circular)
-                                } else if navigator.websocketConnectionInfo == .receivedPong {
-                                    Image(systemImageName: .bolt)
                                 }
                             }
                             .padding([.bottom, .trailing], 16)

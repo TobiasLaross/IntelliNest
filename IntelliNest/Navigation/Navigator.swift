@@ -13,7 +13,6 @@ import WidgetKit
 enum WebsocketConnectionInfo {
     case unknown
     case waitingForPong
-    case receivedPong
 }
 
 @MainActor
@@ -69,10 +68,6 @@ class Navigator: ObservableObject {
                                                  setConnectionInfo: { [weak self] info in
                                                      Task { @MainActor in
                                                          self?.websocketConnectionInfo = info
-                                                         if info == .receivedPong {
-                                                             try? await Task.sleep(seconds: 1)
-                                                             self?.websocketConnectionInfo = .unknown
-                                                         }
                                                      }
                                                  })
     lazy var restAPIService = RestAPIService(urlCreator: urlCreator,
@@ -138,6 +133,7 @@ class Navigator: ObservableObject {
 
         Task {
             await urlCreator.updateConnectionState()
+            await heatersViewModel.reload()
         }
 
         if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
@@ -230,12 +226,11 @@ class Navigator: ObservableObject {
 
     func didEnterForeground() {
         isAppInForeground = true
+        webSocketService.didEnterForeground()
         updateActiveView()
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
-            try? await Task.sleep(seconds: 1)
-            webSocketService.sendPing()
         }
     }
 
@@ -245,16 +240,14 @@ class Navigator: ObservableObject {
         lynkViewModel.isViewActive = false
         homeViewModel.resetExpectedLockStates()
         lynkViewModel.lynkDoorLock.expectedState = .unknown
-        webSocketService.isExpectingTextResponse = false
-        webSocketService.disconnect()
-        webSocketService.isAuthenticated = false
+        webSocketService.didResignForeground()
     }
 
     @MainActor
     func reloadCurrentModel() async {
         await reloadConnection()
         await reload(for: currentDestination)
-        webSocketService.sendPing()
+        webSocketService.sendPing(shouldExpectPong: false)
     }
 
     func setHomeCoordinates(_ homeCoordinates: Coordinates) {

@@ -27,8 +27,8 @@ class WebSocketService {
     private var socket: WebSocket?
     private var requestID = 0
     private var requests: [String] = []
-    private var shouldRetryConnection = true
-    private var expectingTextTask: Task<Void, Error>?
+    private var expectingResponseTask: Task<Void, Error>?
+    private var reconnectBackoffInSeconds = 1.0
     private var recentlySentRequests: [String] = [] {
         didSet {
             let count = recentlySentRequests.count
@@ -38,21 +38,19 @@ class WebSocketService {
         }
     }
 
-    var isExpectingTextResponse = false {
-        didSet {
-            if !isExpectingTextResponse {
-                expectingTextTask?.cancel()
-                expectingTextTask = nil
-            }
-        }
-    }
-
+    var isForegroundMode = true
     var isAuthenticated = false {
         didSet {
             if isAuthenticated {
                 sendGetStatesRequest()
-            } else if oldValue {
+            } else if oldValue && isForegroundMode {
                 socket?.connect()
+                Task { @MainActor in
+                    try? await Task.sleep(seconds: 1)
+                    sendAuthenticationMessage()
+                    try? await Task.sleep(seconds: 1)
+                    sendPing(shouldExpectPong: false)
+                }
             }
         }
     }
@@ -110,15 +108,17 @@ class WebSocketService {
         socket?.connect()
     }
 
-    func sendPing() {
-        setConnectionInfo(.waitingForPong)
+    func sendPing(shouldExpectPong: Bool) {
+        if shouldExpectPong {
+            expectResponse()
+            setConnectionInfo(.waitingForPong)
+        }
         socket?.write(ping: Data())
     }
 
     func disconnect() {
         socket?.disconnect()
-        expectingTextTask?.cancel()
-        expectingTextTask = nil
+        stopExpectingResponse()
     }
 
     private func sendJSONCommand(_ command: some Encodable, requestID: Int? = nil) {
@@ -147,7 +147,7 @@ extension WebSocketService: WebSocketDelegate {
     func didReceive(event: WebSocketEvent, client _: WebSocketClient) {
         switch event {
         case let .text(string):
-            isExpectingTextResponse = false
+            stopExpectingResponse()
             didReceive(text: string)
         case .disconnected:
             isAuthenticated = false
@@ -165,13 +165,15 @@ extension WebSocketService: WebSocketDelegate {
         case .reconnectSuggested:
             isAuthenticated = false
         case .pong:
-            setConnectionInfo(.receivedPong)
+            stopExpectingResponse()
+            setConnectionInfo(.unknown)
         case .connected, .ping:
             break
         }
     }
 
     private func handleWebSocketError(_ error: Error?) {
+        isAuthenticated = false
         reloadConnectionAction()
         let errorMessage = String(describing: error)
         if let wsError = error as? Starscream.WSError, wsError.type == .securityError {
@@ -248,7 +250,7 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     func sendGetStatesRequest() {
-        expectTextResponse()
+        expectResponse()
         let getStatesRequest = ["type": "get_states"]
         sendJSONCommand(getStatesRequest)
     }
@@ -372,20 +374,45 @@ extension WebSocketService: WebSocketDelegate {
         }
     }
 
-    private func expectTextResponse() {
-        expectingTextTask = Task {
-            isExpectingTextResponse = true
+    func didResignForeground() {
+        isForegroundMode = false
+        disconnect()
+        isAuthenticated = false
+        stopExpectingResponse()
+    }
+
+    func didEnterForeground() {
+        isForegroundMode = true
+        Task {
+            try? await Task.sleep(seconds: 1)
+            sendPing(shouldExpectPong: false)
+        }
+    }
+
+    func stopExpectingResponse() {
+        if expectingResponseTask != nil {
+            expectingResponseTask?.cancel()
+            expectingResponseTask = nil
+            reconnectBackoffInSeconds = 1
+        }
+    }
+
+    private func expectResponse() {
+        expectingResponseTask?.cancel()
+        expectingResponseTask = Task { @MainActor in
             do {
                 let sleepTime = isLocalConnection ? 0.2 : 1.0
                 try await Task.sleep(seconds: sleepTime)
-                if isExpectingTextResponse {
-                    Log.warning("Websocket did not get expected text response, internal: \(isLocalConnection)")
-                    if shouldRetryConnection {
-                        shouldRetryConnection = false
-                        baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
-                    } else {
+                if expectingResponseTask?.isCancelled == false {
+                    if reconnectBackoffInSeconds >= 15 {
                         setErrorBannerText("Websocket error", "Fick inte uppdatering från websocket")
-                        shouldRetryConnection = true
+                    }
+                    try await Task.sleep(seconds: reconnectBackoffInSeconds)
+                    if expectingResponseTask?.isCancelled == false {
+                        Log.warning("Websocket did not get expected websocket response, internal: \(isLocalConnection)")
+                        reconnectBackoffInSeconds = min(15, reconnectBackoffInSeconds + 3)
+                        isAuthenticated = false
+                        reloadConnectionAction()
                     }
                 }
             } catch {}

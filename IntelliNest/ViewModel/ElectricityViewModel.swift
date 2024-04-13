@@ -27,6 +27,16 @@ class ElectricityViewModel: ObservableObject {
         }
     }
 
+    var gridPower: String {
+        let pulsePower = pulsePower.state
+        let sonnenPower = -1 * Double(sonnenBattery.gridPower)
+        if abs(Double(pulsePower) ?? 0) < 0.05 && sonnenPower < 0 {
+            return sonnenBattery.gridPower.toKW
+        } else {
+            return sonnenPower.toKW
+        }
+    }
+
     let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberCostToday, .pulseConsumptionToday, .sonnenAutomation]
 
     var restAPIService: RestAPIService
@@ -42,9 +52,10 @@ class ElectricityViewModel: ObservableObject {
         switch entityID {
         case .pulsePower:
             pulsePower.state = state
-            if let power = Double(state) {
-                sonnenBattery.update(gridPower: power)
-            }
+        /* if let power = Double(state) {
+             sonnenBattery.update(gridPower: power)
+         }
+          */
         case .tibberCostToday:
             tibberCostToday.state = state
         case .pulseConsumptionToday:

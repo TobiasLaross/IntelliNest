@@ -104,10 +104,12 @@ private struct NavigationButtonsView: View {
                                      buttonImageWidth: 45,
                                      buttonImageHeight: 50,
                                      action: viewModel.showPowerGridAction)
-                NavigationButtonView(image: Image(systemImageName: .cctv),
-                                     buttonImageWidth: 45,
-                                     buttonImageHeight: 30,
-                                     action: viewModel.showCamerasAction)
+                /*
+                 NavigationButtonView(image: Image(systemImageName: .cctv),
+                                      buttonImageWidth: 45,
+                                      buttonImageHeight: 30,
+                                      action: viewModel.showCamerasAction)
+                  */
 
                 NavigationButtonView(image: Image(systemName: "lightbulb.fill"),
                                      buttonImageWidth: 30,

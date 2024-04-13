@@ -48,7 +48,7 @@ struct ElectricityFlowView: View {
 
     var body: some View {
         HStack {
-            PowerView(text: viewModel.pulsePower.state.toKW, imageName: .powerGrid)
+            PowerView(text: viewModel.gridPower, imageName: .powerGrid)
                 .overlay(alignment: .trailing) {
                     FlowIndicatorView(isFlowing: $viewModel.sonnenBattery.hasFlowGridToHouse,
                                       flowIntensity: 0.5, arrowCount: 6)
