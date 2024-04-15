@@ -73,17 +73,13 @@ struct SonnenEntity {
     }
 
     mutating func update(from statusEntity: SonnenStatusEntity) {
-        hasFlowGridToBattery = statusEntity.hasFlowGridToBattery && abs(statusEntity.gridPower) >= 100
+        hasFlowGridToBattery = statusEntity.hasFlowGridToBattery && abs(statusEntity.gridPower) >= 100 && batteryPower > 100
         hasFlowGridToHouse = statusEntity.hasFlowGridToHouse && abs(statusEntity.gridPower) >= 100
         hasFlowSolarToHouse = statusEntity.hasFlowSolarToHouse
         hasFlowBatteryToHouse = statusEntity.hasFlowBatteryToHouse
         hasFlowSolarToBattery = statusEntity.hasFlowSolarToBattery
         hasFlowSolarToGrid = statusEntity.hasFlowSolarToGrid
         operationMode = statusEntity.operationMode
-        gridPower = statusEntity.gridPower
-    }
-
-    mutating func update(gridPower: Double) {
-        self.gridPower = gridPower
+        gridPower = statusEntity.gridPower * -1
     }
 }
