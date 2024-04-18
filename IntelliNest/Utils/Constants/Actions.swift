@@ -23,7 +23,7 @@ enum Action: String, Codable {
     case snapshot
     case stop
     case start
-    case lynkReload = "manual_update_data"
+    case lynkReload = "force_update_data"
     case lockDoors = "lock_doors"
     case unlockDoors = "unlock_doors"
     case startFlashLights = "start_flash_lights"
