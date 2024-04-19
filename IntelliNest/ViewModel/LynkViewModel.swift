@@ -268,8 +268,8 @@ private extension LynkViewModel {
         lynkUpdateTask = Task {
             while isViewActive {
                 do {
-                    try await Task.sleep(seconds: 5)
                     await reload()
+                    try await Task.sleep(seconds: 10)
                 } catch {
                     break
                 }

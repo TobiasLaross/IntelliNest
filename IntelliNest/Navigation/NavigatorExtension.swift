@@ -82,6 +82,5 @@ extension Navigator: WebSocketServiceDelegate {
 extension Navigator: URLCreatorDelegate {
     func baseURLChanged(urlString: String) {
         webSocketService.baseURLChanged(urlString: urlString)
-        restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
     }
 }

@@ -371,13 +371,13 @@ private extension RestAPIService {
                 }
 
                 (statusCodeExternal, externalData) = await sendRequest(request)
-                if statusCodeExternal != statusCodeOK {
+                if statusCodeExternal != statusCodeOK && action != .lynkReload { // TODO: Temporary disabled error banner for lynk
                     setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
                 } else if let externalData {
                     handleSuccessfulResponse(domain: domain, action: action, data: externalData)
                 }
             }
-            if statusCode != statusCodeOK, statusCodeExternal != statusCodeOK {
+            if statusCode != statusCodeOK, statusCodeExternal != statusCodeOK && action != .lynkReload { // TODO: Temporary disabled error banner for lynk
                 let errorCode = statusCode != statusCodeOK ? statusCode : statusCodeExternal
                 setErrorBannerText(errorBannerTitle, "\(errorCode.errorDescription) \(errorBannerMessageEnd)")
             }
