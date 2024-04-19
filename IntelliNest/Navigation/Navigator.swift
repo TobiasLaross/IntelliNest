@@ -134,6 +134,7 @@ class Navigator: ObservableObject {
         Task {
             await urlCreator.updateConnectionState()
             await heatersViewModel.reload()
+            await lynkViewModel.reload()
         }
 
         if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
