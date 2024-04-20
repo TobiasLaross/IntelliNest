@@ -134,7 +134,6 @@ class Navigator: ObservableObject {
         Task {
             await urlCreator.updateConnectionState()
             await heatersViewModel.reload()
-            await lynkViewModel.reload()
         }
 
         if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
@@ -238,7 +237,6 @@ class Navigator: ObservableObject {
     func didResignForeground() {
         isAppInForeground = false
         electricityViewModel.isViewActive = false
-        lynkViewModel.isViewActive = false
         homeViewModel.resetExpectedLockStates()
         lynkViewModel.lynkDoorLock.expectedState = .unknown
         webSocketService.didResignForeground()
@@ -386,7 +384,6 @@ private extension Navigator {
     func updateActiveView() {
         camerasViewModel.setIsActiveScreen(currentDestination == .cameras)
         electricityViewModel.isViewActive = currentDestination == .electricity
-        lynkViewModel.isViewActive = currentDestination == .lynk
     }
 
     func registerAPNSToken(_ apnsToken: String) {
