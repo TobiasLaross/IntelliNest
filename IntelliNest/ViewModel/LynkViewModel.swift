@@ -34,7 +34,6 @@ class LynkViewModel: ObservableObject {
 
     @Published var airConditionInitiatedTime: Date?
 
-    var lynkUpdateTask: Task<Void, Error>?
     let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
                                  .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
                                  .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkClimateUpdatedAt,
@@ -45,17 +44,6 @@ class LynkViewModel: ObservableObject {
     var engineInitiatedTime: Date?
     var isEaseeCharging: Bool {
         easeeIsEnabled.isActive
-    }
-
-    var isViewActive = false {
-        didSet {
-            if isViewActive {
-                updateLynkContinously()
-            } else {
-                lynkUpdateTask?.cancel()
-                lynkUpdateTask = nil
-            }
-        }
     }
 
     var climateTitle: String {
@@ -261,19 +249,5 @@ private extension LynkViewModel {
     func stopClimate() {
         airConditionInitiatedTime = nil
         restAPIService.callScript(scriptID: .lynkStopClimate)
-    }
-
-    func updateLynkContinously() {
-        lynkUpdateTask?.cancel()
-        lynkUpdateTask = Task {
-            while isViewActive {
-                do {
-                    await reload()
-                    try await Task.sleep(seconds: 10)
-                } catch {
-                    break
-                }
-            }
-        }
     }
 }
