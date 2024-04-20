@@ -9,7 +9,7 @@ import Foundation
 
 enum StorageKeys: String {
     case apnsToken
-    case homeCoordinates
+    case homeCoordinatesDual
     case sarahPills
     case userInitials
     case webhookID

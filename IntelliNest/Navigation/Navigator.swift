@@ -118,7 +118,7 @@ class Navigator: ObservableObject {
     lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService)
 
     init() {
-        homeCoordinates = UserDefaults.standard.value(forKey: StorageKeys.homeCoordinates.rawValue) as? Coordinates
+        homeCoordinates = UserDefaults.standard.value(forKey: StorageKeys.homeCoordinatesDual.rawValue) as? Coordinates
         urlCreator.delegate = self
         webSocketService.delegate = self
         if UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) == nil {
@@ -251,9 +251,9 @@ class Navigator: ObservableObject {
 
     func setHomeCoordinates(_ homeCoordinates: Coordinates) {
         if self.homeCoordinates != homeCoordinates {
-            geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates, oldCoordinates: self.homeCoordinates)
+            geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates)
             self.homeCoordinates = homeCoordinates
-            UserDefaults.standard.setCoordinates(homeCoordinates, forKey: StorageKeys.homeCoordinates)
+            UserDefaults.standard.setCoordinates(homeCoordinates, forKey: StorageKeys.homeCoordinatesDual)
         }
     }
 

@@ -24,20 +24,25 @@ class GeofenceManager: NSObject {
         locationManager.requestAlwaysAuthorization()
     }
 
-    func configureGeoFence(homeCoordinates: Coordinates, oldCoordinates: Coordinates? = nil) {
-        if let oldCoordinates {
-            let oldGeofenceRegion = CLCircularRegion(center: oldCoordinates.toCLLocationCoordinate2D(),
-                                                     radius: 35,
-                                                     identifier: "HouseGeofence")
-            locationManager.stopMonitoring(for: oldGeofenceRegion)
+    func configureGeoFence(homeCoordinates: Coordinates) {
+        for region in locationManager.monitoredRegions {
+            if let circularRegion = region as? CLCircularRegion {
+                locationManager.stopMonitoring(for: circularRegion)
+            }
         }
 
-        let geofenceRegion = CLCircularRegion(center: homeCoordinates.toCLLocationCoordinate2D(),
-                                              radius: 35,
-                                              identifier: "HouseGeofence")
-        geofenceRegion.notifyOnEntry = true
-        geofenceRegion.notifyOnExit = true
-        startMonitoring(geofenceRegion: geofenceRegion)
+        let exitGeofenceRegion = CLCircularRegion(center: homeCoordinates.toCLLocationCoordinate2D(),
+                                                  radius: 50,
+                                                  identifier: "HomeExitGeofence")
+        exitGeofenceRegion.notifyOnExit = true
+
+        let enterGeofenceRegion = CLCircularRegion(center: homeCoordinates.toCLLocationCoordinate2D(),
+                                                   radius: 30,
+                                                   identifier: "HomeEnterGeofence")
+        enterGeofenceRegion.notifyOnEntry = true
+
+        startMonitoring(geofenceRegion: enterGeofenceRegion)
+        startMonitoring(geofenceRegion: exitGeofenceRegion)
     }
 
     private func startMonitoring(geofenceRegion: CLCircularRegion) {
