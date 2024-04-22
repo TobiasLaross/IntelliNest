@@ -118,8 +118,12 @@ class LynkViewModel: ObservableObject {
         self.showClimateSchedulingAction = showClimateSchedulingAction
     }
 
-    func reload() async {
-        restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
+    func reload(forceReload: Bool = false) async {
+        let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
+        if forceReload || (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantFuture) > Date.now {
+            restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
+            UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.lynkReloadTime.rawValue)
+        }
     }
 
     // swiftlint:disable cyclomatic_complexity
