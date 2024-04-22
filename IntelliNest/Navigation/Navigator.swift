@@ -216,7 +216,7 @@ class Navigator: ObservableObject {
         case .heaters:
             await heatersViewModel.reload()
         case .lynk:
-            await lynkViewModel.reload()
+            await lynkViewModel.reload(forceReload: true)
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
         case .roborock, .cameras, .lights, .playroomHeaterDetails, .corridorHeaterDetails:
