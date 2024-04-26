@@ -330,23 +330,7 @@ private extension Navigator {
         Task {
             async let tmpFrontDoorSuccess = yaleApiService.setLockState(lockID: .frontDoor, action: action)
             async let tmpSideDoorSuccess = yaleApiService.setLockState(lockID: .sideDoor, action: action)
-            let (frontDoorSuccess, sideDoorSuccess) = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
-            if !frontDoorSuccess || !sideDoorSuccess {
-                var errorMessage = "Lyckades inte låsa".appending(action == .unlock ? " upp" : "")
-                if !frontDoorSuccess && !sideDoorSuccess {
-                    errorMessage.append(frontDoorSuccess ? "" : " varken fram- eller sidodörren")
-                } else if !frontDoorSuccess {
-                    errorMessage.append(frontDoorSuccess ? "" : " framdörren.")
-                } else if !sideDoorSuccess {
-                    errorMessage.append(sideDoorSuccess ? "" : " sidodörren.")
-                }
-
-                if UserManager.currentUser == .tobias {
-                    NotificationService.sendNotification(title: "Geofence",
-                                                         message: errorMessage,
-                                                         identifier: "Geofence-yale-failure")
-                }
-            }
+            _ = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
         }
     }
 

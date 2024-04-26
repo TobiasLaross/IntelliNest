@@ -18,27 +18,30 @@ class LynkViewModel: ObservableObject {
     @Published var exteriorTemperature = Entity(entityId: .lynkTemperatureExterior)
     @Published var battery = InputNumberEntity(entityId: .lynkBattery)
     @Published var batteryDistance = Entity(entityId: .lynkBatteryDistance)
-    @Published var fuel = Entity(entityId: .lynkFuel)
+    @Published var fuel = InputNumberEntity(entityId: .lynkFuel)
     @Published var fuelDistance = Entity(entityId: .lynkFuelDistance)
     @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
     @Published var address = Entity(entityId: .lynkAddress)
-    @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
+    @Published var chargerState = Entity(entityId: .lynkChargeState)
+    @Published var timeUntilCharged = Entity(entityId: .lynkTimeUntilCharged)
 
+    @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
     @Published var climateUpdatedAt = Entity(entityId: .lynkClimateUpdatedAt)
     @Published var doorLockUpdatedAt = Entity(entityId: .lynkDoorLockUpdatedAt)
     @Published var engineUpdatedAt = Entity(entityId: .lynkEngineUpdatedAt)
     @Published var batteryUpdatedAt = Entity(entityId: .lynkBatteryUpdatedAt)
     @Published var fuelUpdatedAt = Entity(entityId: .lynkFuelUpdatedAt)
     @Published var addressUpdatedAt = Entity(entityId: .lynkAddressUpdatedAt)
+    @Published var chargerUpdatedAt = Entity(entityId: .lynkChargerUpdatedAt)
 
     @Published var airConditionInitiatedTime: Date?
 
     let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
                                  .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
-                                 .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkClimateUpdatedAt,
-                                 .lynkDoorLockUpdatedAt, .lynkEngineUpdatedAt, .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt,
-                                 .lynkAddressUpdatedAt]
+                                 .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkChargeState,
+                                 .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt, .lynkEngineUpdatedAt,
+                                 .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt, .lynkChargerUpdatedAt]
     var isReloading = false
     var isLynkFlashing = false
     var engineInitiatedTime: Date?
@@ -50,10 +53,34 @@ class LynkViewModel: ObservableObject {
         isAirConditionActive || isAirConditionLoading ? "Stäng av" : "Starta"
     }
 
-    var interiorTemperatureUpdatedAt: String {
+    var climateUpdatedAtDescription: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd/MM HH:mm"
         return dateFormatter.string(from: climateUpdatedAt.date)
+    }
+
+    var addressUpdatedAtDescription: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM HH:mm"
+        return dateFormatter.string(from: max(addressUpdatedAt.date, doorLockUpdatedAt.date))
+    }
+
+    var batteryUpdatedAtDescription: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM HH:mm"
+        return dateFormatter.string(from: batteryUpdatedAt.date)
+    }
+
+    var fuelUpdatedAtDescription: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM HH:mm"
+        return dateFormatter.string(from: fuelUpdatedAt.date)
+    }
+
+    var chargerUpdatedAtDescription: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM HH:mm"
+        return dateFormatter.string(from: chargerUpdatedAt.date)
     }
 
     var engineTitle: String {
@@ -96,6 +123,14 @@ class LynkViewModel: ObservableObject {
         isEaseeCharging ? "Pausa Easee" : "Starta Easee"
     }
 
+    var isCharging: Bool {
+        chargerState.state == "CHARGER_STATE_CHARGN"
+    }
+
+    var chargerStateDescription: String {
+        isCharging ? "Laddar, \(timeUntilCharged.state)min kvar" : "Laddar inte"
+    }
+
     var chargingIcon: Image {
         isEaseeCharging ? .init(systemImageName: .xmarkCircle) : .init(systemImageName: .boltCar)
     }
@@ -103,7 +138,8 @@ class LynkViewModel: ObservableObject {
     var lastUpdated: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM HH:mm"
-        return formatter.string(from: carUpdatedAt.date)
+        let date = max(doorLockUpdatedAt.date, carUpdatedAt.date)
+        return formatter.string(from: date)
     }
 
     var climateIconColor: Color {
@@ -165,6 +201,10 @@ class LynkViewModel: ObservableObject {
             fuelDistance.state = state
         case .lynkAddress:
             address.state = state
+        case .lynkChargeState:
+            chargerState.state = state
+        case .lynkTimeUntilCharged:
+            timeUntilCharged.state = timeUntilCharged.state
         case .lynkCarUpdatedAt:
             carUpdatedAt.state = state
         case .lynkClimateUpdatedAt:
@@ -179,6 +219,8 @@ class LynkViewModel: ObservableObject {
             fuelUpdatedAt.state = state
         case .lynkAddressUpdatedAt:
             addressUpdatedAt.state = state
+        case .lynkChargerUpdatedAt:
+            chargerUpdatedAt.state = state
         default:
             Log.error("LynkViewModel doesn't reload entityID: \(entityID)")
         }
