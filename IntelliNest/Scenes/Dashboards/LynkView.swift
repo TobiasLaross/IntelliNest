@@ -17,23 +17,58 @@ struct LynkView: View {
                 .frame(height: 50)
             Text("Bilen är **\(viewModel.lynkDoorLock.stateToString())** på \(viewModel.address.state)")
                 .foregroundColor(.white)
+                .padding([.top, .horizontal])
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
-                .padding()
-            Text("Batteri: \(viewModel.battery.inputNumber.toPercent) - \(viewModel.batteryDistance.state)km")
+            Text(viewModel.addressUpdatedAtDescription)
+                .font(.buttonFontExtraSmall)
                 .foregroundColor(.white)
-            Text("Bensin: \(viewModel.fuel.state)l - \(viewModel.fuelDistance.state)km")
-                .foregroundColor(.white)
+                .padding(.bottom)
+            HStack {
+                Spacer()
+                VStack {
+                    BatteryView(level: Int(viewModel.battery.inputNumber.rounded()),
+                                isCharging: viewModel.isCharging,
+                                degreeRotation: 90,
+                                width: 50,
+                                height: 90)
+                    Text("\(viewModel.batteryDistance.state)km")
+                        .font(.buttonFontSmall)
+                        .foregroundColor(.white)
+                        .padding(.top, -32)
+                    Text(viewModel.batteryUpdatedAtDescription)
+                        .font(.buttonFontExtraSmall)
+                        .foregroundColor(.white)
+                        .padding(.top, -28)
+                }
+                Spacer()
+                    .frame(width: 90)
+                VStack {
+                    FuelView(level: Int(viewModel.fuel.inputNumber.rounded()),
+                             degreeRotation: 90,
+                             width: 50,
+                             height: 90)
+                    Text("\(viewModel.fuelDistance.state)km")
+                        .font(.buttonFontSmall)
+                        .foregroundColor(.white)
+                        .padding(.top, -27)
+                    Text(viewModel.fuelUpdatedAtDescription)
+                        .font(.buttonFontExtraSmall)
+                        .foregroundColor(.white)
+                        .padding(.top, -23)
+                }
+                Spacer()
+            }
 
             Spacer()
-                .frame(height: 150)
+                .frame(height: 20)
             HStack {
                 VStack(alignment: .trailing) {
                     Text("Bilen \(String(format: "%.1f", viewModel.interiorTemperature.state.roundedWithOneDecimal))°C")
                         .foregroundColor(.white)
                     Text("Ute \(String(format: "%.1f", viewModel.exteriorTemperature.state.roundedWithOneDecimal))°C")
                         .foregroundColor(.white)
-                    Text(viewModel.interiorTemperatureUpdatedAt)
+                    Text(viewModel.climateUpdatedAtDescription)
                         .font(.buttonFontExtraSmall)
                         .foregroundColor(.white)
                 }
@@ -63,7 +98,7 @@ struct LynkView: View {
                                       }
                                   })
                                   .alert(isPresented: $isEngineAlertVisible) {
-                                      Alert(title: Text("Start motorn"),
+                                      Alert(title: Text("Starta motorn?"),
                                             message: Text(""),
                                             primaryButton: .destructive(Text("Ja")) {
                                                 viewModel.startEngine()
@@ -74,14 +109,16 @@ struct LynkView: View {
             .padding([.horizontal, .top], 32)
 
             Spacer()
+                .frame(height: 50)
 
             LynkMiscView(viewModel: viewModel)
             Spacer()
 
             Divider()
-                .padding(.top)
+                .padding(.vertical)
             Text("Senast uppdaterad: \(viewModel.lastUpdated)")
-                .font(Font.system(size: 12).italic())
+                .font(.buttonFontMedium)
+                .italic()
                 .foregroundColor(.white)
                 .padding(.bottom)
         }

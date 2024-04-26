@@ -10,14 +10,21 @@ import SwiftUI
 struct BatteryView: View {
     var level: Int
     var isCharging: Bool
+    var timeUntilCharged: Int?
     var degreeRotation: Double
     var width: CGFloat
     var height: CGFloat
     private let batteryCornerRadius: CGFloat = 15
 
-    init(level: Int, isCharging: Bool, degreeRotation: Double = 0, width: CGFloat = 50, height: CGFloat = 90) {
+    init(level: Int,
+         isCharging: Bool,
+         timeUntilCharged: Int? = nil,
+         degreeRotation: Double = 0,
+         width: CGFloat = 50,
+         height: CGFloat = 90) {
         self.level = level
         self.isCharging = isCharging
+        self.timeUntilCharged = timeUntilCharged
         self.degreeRotation = degreeRotation
         self.width = width
         self.height = height
@@ -28,13 +35,13 @@ struct BatteryView: View {
             Group {
                 VStack {
                     Rectangle()
+                        .fill(Color.gray.opacity(0.4))
                         .frame(width: 0.25 * width, height: 0.07 * height, alignment: .center)
                         .padding(.bottom, -4)
-                        .foregroundStyle(.gray.opacity(0.4))
                     Rectangle()
+                        .fill(level >= 99 ? Color.green : Color.gray.opacity(0.4))
                         .frame(width: width, height: height, alignment: .bottom)
                         .cornerRadius(batteryCornerRadius)
-                        .foregroundStyle(.gray.opacity(0.4))
                         .padding(.top, -4)
                 }
                 Rectangle()
@@ -49,6 +56,12 @@ struct BatteryView: View {
                 if isCharging {
                     Image(systemName: "bolt")
                         .foregroundColor(.yellow)
+                    if let timeUntilCharged {
+                        Text("\(timeUntilCharged)min")
+                            .font(.buttonFontSmall)
+                            .minimumScaleFactor(0.2)
+                            .lineLimit(1)
+                    }
                 }
                 Text("\(level)%")
                     .font(Font.headline.weight(.semibold))
