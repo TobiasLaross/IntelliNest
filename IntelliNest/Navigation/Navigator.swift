@@ -307,13 +307,31 @@ private extension Navigator {
     }
 
     func didEnterHome() {
-        updateYaleLocks(with: .unlock)
-        guard UserManager.currentUser == .sarah || UserManager.currentUser == .tobias else {
-            Log.warning("Geofence utan användare: \(UserManager.currentUser)")
-            return
+        Task {
+            let lastEnteredHomeTime = UserDefaults.shared.value(forKey: StorageKeys.enteredHomeTime.rawValue) as? Date
+            UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.enteredHomeTime.rawValue)
+            guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
+                Log.warning("Geofence utan användare: \(UserManager.currentUser)")
+                return
+            }
+            do {
+                if let lastEnteredHomeTime, Date.now.timeIntervalSince(lastEnteredHomeTime) < 15 * 60 {
+                    let userIsAway = try await restAPIService.get(entityId: currentUserAwayEntityID, entityType: Entity.self)
+                    guard userIsAway.isActive else {
+                        Log.debug("Geofence användare redan hemma")
+                        return
+                    }
+                }
+            } catch {
+                Log.error("Failed to fetch user away status for \(currentUserAwayEntityID)")
+            }
+
+            NotificationService.sendNotification(title: "Välkommen hem",
+                                                 message: "",
+                                                 identifier: "Geofence-did-enter-home")
+            updateYaleLocks(with: .unlock)
+            restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOff)
         }
-        let entityID: EntityId = UserManager.currentUser == .sarah ? .sarahIsAway : .tobiasIsAway
-        restAPIService.update(entityID: entityID, domain: .inputBoolean, action: .turnOff)
     }
 
     func didExitHome() {
@@ -381,5 +399,18 @@ private extension Navigator {
                 restAPIService.registerAPNSToken(apnsToken)
             }
         #endif
+    }
+}
+
+private extension UserManager {
+    static var currentUserAwayEntityID: EntityId? {
+        switch currentUser {
+        case .sarah:
+            .sarahIsAway
+        case .tobias:
+            .tobiasIsAway
+        default:
+            nil
+        }
     }
 }
