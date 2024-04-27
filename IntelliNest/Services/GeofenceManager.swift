@@ -56,9 +56,6 @@ extension GeofenceManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         if region is CLCircularRegion {
             didEnterHomeAction()
-            NotificationService.sendNotification(title: "Välkommen hem",
-                                                 message: "",
-                                                 identifier: "Geofence-did-enter-home")
         }
     }
 

@@ -10,6 +10,7 @@ import Foundation
 enum StorageKeys: String {
     case apnsToken
     case homeCoordinatesDual
+    case enteredHomeTime
     case lynkReloadTime
     case sarahPills
     case userInitials
