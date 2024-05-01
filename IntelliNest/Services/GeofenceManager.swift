@@ -32,7 +32,7 @@ class GeofenceManager: NSObject {
         }
 
         let exitGeofenceRegion = CLCircularRegion(center: homeCoordinates.toCLLocationCoordinate2D(),
-                                                  radius: 50,
+                                                  radius: 90,
                                                   identifier: "HomeExitGeofence")
         exitGeofenceRegion.notifyOnExit = true
 
