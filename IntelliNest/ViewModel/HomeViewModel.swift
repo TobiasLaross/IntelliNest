@@ -254,6 +254,7 @@ class HomeViewModel: ObservableObject {
     @MainActor
     func sarahDidTakePills() {
         UserDefaults.shared.setValue(Date(), forKey: StorageKeys.sarahPills.rawValue)
+        restAPIService.update(entityID: .sarahTookPill, domain: .inputBoolean, action: .turnOn)
         WidgetCenter.shared.reloadAllTimelines()
         isSarahsPillsTaken = true
     }

@@ -26,6 +26,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case framdorren = "lock.framdorren"
     case storageLock = "lock.forradet"
     case hittaSarahsIphone = "script.hitta_sarahs_iphone"
+    case sarahTookPill = "input_boolean.sarah_took_pill"
     case snoozeWashingMachine = "input_boolean.washer_snooze"
     case washerCompletionTime = "sensor.washing_machine_washer_completion_time"
     case washerState = "sensor.washing_machine_washer_job_state"

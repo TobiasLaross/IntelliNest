@@ -35,11 +35,11 @@ struct BatteryView: View {
             Group {
                 VStack {
                     Rectangle()
-                        .fill(Color.gray.opacity(0.4))
+                        .fill(level > 99 ? Color.green : Color.gray.opacity(0.4))
                         .frame(width: 0.25 * width, height: 0.07 * height, alignment: .center)
                         .padding(.bottom, -4)
                     Rectangle()
-                        .fill(level >= 99 ? Color.green : Color.gray.opacity(0.4))
+                        .fill(Color.gray.opacity(0.4))
                         .frame(width: width, height: height, alignment: .bottom)
                         .cornerRadius(batteryCornerRadius)
                         .padding(.top, -4)
@@ -75,6 +75,10 @@ struct BatteryView: View {
 
 struct BatteryView_Previews: PreviewProvider {
     static var previews: some View {
-        BatteryView(level: 62, isCharging: false)
+        HStack {
+            BatteryView(level: 62, isCharging: false)
+            BatteryView(level: 99, isCharging: false)
+            BatteryView(level: 100, isCharging: false)
+        }
     }
 }
