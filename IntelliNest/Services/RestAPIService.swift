@@ -247,10 +247,11 @@ class RestAPIService: URLRequestBuilder {
     }
 
     func getRequestHeaders() -> [String: String] {
-        [
+        let token = UserManager.currentUser == .sarah ? GlobalConstants.secretHassTokenSarah : GlobalConstants.secretHassToken
+        return [
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": "Bearer \(GlobalConstants.secretHassToken)"
+            "Authorization": "Bearer \(token)"
         ]
     }
 
@@ -387,12 +388,10 @@ private extension RestAPIService {
     }
 
     func handleSuccessfulResponse(domain: Domain, action: Action, data: Data) {
-        if domain == .apnsToken, action == .register {
+        if domain == .apnsToken && action == .register {
             do {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                    // Extract the webhook_id from the JSON response
                     if let webhookId = jsonResponse["webhook_id"] as? String {
-                        // Store the webhook_id for future use, e.g., in UserDefaults
                         UserDefaults.standard.setValue(webhookId, forKey: StorageKeys.webhookID.rawValue)
                     } else {
                         Log.error("webhook_id not found in response")

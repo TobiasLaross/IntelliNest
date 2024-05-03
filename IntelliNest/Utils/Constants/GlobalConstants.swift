@@ -34,24 +34,21 @@ enum GlobalConstants {
     }
 
     static var secretHassToken: String {
-        if let hassToken = Bundle.main.object(forInfoDictionaryKey: "SECRET_HASS_TOKEN") as? String {
-            return hassToken
-        }
-        return ""
+        let hassTokenKey = "SECRET_HASS_TOKEN"
+        return Bundle.main.object(forInfoDictionaryKey: hassTokenKey) as? String ?? ""
+    }
+
+    static var secretHassTokenSarah: String {
+        let hassTokenKey = "SECRET_HASS_TOKEN_SARAH"
+        return Bundle.main.object(forInfoDictionaryKey: hassTokenKey) as? String ?? ""
     }
 
     static var secretShipBookAppID: String {
-        if let shipBookAppID = Bundle.main.object(forInfoDictionaryKey: "SECRET_SHIP_BOOK_APP_ID") as? String {
-            return shipBookAppID
-        }
-        return ""
+        Bundle.main.object(forInfoDictionaryKey: "SECRET_SHIP_BOOK_APP_ID") as? String ?? ""
     }
 
     static var secretShipBookAppKey: String {
-        if let shipBookAppKey = Bundle.main.object(forInfoDictionaryKey: "SECRET_SHIP_BOOK_APP_KEY") as? String {
-            return shipBookAppKey
-        }
-        return ""
+        Bundle.main.object(forInfoDictionaryKey: "SECRET_SHIP_BOOK_APP_KEY") as? String ?? ""
     }
 
     static var secretYaleAPIURL: String {
@@ -62,10 +59,7 @@ enum GlobalConstants {
     }
 
     static var secretYaleAPIKey: String {
-        if let yaleAPIKey = Bundle.main.object(forInfoDictionaryKey: "SECRET_YALE_API_KEY") as? String {
-            return yaleAPIKey
-        }
-        return ""
+        Bundle.main.object(forInfoDictionaryKey: "SECRET_YALE_API_KEY") as? String ?? ""
     }
 
     static var secretRTSPURLBackCamera: String {

@@ -31,6 +31,8 @@
 	</array>
 	<key>SECRET_HASS_TOKEN</key>
 	<string>$(SECRET_HASS_TOKEN)</string>
+	<key>SECRET_HASS_TOKEN_SARAH</key>
+	<string>$(SECRET_HASS_TOKEN_SARAH)</string>
 	<key>SECRET_RTSP_STREAM_CAMERA_BACK</key>
 	<string>$(SECRET_RTSP_STREAM_CAMERA_BACK)</string>
 	<key>SECRET_RTSP_STREAM_CAMERA_CARPORT</key>

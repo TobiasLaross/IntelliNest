@@ -228,7 +228,7 @@ extension WebSocketService: WebSocketDelegate {
     private func sendAuthenticationMessage() {
         let authMessage: [String: Any] = [
             "type": "auth",
-            "access_token": "\(GlobalConstants.secretHassToken)"
+            "access_token": "\(UserManager.currentUser == .sarah ? GlobalConstants.secretHassTokenSarah : GlobalConstants.secretHassToken)"
         ]
 
         if let jsonData = try? JSONSerialization.data(withJSONObject: authMessage, options: []),

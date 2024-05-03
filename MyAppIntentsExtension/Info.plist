@@ -32,5 +32,7 @@
 	</dict>
 	<key>SECRET_HASS_TOKEN</key>
 	<string>$(SECRET_HASS_TOKEN)</string>
+	<key>SECRET_HASS_TOKEN_SARAH</key>
+	<string>$(SECRET_HASS_TOKEN_SARAH)</string>
 </dict>
 </plist>
