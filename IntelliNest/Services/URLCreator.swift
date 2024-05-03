@@ -66,10 +66,11 @@ class URLCreator: ObservableObject, URLRequestBuilder {
     }
 
     func getRequestHeaders() -> [String: String] {
-        [
+        let token = UserManager.currentUser == .sarah ? GlobalConstants.secretHassTokenSarah : GlobalConstants.secretHassToken
+        return [
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": "Bearer \(GlobalConstants.secretHassToken)"
+            "Authorization": "Bearer \(token)"
         ]
     }
 
