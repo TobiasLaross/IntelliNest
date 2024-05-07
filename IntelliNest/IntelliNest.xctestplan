@@ -1,0 +1,44 @@
+{
+  "configurations" : [
+    {
+      "id" : "1694E45D-B5AE-4849-B0E6-FAA62C5C8D8A",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:IntelliNest.xcodeproj",
+          "identifier" : "F67023F627A177320070FFBB",
+          "name" : "IntelliNest"
+        }
+      ]
+    },
+    "environmentVariableEntries" : [
+      {
+        "key" : "CFNETWORK_DIAGNOSTICS",
+        "value" : "0"
+      }
+    ],
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:IntelliNest.xcodeproj",
+      "identifier" : "F67023F627A177320070FFBB",
+      "name" : "IntelliNest"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:IntelliNest.xcodeproj",
+        "identifier" : "F670240627A177340070FFBB",
+        "name" : "IntelliNestTests"
+      }
+    }
+  ],
+  "version" : 1
+}

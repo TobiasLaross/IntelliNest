@@ -35,6 +35,7 @@ class HomeViewModel: ObservableObject {
     @Published var easeeCharger = Entity(entityId: .easeePower)
     @Published var generalWasteDate = Entity(entityId: .generalWasteDate)
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
+    @Published var gardenWasteDate = Entity(entityId: .gardenWasteDate)
 
     @Published var isSarahsPillsTaken = false
     @Published var noLocationAccess = false
@@ -43,7 +44,7 @@ class HomeViewModel: ObservableObject {
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
                                  .sonnenBattery, .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
                                  .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower,
-                                 .generalWasteDate, .plasticWasteDate]
+                                 .generalWasteDate, .plasticWasteDate, .gardenWasteDate]
 
     private var restAPIService: RestAPIService
     private let locationManager = CLLocationManager()
@@ -207,6 +208,8 @@ class HomeViewModel: ObservableObject {
             generalWasteDate.state = state
         case .plasticWasteDate:
             plasticWasteDate.state = state
+        case .gardenWasteDate:
+            gardenWasteDate.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }
