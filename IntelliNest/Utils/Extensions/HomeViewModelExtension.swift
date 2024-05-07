@@ -38,6 +38,9 @@ extension HomeViewModel {
         if let plasticWasteDescription = plasticWasteDate.date.daysRemainingDescription() {
             text.addNewLineAndAppend("Plast töms \(plasticWasteDescription)")
         }
+        if let gardenWasteDescription = gardenWasteDate.date.daysRemainingDescription() {
+            text.addNewLineAndAppend("Trädgårdsavfall töms \(gardenWasteDescription)")
+        }
 
         return text
     }

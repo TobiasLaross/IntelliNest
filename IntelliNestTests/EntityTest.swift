@@ -133,7 +133,6 @@ class EntityTests: XCTestCase {
     }
 
     func testDecodeWithIncompleteData() throws {
-        // A test case with missing data
         let json = """
         {
             "entity_id": "switch.kaffemaskinen",

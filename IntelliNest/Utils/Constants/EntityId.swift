@@ -34,12 +34,14 @@ enum EntityId: String, Decodable, CaseIterable {
     case dryerState = "sensor.tumble_dryer_dryer_job_state"
     case generalWasteDate = "sensor.general_waste_collection_date"
     case plasticWasteDate = "sensor.plastic_waste_collection_date"
+    case gardenWasteDate = "sensor.garden_waste_collection_date"
     case homeLocation = "zone.home"
     case tobiasIsAway = "input_boolean.tobias_is_away"
     case sarahIsAway = "input_boolean.sarah_is_away"
     case personTobias = "person.tobias_laross"
     case personSarah = "person.sarah"
-    // Electricity
+
+    /* Electricity */
     case nordPool = "sensor.nordpool_kwh_se4_sek_0_10_0"
     case sonnenAutomation = "automation.battery_charger"
     case sonnenBattery = "sensor.sonnen_battery"
@@ -49,6 +51,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case tibberCostToday = "sensor.accumulated_cost_hem"
     case pulseConsumptionToday = "sensor.pulse_consumption_today"
     case solarProducdtionToday = "sensor.solaredge_energy_today"
+
     /* Easee */
     case easeePower = "sensor.eh4ngpuj_power"
     case easeeIsEnabled = "switch.eh4ngpuj_is_enabled"
