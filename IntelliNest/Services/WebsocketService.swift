@@ -325,8 +325,12 @@ extension WebSocketService: WebSocketDelegate {
     private func parseStateChange(newState: [String: Any]) {
         if let entityIDString = newState["entity_id"] as? String,
            let entityID = EntityId(rawValue: entityIDString),
-           let state = newState["state"] as? String {
+           var state = newState["state"] as? String {
             let attributes = newState["attributes"] as? [String: Any] ?? [:]
+            if entityID == .purifierFanSpeed {
+                state = "\(attributes["percentage"] as? Double ?? -1)"
+                print("speedState: \(state)")
+            }
             if entityID == .roborock {
                 let status = attributes["status"] as? String
                 let batteryLevel = attributes["battery_level"] as? Int

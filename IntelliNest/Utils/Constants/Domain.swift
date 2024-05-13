@@ -11,6 +11,7 @@ enum Domain: String, Encodable {
     case apnsToken
     case camera
     case climate
+    case fan
     case melcloud
     case switchDomain = "switch"
     case lock

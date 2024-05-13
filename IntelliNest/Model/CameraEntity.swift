@@ -10,7 +10,7 @@ import Foundation
 struct CameraEntity: EntityProtocol {
     var entityId: EntityId
     var state: String
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var isActive: Bool = false
     var isLoading: Bool = false
     // var imageUrlString: String = ""
@@ -38,7 +38,7 @@ struct CameraEntity: EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(-1)
+        nextUpdate = Date().addingTimeInterval(-1)
     }
 
     mutating func updateIsActive() {

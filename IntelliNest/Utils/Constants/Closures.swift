@@ -15,6 +15,7 @@ typealias MainActorAsyncVoidClosure = @MainActor () async -> Void
 typealias StringClosure = (String) -> Void
 typealias StringStringClosure = (String, String) -> Void
 typealias DoubleClosure = (Double) -> Void
+typealias IntClosure = (Int) -> Void
 typealias HeaterDoubleClosure = @MainActor (HeaterEntity, Double) -> Void
 typealias HeaterStringClosure = @MainActor (HeaterEntity, HvacMode) -> Void
 typealias HeaterFanModeClosure = @MainActor (HeaterEntity, HeaterFanMode) -> Void

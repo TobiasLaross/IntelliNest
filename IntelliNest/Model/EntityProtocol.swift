@@ -10,7 +10,7 @@ import Foundation
 protocol EntityProtocol: Decodable, Equatable {
     var entityId: EntityId { get }
     var state: String { get set }
-    var nextUpdate: NSDate { get set }
+    var nextUpdate: Date { get set }
     var isActive: Bool { get }
 
     mutating func setNextUpdateTime()
@@ -27,6 +27,6 @@ extension EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.5)
+        nextUpdate = Date().addingTimeInterval(0.5)
     }
 }

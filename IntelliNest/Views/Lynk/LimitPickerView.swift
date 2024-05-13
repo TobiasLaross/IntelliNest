@@ -28,7 +28,7 @@ struct LimitPickerView: View {
                 }
             VStack {
                 NumberPickerScrollView(entityId: limitEntity.entityId,
-                                       targetTemperature: $currentLimit,
+                                       targetNumber: $currentLimit,
                                        numberSelectedCallback: saveChargerLimit,
                                        pickerTextWidth: pickerTextWidth,
                                        strideFrom: 50,

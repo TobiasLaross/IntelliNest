@@ -12,9 +12,11 @@ import ShipBookSDK
 class HeatersViewModel: HassAPIViewModelProtocol {
     @Published var heaterCorridor = HeaterEntity(entityId: .heaterCorridor)
     @Published var heaterPlayroom = HeaterEntity(entityId: .heaterPlayroom)
+    @Published var purifier = PurifierEntity()
     @Published var thermCorridor = Entity(entityId: .thermCorridor)
     @Published var resetCorridorHeaterTime = Entity(entityId: .resetCorridorHeaterTime)
     @Published var resetPlayroomHeaterTime = Entity(entityId: .resetPlayroomHeaterTime)
+    @Published var resetPurifierTime = Entity(entityId: .resetPurifierTime)
     @Published var thermBedroom = Entity(entityId: .thermBedroom)
     @Published var thermGym = Entity(entityId: .thermGym)
     @Published var thermVince = Entity(entityId: .thermVince)
@@ -24,8 +26,11 @@ class HeatersViewModel: HassAPIViewModelProtocol {
     @Published var thermGuest = Entity(entityId: .thermGuest)
     @Published var heaterCorridorTimerMode = Entity(entityId: .heaterCorridorTimerMode)
     @Published var heaterPlayroomTimerMode = Entity(entityId: .heaterPlayroomTimerMode)
+    @Published var purifierTimerMode = Entity(entityId: .purifierTimerMode)
 
-    let entityIDs: [EntityId] = [.resetCorridorHeaterTime, .resetPlayroomHeaterTime, .heaterCorridorTimerMode, .heaterPlayroomTimerMode]
+    let entityIDs: [EntityId] = [.resetCorridorHeaterTime, .resetPlayroomHeaterTime, .heaterCorridorTimerMode, .heaterPlayroomTimerMode,
+                                 .purifierTimerMode, .purifierFanSpeed, .purifierHumidity, .purifierTemperature, .purifierMode,
+                                 .resetPurifierTime]
 
     let restAPIService: RestAPIService
     let showHeaterDetails: MainActorEntityIDClosure
@@ -35,26 +40,52 @@ class HeatersViewModel: HassAPIViewModelProtocol {
     }
 
     func setTargetTemperature(entityId: EntityId, temperature: Double) {
-        restAPIService.update(heaterID: entityId, action: .setTemperature, dataKey: .temperature, dataValue: "\(temperature)")
+        restAPIService.update(entityID: entityId,
+                              domain: .climate,
+                              action: .setTemperature,
+                              dataKey: .temperature,
+                              dataValue: "\(temperature)")
+    }
+
+    func setPurifierFanSpeed(_ speed: Double) {
+        restAPIService.update(entityID: .purifierFanSpeed,
+                              domain: .fan,
+                              action: .setPercentage,
+                              dataKey: .percentage,
+                              dataValue: speed.toFanSpeedPercentage)
     }
 
     func setHvacMode(heater: HeaterEntity, hvacMode: HvacMode) {
-        restAPIService.update(heaterID: heater.entityId, action: .setHvacMode, dataKey: .hvacMode, dataValue: hvacMode.rawValue)
+        restAPIService.update(entityID: heater.entityId,
+                              domain: .climate,
+                              action: .setHvacMode,
+                              dataKey: .hvacMode,
+                              dataValue: hvacMode.rawValue)
     }
 
     func setFanMode(_ heater: HeaterEntity, _ fanMode: HeaterFanMode) {
         if fanMode != heater.fanMode {
-            restAPIService.update(heaterID: heater.entityId, action: .setFanMode, dataKey: .fanMode, dataValue: fanMode.rawValue)
+            restAPIService.update(entityID: heater.entityId,
+                                  domain: .climate,
+                                  action: .setFanMode,
+                                  dataKey: .fanMode,
+                                  dataValue: fanMode.rawValue)
         }
     }
 
     func horizontalModeSelectedCallback(_ heater: HeaterEntity, _ horizontalMode: HeaterHorizontalMode) {
-        restAPIService.update(heaterID: heater.entityId, domain: .melcloud, action: .setVaneHorizontal, dataKey: .position,
+        restAPIService.update(entityID: heater.entityId,
+                              domain: .melcloud,
+                              action: .setVaneHorizontal,
+                              dataKey: .position,
                               dataValue: horizontalMode.rawValue)
     }
 
     func verticalModeSelectedCallback(_ heater: HeaterEntity, _ verticalMode: HeaterVerticalMode) {
-        restAPIService.update(heaterID: heater.entityId, domain: .melcloud, action: .setVaneVertical, dataKey: .position,
+        restAPIService.update(entityID: heater.entityId,
+                              domain: .melcloud,
+                              action: .setVaneVertical,
+                              dataKey: .position,
                               dataValue: verticalMode.rawValue)
     }
 
@@ -78,6 +109,14 @@ class HeatersViewModel: HassAPIViewModelProtocol {
                               action: action)
     }
 
+    func togglePurifierTimerMode() {
+        let action: Action = purifierTimerMode.isActive ? .turnOff : .turnOn
+        toggleHeaterTimerMode(heaterEntityID: .purifierFanSpeed,
+                              heaterTimerModeEntityID: purifierTimerMode.entityId,
+                              dateEntity: resetPurifierTime,
+                              action: action)
+    }
+
     func reload(entityID: EntityId, state: String) {
         switch entityID {
         case .resetCorridorHeaterTime:
@@ -88,6 +127,20 @@ class HeatersViewModel: HassAPIViewModelProtocol {
             heaterCorridorTimerMode.state = state
         case .heaterPlayroomTimerMode:
             heaterPlayroomTimerMode.state = state
+        case .purifierMode:
+            purifier.fanMode = PurifierFanMode(rawValue: state) ?? .off
+        case .purifierFanSpeed:
+            print("speed raw: \(state)")
+            purifier.speed = Double(state)?.toFanSpeedTargetNumber ?? 0
+            print("speed target: \(purifier.speed)")
+        case .purifierTemperature:
+            purifier.temperature = Double(state) ?? 0
+        case .purifierHumidity:
+            purifier.humidity = Int(state) ?? 0
+        case .resetPurifierTime:
+            resetPurifierTime.state = state
+        case .purifierTimerMode:
+            purifierTimerMode.state = state
         default:
             Log.error("HeatersViewModel doesn't reload entityID: \(entityID)")
         }
@@ -115,7 +168,15 @@ private extension HeatersViewModel {
             if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
                 dateEntity.date = newDate
                 setClimateSchedule(dateEntity: dateEntity)
-                restAPIService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
+                if heaterEntityID == .purifierFanSpeed {
+                    restAPIService.update(entityID: .purifierSavedSpeed,
+                                          domain: .inputNumber,
+                                          action: .setValue,
+                                          dataKey: .value,
+                                          dataValue: purifier.speed.toFanSpeedPercentage)
+                } else {
+                    restAPIService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
+                }
             }
         }
     }

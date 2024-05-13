@@ -1,10 +1,3 @@
-//
-//  FontExtension.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2023-11-22.
-//
-
 import SwiftUI
 
 extension Font {

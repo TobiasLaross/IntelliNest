@@ -139,10 +139,28 @@ class RestAPIService: URLRequestBuilder {
         }
     }
 
-    func update(heaterID: EntityId, domain: Domain = .climate, action: Action, dataKey: JSONKey, dataValue: String) {
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: String) {
         Task {
             var json = [JSONKey: Any]()
-            json[.entityID] = heaterID.rawValue
+            json[.entityID] = entityID.rawValue
+            json[dataKey] = dataValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+        }
+    }
+
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Int) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
+            json[dataKey] = dataValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+        }
+    }
+
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
             await sendPostRequest(json: json, domain: domain, action: action)
         }
@@ -152,7 +170,7 @@ class RestAPIService: URLRequestBuilder {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = numberEntityID.rawValue
-            json[.inputNumberValue] = number
+            json[.value] = number
             await sendPostRequest(json: json, domain: .inputNumber, action: .setValue)
         }
     }

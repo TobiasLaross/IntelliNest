@@ -27,7 +27,7 @@ struct LockEntity: Lockable, EntityProtocol {
             expectedState = .unknown
         }
     }}
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var expectedStateSetDate: Date?
 
     var lockState: LockState = .unknown
@@ -66,6 +66,6 @@ struct LockEntity: Lockable, EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.29)
+        nextUpdate = Date().addingTimeInterval(0.29)
     }
 }

@@ -32,7 +32,7 @@ struct SwitchEntity: EntityProtocol {
         }
     }
 
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var isActive: Bool {
         state.lowercased() == "on"
     }
