@@ -15,7 +15,7 @@ struct HeaterEntity: EntityProtocol {
         HvacMode(rawValue: state) ?? .off
     }
 
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var isActive: Bool {
         state.lowercased() == "on"
     }
@@ -75,7 +75,7 @@ struct HeaterEntity: EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.5)
+        nextUpdate = Date().addingTimeInterval(0.5)
     }
 
     static func == (lhs: HeaterEntity, rhs: HeaterEntity) -> Bool {

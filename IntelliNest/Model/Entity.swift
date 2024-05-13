@@ -10,7 +10,7 @@ import SwiftUI
 struct Entity: EntityProtocol {
     var lastUpdated: Date
     var lastChanged: Date
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var isActive: Bool {
         get { state.lowercased() == "on" }
         set { state = newValue ? "on" : "off" }
@@ -71,7 +71,7 @@ struct Entity: EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.5)
+        nextUpdate = Date().addingTimeInterval(0.5)
     }
 
     static func == (lhs: Entity, rhs: Entity) -> Bool {

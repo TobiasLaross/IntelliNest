@@ -30,7 +30,7 @@ struct NordPoolEntity: EntityProtocol {
         "\(price) öre"
     }
 
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var isActive = true
     var hours: [Int] {
         stride(from: 0, to: 24, by: 3).map { $0 }
@@ -127,7 +127,7 @@ struct NordPoolEntity: EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.5)
+        nextUpdate = Date().addingTimeInterval(0.5)
     }
 
     static func == (lhs: NordPoolEntity, rhs: NordPoolEntity) -> Bool {

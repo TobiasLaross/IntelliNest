@@ -17,15 +17,15 @@ struct SimpleHeaterView: View {
     var therm3: Entity
     var therm4: Entity
     @Binding var heater: HeaterEntity
-    var showDetailsAction: MainActorEntityIDClosure
+    let showDetailsClosure: MainActorEntityIDClosure
     @Binding var resetClimateTimeEntity: Entity
     @Binding private var resetClimateTimeDate: Date
 
     var isTimerModeEnabled: Bool
     let setTargetTemperatureClosure: EntityIdDoubleClosure
     let setHvacModeClosure: HeaterStringClosure
-    let toggleTimerModeAction: MainActorVoidClosure
-    let setClimateScheduleTime: MainActorEntityClosure
+    let toggleTimerModeClosure: MainActorVoidClosure
+    let setClimateScheduleTimeClosure: MainActorEntityClosure
 
     var body: some View {
         ZStack {
@@ -36,21 +36,16 @@ struct SimpleHeaterView: View {
                     .padding(.horizontal, 4)
             }
             VStack {
-                Text("\(roomName)")
-                    .font(.title)
-                    .foregroundColor(.white)
-                Text("\(heater.currentTemperatureFormatted)℃")
-                    .font(.title3)
-                    .padding([.bottom, .leading, .trailing])
-                    .foregroundColor(.white)
-                ThermometerGroupView(therm1: therm1, therm2: therm2,
-                                     therm3: therm3, therm4: therm4)
-                    .padding([.leading, .trailing])
+                INText(roomName, font: .title)
+                INText("\(heater.currentTemperatureFormatted)℃", font: .title3)
+                    .padding([.bottom, .horizontal])
+                ThermometerGroupView(therm1: therm1, therm2: therm2, therm3: therm3, therm4: therm4)
+                    .padding(.horizontal)
 
                 ZStack(alignment: .center) {
                     VStack {
                         NumberPickerScrollView(entityId: heater.entityId,
-                                               targetTemperature: $heater.targetTemperature,
+                                               targetNumber: $heater.targetTemperature,
                                                numberSelectedCallback: setTargetTemperatureClosure)
                             .padding(.vertical)
                         HvacModeView(heater: heater,
@@ -62,7 +57,7 @@ struct SimpleHeaterView: View {
                         Spacer()
                         VStack {
                             Button {
-                                showDetailsAction(heater.entityId)
+                                showDetailsClosure(heater.entityId)
                             } label: {
                                 Image(imageName: .settings)
                                     .resizable()
@@ -70,7 +65,7 @@ struct SimpleHeaterView: View {
                                     .foregroundColor(.white)
                             }
                             Button {
-                                toggleTimerModeAction()
+                                toggleTimerModeClosure()
                             } label: {
                                 Image(systemImageName: .clock)
                                     .resizable()
@@ -82,7 +77,7 @@ struct SimpleHeaterView: View {
                                     .labelsHidden()
                                     .colorScheme(.dark)
                                     .onChange(of: resetClimateTimeDate) {
-                                        setClimateScheduleTime(resetClimateTimeEntity)
+                                        setClimateScheduleTimeClosure(resetClimateTimeEntity)
                                     }
                             }
                         }
@@ -101,11 +96,11 @@ struct SimpleHeaterView: View {
          heater: Binding<HeaterEntity>,
          resetClimateTimeEntity: Binding<Entity>,
          isTimerModeEnabled: Bool,
-         showDetailsAction: @escaping MainActorEntityIDClosure,
+         showDetailsClosure: @escaping MainActorEntityIDClosure,
          setTargetTemperatureClosure: @escaping EntityIdDoubleClosure,
          setHvacModeClosure: @escaping HeaterStringClosure,
-         toggleTimerModeAction: @escaping MainActorVoidClosure,
-         setClimateScheduleTime: @escaping MainActorEntityClosure) {
+         toggleTimerModeClosure: @escaping MainActorVoidClosure,
+         setClimateScheduleTimeClosure: @escaping MainActorEntityClosure) {
         self.roomName = roomName
         self.therm1 = therm1
         self.therm2 = therm2
@@ -115,11 +110,11 @@ struct SimpleHeaterView: View {
         _resetClimateTimeEntity = resetClimateTimeEntity
         _resetClimateTimeDate = _resetClimateTimeEntity.date
         self.isTimerModeEnabled = isTimerModeEnabled
-        self.showDetailsAction = showDetailsAction
+        self.showDetailsClosure = showDetailsClosure
         self.setTargetTemperatureClosure = setTargetTemperatureClosure
         self.setHvacModeClosure = setHvacModeClosure
-        self.toggleTimerModeAction = toggleTimerModeAction
-        self.setClimateScheduleTime = setClimateScheduleTime
+        self.toggleTimerModeClosure = toggleTimerModeClosure
+        self.setClimateScheduleTimeClosure = setClimateScheduleTimeClosure
     }
 }
 
@@ -135,10 +130,10 @@ struct SimpleHeaterView_Previews: PreviewProvider {
                          heater: .constant(heater),
                          resetClimateTimeEntity: .constant(.init(entityId: .eniroClimate)),
                          isTimerModeEnabled: true,
-                         showDetailsAction: { _ in },
+                         showDetailsClosure: { _ in },
                          setTargetTemperatureClosure: { _, _ in },
                          setHvacModeClosure: { _, _ in },
-                         toggleTimerModeAction: {},
-                         setClimateScheduleTime: { _ in })
+                         toggleTimerModeClosure: {},
+                         setClimateScheduleTimeClosure: { _ in })
     }
 }

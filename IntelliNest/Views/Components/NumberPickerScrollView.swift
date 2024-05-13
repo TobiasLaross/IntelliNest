@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NumberPickerScrollView: View {
     var entityId: EntityId
-    @Binding var targetTemperature: Double
+    @Binding var targetNumber: Double
     var numberSelectedCallback: EntityIdDoubleClosure
     let pickerTextWidth: CGFloat
     @State var selectedNewNumber = false
@@ -31,9 +31,10 @@ struct NumberPickerScrollView: View {
                     HStack {
                         ForEach(Array(stride(from: strideFrom,
                                              to: strideTo,
-                                             by: strideStep)), id: \.self) { index in
+                                             by: strideStep)),
+                                id: \.self) { index in
                             NumberTextView(pickerTextWidth: pickerTextWidth,
-                                           targetTemperature: $targetTemperature,
+                                           targetTemperature: $targetNumber,
                                            selectedNewTarget: $selectedNewNumber,
                                            index: index,
                                            numberPickerFormat: NumberPickerScrollView.numberFormat)
@@ -49,13 +50,13 @@ struct NumberPickerScrollView: View {
                     PrimaryContentBorderView(isSelected: false)
                 }
                 .onAppear {
-                    scrollView.scrollTo(targetTemperature, anchor: .center)
+                    scrollView.scrollTo(targetNumber, anchor: .center)
                 }
-                .onChange(of: targetTemperature) {
-                    scrollView.scrollTo(targetTemperature, anchor: .center)
+                .onChange(of: targetNumber) {
+                    scrollView.scrollTo(targetNumber, anchor: .center)
                     if selectedNewNumber {
                         selectedNewNumber = false
-                        numberSelectedCallback(entityId, targetTemperature)
+                        numberSelectedCallback(entityId, targetNumber)
                     }
                 }
             }
@@ -63,7 +64,7 @@ struct NumberPickerScrollView: View {
     }
 
     init(entityId: EntityId,
-         targetTemperature: Binding<Double>,
+         targetNumber: Binding<Double>,
          numberSelectedCallback: @escaping EntityIdDoubleClosure,
          pickerTextWidth: CGFloat = 60,
          selectedNewNumber: Bool = false,
@@ -71,7 +72,7 @@ struct NumberPickerScrollView: View {
          strideTo: CGFloat = 29,
          strideStep: CGFloat = 0.5) {
         self.entityId = entityId
-        _targetTemperature = targetTemperature
+        _targetNumber = targetNumber
         self.numberSelectedCallback = numberSelectedCallback
         self.pickerTextWidth = pickerTextWidth
         self.selectedNewNumber = selectedNewNumber
@@ -86,7 +87,7 @@ private func previewHelperCallback(_: EntityId, _: Double) {}
 struct NumberPickerScrollView_Previews: PreviewProvider {
     static var previews: some View {
         NumberPickerScrollView(entityId: .lynkClimateHeating,
-                               targetTemperature: .constant(22),
+                               targetNumber: .constant(22),
                                numberSelectedCallback: previewHelperCallback)
     }
 }

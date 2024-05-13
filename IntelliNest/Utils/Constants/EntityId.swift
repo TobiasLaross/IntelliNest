@@ -123,6 +123,14 @@ enum EntityId: String, Decodable, CaseIterable {
     case thermCommonarea = "sensor.temperature_vardagsrummet"
     case thermPlayroom = "sensor.temperature_lekrummet"
     case thermGuest = "sensor.temperature_gastrummet"
+    /* Pure */
+    case purifierFanSpeed = "fan.wellbeing_pure_fanspeed"
+    case purifierMode = "fan.wellbeing_pure_workmode"
+    case purifierTemperature = "sensor.wellbeing_pure_temp"
+    case purifierHumidity = "sensor.wellbeing_pure_humidity"
+    case purifierTimerMode = "input_boolean.purifier_timer_mode"
+    case resetPurifierTime = "input_datetime.reset_purifier_heater_time"
+    case purifierSavedSpeed = "input_number.purifier_saved_speed"
     /* Heaters */
     case heaterCorridor = "climate.varmepump"
     case heaterPlayroom = "climate.mellanrummet"

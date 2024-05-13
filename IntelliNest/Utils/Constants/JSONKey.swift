@@ -24,7 +24,8 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case osName = "os_name"
     case osVersion = "os_version"
     case time
-    case inputNumberValue = "value"
+    case percentage
+    case presetMode = "preset_mode"
     case temperature
     case hvacMode = "hvac_mode"
     case fanMode = "fan_mode"
@@ -44,5 +45,6 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case pushURL = "push_url"
     case operationMode
     case yaleAccessTokenFull = "yale_access_token_full"
+    case value
     case watt
 }

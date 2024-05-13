@@ -10,7 +10,7 @@ import Foundation
 struct LightEntity: EntityProtocol {
     var entityId: EntityId
     var state: String
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var isActive: Bool {
         state == "on" ? true : false
     }
@@ -54,7 +54,7 @@ struct LightEntity: EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.5)
+        nextUpdate = Date().addingTimeInterval(0.5)
     }
 
     static func == (lhs: LightEntity, rhs: LightEntity) -> Bool {

@@ -14,7 +14,7 @@ struct InputNumberEntity: EntityProtocol {
     }}
     var lastUpdated: Date
     var lastChanged: Date
-    var nextUpdate = NSDate().addingTimeInterval(-1)
+    var nextUpdate = Date().addingTimeInterval(-1)
     var isActive = false
     var isLoading = false
     var inputNumber: Double = 0
@@ -60,7 +60,7 @@ struct InputNumberEntity: EntityProtocol {
     }
 
     mutating func setNextUpdateTime() {
-        nextUpdate = NSDate().addingTimeInterval(0.29)
+        nextUpdate = Date().addingTimeInterval(0.29)
     }
 
     static func == (lhs: InputNumberEntity, rhs: InputNumberEntity) -> Bool {
