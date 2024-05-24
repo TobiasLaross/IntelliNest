@@ -95,7 +95,11 @@ class RoborockViewModel: ObservableObject {
     }
 
     func dockRoborock() {
-        restAPIService.callScript(scriptID: .roborockDock)
+        if roborock.isReturning {
+            restAPIService.update(entityID: .roborock, domain: .vacuum, action: .stop)
+        } else {
+            restAPIService.callScript(scriptID: .roborockDock)
+        }
     }
 
     func sendRoborockToBin() {
