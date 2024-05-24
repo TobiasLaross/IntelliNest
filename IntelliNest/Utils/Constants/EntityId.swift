@@ -141,7 +141,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case saveClimateState = "script.save_climate_state"
     /* Roborock */
     case roborock = "vacuum.bob"
-    case roborockAutomation = "automation.dammsug"
+    case roborockAutomation = "automation.vacuum"
     case roborockLastCleanArea = "sensor.bob_last_clean_area"
     case roborockAreaSinceEmptied = "input_number.bob_clean_area_since_trash_emptied"
     case roborockEmptiedAtDate = "input_datetime.bob_trash_last_emptied"
