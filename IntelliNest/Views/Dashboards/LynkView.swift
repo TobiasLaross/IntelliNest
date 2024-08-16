@@ -36,10 +36,16 @@ struct LynkView: View {
                         .font(.buttonFontSmall)
                         .foregroundColor(.white)
                         .padding(.top, -32)
+                    if viewModel.isCharging {
+                        Text(viewModel.chargerStateDescription)
+                            .font(.buttonFontExtraSmall)
+                            .foregroundColor(.white)
+                            .padding(.top, -25)
+                    }
                     Text(viewModel.batteryUpdatedAtDescription)
                         .font(.buttonFontExtraSmall)
                         .foregroundColor(.white)
-                        .padding(.top, -28)
+                        .padding(.top, -20)
                 }
                 Spacer()
                     .frame(width: 90)

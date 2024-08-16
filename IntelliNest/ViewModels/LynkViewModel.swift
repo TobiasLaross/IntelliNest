@@ -124,7 +124,7 @@ class LynkViewModel: ObservableObject {
     }
 
     var isCharging: Bool {
-        chargerState.state == "CHARGER_STATE_CHARGN"
+        chargerState.state == "Charging"
     }
 
     var chargerStateDescription: String {
@@ -204,7 +204,7 @@ class LynkViewModel: ObservableObject {
         case .lynkChargeState:
             chargerState.state = state
         case .lynkTimeUntilCharged:
-            timeUntilCharged.state = timeUntilCharged.state
+            timeUntilCharged.state = state
         case .lynkCarUpdatedAt:
             carUpdatedAt.state = state
         case .lynkClimateUpdatedAt:
