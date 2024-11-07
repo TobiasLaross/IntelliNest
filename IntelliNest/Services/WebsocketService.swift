@@ -16,6 +16,12 @@ enum SocketResponseType: String {
     case event
 }
 
+struct UnsubscribeRequest: Encodable {
+    let id: Int
+    let type: String = "unsubscribe_events"
+    let subscription: Int
+}
+
 protocol WebsocketServiceProtocol {
     @discardableResult
     func sendCameraStreamRequest(for cameraEntityID: EntityId) -> Int
@@ -25,6 +31,7 @@ class WebSocketService {
     weak var delegate: WebSocketServiceDelegate?
 
     private var socket: WebSocket?
+    private var subscriptionID: Int?
     private var requestID = 0
     private var requests: [String] = []
     private var expectingResponseTask: Task<Void, Error>?
@@ -149,25 +156,18 @@ extension WebSocketService: WebSocketDelegate {
         case let .text(string):
             stopExpectingResponse()
             didReceive(text: string)
-        case .disconnected:
-            isAuthenticated = false
         case let .error(error):
             isAuthenticated = false
             handleWebSocketError(error)
         case let .binary(data):
             print("Received data: \(data.count)")
-        case .cancelled, .peerClosed:
-            isAuthenticated = false
-        case let .viabilityChanged(isViable):
-            if !isViable {
-                isAuthenticated = false
-            }
-        case .reconnectSuggested:
-            isAuthenticated = false
         case .pong:
             stopExpectingResponse()
             setConnectionInfo(.unknown)
-        case .connected, .ping:
+        case .disconnected, .cancelled, .peerClosed, .viabilityChanged(false), .reconnectSuggested:
+            isAuthenticated = false
+            subscriptionID = nil
+        case .connected, .ping, .viabilityChanged(true):
             break
         }
     }
@@ -306,8 +306,22 @@ extension WebSocketService: WebSocketDelegate {
     }
 
     private func subscribe() {
+        if subscriptionID != nil {
+            // Already subscribed
+            return
+        }
+        let requestID = getNextRequestID()
+        subscriptionID = requestID
         let subscribeRequest = SubscribeRequest(eventType: .stateChange)
-        sendJSONCommand(subscribeRequest)
+        sendJSONCommand(subscribeRequest, requestID: requestID)
+    }
+
+    // Updated unsubscribe function
+    private func unsubscribe() {
+        guard let subscriptionID else { return }
+        let unsubscribeRequest = UnsubscribeRequest(id: getNextRequestID(), subscription: subscriptionID)
+        sendJSONCommand(unsubscribeRequest)
+        self.subscriptionID = nil
     }
 
     private func parseDictionaryResult(result: [String: Any], resultID: Int) {
@@ -381,6 +395,7 @@ extension WebSocketService: WebSocketDelegate {
     func didResignForeground() {
         isForegroundMode = false
         disconnect()
+        unsubscribe()
         isAuthenticated = false
         stopExpectingResponse()
     }
@@ -415,6 +430,7 @@ extension WebSocketService: WebSocketDelegate {
                     if expectingResponseTask?.isCancelled == false {
                         Log.warning("Websocket did not get expected websocket response, internal: \(isLocalConnection)")
                         reconnectBackoffInSeconds = min(15, reconnectBackoffInSeconds + 3)
+                        unsubscribe()
                         isAuthenticated = false
                         reloadConnectionAction()
                     }

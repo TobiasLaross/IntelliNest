@@ -23,6 +23,9 @@ class ElectricityViewModel: ObservableObject {
         didSet {
             if isViewActive {
                 updateSonnenContinously()
+            } else {
+                sonnenUpdateTask?.cancel()
+                sonnenUpdateTask = nil
             }
         }
     }
