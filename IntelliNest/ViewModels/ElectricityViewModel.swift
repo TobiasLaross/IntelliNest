@@ -59,7 +59,7 @@ class ElectricityViewModel: ObservableObject {
         case .sonnenAutomation:
             sonnenAutomationEnabled.state = state
         default:
-            Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
+            Log.error("ElectricityViewModel doesn't reload entityID: \(entityID)")
         }
     }
 

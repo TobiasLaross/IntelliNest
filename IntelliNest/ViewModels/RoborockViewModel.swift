@@ -60,8 +60,10 @@ class RoborockViewModel: ObservableObject {
             roborockEmptiedAtDate.state = state
         case .roborockWaterShortage:
             roborockWaterShortage.state = state
+        case .roborockMapImage:
+            roborockMapImage.state = state
         default:
-            Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
+            Log.error("RoborockViewModel doesn't reload entityID: \(entityID)")
         }
     }
 
@@ -71,7 +73,7 @@ class RoborockViewModel: ObservableObject {
             roborockMapImage.state = state
             roborockMapImage.urlPath = urlPath
         default:
-            Log.error("HomeViewModel doesn't reload image entity: \(entityID)")
+            Log.error("RoborockViewModel doesn't reload image entity: \(entityID)")
         }
     }
 
