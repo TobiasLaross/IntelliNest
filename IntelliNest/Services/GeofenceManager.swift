@@ -31,18 +31,13 @@ class GeofenceManager: NSObject {
             }
         }
 
-        let exitGeofenceRegion = CLCircularRegion(center: homeCoordinates.toCLLocationCoordinate2D(),
-                                                  radius: 90,
-                                                  identifier: "HomeExitGeofence")
-        exitGeofenceRegion.notifyOnExit = true
+        let geofenceRegion = CLCircularRegion(center: homeCoordinates.toCLLocationCoordinate2D(),
+                                              radius: 50,
+                                              identifier: "HomeRegion")
+        geofenceRegion.notifyOnExit = true
+        geofenceRegion.notifyOnEntry = true
 
-        let enterGeofenceRegion = CLCircularRegion(center: homeCoordinates.toCLLocationCoordinate2D(),
-                                                   radius: 30,
-                                                   identifier: "HomeEnterGeofence")
-        enterGeofenceRegion.notifyOnEntry = true
-
-        startMonitoring(geofenceRegion: enterGeofenceRegion)
-        startMonitoring(geofenceRegion: exitGeofenceRegion)
+        startMonitoring(geofenceRegion: geofenceRegion)
     }
 
     private func startMonitoring(geofenceRegion: CLCircularRegion) {
@@ -55,13 +50,19 @@ class GeofenceManager: NSObject {
 extension GeofenceManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         if region is CLCircularRegion {
-            didEnterHomeAction()
+            if !UserDefaults.standard.bool(forKey: StorageKeys.isHome.rawValue) {
+                UserDefaults.standard.set(true, forKey: StorageKeys.isHome.rawValue)
+                didEnterHomeAction()
+            }
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
         if region is CLCircularRegion {
-            didExitHomeAction()
+            if UserDefaults.standard.bool(forKey: StorageKeys.isHome.rawValue) {
+                UserDefaults.standard.set(false, forKey: StorageKeys.isHome.rawValue)
+                didExitHomeAction()
+            }
         }
     }
 

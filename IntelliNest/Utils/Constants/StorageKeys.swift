@@ -11,6 +11,7 @@ enum StorageKeys: String {
     case apnsToken
     case homeCoordinatesDual
     case enteredHomeTime
+    case isHome
     case lynkReloadTime
     case sarahPills
     case userInitials
