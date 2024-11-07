@@ -315,7 +315,7 @@ private extension Navigator {
                 return
             }
             do {
-                if let lastEnteredHomeTime, Date.now.timeIntervalSince(lastEnteredHomeTime) < 15 * 60 {
+                if let lastEnteredHomeTime, Date.now.timeIntervalSince(lastEnteredHomeTime) < 10 * 60 {
                     let userIsAway = try await restAPIService.get(entityId: currentUserAwayEntityID, entityType: Entity.self)
                     guard userIsAway.isActive else {
                         Log.debug("Geofence användare redan hemma")
