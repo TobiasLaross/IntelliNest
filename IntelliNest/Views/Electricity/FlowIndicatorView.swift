@@ -24,6 +24,7 @@ struct FlowIndicatorView: View {
     }
 
     private func arrowOpacity(phase: Double, index: Int) -> Double {
+        guard arrowCount > 0 else { return 0 }
         let position = (phase - Double(index) / Double(arrowCount)).truncatingRemainder(dividingBy: 1.0)
         return max(0, sin(position * 2 * .pi))
     }

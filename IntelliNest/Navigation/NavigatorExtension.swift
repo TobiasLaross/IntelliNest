@@ -14,9 +14,6 @@ extension Navigator: WebSocketServiceDelegate {
     }
 
     func webSocketService(didReceiveEntity entityID: EntityId, state: String, lastChanged: Date?) {
-        if entityID == .lynkChargerConnectionStatus {
-            print("status state: \(state)")
-        }
         if homeViewModel.entityIDs.contains(entityID) {
             homeViewModel.reload(entityID: entityID, state: state, lastChanged: lastChanged)
         }

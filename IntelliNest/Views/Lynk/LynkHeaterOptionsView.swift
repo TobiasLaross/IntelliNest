@@ -15,7 +15,7 @@ struct LynkHeaterOptionsView: View {
                 .overlay {
                     ZStack {
                         VStack {
-                            INText("Laddkabeln är \(viewModel.chargerConnetionStatus.state) och \(viewModel.chargerState.state)",
+                            INText("Laddkabeln är \(viewModel.chargerConnectionStatus.state) och \(viewModel.chargerState.state)",
                                    font: .buttonFontLarge)
                                 .padding(.horizontal)
                                 .padding(.bottom, 4)

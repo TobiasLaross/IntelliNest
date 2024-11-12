@@ -196,9 +196,7 @@ class Navigator: ObservableObject {
     }
 
     func showLynkHeaterOptions() {
-        Task { @MainActor in
-            lynkViewModel.isShowingHeaterOptions = true
-        }
+        lynkViewModel.isShowingHeaterOptions = true
     }
 
     func lynkStartClimate() {

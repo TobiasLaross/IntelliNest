@@ -8,7 +8,7 @@ IntelliNest is a native iOS application that leverages the power of the popular 
 ## Code statistics
 | Indicators                          | Now  | Desired |
 |-------------------------------------|------|---------|
-| Total LOC                           | 11672 | N/A |
+| Total LOC                           | 11668 | N/A |
 | Swift file count                    | 162 | N/A |
 | Average LOC per file                | 72 | <100 |
 | TODO comment count                  | 0 | 0 |
