@@ -16,6 +16,7 @@ class PreviewProviderUtil {
                                                            restAPIService: PreviewProviderUtil.restAPIService,
                                                            websocketService: PreviewProviderUtil.websocketService)
     static var heatersViewModel = HeatersViewModel(restAPIService: restAPIService, showHeaterDetails: { _ in })
+    static var lynkViewModel = LynkViewModel(restAPIService: restAPIService, showClimateSchedulingAction: {})
 
     private init() {}
 }

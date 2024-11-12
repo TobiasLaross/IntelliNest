@@ -195,6 +195,10 @@ class Navigator: ObservableObject {
         }
     }
 
+    func showLynkHeaterOptions() {
+        lynkViewModel.isShowingHeaterOptions = true
+    }
+
     func lynkStartClimate() {
         restAPIService.callScript(scriptID: .lynkStartClimate)
     }

@@ -43,7 +43,7 @@ enum EntityId: String, Decodable, CaseIterable {
 
     /* Electricity */
     case nordPool = "sensor.nordpool_kwh_se4_sek_0_10_0"
-    case sonnenAutomation = "automation.battery_charger"
+    case sonnenAutomation = "automation.sonnen_battery_charger"
     case sonnenBattery = "sensor.sonnen_battery"
     case sonnenBatteryStatus = "sensor.sonnen_battery_status"
     case pulsePower = "sensor.pulse_power"
@@ -94,6 +94,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case lynkFuelDistance = "sensor.lynk_co_fuel_distance"
     case lynkAddress = "sensor.lynk_co_address"
     case lynkChargeState = "sensor.lynk_co_charge_state"
+    case lynkChargerConnectionStatus = "sensor.lynk_co_charger_connection_status"
     case lynkTimeUntilCharged = "sensor.lynk_co_time_until_charged"
     case lynkCarUpdatedAt = "sensor.lynk_co_last_updated_by_car"
     case lynkClimateUpdatedAt = "sensor.lynk_co_climate_updated"

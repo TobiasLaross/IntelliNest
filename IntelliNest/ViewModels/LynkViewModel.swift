@@ -24,6 +24,7 @@ class LynkViewModel: ObservableObject {
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
     @Published var address = Entity(entityId: .lynkAddress)
     @Published var chargerState = Entity(entityId: .lynkChargeState)
+    @Published var chargerConnectionStatus = Entity(entityId: .lynkChargerConnectionStatus)
     @Published var timeUntilCharged = Entity(entityId: .lynkTimeUntilCharged)
 
     @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
@@ -36,15 +37,17 @@ class LynkViewModel: ObservableObject {
     @Published var chargerUpdatedAt = Entity(entityId: .lynkChargerUpdatedAt)
 
     @Published var airConditionInitiatedTime: Date?
+    @Published var engineInitiatedTime: Date?
+    @Published var isShowingHeaterOptions = false
 
     let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
                                  .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
                                  .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkChargeState,
-                                 .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt, .lynkEngineUpdatedAt,
-                                 .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt, .lynkChargerUpdatedAt]
+                                 .lynkChargerConnectionStatus, .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt,
+                                 .lynkEngineUpdatedAt, .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt,
+                                 .lynkChargerUpdatedAt]
     var isReloading = false
     var isLynkFlashing = false
-    var engineInitiatedTime: Date?
     var isEaseeCharging: Bool {
         easeeIsEnabled.isActive
     }
@@ -203,6 +206,8 @@ class LynkViewModel: ObservableObject {
             address.state = state
         case .lynkChargeState:
             chargerState.state = state
+        case .lynkChargerConnectionStatus:
+            chargerConnectionStatus.state = state
         case .lynkTimeUntilCharged:
             timeUntilCharged.state = state
         case .lynkCarUpdatedAt:
@@ -282,16 +287,12 @@ class LynkViewModel: ObservableObject {
         let action: Action = entity.isActive ? .turnOff : .turnOn
         restAPIService.update(entityID: entity.entityId, domain: .inputBoolean, action: action)
     }
-}
 
-private extension LynkViewModel {
-    @MainActor
     func startClimate() {
         airConditionInitiatedTime = Date()
         restAPIService.callScript(scriptID: .lynkStartClimate)
     }
 
-    @MainActor
     func stopClimate() {
         airConditionInitiatedTime = nil
         restAPIService.callScript(scriptID: .lynkStopClimate)

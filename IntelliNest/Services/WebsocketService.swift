@@ -343,7 +343,6 @@ extension WebSocketService: WebSocketDelegate {
             let attributes = newState["attributes"] as? [String: Any] ?? [:]
             if entityID == .purifierFanSpeed {
                 state = "\(attributes["percentage"] as? Double ?? -1)"
-                print("speedState: \(state)")
             }
             if entityID == .roborock {
                 let status = attributes["status"] as? String

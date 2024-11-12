@@ -34,9 +34,9 @@ class ElectricityViewModel: ObservableObject {
         let pulsePower = pulsePower.state
         let sonnenPower = Double(sonnenBattery.gridPower)
         if abs(Double(pulsePower) ?? 0) < 0.05 && sonnenPower < 0 {
-            return sonnenBattery.gridPower.toKW
+            return sonnenBattery.gridPower.toKWString
         } else {
-            return sonnenPower.toKW
+            return sonnenPower.toKWString
         }
     }
 

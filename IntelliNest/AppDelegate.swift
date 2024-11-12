@@ -14,6 +14,7 @@ private enum CategoryIdentifier: String {
 
 enum NotificationActionIdentifier: String {
     case snoozeWashingMachine
+    case startCarHeater = "start-car-heater"
 }
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {

@@ -19,12 +19,13 @@ struct HomeWidgetEntryView: View {
                     Image(systemName: "pills.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .padding(9)
+                        .padding(10)
                 } else {
-                    Image("widget-home-icon")
+                    // Image("widget-home-icon")
+                    Image(systemName: "house")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .padding(9)
+                        .padding(12)
                 }
             }
         }
