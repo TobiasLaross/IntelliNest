@@ -40,6 +40,35 @@ extension Color {
 
         return Color(UIColor(red: blendedRed, green: blendedGreen, blue: blendedBlue, alpha: 1))
     }
+
+    func blended(with color: Color, amount: CGFloat) -> Color {
+        let uiColor1 = UIColor(self)
+        let uiColor2 = UIColor(color)
+
+        guard let components1 = uiColor1.cgColor.components,
+              let components2 = uiColor2.cgColor.components else {
+            return self // Return the original color if components are unavailable
+        }
+
+        let amount = min(max(amount, 0), 1)
+
+        // Handle colors with different numbers of components (e.g., grayscale vs RGB)
+        let componentCount = max(components1.count, components2.count)
+        var blendedComponents = [CGFloat](repeating: 0, count: componentCount)
+
+        for index in 0 ..< componentCount {
+            let color1 = index < components1.count ? components1[index] : components1[0] // Use grayscale component if missing
+            let color2 = index < components2.count ? components2[index] : components2[0]
+            blendedComponents[index] = color1 + (color2 - color1) * amount
+        }
+
+        let blendedColor = UIColor(red: blendedComponents[0],
+                                   green: blendedComponents[1],
+                                   blue: blendedComponents[2],
+                                   alpha: blendedComponents.count > 3 ? blendedComponents[3] : 1)
+
+        return Color(blendedColor)
+    }
 }
 
 extension Color {
