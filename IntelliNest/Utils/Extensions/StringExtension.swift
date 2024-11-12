@@ -21,7 +21,7 @@ extension String {
 
     var toKW: String {
         if let doubleValue = Double(self) {
-            doubleValue.toKW
+            doubleValue.toKWString
         } else {
             "?kW"
         }

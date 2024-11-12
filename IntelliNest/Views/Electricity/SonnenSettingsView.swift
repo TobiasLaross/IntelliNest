@@ -39,11 +39,10 @@ struct SonnenSettingsView: View {
                             }
                             .padding(.top)
                             HStack {
-                                Text("Mode:")
-                                    .foregroundStyle(.white)
+                                INText("Mode:")
                                 Picker("", selection: $selectedMode) {
                                     ForEach(SonnenOperationModes.allCases.filter { $0 != .unknown }, id: \.self) {
-                                        Text($0.title)
+                                        INText($0.title)
                                     }
                                 }
                                 .onChange(of: selectedMode) {
@@ -52,11 +51,10 @@ struct SonnenSettingsView: View {
                                 Spacer()
                             }
                             HStack {
-                                Text("Watt:")
-                                    .foregroundStyle(.white)
+                                INText("Watt:")
                                 Picker("", selection: $selectedWatt) {
                                     ForEach(chargeValues, id: \.self) {
-                                        Text("\($0)")
+                                        INText("\($0)")
                                     }
                                 }
                                 Spacer()

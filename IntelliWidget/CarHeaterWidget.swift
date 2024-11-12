@@ -19,7 +19,7 @@ struct CarHeaterEntryView: View {
                 Image(systemName: "car")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .padding(9)
+                    .padding(12)
             }
         }
     }

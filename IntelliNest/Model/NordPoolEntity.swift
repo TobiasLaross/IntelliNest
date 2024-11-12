@@ -90,6 +90,10 @@ struct NordPoolEntity: EntityProtocol {
         priceData.count > hour ? priceData[hour].price : 0
     }
 
+    func priceTomorrow(hour: Int) -> Int {
+        tomorrow.count > hour ? tomorrow[hour] : 0
+    }
+
     private mutating func populatePriceData() {
         priceData = []
         var hour = 0

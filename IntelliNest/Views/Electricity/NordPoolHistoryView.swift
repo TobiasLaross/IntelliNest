@@ -38,22 +38,31 @@ struct NordPoolHistoryView: View {
                     }
                 )
                 .sensoryFeedback(.selection, trigger: selectedHour)
-                .chartOverlay { _ in
-                    RoundedRectangle(cornerRadius: 12)
-                        .overlay {
-                            Text(
+                .chartOverlay(alignment: .top) { _ in
+                    HStack {
+                        Spacer()
+                        INText(
+                            """
+                            \(selectedHour.description)
+                            \(nordPool.price(hour: selectedHour)) öre
+                            """,
+                            foregroundStyle: .blue,
+                            lineLimit: 2
+                        )
+                        if nordPool.tomorrowValid {
+                            INText(
                                 """
                                 \(selectedHour.description)
-                                \(nordPool.price(hour: selectedHour)) öre
-                                """
+                                \(nordPool.priceTomorrow(hour: selectedHour)) öre
+                                """,
+                                foregroundStyle: .green,
+                                lineLimit: 2
                             )
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
+                            .padding(.leading, 20)
                         }
-                        .foregroundStyle(.clear)
-                        .frame(width: 75, height: 60)
-                        .position(x: 170, y: -40)
+                    }
+                    .padding(.trailing, 48)
+                    .offset(y: -50)
                 }
                 .chartXAxis {
                     AxisMarks(values: nordPool.hours)

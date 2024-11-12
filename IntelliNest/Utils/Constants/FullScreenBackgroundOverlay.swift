@@ -12,7 +12,7 @@ struct FullScreenBackgroundOverlay: View {
         Rectangle()
             .foregroundStyle(Color.bodyColor)
             .opacity(0.5)
-            .edgesIgnoringSafeArea(.bottom)
+            .edgesIgnoringSafeArea(.all)
     }
 }
 
