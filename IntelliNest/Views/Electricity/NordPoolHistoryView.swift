@@ -41,28 +41,22 @@ struct NordPoolHistoryView: View {
                 .chartOverlay(alignment: .top) { _ in
                     HStack {
                         Spacer()
-                        INText(
-                            """
-                            \(selectedHour.description)
-                            \(nordPool.price(hour: selectedHour)) öre
-                            """,
-                            foregroundStyle: .blue,
-                            lineLimit: 2
-                        )
-                        if nordPool.tomorrowValid {
-                            INText(
-                                """
-                                \(selectedHour.description)
-                                \(nordPool.priceTomorrow(hour: selectedHour)) öre
-                                """,
-                                foregroundStyle: .green,
-                                lineLimit: 2
-                            )
-                            .padding(.leading, 20)
+                        VStack(alignment: .leading) {
+                            INText(selectedHour.description, font: .footnote)
+                            INText("\(nordPool.price(hour: selectedHour)) öre",
+                                   foregroundStyle: .blue.blended(with: .white, amount: 0.4),
+                                   font: .footnote,
+                                   lineLimit: 1)
+                            if nordPool.tomorrowValid {
+                                INText("\(nordPool.priceTomorrow(hour: selectedHour)) öre",
+                                       foregroundStyle: .green,
+                                       font: .footnote,
+                                       lineLimit: 1)
+                            }
                         }
                     }
                     .padding(.trailing, 48)
-                    .offset(y: -50)
+                    .offset(y: -60)
                 }
                 .chartXAxis {
                     AxisMarks(values: nordPool.hours)
