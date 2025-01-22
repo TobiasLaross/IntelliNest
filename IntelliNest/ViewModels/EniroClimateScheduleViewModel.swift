@@ -7,7 +7,7 @@
 
 import Foundation
 
-class EniroClimateScheduleViewModel: HassAPIViewModelProtocol {
+class EniroClimateScheduleViewModel: ObservableObject {
     @Published var climate1 = Entity(entityId: .eniroClimateSchedule1)
     @Published var climate1Bool = Entity(entityId: .eniroClimateSchedule1Bool)
     @Published var climate2 = Entity(entityId: .eniroClimateSchedule2)

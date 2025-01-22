@@ -6,28 +6,9 @@
 //
 
 import Foundation
+import ShipBookSDK
 
-protocol HeaterReloadable: AnyObject {
-    var heaterCorridor: HeaterEntity { get set }
-    var heaterPlayroom: HeaterEntity { get set }
-    var thermCorridor: Entity { get set }
-    var resetCorridorHeaterTime: Entity { get set }
-    var resetPlayroomHeaterTime: Entity { get set }
-    var thermBedroom: Entity { get set }
-    var thermGym: Entity { get set }
-    var thermVince: Entity { get set }
-    var thermKitchen: Entity { get set }
-    var thermCommonarea: Entity { get set }
-    var thermPlayroom: Entity { get set }
-    var thermGuest: Entity { get set }
-    var heaterCorridorTimerMode: Entity { get set }
-    var heaterPlayroomTimerMode: Entity { get set }
-
-    func reload() async
-    func reload<T: EntityProtocol>(entity: T) async -> T
-}
-
-extension HeatersViewModel: HeaterReloadable {
+extension HeatersViewModel {
     @MainActor
     func reload() async {
         async let tmpThermCorridor = reload(entity: thermCorridor)
@@ -38,6 +19,8 @@ extension HeatersViewModel: HeaterReloadable {
         async let tmpThermCommonarea = reload(entity: thermCommonarea)
         async let tmpThermPlayroom = reload(entity: thermPlayroom)
         async let tmpThermGuest = reload(entity: thermGuest)
+        async let tmpHeaterCorridor = reload(entity: heaterCorridor)
+        async let tmpHeaterPlayroom = reload(entity: heaterPlayroom)
 
         thermCorridor = await tmpThermCorridor
         thermBedroom = await tmpThermBedroom
@@ -47,6 +30,22 @@ extension HeatersViewModel: HeaterReloadable {
         thermCommonarea = await tmpThermCommonarea
         thermPlayroom = await tmpThermPlayroom
         thermGuest = await tmpThermGuest
+        heaterCorridor = await tmpHeaterCorridor
+        heaterPlayroom = await tmpHeaterPlayroom
+
+        for entityID in entityIDs {
+            do {
+                if entityID == .purifierFanSpeed {
+                    let purifierSpeed = try await restAPIService.reload(entityId: entityID, entityType: PurifierSpeed.self)
+                    purifier.speed = purifierSpeed.speed
+                } else {
+                    let state = try await restAPIService.reloadState(entityID: entityID)
+                    reload(entityID: entityID, state: state)
+                }
+            } catch {
+                Log.error("Failed to reload entity: \(entityID): \(error)")
+            }
+        }
     }
 
     func reload<T: EntityProtocol>(entity: T) async -> T {

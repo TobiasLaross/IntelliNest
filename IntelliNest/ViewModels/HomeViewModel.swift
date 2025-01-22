@@ -12,6 +12,7 @@ import SwiftUI
 import UIKit
 import WidgetKit
 
+@MainActor
 class HomeViewModel: ObservableObject {
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
@@ -22,8 +23,6 @@ class HomeViewModel: ObservableObject {
     @Published var shouldShowCoffeeMachineScheduling = false
     @Published var coffeeMachineStartTime = Entity(entityId: .coffeeMachineStartTime)
     @Published var coffeeMachineStartTimeEnabled = Entity(entityId: .coffeeMachineStartTimeEnabled)
-    @Published var nordPool = NordPoolEntity(entityId: .nordPool)
-    @Published var sonnenBattery = SonnenEntity(entityID: .sonnenBattery)
     @Published var pulsePower = Entity(entityId: .pulsePower)
     @Published var tibberPrice = Entity(entityId: .tibberPrice)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
@@ -40,11 +39,11 @@ class HomeViewModel: ObservableObject {
     @Published var isSarahsPillsTaken = false
     @Published var noLocationAccess = false
 
-    var isReloading = false
+    private var isReloading = false
     let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
-                                 .sonnenBattery, .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
+                                 .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
                                  .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower,
-                                 .generalWasteDate, .plasticWasteDate, .gardenWasteDate]
+                                 .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights]
 
     private var restAPIService: RestAPIService
     private let locationManager = CLLocationManager()
@@ -54,8 +53,8 @@ class HomeViewModel: ObservableObject {
     let showLynkAction: MainActorVoidClosure
     let showRoborockAction: MainActorVoidClosure
     let showPowerGridAction: MainActorVoidClosure
-    let showCamerasAction: MainActorVoidClosure
     let showLightsAction: MainActorVoidClosure
+    let repeatReloadAction: IntClosure
     private(set) var toolbarReloadAction: MainActorAsyncVoidClosure
 
     init(restAPIService: RestAPIService,
@@ -65,8 +64,8 @@ class HomeViewModel: ObservableObject {
          showLynkAction: @escaping MainActorVoidClosure,
          showRoborockAction: @escaping MainActorVoidClosure,
          showPowerGridAction: @escaping MainActorVoidClosure,
-         showCamerasAction: @escaping MainActorVoidClosure,
          showLightsAction: @escaping MainActorVoidClosure,
+         repeatReloadAction: @escaping IntClosure,
          toolbarReloadAction: @escaping MainActorAsyncVoidClosure) {
         self.restAPIService = restAPIService
         self.yaleApiService = yaleApiService
@@ -75,38 +74,50 @@ class HomeViewModel: ObservableObject {
         self.showLynkAction = showLynkAction
         self.showRoborockAction = showRoborockAction
         self.showPowerGridAction = showPowerGridAction
-        self.showCamerasAction = showCamerasAction
         self.showLightsAction = showLightsAction
+        self.repeatReloadAction = repeatReloadAction
         self.toolbarReloadAction = toolbarReloadAction
-
-        reloadSarahsPill()
     }
 
     @MainActor
     func reload() async {
-        if !isReloading {
-            isReloading = true
-            reloadSarahsPill()
-            async let tmpSideDoorState = await reload(lockID: sideDoor.id)
-            async let tmpFrontDoorState = await reload(lockID: frontDoor.id)
-
-            (sideDoor.lockState, frontDoor.lockState) = await (tmpSideDoorState, tmpFrontDoorState)
-            isReloading = false
+        guard !isReloading else {
+            return
         }
+
+        isReloading = true
+        reloadSarahsPill()
+        for entityID in entityIDs {
+            do {
+                let state = try await restAPIService.reloadState(entityID: entityID)
+                reload(entityID: entityID, state: state)
+            } catch {
+                Log.error("Failed to reload entity: \(entityID): \(error)")
+            }
+        }
+        isReloading = false
+    }
+
+    func reloadYaleLocks() async {
+        sideDoor.lockState = await reload(lockID: sideDoor.id)
+        frontDoor.lockState = await reload(lockID: frontDoor.id)
     }
 
     func turnOffAllLights() {
         restAPIService.update(lightIDs: [.allLights], action: .turnOff, brightness: 0)
+        repeatReloadAction(4)
     }
 
     func toggleStateForSarahsIphone() {
         let action: Action = sarahsIphone.isActive ? .turnOff : .turnOn
         restAPIService.update(entityID: .hittaSarahsIphone, domain: .script, action: action)
+        repeatReloadAction(7)
     }
 
     func toggleCoffeeMachine() {
         let action: Action = coffeeMachine.isActive ? .turnOff : .turnOn
         restAPIService.update(entityID: .coffeeMachine, domain: .switchDomain, action: action)
+        repeatReloadAction(2)
     }
 
     func showCoffeeMachineScheduling() {
@@ -126,22 +137,26 @@ class HomeViewModel: ObservableObject {
     func toggleCoffeeMachineStarTimeEnabled() {
         let action: Action = coffeeMachineStartTimeEnabled.isActive ? .turnOff : .turnOn
         restAPIService.update(entityID: .coffeeMachineStartTimeEnabled, domain: .inputBoolean, action: action)
+        repeatReloadAction(2)
     }
 
     func toggleStateForStorageLock() {
         let action: Action = storageLock.lockState == .unlocked ? .lock : .unlock
         storageLock.expectedState = action == .lock ? .locked : .unlocked
         restAPIService.update(entityID: .storageLock, domain: .lock, action: action)
+        repeatReloadAction(6)
     }
 
     func lockStorage() {
         storageLock.expectedState = .locked
         restAPIService.update(entityID: .storageLock, domain: .lock, action: .lock)
+        repeatReloadAction(6)
     }
 
     func unlockStorage() {
         storageLock.expectedState = .unlocked
         restAPIService.update(entityID: .storageLock, domain: .lock, action: .unlock)
+        repeatReloadAction(6)
     }
 
     func resetExpectedLockStates() {
@@ -215,22 +230,6 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    @MainActor
-    func reloadNordPoolEntity(nordPoolEntity: NordPoolEntity) {
-        nordPool = nordPoolEntity
-    }
-
-    @MainActor
-    func reloadSonnenBattery(_ sonnenEntity: SonnenEntity) {
-        sonnenBattery.update(from: sonnenEntity)
-    }
-
-    @MainActor
-    func reloadSonnenStatusBattery(_ sonnenStatusEntity: SonnenStatusEntity) {
-        sonnenBattery.update(from: sonnenStatusEntity)
-    }
-
-    @MainActor
     func reloadLockUntilExpectedState(lockID: LockID) async {
         var isLoading = true
         var count = 0
@@ -258,6 +257,7 @@ class HomeViewModel: ObservableObject {
     func sarahDidTakePills() {
         UserDefaults.shared.setValue(Date(), forKey: StorageKeys.sarahPills.rawValue)
         restAPIService.update(entityID: .sarahTookPill, domain: .inputBoolean, action: .turnOn)
+        repeatReloadAction(2)
         WidgetCenter.shared.reloadAllTimelines()
         isSarahsPillsTaken = true
     }

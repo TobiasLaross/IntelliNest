@@ -10,17 +10,21 @@ import ShipBookSDK
 import SwiftUI
 import WidgetKit
 
-enum WebsocketConnectionInfo {
-    case unknown
-    case waitingForPong
-}
-
 @MainActor
 class Navigator: ObservableObject {
     @ObservedObject var urlCreator = URLCreator()
-    @Published var navigationPath = [Destination]() { didSet {
-        updateActiveView()
-    }}
+    @Published var navigationPath = [Destination]() {
+        didSet {
+            updateActiveView()
+            if navigationPath.isEmpty {
+                Task {
+                    await homeViewModel.reload()
+                    await homeViewModel.reloadYaleLocks()
+                }
+            }
+        }
+    }
+
     @Published var errorBannerTitle: String? {
         didSet {
             if errorBannerTitle != nil {
@@ -40,14 +44,15 @@ class Navigator: ObservableObject {
     }
 
     @Published var errorBannerMessage: String?
-    @Published var websocketConnectionInfo: WebsocketConnectionInfo = .unknown
+    private var repeatReloadTask: Task<Void, Error>?
+    private var continousReloadTask: Task<Void, Error>?
+    private var shouldSkipContinousReload = false
 
     var currentDestination: Destination {
         navigationPath.last ?? .home
     }
 
     private var homeCoordinates: Coordinates?
-    private var webhookID: String?
     private var isAppInForeground = true
     private var errorBannerDismissTask: Task<Void, Error>?
     private lazy var geoFenceManager = GeofenceManager(didEnterHomeAction: { [weak self] in
@@ -57,19 +62,6 @@ class Navigator: ObservableObject {
                                                            self?.didExitHome()
                                                        })
 
-    lazy var webSocketService = WebSocketService(reloadConnectionAction: { [weak self] in
-                                                     Task { [weak self] in
-                                                         await self?.urlCreator.updateConnectionState(ignoreLocalSSID: true)
-                                                     }
-                                                 },
-                                                 setErrorBannerText: { [weak self] title, message in
-                                                     self?.setErrorBannerText(title: title, message: message)
-                                                 },
-                                                 setConnectionInfo: { [weak self] info in
-                                                     Task { @MainActor in
-                                                         self?.websocketConnectionInfo = info
-                                                     }
-                                                 })
     lazy var restAPIService = RestAPIService(urlCreator: urlCreator,
                                              setErrorBannerText: { [weak self] title, message in
                                                  self?.setErrorBannerText(title: title, message: message)
@@ -90,17 +82,15 @@ class Navigator: ObservableObject {
                                            showPowerGridAction: { [weak self] in
                                                self?.push(.electricity)
                                            },
-                                           showCamerasAction: { [weak self] in
-                                               self?.push(.cameras)
-                                           },
                                            showLightsAction: { [weak self] in
                                                self?.push(.lights)
                                            },
-                                           toolbarReloadAction: reloadCurrentModel)
+                                           repeatReloadAction: { [weak self] times in
+                                               self?.repeatReload(times: times)
+                                           },
+                                           toolbarReloadAction: toolbarReload)
     lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
-                                                         restAPIService: restAPIService,
-                                                         websocketService: webSocketService)
-    lazy var camerasViewModel = CamerasViewModel(urlCreator: urlCreator, websocketService: webSocketService, apiService: restAPIService)
+                                                         restAPIService: restAPIService)
     lazy var heatersViewModel = HeatersViewModel(restAPIService: restAPIService,
                                                  showHeaterDetails: { [weak self] heaterID in
                                                      if heaterID == .heaterCorridor {
@@ -110,23 +100,25 @@ class Navigator: ObservableObject {
                                                      }
                                                  })
     lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService,
-                                           showClimateSchedulingAction: { [weak self] in
+                                           repeatReloadAction: { [weak self] times in
+                                               self?.repeatReload(times: times)
+                                           }, showClimateSchedulingAction: { [weak self] in
                                                self?.push(.eniroClimateSchedule)
                                            })
     lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: restAPIService)
-    lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService)
-    lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService)
+    lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService,
+                                                   repeatReloadAction: { [weak self] times in
+                                                       self?.repeatReload(times: times)
+                                                   })
+
+    lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService,
+                                               repeatReloadAction: { [weak self] times in
+                                                   self?.repeatReload(times: times)
+                                               })
 
     init() {
-        homeCoordinates = UserDefaults.standard.value(forKey: StorageKeys.homeCoordinatesDual.rawValue) as? Coordinates
-        urlCreator.delegate = self
-        webSocketService.delegate = self
         if UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) == nil {
             UserDefaults.shared.setValue(Date.distantPast, forKey: StorageKeys.sarahPills.rawValue)
-        }
-
-        if let homeCoordinates {
-            geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates)
         }
 
         WidgetCenter.shared.reloadAllTimelines()
@@ -134,10 +126,7 @@ class Navigator: ObservableObject {
         Task {
             await urlCreator.updateConnectionState()
             await heatersViewModel.reload()
-        }
-
-        if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
-            self.webhookID = webhookID
+            await reloadHomeCoordinates()
         }
 
         handlePushNotificationPermissions()
@@ -151,12 +140,10 @@ class Navigator: ObservableObject {
     func show(destination: Destination) -> some View {
         Group {
             switch destination {
-            case .cameras:
-                showCamerasView()
             case .electricity:
                 showElectricityView()
             case .home:
-                Text("Not implemented for home")
+                Text("Not implemented show for home")
             case .heaters:
                 showHeatersView()
             case .lynk:
@@ -184,14 +171,10 @@ class Navigator: ObservableObject {
                 } else {
                     navigationPath.append(destination)
                 }
-                async let updateConnectionStateTask = Task { await urlCreator.updateConnectionState() }
-                async let reloadCurrentModelTask = Task { await reloadCurrentModel() }
 
-                await updateConnectionStateTask.value
-                await reloadCurrentModelTask.value
-
-                updateActiveView()
+                await reloadCurrentModel()
             }
+            updateActiveView()
         }
     }
 
@@ -211,30 +194,36 @@ class Navigator: ObservableObject {
 
     @MainActor
     func reload(for destination: Destination) async {
+        shouldSkipContinousReload = true
         switch destination {
         case .home:
             homeViewModel.checkLocationAccess()
             await homeViewModel.reload()
+            await homeViewModel.reloadYaleLocks()
         case .electricity:
-            break
-        case .heaters:
+            await electricityViewModel.reload()
+        case .heaters, .playroomHeaterDetails, .corridorHeaterDetails:
             await heatersViewModel.reload()
         case .lynk:
-            await lynkViewModel.reload(forceReload: true)
+            await lynkViewModel.reload()
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
-        case .roborock, .cameras, .lights, .playroomHeaterDetails, .corridorHeaterDetails:
-            break
+        case .lights:
+            await lightsViewModel.reload()
+        case .roborock:
+            await roborockViewModel.reload()
         }
     }
 
     func didEnterForeground() {
         isAppInForeground = true
-        webSocketService.didEnterForeground()
         updateActiveView()
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
+            if currentDestination != .electricity {
+                await reload(for: .electricity)
+            }
         }
     }
 
@@ -242,22 +231,44 @@ class Navigator: ObservableObject {
         isAppInForeground = false
         electricityViewModel.isViewActive = false
         homeViewModel.resetExpectedLockStates()
+        repeatReloadTask?.cancel()
+        continousReloadTask?.cancel()
         lynkViewModel.lynkDoorLock.expectedState = .unknown
-        webSocketService.didResignForeground()
+    }
+
+    @MainActor
+    func toolbarReload() async {
+        if currentDestination == .lynk {
+            lynkViewModel.forceUpdate()
+            try? await Task.sleep(seconds: 2)
+            repeatReload(times: 6)
+        } else {
+            await reloadCurrentModel()
+        }
     }
 
     @MainActor
     func reloadCurrentModel() async {
         await reloadConnection()
         await reload(for: currentDestination)
-        webSocketService.sendPing(shouldExpectPong: false)
     }
 
-    func setHomeCoordinates(_ homeCoordinates: Coordinates) {
-        if self.homeCoordinates != homeCoordinates {
+    func reloadHomeCoordinates() async {
+        homeCoordinates = UserDefaults.standard.value(forKey: StorageKeys.homeCoordinatesDual.rawValue) as? Coordinates
+        do {
+            let homeLocation = try await restAPIService.reload(entityId: .homeLocation, entityType: HomeLocationEntity.self)
+            let homeCoordinates = Coordinates(longitude: homeLocation.longitude, latitude: homeLocation.latitude)
+            if self.homeCoordinates != homeCoordinates {
+                geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates)
+                self.homeCoordinates = homeCoordinates
+                UserDefaults.standard.setCoordinates(homeCoordinates, forKey: StorageKeys.homeCoordinatesDual)
+            }
+        } catch {
+            Log.error("Failed to load home coordinates: \(error)")
+        }
+
+        if let homeCoordinates {
             geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates)
-            self.homeCoordinates = homeCoordinates
-            UserDefaults.standard.setCoordinates(homeCoordinates, forKey: StorageKeys.homeCoordinatesDual)
         }
     }
 
@@ -268,12 +279,6 @@ class Navigator: ObservableObject {
 }
 
 private extension Navigator {
-    func showCamerasView() -> CamerasView {
-        // swiftformat:disable all
-        CamerasView(viewModel: self.camerasViewModel)
-        // swiftformat:enable all
-    }
-
     func showElectricityView() -> ElectricityView {
         ElectricityView(viewModel: electricityViewModel)
     }
@@ -308,6 +313,47 @@ private extension Navigator {
 
     func showLightsView() -> LightsView {
         LightsView(viewModel: lightsViewModel)
+    }
+
+    func repeatReload(times: Int) {
+        repeatReloadTask?.cancel()
+        repeatReloadTask = Task {
+            do {
+                try await Task.sleep(seconds: 0.3)
+                for _ in 0 ..< times {
+                    if currentDestination == .home {
+                        shouldSkipContinousReload = true
+                        await homeViewModel.reload()
+                    } else {
+                        await reload(for: currentDestination)
+                    }
+
+                    try await Task.sleep(seconds: times > 5 ? 1.0 : 0.5)
+                }
+            } catch {
+                // Restarted
+            }
+        }
+    }
+
+    func restartContinousReloadTask() {
+        continousReloadTask?.cancel()
+        continousReloadTask = Task {
+            do {
+                while true {
+                    print("sleeping")
+                    try await Task.sleep(seconds: 5)
+                    print("start reloading")
+                    if !shouldSkipContinousReload {
+                        await reload(for: currentDestination)
+                    }
+
+                    shouldSkipContinousReload = false
+                }
+            } catch {
+                // Cancelled
+            }
+        }
     }
 
     func didEnterHome() {
@@ -371,9 +417,6 @@ private extension Navigator {
                 if granted {
                     Task { @MainActor in
                         UIApplication.shared.registerForRemoteNotifications()
-                        if let webhookID = UserDefaults.standard.string(forKey: StorageKeys.webhookID.rawValue) {
-                            self?.webhookID = webhookID
-                        }
 
                         try? await Task.sleep(seconds: 1.5)
 
@@ -388,7 +431,6 @@ private extension Navigator {
     }
 
     func updateActiveView() {
-        camerasViewModel.setIsActiveScreen(currentDestination == .cameras)
         electricityViewModel.isViewActive = currentDestination == .electricity
     }
 

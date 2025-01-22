@@ -16,18 +16,9 @@ enum ConnectionState {
     case loading
 }
 
-class URLCreator: ObservableObject, URLRequestBuilder {
-    @Published var connectionState = ConnectionState.unset {
-        didSet {
-            delegate?.connectionStateChanged(state: connectionState)
-            if connectionState == .local {
-                delegate?.baseURLChanged(urlString: GlobalConstants.baseInternalUrlString)
-            }
-        }
-    }
-
-    weak var delegate: URLCreatorDelegate?
-
+@MainActor
+class URLCreator: ObservableObject, @preconcurrency URLRequestBuilder {
+    @Published var connectionState = ConnectionState.unset
     var nextUpdate = Date().addingTimeInterval(-1)
     var urlString: String {
         connectionState == .local ? GlobalConstants.baseInternalUrlString : GlobalConstants.baseExternalUrlString
@@ -41,7 +32,6 @@ class URLCreator: ObservableObject, URLRequestBuilder {
         self.session = session
     }
 
-    @MainActor
     func updateConnectionState(ignoreLocalSSID: Bool = false) async {
         guard connectionState != .loading else {
             return
@@ -75,8 +65,6 @@ class URLCreator: ObservableObject, URLRequestBuilder {
     }
 
     private func retryWithExternalURL() {
-        delegate?.baseURLChanged(urlString: GlobalConstants.baseExternalUrlString)
-
         Task { @MainActor in
             let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
                                                             path: apiPath,

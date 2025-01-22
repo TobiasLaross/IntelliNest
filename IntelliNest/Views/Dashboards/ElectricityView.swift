@@ -29,7 +29,7 @@ struct ElectricityView: View {
                     Spacer()
                 }
                 Spacer()
-                NordPoolHistoryView(nordPool: viewModel.nordPool)
+                NordPoolHistoryView(nordPool: $viewModel.nordPool)
                     .frame(height: 350)
                     .padding(.bottom, 16)
                     .padding(.horizontal, 8)

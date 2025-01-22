@@ -30,3 +30,7 @@ extension EntityProtocol {
         nextUpdate = Date().addingTimeInterval(0.5)
     }
 }
+
+struct EntityMinimized: Decodable {
+    let state: String
+}

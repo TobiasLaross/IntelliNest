@@ -9,7 +9,7 @@ import Foundation
 import ShipBookSDK
 
 @MainActor
-class HeatersViewModel: HassAPIViewModelProtocol {
+class HeatersViewModel: ObservableObject {
     @Published var heaterCorridor = HeaterEntity(entityId: .heaterCorridor)
     @Published var heaterPlayroom = HeaterEntity(entityId: .heaterPlayroom)
     @Published var purifier = PurifierEntity()
@@ -178,6 +178,11 @@ private extension HeatersViewModel {
                     restAPIService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
                 }
             }
+        }
+
+        Task { @MainActor in
+            try? await Task.sleep(seconds: 0.3)
+            await reload()
         }
     }
 }

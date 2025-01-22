@@ -1,10 +1,3 @@
-//
-//  ElectricityViewModel.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2023-12-14.
-//
-
 import Foundation
 import ShipBookSDK
 
@@ -40,15 +33,56 @@ class ElectricityViewModel: ObservableObject {
         }
     }
 
-    let entityIDs: [EntityId] = [.sonnenBattery, .pulsePower, .tibberCostToday, .pulseConsumptionToday, .sonnenAutomation]
+    let entityIDs: [EntityId] = [
+        .sonnenBatteryStatus,
+        .sonnenBattery,
+        .pulsePower,
+        .tibberCostToday,
+        .pulseConsumptionToday,
+        .sonnenAutomation,
+        .nordPool
+    ]
+    private var isReloading = false
+    private let restAPIService: RestAPIService
 
-    var restAPIService: RestAPIService
-    var websocketService: WebSocketService
-
-    init(sonnenBattery: SonnenEntity, restAPIService: RestAPIService, websocketService: WebSocketService) {
+    init(sonnenBattery: SonnenEntity, restAPIService: RestAPIService) {
         self.sonnenBattery = sonnenBattery
         self.restAPIService = restAPIService
-        self.websocketService = websocketService
+    }
+
+    func reload() async {
+        guard !isReloading else {
+            return
+        }
+
+        isReloading = true
+        restAPIService.callService(serviceID: .updateEntity,
+                                   domain: .homeassistant,
+                                   json: [.entityID: EntityId.sonnenBattery.rawValue])
+        restAPIService.callService(serviceID: .updateEntity,
+                                   domain: .homeassistant,
+                                   json: [.entityID: EntityId.sonnenBatteryStatus.rawValue])
+        try? await Task.sleep(seconds: 0.2)
+        for entityID in entityIDs {
+            do {
+                if entityID == .sonnenBatteryStatus {
+                    let sonnenStatus = try await restAPIService.reload(entityId: entityID, entityType: SonnenStatusEntity.self)
+                    sonnenBattery.update(from: sonnenStatus)
+                } else if entityID == .sonnenBattery {
+                    let sonnenBattery = try await restAPIService.reload(entityId: entityID, entityType: SonnenEntity.self)
+                    self.sonnenBattery.update(from: sonnenBattery)
+                } else if entityID == .nordPool {
+                    let nordPool = try await restAPIService.reload(entityId: entityID, entityType: NordPoolEntity.self)
+                    self.nordPool = nordPool
+                } else {
+                    let state = try await restAPIService.reloadState(entityID: entityID)
+                    reload(entityID: entityID, state: state)
+                }
+            } catch {
+                Log.error("Failed to reload entity: \(entityID): \(error)")
+            }
+        }
+        isReloading = false
     }
 
     func reload(entityID: EntityId, state: String) {
@@ -66,26 +100,11 @@ class ElectricityViewModel: ObservableObject {
         }
     }
 
-    func reloadNordPoolEntity(nordPoolEntity: NordPoolEntity) {
-        nordPool = nordPoolEntity
-    }
-
-    func reloadSonnenBattery(_ sonnenEntity: SonnenEntity) {
-        sonnenBattery.update(from: sonnenEntity)
-    }
-
-    func reloadSonnenStatusBattery(_ sonnenStatusEntity: SonnenStatusEntity) {
-        sonnenBattery.update(from: sonnenStatusEntity)
-    }
-
     func updateSonnenContinously() {
         sonnenUpdateTask?.cancel()
-        let entityIDs = [EntityId.sonnenBattery.rawValue, EntityId.sonnenBatteryStatus.rawValue]
-        let variableValueEntities: ServiceValues = .stringArray(entityIDs)
         sonnenUpdateTask = Task {
-            while isViewActive {
-                websocketService.callService(serviceID: .updateEntity, data: [.entityID: variableValueEntities])
-                try? await Task.sleep(seconds: 1)
+            while isViewActive && false {
+                try? await Task.sleep(seconds: 2)
             }
         }
     }

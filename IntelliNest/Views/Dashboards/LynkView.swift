@@ -134,10 +134,9 @@ struct LynkView: View {
     }
 }
 
-struct Eniro_Previews: PreviewProvider {
+struct Lynk_Previews: PreviewProvider {
     static var previews: some View {
-        LynkView(viewModel: LynkViewModel(restAPIService: PreviewProviderUtil.restAPIService,
-                                          showClimateSchedulingAction: {}))
+        LynkView(viewModel: PreviewProviderUtil.lynkViewModel)
             .backgroundModifier()
     }
 }
