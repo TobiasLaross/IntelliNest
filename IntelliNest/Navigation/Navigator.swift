@@ -341,9 +341,7 @@ private extension Navigator {
         continousReloadTask = Task {
             do {
                 while true {
-                    print("sleeping")
                     try await Task.sleep(seconds: 5)
-                    print("start reloading")
                     if !shouldSkipContinousReload {
                         await reload(for: currentDestination)
                     }

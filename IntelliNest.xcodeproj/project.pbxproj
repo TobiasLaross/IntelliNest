@@ -52,7 +52,6 @@
 		F62750A92A00ED9500C1253F /* UINavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A82A00ED9500C1253F /* UINavigationController.swift */; };
 		F62750AB2A00EE8800C1253F /* ToolbarBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */; };
 		F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AE2A01123500C1253F /* ToolbarItems.swift */; };
-		F62750B12A066A7D00C1253F /* URLCreatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750B02A066A7D00C1253F /* URLCreatorTests.swift */; };
 		F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750B22A066B4500C1253F /* URLProtocolStub.swift */; };
 		F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2DF286D950A00462092 /* LightEntity.swift */; };
 		F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E228770D5500462092 /* LightsViewModel.swift */; };
@@ -271,7 +270,6 @@
 		F62750A82A00ED9500C1253F /* UINavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UINavigationController.swift; sourceTree = "<group>"; };
 		F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarBackButton.swift; sourceTree = "<group>"; };
 		F62750AE2A01123500C1253F /* ToolbarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarItems.swift; sourceTree = "<group>"; };
-		F62750B02A066A7D00C1253F /* URLCreatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLCreatorTests.swift; sourceTree = "<group>"; };
 		F62750B22A066B4500C1253F /* URLProtocolStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolStub.swift; sourceTree = "<group>"; };
 		F62CD2DF286D950A00462092 /* LightEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightEntity.swift; sourceTree = "<group>"; };
 		F62CD2E228770D5500462092 /* LightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModel.swift; sourceTree = "<group>"; };
@@ -551,7 +549,6 @@
 				F6EF35B42A3E1BB500895250 /* LightEntityTests.swift */,
 				F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */,
 				F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */,
-				F62750B02A066A7D00C1253F /* URLCreatorTests.swift */,
 				F62750B22A066B4500C1253F /* URLProtocolStub.swift */,
 			);
 			path = IntelliNestTests;
@@ -1276,7 +1273,6 @@
 			files = (
 				F664BA7229B48AF80092CB2E /* EntityTest.swift in Sources */,
 				F664BA7629B48F860092CB2E /* InputNumberEntityTest.swift in Sources */,
-				F62750B12A066A7D00C1253F /* URLCreatorTests.swift in Sources */,
 				F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */,
 				F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */,
 				F6EF35B52A3E1BB500895250 /* LightEntityTests.swift in Sources */,

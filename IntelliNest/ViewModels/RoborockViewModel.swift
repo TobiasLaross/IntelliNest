@@ -19,7 +19,7 @@ class RoborockViewModel: ObservableObject {
     @Published var roborockWaterShortage = Entity(entityId: .roborockWaterShortage, state: "off")
     @Published var roborockMapImage = RoborockImageEntity(entityId: .roborockMapImage)
     private var mapViewTask: Task<Void, Never>?
-    
+
     @Published var isShowingMapView = false {
         didSet {
             mapViewTask?.cancel()
