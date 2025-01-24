@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		15D16E8AB702D79269A6BD39 /* RoborockImageEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386D85613C7069D1CC652E21 /* RoborockImageEntity.swift */; };
+		21F16FCFD796322F432CEDBD /* LeafView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF213DF2635314B9672C3252 /* LeafView.swift */; };
 		3BE58BE3D740734914B1C7DD /* HomeLocationEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */; };
 		3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DC1A4298196BF77982508A /* PurifierView.swift */; };
 		40D2B2C064DFFA29F5082543 /* PurifierEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171E57CCB554528320B69CFA /* PurifierEntity.swift */; };
@@ -16,6 +17,7 @@
 		8AC963688E594E56ED469785 /* PurifierSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7AA547F46C2F6F2C2DC77A /* PurifierSpeed.swift */; };
 		9066A22629C1C0C6A469AFF1 /* .swiftformat in Sources */ = {isa = PBXBuildFile; fileRef = 64A22CB4FE13D0628B12F9F6 /* .swiftformat */; };
 		923B1B66ED3B56AEE3236623 /* .swift-version in Sources */ = {isa = PBXBuildFile; fileRef = 8337000DEB817B1114E96622 /* .swift-version */; };
+		C4B8EF5D5F63799917DA4117 /* LeafViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C051112CA3E175BAF3F61DC /* LeafViewModel.swift */; };
 		CD215FD8D5AD91EE27DAAB00 /* FuelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F941237969DF91783B00BE7 /* FuelView.swift */; };
 		EDA427791B9DF78634D7F957 /* LynkMiscView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA20B3409BB996ED12E461BF /* LynkMiscView.swift */; };
 		F60345C127A7F33700212D04 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C027A7F33700212D04 /* Entity.swift */; };
@@ -226,6 +228,7 @@
 
 /* Begin PBXFileReference section */
 		171E57CCB554528320B69CFA /* PurifierEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PurifierEntity.swift; sourceTree = "<group>"; };
+		1C051112CA3E175BAF3F61DC /* LeafViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LeafViewModel.swift; sourceTree = "<group>"; };
 		1F941237969DF91783B00BE7 /* FuelView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FuelView.swift; sourceTree = "<group>"; };
 		2EAEED7651CD21D72BA8AC79 /* INText.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = INText.swift; sourceTree = "<group>"; };
 		386D85613C7069D1CC652E21 /* RoborockImageEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoborockImageEntity.swift; sourceTree = "<group>"; };
@@ -235,6 +238,7 @@
 		8D7AA547F46C2F6F2C2DC77A /* PurifierSpeed.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PurifierSpeed.swift; sourceTree = "<group>"; };
 		8E1A30B909E2B12A91A30BAA /* LynkHeaterOptionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LynkHeaterOptionsView.swift; sourceTree = "<group>"; };
 		B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeLocationEntity.swift; sourceTree = "<group>"; };
+		EF213DF2635314B9672C3252 /* LeafView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LeafView.swift; sourceTree = "<group>"; };
 		F60345C027A7F33700212D04 /* Entity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
 		F60345C327A933D700212D04 /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		F60345C827A9379200212D04 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -513,6 +517,7 @@
 				F60345C827A9379200212D04 /* HomeView.swift */,
 				F60345D327ABE49100212D04 /* LightsView.swift */,
 				F60345D527ABE49700212D04 /* RoborockView.swift */,
+				EF213DF2635314B9672C3252 /* LeafView.swift */,
 			);
 			path = Dashboards;
 			sourceTree = "<group>";
@@ -578,6 +583,7 @@
 				F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */,
 				F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */,
 				F685F8002B2B153C008E47AF /* ElectricityViewModel.swift */,
+				1C051112CA3E175BAF3F61DC /* LeafViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -1264,6 +1270,8 @@
 				8AC963688E594E56ED469785 /* PurifierSpeed.swift in Sources */,
 				15D16E8AB702D79269A6BD39 /* RoborockImageEntity.swift in Sources */,
 				3BE58BE3D740734914B1C7DD /* HomeLocationEntity.swift in Sources */,
+				21F16FCFD796322F432CEDBD /* LeafView.swift in Sources */,
+				C4B8EF5D5F63799917DA4117 /* LeafViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1461,7 +1469,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1483,7 +1491,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1503,7 +1511,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1525,7 +1533,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1544,7 +1552,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1553,7 +1561,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1571,7 +1579,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1580,7 +1588,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1598,7 +1606,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1614,7 +1622,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1633,7 +1641,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1649,7 +1657,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1667,7 +1675,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1683,7 +1691,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.IntelliWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1762,7 +1770,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_PREVIEWS = YES;
@@ -1784,7 +1792,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1803,7 +1811,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1812,7 +1820,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNestTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1828,7 +1836,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1842,7 +1850,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1858,7 +1866,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1872,7 +1880,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1888,7 +1896,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 68;
+				CURRENT_PROJECT_VERSION = 69;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
@@ -1902,7 +1910,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2025.01.23;
+				MARKETING_VERSION = 2025.01.24;
 				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

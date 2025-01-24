@@ -51,6 +51,7 @@ class HomeViewModel: ObservableObject {
     var urlCreator: URLCreator
     let showHeatersAction: MainActorVoidClosure
     let showLynkAction: MainActorVoidClosure
+    let showLeafAction: MainActorVoidClosure
     let showRoborockAction: MainActorVoidClosure
     let showPowerGridAction: MainActorVoidClosure
     let showLightsAction: MainActorVoidClosure
@@ -62,6 +63,7 @@ class HomeViewModel: ObservableObject {
          urlCreator: URLCreator,
          showHeatersAction: @escaping MainActorVoidClosure,
          showLynkAction: @escaping MainActorVoidClosure,
+         showLeafAction: @escaping MainActorVoidClosure,
          showRoborockAction: @escaping MainActorVoidClosure,
          showPowerGridAction: @escaping MainActorVoidClosure,
          showLightsAction: @escaping MainActorVoidClosure,
@@ -72,6 +74,7 @@ class HomeViewModel: ObservableObject {
         self.urlCreator = urlCreator
         self.showHeatersAction = showHeatersAction
         self.showLynkAction = showLynkAction
+        self.showLeafAction = showLeafAction
         self.showRoborockAction = showRoborockAction
         self.showPowerGridAction = showPowerGridAction
         self.showLightsAction = showLightsAction

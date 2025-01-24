@@ -92,24 +92,19 @@ private struct NavigationButtonsView: View {
         VStack {
             HStack(spacing: 15) {
                 NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), action: viewModel.showHeatersAction)
-                NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.fill"), action: viewModel.showLynkAction)
-                NavigationButtonView(buttonTitle: "",
-                                     image: Image("roborocks7"),
-                                     buttonImageWidth: 50,
-                                     buttonImageHeight: 50,
-                                     action: viewModel.showRoborockAction)
+                NavigationButtonView(buttonTitle: "Lynk", image: Image(systemName: "car.fill"), action: viewModel.showLynkAction)
+                NavigationButtonView(
+                    buttonTitle: "Leaf",
+                    image: Image(systemName: "car.2.fill"),
+                    buttonImageWidth: 40,
+                    action: viewModel.showLeafAction
+                )
             }
             HStack(spacing: 15) {
                 NavigationButtonView(image: Image(imageName: .powerGrid),
                                      buttonImageWidth: 45,
                                      buttonImageHeight: 50,
                                      action: viewModel.showPowerGridAction)
-                /*
-                 NavigationButtonView(image: Image(systemImageName: .cctv),
-                                      buttonImageWidth: 45,
-                                      buttonImageHeight: 30,
-                                      action: viewModel.showCamerasAction)
-                  */
 
                 NavigationButtonView(image: Image(systemName: "lightbulb.fill"),
                                      buttonImageWidth: 30,
@@ -123,6 +118,11 @@ private struct NavigationButtonsView: View {
                             Text("Släck alla lampor")
                         }
                     }
+                NavigationButtonView(buttonTitle: "",
+                                     image: Image("roborocks7"),
+                                     buttonImageWidth: 50,
+                                     buttonImageHeight: 50,
+                                     action: viewModel.showRoborockAction)
             }
         }
     }
@@ -238,6 +238,7 @@ struct Home_Previews: PreviewProvider {
                                       urlCreator: PreviewProviderUtil.urlCreator,
                                       showHeatersAction: {},
                                       showLynkAction: {},
+                                      showLeafAction: {},
                                       showRoborockAction: {},
                                       showPowerGridAction: {},
                                       showLightsAction: {},

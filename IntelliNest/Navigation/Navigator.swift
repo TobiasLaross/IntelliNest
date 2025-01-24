@@ -76,6 +76,9 @@ class Navigator: ObservableObject {
                                            showLynkAction: { [weak self] in
                                                self?.push(.lynk)
                                            },
+                                           showLeafAction: { [weak self] in
+                                               self?.push(.leaf)
+                                           },
                                            showRoborockAction: { [weak self] in
                                                self?.push(.roborock)
                                            },
@@ -99,6 +102,10 @@ class Navigator: ObservableObject {
                                                          self?.push(.playroomHeaterDetails)
                                                      }
                                                  })
+    lazy var leafViewModel = LeafViewModel(restAPIService: restAPIService,
+                                           repeatReloadAction: { [weak self] times in
+                                               self?.repeatReload(times: times)
+                                           })
     lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService,
                                            repeatReloadAction: { [weak self] times in
                                                self?.repeatReload(times: times)
@@ -146,6 +153,8 @@ class Navigator: ObservableObject {
                 Text("Not implemented show for home")
             case .heaters:
                 showHeatersView()
+            case .leaf:
+                showLeafView()
             case .lynk:
                 showLynkView()
             case .corridorHeaterDetails:
@@ -206,6 +215,8 @@ class Navigator: ObservableObject {
             await heatersViewModel.reload()
         case .lynk:
             await lynkViewModel.reload()
+        case .leaf:
+            await leafViewModel.reload()
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
         case .lights:
@@ -240,6 +251,10 @@ class Navigator: ObservableObject {
     func toolbarReload() async {
         if currentDestination == .lynk {
             lynkViewModel.forceUpdate()
+            try? await Task.sleep(seconds: 2)
+            repeatReload(times: 6)
+        } else if currentDestination == .leaf {
+            leafViewModel.forceUpdate()
             try? await Task.sleep(seconds: 2)
             repeatReload(times: 6)
         } else {
@@ -289,6 +304,10 @@ private extension Navigator {
 
     func showHeatersView() -> HeatersView {
         HeatersView(viewModel: heatersViewModel)
+    }
+
+    func showLeafView() -> LeafView {
+        LeafView(viewModel: leafViewModel)
     }
 
     func showLynkView() -> LynkView {
