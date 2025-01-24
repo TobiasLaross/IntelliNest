@@ -18,10 +18,13 @@ class RoborockViewModel: ObservableObject {
     @Published var roborockEmptiedAtDate = Entity(entityId: .roborockEmptiedAtDate)
     @Published var roborockWaterShortage = Entity(entityId: .roborockWaterShortage, state: "off")
     @Published var roborockMapImage = RoborockImageEntity(entityId: .roborockMapImage)
+    private var mapViewTask: Task<Void, Never>?
+    
     @Published var isShowingMapView = false {
         didSet {
-            Task {
-                if isShowingMapView {
+            mapViewTask?.cancel()
+            if isShowingMapView {
+                mapViewTask = Task {
                     for _ in 0 ..< 4 {
                         await reloadMapImage()
                         try? await Task.sleep(seconds: 1.5)
