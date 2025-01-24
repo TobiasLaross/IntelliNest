@@ -61,35 +61,21 @@ struct RoborockEntity: EntityProtocol {
         let entityId = try EntityId(rawValue: container.decode(String.self, forKey: .entityId))
         self.entityId = entityId ?? EntityId.unknown
         state = try container.decode(String.self, forKey: .state)
-        let attributes = try container.decode(RoborockAttributes.self, forKey: .attributes)
-        status = attributes.status
-        batteryLevel = attributes.batteryLevel
-        error = attributes.error
-    }
 
-    static func == (lhs: RoborockEntity, rhs: RoborockEntity) -> Bool {
-        lhs.entityId == rhs.entityId &&
-            lhs.isActive == rhs.isActive &&
-            lhs.state == rhs.state &&
-            lhs.status == rhs.status
+        let attributes = try container.decode(RoborockAttributes.self, forKey: .attributes)
+        batteryLevel = attributes.batteryLevel
     }
 }
 
 private struct RoborockAttributes: Decodable {
-    var status: String
     var batteryLevel: Int
-    var error: String
 
     private enum CodingKeys: String, CodingKey {
-        case status
         case batteryLevel = "battery_level"
-        case error
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        status = try container.decode(String.self, forKey: .status)
         batteryLevel = try container.decode(Int.self, forKey: .batteryLevel)
-        error = try container.decodeIfPresent(String.self, forKey: .error) ?? ""
     }
 }

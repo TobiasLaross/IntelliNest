@@ -84,6 +84,7 @@ struct NordPoolEntity: EntityProtocol {
         today = attributes.today.map { Int($0?.rounded() ?? 0) }
         tomorrow = attributes.tomorrow.map { Int($0?.rounded() ?? 0) }
         tomorrowValid = attributes.tomorrowValid
+        populatePriceData()
     }
 
     func price(hour: Int) -> Int {

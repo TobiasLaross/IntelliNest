@@ -8,6 +8,7 @@
 import Foundation
 import ShipBookSDK
 
+@MainActor
 class LightsViewModel: ObservableObject {
     @Published var lightEntities: [EntityId: LightEntity] = [
         .sofa: LightEntity(entityId: .sofa),
@@ -22,7 +23,7 @@ class LightsViewModel: ObservableObject {
                                         groupedLightIDs: [.guestRoomCeiling1, .guestRoomCeiling2, .guestRoomCeiling3]),
         .laundryRoom: LightEntity(entityId: .laundryRoom)
     ]
-    var updateTasks: [EntityId: DispatchWorkItem] = [:]
+    private var isReloading = false
 
     let corridorName = "Korridoren"
     let corridorSouthName = "Södra"
@@ -37,34 +38,29 @@ class LightsViewModel: ObservableObject {
     let laundryRoomName = "Tvättstugan"
 
     private var restAPIService: RestAPIService
-    init(restAPIService: RestAPIService) {
+    private let repeatReloadAction: IntClosure
+
+    init(restAPIService: RestAPIService,
+         repeatReloadAction: @escaping IntClosure) {
         self.restAPIService = restAPIService
+        self.repeatReloadAction = repeatReloadAction
     }
 
-    @MainActor
-    func reload(lightID: EntityId, state: String, brightness: Int?) {
-        guard lightEntities[lightID] != nil else {
-            Log.error("Light: \(lightID) not in lightEntities")
+    func reload() async {
+        guard !isReloading else {
             return
         }
-
-        lightEntities[lightID]?.state = state
-        if let brightness {
-            if lightEntities.keys.contains(lightID) {
-                updateTasks[lightID]?.cancel()
-                let task = DispatchWorkItem { [weak self] in
-                    self?.lightEntities[lightID]?.brightness = brightness
-                    self?.lightEntities[lightID]?.isUpdating = false
-                    self?.updateTasks[lightID] = nil
-                }
-                updateTasks[lightID] = task
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: task)
+        isReloading = true
+        for (entityID, light) in lightEntities {
+            do {
+                var updatedLight = try await restAPIService.reload(entityId: entityID, entityType: LightEntity.self)
+                updatedLight.groupedLightIDs = light.groupedLightIDs
+                lightEntities[entityID] = updatedLight
+            } catch {
+                Log.error("Failed to reload light: \(entityID): \(error)")
             }
         }
-
-        if brightness == nil || !lightEntities.keys.contains(lightID) {
-            lightEntities[lightID]?.isUpdating = false
-        }
+        isReloading = false
     }
 
     func onSliderChange(slideable: Slideable, brightness: Int) {
@@ -91,6 +87,7 @@ class LightsViewModel: ObservableObject {
             }
 
             restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness)
+            repeatReloadAction(2)
         }
     }
 
@@ -110,6 +107,7 @@ class LightsViewModel: ObservableObject {
             }
 
             restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness)
+            repeatReloadAction(2)
         }
     }
 }

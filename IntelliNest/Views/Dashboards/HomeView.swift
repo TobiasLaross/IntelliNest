@@ -240,8 +240,8 @@ struct Home_Previews: PreviewProvider {
                                       showLynkAction: {},
                                       showRoborockAction: {},
                                       showPowerGridAction: {},
-                                      showCamerasAction: {},
                                       showLightsAction: {},
+                                      repeatReloadAction: { _ in },
                                       toolbarReloadAction: {})
 
         HomeView(viewModel: viewModel)

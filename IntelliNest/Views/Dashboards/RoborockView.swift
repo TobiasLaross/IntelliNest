@@ -14,7 +14,7 @@ struct RoborockView: View {
         ZStack {
             VStack {
                 Group {
-                    Text("Status: \(viewModel.status)")
+                    Text(viewModel.status)
                         .font(.title2)
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -92,6 +92,6 @@ struct RoborockView: View {
 
 struct Roborock_Previews: PreviewProvider {
     static var previews: some View {
-        RoborockView(viewModel: .init(restAPIService: PreviewProviderUtil.restAPIService))
+        RoborockView(viewModel: .init(restAPIService: PreviewProviderUtil.restAPIService, repeatReloadAction: { _ in }))
     }
 }

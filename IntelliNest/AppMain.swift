@@ -41,7 +41,7 @@ struct AppMain: App {
                                     ToolBarConnectionStateView(urlCreator: navigator.urlCreator)
                                 }
                                 ToolbarItem(placement: .navigationBarTrailing) {
-                                    ToolbarReloadButtonView(destination: destination, reloadAction: navigator.reloadCurrentModel)
+                                    ToolbarReloadButtonView(destination: destination, reloadAction: navigator.toolbarReload)
                                 }
                             }
                             .navigationBarBackButtonHidden(true)
@@ -73,24 +73,6 @@ struct AppMain: App {
                     }
                 }
             }
-            .overlay {
-                if UserManager.currentUser == .tobias && navigator.websocketConnectionInfo != .unknown {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            Group {
-                                if navigator.websocketConnectionInfo == .waitingForPong {
-                                    ProgressView()
-                                        .progressViewStyle(.circular)
-                                }
-                            }
-                            .padding([.bottom, .trailing], 16)
-                            .frame(width: 32, height: 32)
-                        }
-                    }
-                }
-            }
             .onChange(of: scenePhase) {
                 if scenePhase == .active {
                     navigator.didEnterForeground()
@@ -100,9 +82,6 @@ struct AppMain: App {
                 }
             }
             .onAppear {
-                Task {
-                    await navigator.reloadCurrentModel()
-                }
                 if UserManager.shared.isUserNotSet {
                     shouldShowSelectUserActionSheet = true
                 }

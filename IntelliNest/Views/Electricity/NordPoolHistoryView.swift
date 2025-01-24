@@ -9,7 +9,7 @@ import Charts
 import SwiftUI
 
 struct NordPoolHistoryView: View {
-    let nordPool: NordPoolEntity
+    @Binding var nordPool: NordPoolEntity
     @State var selectedHour = Calendar.currentHour
 
     var body: some View {
@@ -94,7 +94,7 @@ struct NordPoolHistory_Previews: PreviewProvider {
         return ZStack {
             VStack {
                 Spacer()
-                NordPoolHistoryView(nordPool: nordPool)
+                NordPoolHistoryView(nordPool: .constant(nordPool))
                     .frame(height: 350)
                     .padding(.bottom, 16)
                     .padding(.horizontal, 8)

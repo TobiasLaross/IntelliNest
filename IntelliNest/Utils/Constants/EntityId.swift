@@ -99,7 +99,6 @@ enum EntityId: String, Decodable, CaseIterable {
     case lynkCarUpdatedAt = "sensor.lynk_co_last_updated_by_car"
     case lynkClimateUpdatedAt = "sensor.lynk_co_climate_updated"
     case lynkDoorLockUpdatedAt = "sensor.lynk_co_door_lock_updated"
-    case lynkEngineUpdatedAt = "sensor.lynk_co_engine_updated"
     case lynkBatteryUpdatedAt = "sensor.lynk_co_battery_updated"
     case lynkFuelUpdatedAt = "sensor.lynk_co_fuel_updated"
     case lynkAddressUpdatedAt = "sensor.lynk_co_position_updated"
@@ -126,7 +125,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case thermGuest = "sensor.temperature_gastrummet"
     /* Pure */
     case purifierFanSpeed = "fan.wellbeing_pure_fanspeed"
-    case purifierMode = "fan.wellbeing_pure_workmode"
+    case purifierMode = "sensor.wellbeing_pure_workmode"
     case purifierTemperature = "sensor.wellbeing_pure_temp"
     case purifierHumidity = "sensor.wellbeing_pure_humidity"
     case purifierTimerMode = "input_boolean.purifier_timer_mode"

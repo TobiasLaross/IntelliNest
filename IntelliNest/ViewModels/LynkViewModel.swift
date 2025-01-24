@@ -1,10 +1,3 @@
-//
-//  LynkViewModel.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2022-08-24.
-//
-
 import Foundation
 import ShipBookSDK
 import SwiftUI
@@ -30,7 +23,6 @@ class LynkViewModel: ObservableObject {
     @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
     @Published var climateUpdatedAt = Entity(entityId: .lynkClimateUpdatedAt)
     @Published var doorLockUpdatedAt = Entity(entityId: .lynkDoorLockUpdatedAt)
-    @Published var engineUpdatedAt = Entity(entityId: .lynkEngineUpdatedAt)
     @Published var batteryUpdatedAt = Entity(entityId: .lynkBatteryUpdatedAt)
     @Published var fuelUpdatedAt = Entity(entityId: .lynkFuelUpdatedAt)
     @Published var addressUpdatedAt = Entity(entityId: .lynkAddressUpdatedAt)
@@ -44,7 +36,7 @@ class LynkViewModel: ObservableObject {
                                  .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
                                  .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkChargeState,
                                  .lynkChargerConnectionStatus, .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt,
-                                 .lynkEngineUpdatedAt, .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt,
+                                 .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt,
                                  .lynkChargerUpdatedAt]
     var isReloading = false
     var isLynkFlashing = false
@@ -150,22 +142,51 @@ class LynkViewModel: ObservableObject {
     }
 
     var restAPIService: RestAPIService
+    private let repeatReloadAction: IntClosure
     let showClimateSchedulingAction: MainActorVoidClosure
 
-    init(restAPIService: RestAPIService, showClimateSchedulingAction: @escaping MainActorVoidClosure) {
+    init(restAPIService: RestAPIService,
+         repeatReloadAction: @escaping IntClosure,
+         showClimateSchedulingAction: @escaping MainActorVoidClosure) {
         self.restAPIService = restAPIService
+        self.repeatReloadAction = repeatReloadAction
         self.showClimateSchedulingAction = showClimateSchedulingAction
     }
 
-    func reload(forceReload: Bool = false) async {
+    func forceUpdate() {
+        restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
+        UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.lynkReloadTime.rawValue)
+    }
+
+    func reload() async {
+        guard !isReloading else {
+            return
+        }
+
+        isReloading = true
         let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
-        if forceReload || (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantFuture) > Date.now {
-            restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
-            UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.lynkReloadTime.rawValue)
+        if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantFuture) > Date.now {
+            forceUpdate()
+            await reloadEntities()
+            try? await Task.sleep(seconds: 5)
+        }
+
+        await reloadEntities()
+        isReloading = false
+    }
+
+    private func reloadEntities() async {
+        for entityID in entityIDs {
+            do {
+                let state = try await restAPIService.reloadState(entityID: entityID)
+                reload(entityID: entityID, state: state)
+            } catch {
+                Log.error("Failed to reload entity: \(entityID): \(error)")
+            }
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
+    // swiftlint:disable:next cyclomatic_complexity function_body_length
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         switch entityID {
         case .eniroForceCharge:
@@ -215,8 +236,6 @@ class LynkViewModel: ObservableObject {
         case .lynkClimateUpdatedAt:
             climateUpdatedAt.state = state
         case .lynkDoorLockUpdatedAt:
-            doorLockUpdatedAt.state = state
-        case .lynkEngineUpdatedAt:
             doorLockUpdatedAt.state = state
         case .lynkBatteryUpdatedAt:
             batteryUpdatedAt.state = state

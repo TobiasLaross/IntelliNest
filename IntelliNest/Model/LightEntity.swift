@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LightEntity: EntityProtocol {
+struct LightEntity: EntityProtocol, Decodable {
     var entityId: EntityId
     var state: String
     var nextUpdate = Date().addingTimeInterval(-1)
@@ -19,7 +19,7 @@ struct LightEntity: EntityProtocol {
     var isUpdating = false
 
     var brightness: Int
-    let groupedLightIDs: [EntityId]?
+    var groupedLightIDs: [EntityId]?
 
     enum CodingKeys: String, CodingKey {
         case entityId = "entity_id"
@@ -35,7 +35,16 @@ struct LightEntity: EntityProtocol {
     }
 
     init(from decoder: Decoder) throws {
-        fatalError("Not implemented decoder for LightEntity")
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        entityId = try container.decode(EntityId.self, forKey: .entityId)
+        state = try container.decode(String.self, forKey: .state)
+
+        if let attributesContainer = try? container.nestedContainer(keyedBy: AttributesCodingKeys.self, forKey: .attributes) {
+            brightness = try attributesContainer.decodeIfPresent(Int.self, forKey: .brightness) ?? -1
+        } else {
+            brightness = -1
+        }
+        groupedLightIDs = nil
     }
 
     mutating func updateIsActive() {}

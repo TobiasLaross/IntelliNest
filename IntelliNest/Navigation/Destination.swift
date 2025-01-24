@@ -8,7 +8,6 @@
 import Foundation
 
 enum Destination: String {
-    case cameras
     case electricity
     case home
     case heaters
@@ -21,8 +20,6 @@ enum Destination: String {
 
     var title: String {
         switch self {
-        case .cameras:
-            "Kameror"
         case .electricity:
             "Ström"
         case .home:

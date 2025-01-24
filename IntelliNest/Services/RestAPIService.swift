@@ -11,6 +11,7 @@ import SwiftUI
 import UIKit
 
 // swiftlint: disable:next type_body_length
+@MainActor
 class RestAPIService: URLRequestBuilder {
     var urlString: String {
         urlCreator.urlString
@@ -50,6 +51,26 @@ class RestAPIService: URLRequestBuilder {
         }
 
         throw EntityError.genericError
+    }
+
+    func reloadState(entityID: EntityId) async throws -> String {
+        guard let request = createURLRequest(path: "/api/states/\(entityID.rawValue)", method: .get) else {
+            throw EntityError.badRequest
+        }
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw EntityError.badResponse
+        }
+
+        guard httpResponse.statusCode == 200 else {
+            throw EntityError.httpRequestFailure
+        }
+
+        let decoder = JSONDecoder()
+        let entity = try decoder.decode(EntityMinimized.self, from: data)
+        return entity.state
     }
 
     func reload<T: EntityProtocol>(hassEntity: T, entityType: T.Type) async -> T {
@@ -410,6 +431,7 @@ private extension RestAPIService {
             do {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     if let webhookId = jsonResponse["webhook_id"] as? String {
+                        print("Webhook response: \(webhookId)")
                         UserDefaults.standard.setValue(webhookId, forKey: StorageKeys.webhookID.rawValue)
                     } else {
                         Log.error("webhook_id not found in response")

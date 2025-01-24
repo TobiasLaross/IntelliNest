@@ -1,14 +1,7 @@
-//
-//  SonnenEntity.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2023-12-14.
-//
-
 import Foundation
 
-struct SonnenEntity {
-    let entityID: EntityId
+struct SonnenEntity: EntityProtocol {
+    let entityId: EntityId
     var state = ""
     var houseConsumption = 0.0 // Consumption_W
     var chargedPercent = 0 // USOC
@@ -23,6 +16,8 @@ struct SonnenEntity {
     var hasFlowSolarToBattery = false
     var hasFlowSolarToHouse = false
     var hasFlowSolarToGrid = false
+    var nextUpdate = Date.now
+    var isActive = false
 
     var hasFlowBatteryToGrid: Bool {
         !hasFlowGridToBattery && batteryPower < -60 && gridPower < -60 && (gridPower < houseConsumption - solarProduction)
@@ -33,33 +28,27 @@ struct SonnenEntity {
     }
 
     init(entityID: EntityId) {
-        self.entityID = entityID
+        entityId = entityID
     }
 
-    init(entityID: EntityId, state: String, attributes: [String: Any]) {
-        self.init(entityID: entityID)
-        self.state = state
+    enum CodingKeys: String, CodingKey {
+        case entityId = "entity_id"
+        case state
+        case attributes
+    }
 
-        if let houseConsumption = attributes["Consumption_W"] as? Double {
-            self.houseConsumption = houseConsumption
-        }
-        if let chargedPercent = attributes["USOC"] as? Int {
-            self.chargedPercent = chargedPercent
-        }
-        if let fullChargeCapacity = attributes["FullChargeCapacity"] as? Double {
-            self.fullChargeCapacity = fullChargeCapacity
-        }
-        if let batteryPower = attributes["Pac_total_W"] as? Double {
-            self.batteryPower = batteryPower * -1
-        }
-        /* Get this from status or tibber pulse
-          if let gridPower = attributes["GridFeedIn_W"] as? Double {
-             self.gridPower = gridPower
-         }
-          */
-        if let solarProduction = attributes["Production_W"] as? Double {
-            self.solarProduction = solarProduction
-        }
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        entityId = try EntityId(rawValue: container.decode(String.self, forKey: .entityId)) ?? .unknown
+        state = try container.decode(String.self, forKey: .state)
+
+        let attributes = try container.decode(SonnenAttributes.self, forKey: .attributes)
+        houseConsumption = attributes.houseConsumption
+        chargedPercent = attributes.chargedPercent
+        fullChargeCapacity = attributes.fullChargeCapacity
+        batteryPower = attributes.batteryPower * -1
+        gridPower = attributes.gridPower
+        solarProduction = attributes.solarProduction
     }
 
     mutating func update(from sonnenEntity: SonnenEntity) {
@@ -81,5 +70,23 @@ struct SonnenEntity {
         hasFlowSolarToGrid = statusEntity.hasFlowSolarToGrid
         operationMode = statusEntity.operationMode
         gridPower = statusEntity.gridPower * -1
+    }
+}
+
+struct SonnenAttributes: Decodable {
+    let houseConsumption: Double
+    let chargedPercent: Int
+    let fullChargeCapacity: Double
+    let batteryPower: Double
+    let gridPower: Double
+    let solarProduction: Double
+
+    enum CodingKeys: String, CodingKey {
+        case houseConsumption = "Consumption_W"
+        case chargedPercent = "USOC"
+        case fullChargeCapacity = "FullChargeCapacity"
+        case batteryPower = "Pac_total_W"
+        case gridPower = "GridFeedIn_W"
+        case solarProduction = "Production_W"
     }
 }

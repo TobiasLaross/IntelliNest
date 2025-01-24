@@ -9,6 +9,7 @@ import Foundation
 import ShipBookSDK
 import UIKit
 
+@MainActor
 class RoborockViewModel: ObservableObject {
     @Published var roborock = RoborockEntity(entityId: .roborock)
     @Published var roborockAutomation = Entity(entityId: .roborockAutomation)
@@ -16,8 +17,26 @@ class RoborockViewModel: ObservableObject {
     @Published var roborockAreaSinceEmptied = Entity(entityId: .roborockAreaSinceEmptied)
     @Published var roborockEmptiedAtDate = Entity(entityId: .roborockEmptiedAtDate)
     @Published var roborockWaterShortage = Entity(entityId: .roborockWaterShortage, state: "off")
-    @Published var roborockMapImage = ImageEntity(entityID: .roborockMapImage)
-    @Published var isShowingMapView = false
+    @Published var roborockMapImage = RoborockImageEntity(entityId: .roborockMapImage)
+    private var mapViewTask: Task<Void, Never>?
+
+    @Published var isShowingMapView = false {
+        didSet {
+            mapViewTask?.cancel()
+            if isShowingMapView {
+                mapViewTask = Task {
+                    for _ in 0 ..< 4 {
+                        await reloadMapImage()
+                        try? await Task.sleep(seconds: 1.5)
+                        if !isShowingMapView {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Published var isShowingrooms = false
 
     private var baseURLString: String {
@@ -40,12 +59,40 @@ class RoborockViewModel: ObservableObject {
         }
     }
 
+    private var isReloading = false
+    private var isReloadingMap = false
     let entityIDs: [EntityId] = [.roborock, .roborockAutomation, .roborockWaterShortage, .roborockEmptiedAtDate, .roborockLastCleanArea,
                                  .roborockAreaSinceEmptied, .roborockMapImage]
     private var restAPIService: RestAPIService
+    private let repeatReloadAction: IntClosure
 
-    init(restAPIService: RestAPIService) {
+    init(restAPIService: RestAPIService,
+         repeatReloadAction: @escaping IntClosure) {
         self.restAPIService = restAPIService
+        self.repeatReloadAction = repeatReloadAction
+    }
+
+    func reload() async {
+        guard !isReloading else {
+            return
+        }
+
+        isReloading = true
+        for entityID in entityIDs {
+            do {
+                if entityID == .roborockMapImage {
+                    await reloadMapImage()
+                } else if entityID == .roborock {
+                    await reloadRoborock()
+                } else {
+                    let state = try await restAPIService.reloadState(entityID: entityID)
+                    reload(entityID: entityID, state: state)
+                }
+            } catch {
+                Log.error("Failed to reload entity: \(entityID): \(error)")
+            }
+        }
+        isReloading = false
     }
 
     func reload(entityID: EntityId, state: String) {
@@ -67,13 +114,30 @@ class RoborockViewModel: ObservableObject {
         }
     }
 
-    func reload(entityID: EntityId, state: String, urlPath: String) {
-        switch entityID {
-        case .roborockMapImage:
-            roborockMapImage.state = state
-            roborockMapImage.urlPath = urlPath
-        default:
-            Log.error("RoborockViewModel doesn't reload image entity: \(entityID)")
+    @MainActor
+    func reloadMapImage() async {
+        do {
+            guard !isReloadingMap else {
+                return
+            }
+            isReloadingMap = true
+            let mapImage = try await restAPIService.reload(entityId: .roborockMapImage, entityType: RoborockImageEntity.self)
+            roborockMapImage.urlPath = mapImage.urlPath
+            roborockMapImage.state = mapImage.state
+            print("reloaded map")
+        } catch {
+            Log.error("Failed to reload roborock map: \(error)")
+        }
+        isReloadingMap = false
+    }
+
+    @MainActor
+    func reloadRoborock() async {
+        do {
+            let roborock = try await restAPIService.reload(entityId: .roborock, entityType: RoborockEntity.self)
+            self.roborock = roborock
+        } catch {
+            Log.error("Failed to reload roborock: \(error)")
         }
     }
 
@@ -88,33 +152,37 @@ class RoborockViewModel: ObservableObject {
     }
 
     func manualEmpty() {
-        restAPIService.callScript(scriptID: .roborockManualEmpty)
+        callScript(scriptID: .roborockManualEmpty)
     }
 
     func toggleCleaning() {
         let action: Action = roborock.isCleaning ? .stop : .start
         restAPIService.update(entityID: .roborock, domain: .vacuum, action: action)
+        repeatReloadAction(6)
     }
 
     func dockRoborock() {
         if roborock.isReturning {
             restAPIService.update(entityID: .roborock, domain: .vacuum, action: .stop)
+            repeatReloadAction(6)
         } else {
-            restAPIService.callScript(scriptID: .roborockDock)
+            callScript(scriptID: .roborockDock)
         }
     }
 
     func sendRoborockToBin() {
-        restAPIService.callScript(scriptID: .roborockSendToBin)
+        callScript(scriptID: .roborockSendToBin)
     }
 
     func callScript(scriptID: ScriptID) {
         restAPIService.callScript(scriptID: scriptID)
+        repeatReloadAction(6)
     }
 
     func toggleRoborockAutomation() {
         let action: Action = roborockAutomation.isActive ? .turnOff : .turnOn
         roborockAutomation.isActive.toggle()
         restAPIService.update(entityID: .roborockAutomation, domain: .automation, action: action)
+        repeatReloadAction(2)
     }
 }

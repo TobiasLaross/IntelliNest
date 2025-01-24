@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SonnenOperationModes: String, CaseIterable {
+enum SonnenOperationModes: String, CaseIterable, Decodable {
     case manual = "1"
     case selfConsumption = "2"
     case timeOfUse = "10"
@@ -27,8 +27,8 @@ enum SonnenOperationModes: String, CaseIterable {
     }
 }
 
-struct SonnenStatusEntity {
-    let entityID: EntityId
+struct SonnenStatusEntity: EntityProtocol {
+    let entityId: EntityId
     var gridPower: Double = 0.0
     var operationMode = SonnenOperationModes.unknown
     var hasFlowGridToBattery = false
@@ -37,32 +37,51 @@ struct SonnenStatusEntity {
     var hasFlowBatteryToHouse = false
     var hasFlowSolarToBattery = false
     var hasFlowSolarToGrid = false
+    var state: String
+    var nextUpdate = Date.now
+    var isActive = false
 
-    init(entityID: EntityId, attributes: [String: Any]) {
-        self.entityID = entityID
-        if let hasFlowGridToBattery = attributes["FlowGridBattery"] as? Bool {
-            self.hasFlowGridToBattery = hasFlowGridToBattery
-        }
-        if let hasFlowGridToHouse = attributes["FlowConsumptionGrid"] as? Bool {
-            self.hasFlowGridToHouse = hasFlowGridToHouse
-        }
-        if let hasFlowSolarToHouse = attributes["FlowConsumptionProduction"] as? Bool {
-            self.hasFlowSolarToHouse = hasFlowSolarToHouse
-        }
-        if let hasFlowBatteryToHouse = attributes["FlowConsumptionBattery"] as? Bool {
-            self.hasFlowBatteryToHouse = hasFlowBatteryToHouse
-        }
-        if let hasFlowSolarToBattery = attributes["FlowProductionBattery"] as? Bool {
-            self.hasFlowSolarToBattery = hasFlowSolarToBattery
-        }
-        if let hasFlowSolarToGrid = attributes["FlowProductionGrid"] as? Bool {
-            self.hasFlowSolarToGrid = hasFlowSolarToGrid
-        }
-        if let gridIn = attributes["GridFeedIn_W"] as? Double {
-            gridPower = gridIn
-        }
-        if let operationMode = attributes["OperatingMode"] as? String {
-            self.operationMode = SonnenOperationModes(rawValue: operationMode) ?? .unknown
-        }
+    enum CodingKeys: String, CodingKey {
+        case entityId = "entity_id"
+        case state
+        case attributes
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        entityId = try EntityId(rawValue: container.decode(String.self, forKey: .entityId)) ?? .unknown
+        state = try container.decode(String.self, forKey: .state)
+
+        let attributes = try container.decode(SonnenStatusAttributes.self, forKey: .attributes)
+        gridPower = attributes.gridPower
+        operationMode = attributes.operationMode
+        hasFlowGridToBattery = attributes.hasFlowGridToBattery
+        hasFlowGridToHouse = attributes.hasFlowGridToHouse
+        hasFlowSolarToHouse = attributes.hasFlowSolarToHouse
+        hasFlowBatteryToHouse = attributes.hasFlowBatteryToHouse
+        hasFlowSolarToBattery = attributes.hasFlowSolarToBattery
+        hasFlowSolarToGrid = attributes.hasFlowSolarToGrid
+    }
+}
+
+struct SonnenStatusAttributes: Decodable {
+    let gridPower: Double
+    let operationMode: SonnenOperationModes
+    let hasFlowGridToBattery: Bool
+    let hasFlowGridToHouse: Bool
+    let hasFlowSolarToHouse: Bool
+    let hasFlowBatteryToHouse: Bool
+    let hasFlowSolarToBattery: Bool
+    let hasFlowSolarToGrid: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case gridPower = "GridFeedIn_W"
+        case operationMode = "OperatingMode"
+        case hasFlowGridToBattery = "FlowGridBattery"
+        case hasFlowGridToHouse = "FlowConsumptionGrid"
+        case hasFlowSolarToHouse = "FlowConsumptionProduction"
+        case hasFlowBatteryToHouse = "FlowConsumptionBattery"
+        case hasFlowSolarToBattery = "FlowProductionBattery"
+        case hasFlowSolarToGrid = "FlowProductionGrid"
     }
 }
