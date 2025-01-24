@@ -31,6 +31,7 @@ struct URLRequestParameters {
     }
 }
 
+@MainActor
 protocol URLRequestBuilder {
     var urlString: String { get }
     func createJSONData(json: [JSONKey: Any]) -> Data?

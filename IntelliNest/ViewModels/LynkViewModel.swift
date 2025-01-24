@@ -3,8 +3,8 @@ import ShipBookSDK
 import SwiftUI
 
 @MainActor
+// swiftlint:disable:next type_body_length
 class LynkViewModel: ObservableObject {
-    @Published var forceCharging = Entity(entityId: .eniroForceCharge)
     @Published var climateHeating = Entity(entityId: .lynkClimateHeating)
     @Published var isEngineRunning = Entity(entityId: .lynkEngineRunning)
     @Published var interiorTemperature = Entity(entityId: .lynkTemperatureInterior)
@@ -32,7 +32,7 @@ class LynkViewModel: ObservableObject {
     @Published var engineInitiatedTime: Date?
     @Published var isShowingHeaterOptions = false
 
-    let entityIDs: [EntityId] = [.eniroForceCharge, .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
+    let entityIDs: [EntityId] = [.lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
                                  .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
                                  .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkChargeState,
                                  .lynkChargerConnectionStatus, .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt,
@@ -165,7 +165,7 @@ class LynkViewModel: ObservableObject {
 
         isReloading = true
         let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
-        if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantFuture) > Date.now {
+        if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
             forceUpdate()
             await reloadEntities()
             try? await Task.sleep(seconds: 5)
@@ -189,8 +189,6 @@ class LynkViewModel: ObservableObject {
     // swiftlint:disable:next cyclomatic_complexity function_body_length
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         switch entityID {
-        case .eniroForceCharge:
-            forceCharging.state = state
         case .lynkClimateHeating:
             climateHeating.state = state
             if let lastChanged {

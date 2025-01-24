@@ -13,6 +13,7 @@ enum Action: String, Codable {
     case kiaStopCharge = "stop_charge"
     case kiaStartCharge = "start_charge"
     case kiaStartClimate = "start_climate"
+    case stopClimate = "stop_climate"
     case kiaLimitCharger = "set_charge_limits"
     case lock
     case unlock

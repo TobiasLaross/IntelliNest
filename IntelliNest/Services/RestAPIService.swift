@@ -10,7 +10,7 @@ import ShipBookSDK
 import SwiftUI
 import UIKit
 
-// swiftlint: disable:next type_body_length
+// swiftlint:disable:next type_body_length
 @MainActor
 class RestAPIService: URLRequestBuilder {
     var urlString: String {

@@ -11,6 +11,7 @@ enum Destination: String {
     case electricity
     case home
     case heaters
+    case leaf
     case lynk
     case corridorHeaterDetails
     case playroomHeaterDetails
@@ -26,6 +27,8 @@ enum Destination: String {
             "Hem"
         case .heaters:
             "Värmepumpar"
+        case .leaf:
+            "Leaf"
         case .lynk:
             "Lynk"
         case .corridorHeaterDetails:

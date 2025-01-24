@@ -82,6 +82,15 @@ enum EntityId: String, Decodable, CaseIterable {
     case eniroForceCharge = "input_boolean.manually_charge_car"
     case eniroClimateControl = "script.kia_climate_control"
     case eniroTurnOffClimateControl = "script.turn_off_kia_climate_control"
+    /* Leaf */
+    case leafACTimer = "sensor.leaf1sara_ac_timer"
+    case leafClimateRunning = "binary_sensor.leaf1sara_climate_is_running"
+    case leafBattery = "sensor.leaf1sara_battery"
+    case leafCharging = "binary_sensor.leaf1sara_charging"
+    case leafRange = "sensor.leaf1sara_estimated_range"
+    case leafRangeAC = "sensor.leaf1sara_estimated_range_ac"
+    case leafLastPoll = "sensor.leaf1sara_last_poll_request"
+    case leafPluggedIn = "binary_sensor.leaf1sara_plug_status"
     /* Lynk */
     case lynkClimateHeating = "binary_sensor.lynk_co_pre_climate_active"
     case lynkDoorLock = "lock.lynk_co_locks"
