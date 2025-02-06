@@ -92,13 +92,7 @@ private struct NavigationButtonsView: View {
         VStack {
             HStack(spacing: 15) {
                 NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), action: viewModel.showHeatersAction)
-                NavigationButtonView(buttonTitle: "Lynk", image: Image(systemName: "car.fill"), action: viewModel.showLynkAction)
-                NavigationButtonView(
-                    buttonTitle: "Leaf",
-                    image: Image(systemName: "car.2.fill"),
-                    buttonImageWidth: 40,
-                    action: viewModel.showLeafAction
-                )
+                NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.2.fill"), action: viewModel.showLynkAction)
             }
             HStack(spacing: 15) {
                 NavigationButtonView(image: Image(imageName: .powerGrid),
@@ -238,7 +232,6 @@ struct Home_Previews: PreviewProvider {
                                       urlCreator: PreviewProviderUtil.urlCreator,
                                       showHeatersAction: {},
                                       showLynkAction: {},
-                                      showLeafAction: {},
                                       showRoborockAction: {},
                                       showPowerGridAction: {},
                                       showLightsAction: {},

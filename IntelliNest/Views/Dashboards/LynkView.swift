@@ -14,9 +14,9 @@ struct LynkView: View {
     var body: some View {
         ZStack {
             VStack {
-                Text("Bilen är **\(viewModel.lynkDoorLock.stateToString())** på \(viewModel.address.state)")
+                Text("Lynken är **\(viewModel.lynkDoorLock.stateToString())** på \(viewModel.address.state)")
                     .foregroundColor(.white)
-                    .padding([.top, .horizontal])
+                    .padding(.horizontal)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 Text(viewModel.addressUpdatedAtDescription)
@@ -26,12 +26,12 @@ struct LynkView: View {
                 HStack {
                     Spacer()
                     VStack {
-                        BatteryView(level: Int(viewModel.battery.inputNumber.rounded()),
+                        BatteryView(level: Int(viewModel.lynkBattery.inputNumber.rounded()),
                                     isCharging: viewModel.isCharging,
                                     degreeRotation: 90,
                                     width: 50,
                                     height: 90)
-                        Text("\(viewModel.batteryDistance.state)km")
+                        Text("\(viewModel.lynkBatteryDistance.state)km")
                             .font(.buttonFontSmall)
                             .foregroundColor(.white)
                             .padding(.top, -32)
@@ -69,24 +69,24 @@ struct LynkView: View {
                     .frame(height: 20)
                 HStack {
                     VStack(alignment: .trailing) {
-                        Text("Bilen \(String(format: "%.1f", viewModel.interiorTemperature.state.roundedWithOneDecimal))°C")
+                        Text("Bilen \(String(format: "%.1f", viewModel.lynkInteriorTemperature.state.roundedWithOneDecimal))°C")
                             .foregroundColor(.white)
-                        Text("Ute \(String(format: "%.1f", viewModel.exteriorTemperature.state.roundedWithOneDecimal))°C")
+                        Text("Ute \(String(format: "%.1f", viewModel.lynkExteriorTemperature.state.roundedWithOneDecimal))°C")
                             .foregroundColor(.white)
-                        Text(viewModel.climateUpdatedAtDescription)
+                        Text(viewModel.lynkClimateUpdatedAtDescription)
                             .font(.buttonFontExtraSmall)
                             .foregroundColor(.white)
                     }
                     .padding(.trailing, 16)
-                    ServiceButtonView(buttonTitle: viewModel.climateTitle,
-                                      isActive: viewModel.isAirConditionActive,
-                                      activeColor: viewModel.climateIconColor,
+                    ServiceButtonView(buttonTitle: viewModel.lynkClimateTitle,
+                                      isActive: viewModel.isLynkAirConditionActive,
+                                      activeColor: viewModel.lynkClimateIconColor,
                                       buttonSize: 90,
                                       icon: .init(systemImageName: .thermometer),
                                       iconWidth: 25,
                                       iconHeight: 35,
-                                      isLoading: viewModel.isAirConditionLoading,
-                                      action: viewModel.toggleClimate)
+                                      isLoading: viewModel.isLynkAirConditionLoading,
+                                      action: viewModel.toggleLynkClimate)
                     Spacer()
                     ServiceButtonView(buttonTitle: viewModel.engineTitle,
                                       isActive: viewModel.isEngineRunning.isActive,
@@ -121,11 +121,12 @@ struct LynkView: View {
 
                 Divider()
                     .padding(.vertical)
-                Text("Senast uppdaterad: \(viewModel.lastUpdated)")
+                Text("Senast uppdaterad: \(viewModel.lynkLastUpdated)")
                     .font(.buttonFontMedium)
                     .italic()
                     .foregroundColor(.white)
                     .padding(.bottom)
+                LeafView(viewModel: viewModel)
             }
             if viewModel.isShowingHeaterOptions {
                 LynkHeaterOptionsView(viewModel: viewModel)

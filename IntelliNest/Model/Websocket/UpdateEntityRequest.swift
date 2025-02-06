@@ -7,7 +7,6 @@
 
 import Foundation
 
-// swiftlint:disable nesting
 struct UpdateEntityRequest: Encodable {
     let type = "call_service"
     let domain: Domain

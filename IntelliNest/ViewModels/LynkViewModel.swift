@@ -3,143 +3,55 @@ import ShipBookSDK
 import SwiftUI
 
 @MainActor
-// swiftlint:disable:next type_body_length
 class LynkViewModel: ObservableObject {
-    @Published var climateHeating = Entity(entityId: .lynkClimateHeating)
+    // Lynk
+    @Published var lynkClimateHeating = Entity(entityId: .lynkClimateHeating)
     @Published var isEngineRunning = Entity(entityId: .lynkEngineRunning)
-    @Published var interiorTemperature = Entity(entityId: .lynkTemperatureInterior)
-    @Published var exteriorTemperature = Entity(entityId: .lynkTemperatureExterior)
-    @Published var battery = InputNumberEntity(entityId: .lynkBattery)
-    @Published var batteryDistance = Entity(entityId: .lynkBatteryDistance)
+    @Published var lynkInteriorTemperature = Entity(entityId: .lynkTemperatureInterior)
+    @Published var lynkExteriorTemperature = Entity(entityId: .lynkTemperatureExterior)
+    @Published var lynkBattery = InputNumberEntity(entityId: .lynkBattery)
+    @Published var lynkBatteryDistance = Entity(entityId: .lynkBatteryDistance)
     @Published var fuel = InputNumberEntity(entityId: .lynkFuel)
     @Published var fuelDistance = Entity(entityId: .lynkFuelDistance)
-    @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var lynkDoorLock = LockEntity(entityId: .lynkDoorLock)
     @Published var address = Entity(entityId: .lynkAddress)
-    @Published var chargerState = Entity(entityId: .lynkChargeState)
-    @Published var chargerConnectionStatus = Entity(entityId: .lynkChargerConnectionStatus)
-    @Published var timeUntilCharged = Entity(entityId: .lynkTimeUntilCharged)
+    @Published var lynkChargerState = Entity(entityId: .lynkChargeState)
+    @Published var lynkChargerConnectionStatus = Entity(entityId: .lynkChargerConnectionStatus)
+    @Published var lynkTimeUntilCharged = Entity(entityId: .lynkTimeUntilCharged)
 
-    @Published var carUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
-    @Published var climateUpdatedAt = Entity(entityId: .lynkClimateUpdatedAt)
+    @Published var lynkCarUpdatedAt = Entity(entityId: .lynkCarUpdatedAt)
+    @Published var lynkClimateUpdatedAt = Entity(entityId: .lynkClimateUpdatedAt)
     @Published var doorLockUpdatedAt = Entity(entityId: .lynkDoorLockUpdatedAt)
     @Published var batteryUpdatedAt = Entity(entityId: .lynkBatteryUpdatedAt)
     @Published var fuelUpdatedAt = Entity(entityId: .lynkFuelUpdatedAt)
     @Published var addressUpdatedAt = Entity(entityId: .lynkAddressUpdatedAt)
     @Published var chargerUpdatedAt = Entity(entityId: .lynkChargerUpdatedAt)
+    @Published var lynkAirConditionInitiatedTime: Date?
 
-    @Published var airConditionInitiatedTime: Date?
+    // Leaf
+    @Published var leafClimateTimer = Entity(entityId: .leafACTimer)
+    @Published var leafBattery = InputNumberEntity(entityId: .leafBattery)
+    @Published var leafRangeAC = Entity(entityId: .leafRangeAC)
+    @Published var isLeafCharging = Entity(entityId: .leafCharging)
+    @Published var isLeafPluggedIn = Entity(entityId: .leafPluggedIn)
+    @Published var leafLastPoll = Entity(entityId: .leafLastPoll)
+    @Published var leafAirConditionInitiatedTime: Date?
+
     @Published var engineInitiatedTime: Date?
     @Published var isShowingHeaterOptions = false
+    @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
 
-    let entityIDs: [EntityId] = [.lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
-                                 .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
-                                 .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkChargeState,
-                                 .lynkChargerConnectionStatus, .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt,
-                                 .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt,
-                                 .lynkChargerUpdatedAt]
+    let entityIDs: [EntityId] = [
+        .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
+        .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
+        .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkChargeState,
+        .lynkChargerConnectionStatus, .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt,
+        .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt,
+        .lynkChargerUpdatedAt, .leafACTimer, .leafBattery, .leafRangeAC, .leafCharging, .leafPluggedIn,
+        .leafLastPoll
+    ]
     var isReloading = false
     var isLynkFlashing = false
-    var isEaseeCharging: Bool {
-        easeeIsEnabled.isActive
-    }
-
-    var climateTitle: String {
-        isAirConditionActive || isAirConditionLoading ? "Stäng av" : "Starta"
-    }
-
-    var climateUpdatedAtDescription: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM HH:mm"
-        return dateFormatter.string(from: climateUpdatedAt.date)
-    }
-
-    var addressUpdatedAtDescription: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM HH:mm"
-        return dateFormatter.string(from: max(addressUpdatedAt.date, doorLockUpdatedAt.date))
-    }
-
-    var batteryUpdatedAtDescription: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM HH:mm"
-        return dateFormatter.string(from: batteryUpdatedAt.date)
-    }
-
-    var fuelUpdatedAtDescription: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM HH:mm"
-        return dateFormatter.string(from: fuelUpdatedAt.date)
-    }
-
-    var chargerUpdatedAtDescription: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM HH:mm"
-        return dateFormatter.string(from: chargerUpdatedAt.date)
-    }
-
-    var engineTitle: String {
-        isEngineRunning.isActive || isEngineLoading ? "Stäng av" : "Starta"
-    }
-
-    var isAirConditionActive: Bool {
-        climateHeating.isActive
-    }
-
-    var isLynkUnlocked: Bool {
-        lynkDoorLock.lockState == .unlocked
-    }
-
-    var isAirConditionLoading: Bool {
-        !isAirConditionActive && (airConditionInitiatedTime?.addingTimeInterval(5 * 60) ?? Date.distantPast) > Date()
-    }
-
-    var isEngineLoading: Bool {
-        !isEngineRunning.isActive && (engineInitiatedTime?.addingTimeInterval(5 * 60) ?? Date.distantPast) > Date()
-    }
-
-    var doorLockTitle: String {
-        isLynkUnlocked ? "Lås dörrarna" : "Lås upp dörrarna"
-    }
-
-    var doorLockIcon: Image {
-        isLynkUnlocked ? .init(systemImageName: .unlocked) : .init(systemImageName: .locked)
-    }
-
-    var flashLightTitle: String {
-        isLynkFlashing ? "Stäng av lamporna" : "Starta lamporna"
-    }
-
-    var flashLightIcon: Image {
-        isLynkFlashing ? .init(systemImageName: .lightbulbSlash) : .init(systemImageName: .headLightBeam)
-    }
-
-    var chargingTitle: String {
-        isEaseeCharging ? "Pausa Easee" : "Starta Easee"
-    }
-
-    var isCharging: Bool {
-        chargerState.state == "Charging"
-    }
-
-    var chargerStateDescription: String {
-        isCharging ? "Laddar, \(timeUntilCharged.state)min kvar" : "Laddar inte"
-    }
-
-    var chargingIcon: Image {
-        isEaseeCharging ? .init(systemImageName: .xmarkCircle) : .init(systemImageName: .boltCar)
-    }
-
-    var lastUpdated: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM HH:mm"
-        let date = max(doorLockUpdatedAt.date, carUpdatedAt.date)
-        return formatter.string(from: date)
-    }
-
-    var climateIconColor: Color {
-        isAirConditionActive ? .yellow : .white
-    }
 
     var restAPIService: RestAPIService
     private let repeatReloadAction: IntClosure
@@ -153,9 +65,14 @@ class LynkViewModel: ObservableObject {
         self.showClimateSchedulingAction = showClimateSchedulingAction
     }
 
-    func forceUpdate() {
+    func forceUpdateLynk() {
         restAPIService.callService(serviceID: .lynkReload, domain: .lynkco)
         UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.lynkReloadTime.rawValue)
+    }
+
+    func forceUpdateLeaf() {
+        restAPIService.callService(serviceID: .leafUpdate, domain: .leaf)
+        UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.leafReloadTime.rawValue)
     }
 
     func reload() async {
@@ -164,13 +81,24 @@ class LynkViewModel: ObservableObject {
         }
 
         isReloading = true
+        var shouldSleep = false
         let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
         if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
-            forceUpdate()
+            forceUpdateLynk()
             await reloadEntities()
-            try? await Task.sleep(seconds: 5)
+            shouldSleep = true
         }
 
+        let lastLeafReloadTime = UserDefaults.shared.value(forKey: StorageKeys.leafReloadTime.rawValue) as? Date
+        if (lastLeafReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
+            forceUpdateLeaf()
+            await reloadEntities()
+            shouldSleep = true
+        }
+
+        if shouldSleep {
+            try? await Task.sleep(seconds: 5)
+        }
         await reloadEntities()
         isReloading = false
     }
@@ -190,9 +118,9 @@ class LynkViewModel: ObservableObject {
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         switch entityID {
         case .lynkClimateHeating:
-            climateHeating.state = state
+            lynkClimateHeating.state = state
             if let lastChanged {
-                climateHeating.lastChanged = lastChanged
+                lynkClimateHeating.lastChanged = lastChanged
             }
         case .lynkDoorLock:
             lynkDoorLock.state = state
@@ -204,19 +132,19 @@ class LynkViewModel: ObservableObject {
                 isEngineRunning.lastChanged = lastChanged
             }
         case .lynkTemperatureInterior:
-            interiorTemperature.state = state
+            lynkInteriorTemperature.state = state
             if let lastChanged {
-                interiorTemperature.lastChanged = lastChanged
+                lynkInteriorTemperature.lastChanged = lastChanged
             }
         case .lynkTemperatureExterior:
-            exteriorTemperature.state = state
+            lynkExteriorTemperature.state = state
             if let lastChanged {
-                exteriorTemperature.lastChanged = lastChanged
+                lynkExteriorTemperature.lastChanged = lastChanged
             }
         case .lynkBattery:
-            battery.state = state
+            lynkBattery.state = state
         case .lynkBatteryDistance:
-            batteryDistance.state = state
+            lynkBatteryDistance.state = state
         case .lynkFuel:
             fuel.state = state
         case .lynkFuelDistance:
@@ -224,15 +152,15 @@ class LynkViewModel: ObservableObject {
         case .lynkAddress:
             address.state = state
         case .lynkChargeState:
-            chargerState.state = state
+            lynkChargerState.state = state
         case .lynkChargerConnectionStatus:
-            chargerConnectionStatus.state = state
+            lynkChargerConnectionStatus.state = state
         case .lynkTimeUntilCharged:
-            timeUntilCharged.state = state
+            lynkTimeUntilCharged.state = state
         case .lynkCarUpdatedAt:
-            carUpdatedAt.state = state
+            lynkCarUpdatedAt.state = state
         case .lynkClimateUpdatedAt:
-            climateUpdatedAt.state = state
+            lynkClimateUpdatedAt.state = state
         case .lynkDoorLockUpdatedAt:
             doorLockUpdatedAt.state = state
         case .lynkBatteryUpdatedAt:
@@ -243,18 +171,31 @@ class LynkViewModel: ObservableObject {
             addressUpdatedAt.state = state
         case .lynkChargerUpdatedAt:
             chargerUpdatedAt.state = state
+        case .leafACTimer:
+            leafClimateTimer.state = state
+            if let lastChanged {
+                leafClimateTimer.lastChanged = lastChanged
+            }
+        case .leafBattery:
+            leafBattery.state = state
+        case .leafRangeAC:
+            leafRangeAC.state = state
+        case .leafCharging:
+            isLeafCharging.state = state
+        case .leafPluggedIn:
+            isLeafPluggedIn.state = state
+        case .leafLastPoll:
+            leafLastPoll.state = state
         default:
             Log.error("LynkViewModel doesn't reload entityID: \(entityID)")
         }
     }
 
-    // swiftlint:enable cyclomatic_complexity
-
-    func toggleClimate() {
-        if isAirConditionActive {
-            stopClimate()
+    func toggleLynkClimate() {
+        if isLynkAirConditionActive {
+            stopLynkClimate()
         } else {
-            startClimate()
+            startLynkClimate()
         }
     }
 
@@ -305,13 +246,31 @@ class LynkViewModel: ObservableObject {
         restAPIService.update(entityID: entity.entityId, domain: .inputBoolean, action: action)
     }
 
-    func startClimate() {
-        airConditionInitiatedTime = Date()
+    func startLynkClimate() {
+        lynkAirConditionInitiatedTime = Date()
         restAPIService.callScript(scriptID: .lynkStartClimate)
     }
 
-    func stopClimate() {
-        airConditionInitiatedTime = nil
+    func stopLynkClimate() {
+        lynkAirConditionInitiatedTime = nil
         restAPIService.callScript(scriptID: .lynkStopClimate)
+    }
+
+    func toggleLeafClimate() {
+        if isLeafAirConditionActive {
+            stopLeafClimate()
+        } else {
+            startLeafClimate()
+        }
+    }
+
+    func startLeafClimate() {
+        leafAirConditionInitiatedTime = Date()
+        restAPIService.callService(serviceID: .leafStartClimate, domain: .leaf)
+    }
+
+    func stopLeafClimate() {
+        leafAirConditionInitiatedTime = nil
+        restAPIService.callService(serviceID: .leafStopClimate, domain: .leaf)
     }
 }

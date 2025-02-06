@@ -17,7 +17,7 @@ enum ConnectionState {
 }
 
 @MainActor
-class URLCreator: ObservableObject, @preconcurrency URLRequestBuilder {
+class URLCreator: ObservableObject, URLRequestBuilder {
     @Published var connectionState = ConnectionState.unset
     var nextUpdate = Date().addingTimeInterval(-1)
     var urlString: String {

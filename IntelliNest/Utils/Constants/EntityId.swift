@@ -84,7 +84,6 @@ enum EntityId: String, Decodable, CaseIterable {
     case eniroTurnOffClimateControl = "script.turn_off_kia_climate_control"
     /* Leaf */
     case leafACTimer = "sensor.leaf1sara_ac_timer"
-    case leafClimateRunning = "binary_sensor.leaf1sara_climate_is_running"
     case leafBattery = "sensor.leaf1sara_battery"
     case leafCharging = "binary_sensor.leaf1sara_charging"
     case leafRange = "sensor.leaf1sara_estimated_range"

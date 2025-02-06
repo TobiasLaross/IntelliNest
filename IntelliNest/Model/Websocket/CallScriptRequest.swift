@@ -7,7 +7,6 @@
 
 import Foundation
 
-// swiftlint:disable nesting
 struct CallScriptRequest: Encodable {
     let type = "call_service"
     let domain = Domain.script
@@ -31,7 +30,6 @@ struct CallScriptRequest: Encodable {
         }
     }
 
-    // Modified init that accepts variables
     init(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil) {
         target = Target(entityIds: [scriptID.rawValue])
         if let variables {

@@ -8,6 +8,7 @@
 import Foundation
 import ShipBookSDK
 
+@MainActor
 protocol LockServiceProtocol {
     var sideDoor: YaleLock { get set }
     var frontDoor: YaleLock { get set }

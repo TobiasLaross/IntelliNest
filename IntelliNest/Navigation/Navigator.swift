@@ -76,9 +76,6 @@ class Navigator: ObservableObject {
                                            showLynkAction: { [weak self] in
                                                self?.push(.lynk)
                                            },
-                                           showLeafAction: { [weak self] in
-                                               self?.push(.leaf)
-                                           },
                                            showRoborockAction: { [weak self] in
                                                self?.push(.roborock)
                                            },
@@ -102,10 +99,6 @@ class Navigator: ObservableObject {
                                                          self?.push(.playroomHeaterDetails)
                                                      }
                                                  })
-    lazy var leafViewModel = LeafViewModel(restAPIService: restAPIService,
-                                           repeatReloadAction: { [weak self] times in
-                                               self?.repeatReload(times: times)
-                                           })
     lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService,
                                            repeatReloadAction: { [weak self] times in
                                                self?.repeatReload(times: times)
@@ -139,54 +132,6 @@ class Navigator: ObservableObject {
         handlePushNotificationPermissions()
     }
 
-    func pop() {
-        navigationPath.removeLast()
-        updateActiveView()
-    }
-
-    func show(destination: Destination) -> some View {
-        Group {
-            switch destination {
-            case .electricity:
-                showElectricityView()
-            case .home:
-                Text("Not implemented show for home")
-            case .heaters:
-                showHeatersView()
-            case .leaf:
-                showLeafView()
-            case .lynk:
-                showLynkView()
-            case .corridorHeaterDetails:
-                showHeaterDetailsView(heaterID: .heaterCorridor)
-            case .playroomHeaterDetails:
-                showHeaterDetailsView(heaterID: .heaterPlayroom)
-            case .eniroClimateSchedule:
-                showEniroClimateScheduleView()
-            case .roborock:
-                showRoborockView()
-            case .lights:
-                showLightsView()
-            }
-        }
-        .backgroundModifier()
-    }
-
-    func push(_ destination: Destination) {
-        if currentDestination != destination {
-            Task {
-                if destination == .home {
-                    navigationPath = []
-                } else {
-                    navigationPath.append(destination)
-                }
-
-                await reloadCurrentModel()
-            }
-            updateActiveView()
-        }
-    }
-
     func showLynkHeaterOptions() {
         lynkViewModel.isShowingHeaterOptions = true
     }
@@ -201,7 +146,6 @@ class Navigator: ObservableObject {
         }
     }
 
-    @MainActor
     func reload(for destination: Destination) async {
         shouldSkipContinousReload = true
         switch destination {
@@ -215,8 +159,6 @@ class Navigator: ObservableObject {
             await heatersViewModel.reload()
         case .lynk:
             await lynkViewModel.reload()
-        case .leaf:
-            await leafViewModel.reload()
         case .eniroClimateSchedule:
             await eniroClimateScheduleViewModel.reload()
         case .lights:
@@ -232,6 +174,7 @@ class Navigator: ObservableObject {
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
+            restartContinousReloadTask()
             if currentDestination != .electricity {
                 await reload(for: .electricity)
             }
@@ -247,14 +190,10 @@ class Navigator: ObservableObject {
         lynkViewModel.lynkDoorLock.expectedState = .unknown
     }
 
-    @MainActor
     func toolbarReload() async {
         if currentDestination == .lynk {
-            lynkViewModel.forceUpdate()
-            try? await Task.sleep(seconds: 2)
-            repeatReload(times: 6)
-        } else if currentDestination == .leaf {
-            leafViewModel.forceUpdate()
+            lynkViewModel.forceUpdateLynk()
+            lynkViewModel.forceUpdateLeaf()
             try? await Task.sleep(seconds: 2)
             repeatReload(times: 6)
         } else {
@@ -262,7 +201,6 @@ class Navigator: ObservableObject {
         }
     }
 
-    @MainActor
     func reloadCurrentModel() async {
         await reloadConnection()
         await reload(for: currentDestination)
@@ -287,53 +225,16 @@ class Navigator: ObservableObject {
         }
     }
 
-    @MainActor
     func reloadConnection(ignoreLocalSSID _: Bool = false) async {
         await urlCreator.updateConnectionState(ignoreLocalSSID: false)
+    }
+
+    func updateActiveView() {
+        electricityViewModel.isViewActive = currentDestination == .electricity
     }
 }
 
 private extension Navigator {
-    func showElectricityView() -> ElectricityView {
-        ElectricityView(viewModel: electricityViewModel)
-    }
-
-    func showHomeView() -> HomeView {
-        HomeView(viewModel: homeViewModel)
-    }
-
-    func showHeatersView() -> HeatersView {
-        HeatersView(viewModel: heatersViewModel)
-    }
-
-    func showLeafView() -> LeafView {
-        LeafView(viewModel: leafViewModel)
-    }
-
-    func showLynkView() -> LynkView {
-        LynkView(viewModel: lynkViewModel)
-    }
-
-    func showHeaterDetailsView(heaterID: EntityId) -> DetailedHeaterView {
-        if heaterID == .heaterCorridor {
-            DetailedHeaterView(viewModel: heatersViewModel, selectedHeater: .corridor)
-        } else {
-            DetailedHeaterView(viewModel: heatersViewModel, selectedHeater: .playroom)
-        }
-    }
-
-    func showEniroClimateScheduleView() -> EniroClimateScheduleView {
-        EniroClimateScheduleView(viewModel: eniroClimateScheduleViewModel)
-    }
-
-    func showRoborockView() -> RoborockView {
-        RoborockView(viewModel: roborockViewModel)
-    }
-
-    func showLightsView() -> LightsView {
-        LightsView(viewModel: lightsViewModel)
-    }
-
     func repeatReload(times: Int) {
         repeatReloadTask?.cancel()
         repeatReloadTask = Task {
@@ -361,6 +262,9 @@ private extension Navigator {
             do {
                 while true {
                     try await Task.sleep(seconds: 5)
+                    if !isAppInForeground {
+                        break
+                    }
                     if !shouldSkipContinousReload {
                         await reload(for: currentDestination)
                     }
@@ -445,10 +349,6 @@ private extension Navigator {
                     Log.error("Failed to requestAuthorization for push, \(error.localizedDescription)")
                 }
             }
-    }
-
-    func updateActiveView() {
-        electricityViewModel.isViewActive = currentDestination == .electricity
     }
 
     func registerAPNSToken(_ apnsToken: String) {

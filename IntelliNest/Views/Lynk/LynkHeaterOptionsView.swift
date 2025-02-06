@@ -15,7 +15,7 @@ struct LynkHeaterOptionsView: View {
                 .overlay {
                     ZStack {
                         VStack {
-                            INText("Laddkabeln är \(viewModel.chargerConnectionStatus.state) och \(viewModel.chargerState.state)",
+                            INText("Laddkabeln är \(viewModel.lynkChargerConnectionStatus.state) och \(viewModel.lynkChargerState.state)",
                                    font: .buttonFontLarge)
                                 .padding(.horizontal)
                                 .padding(.bottom, 4)
@@ -24,9 +24,9 @@ struct LynkHeaterOptionsView: View {
                                                   buttonWidth: 90,
                                                   buttonHeight: 60,
                                                   cornerRadius: 20,
-                                                  isLoading: viewModel.isAirConditionLoading,
-                                                  action: viewModel.startClimate)
-                                    .disabled(viewModel.isAirConditionLoading)
+                                                  isLoading: viewModel.isLynkAirConditionLoading,
+                                                  action: viewModel.startLynkClimate)
+                                    .disabled(viewModel.isLynkAirConditionLoading)
                                 ServiceButtonView(buttonTitle: "Starta Motorn",
                                                   buttonWidth: 90,
                                                   buttonHeight: 60,
