@@ -36,14 +36,29 @@ class HomeViewModel: ObservableObject {
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
     @Published var gardenWasteDate = Entity(entityId: .gardenWasteDate)
 
+    @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var isSarahsPillsTaken = false
     @Published var noLocationAccess = false
 
     private var isReloading = false
-    let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
-                                 .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
-                                 .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower,
-                                 .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights]
+    let entityIDs: [EntityId] = [
+        .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
+        .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
+        .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower,
+        .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights, .easeeIsEnabled
+    ]
+
+    var chargingTitle: String {
+        isEaseeCharging ? "Pausa" : "Starta"
+    }
+
+    var isEaseeCharging: Bool {
+        easeeIsEnabled.isActive
+    }
+
+    var chargingIcon: Image {
+        isEaseeCharging ? .init(systemImageName: .evCharger) : .init(systemImageName: .evChargerSlash)
+    }
 
     private var restAPIService: RestAPIService
     private let locationManager = CLLocationManager()
@@ -117,6 +132,11 @@ class HomeViewModel: ObservableObject {
     func toggleCoffeeMachine() {
         let action: Action = coffeeMachine.isActive ? .turnOff : .turnOn
         restAPIService.update(entityID: .coffeeMachine, domain: .switchDomain, action: action)
+        repeatReloadAction(2)
+    }
+
+    func toggleEaseeCharging() {
+        restAPIService.callScript(scriptID: .easeeToggle)
         repeatReloadAction(2)
     }
 
@@ -225,6 +245,8 @@ class HomeViewModel: ObservableObject {
             plasticWasteDate.state = state
         case .gardenWasteDate:
             gardenWasteDate.state = state
+        case .easeeIsEnabled:
+            easeeIsEnabled.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }

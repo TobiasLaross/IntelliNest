@@ -187,6 +187,13 @@ private struct ServiceButtonsView: View {
                                    Text("Schemalägg nästa start")
                                })
                     }
+                ServiceButtonView(buttonTitle: "Easee",
+                                  isActive: viewModel.isEaseeCharging,
+                                  buttonSize: 90,
+                                  icon: viewModel.chargingIcon,
+                                  iconWidth: viewModel.isEaseeCharging ? 35 : 35,
+                                  iconHeight: viewModel.isEaseeCharging ? 35 : 40,
+                                  action: viewModel.toggleEaseeCharging)
                 if UserManager.currentUser == .tobias {
                     ServiceButtonView(buttonTitle: "Hitta Sarah's iPhone?",
                                       customFont: .buttonFontSmall,

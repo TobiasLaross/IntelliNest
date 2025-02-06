@@ -10,18 +10,19 @@ import SwiftUI
 struct LynkView: View {
     @ObservedObject var viewModel: LynkViewModel
     @State var isEngineAlertVisible = false
+    @State private var isFlashLightAlertVisible = false
 
     var body: some View {
         ZStack {
             VStack {
-                Text("Lynken är **\(viewModel.lynkDoorLock.stateToString())** på \(viewModel.address.state)")
-                    .foregroundColor(.white)
-                    .padding(.horizontal)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                Text(viewModel.addressUpdatedAtDescription)
-                    .font(.buttonFontExtraSmall)
-                    .foregroundColor(.white)
+                INText(
+                    "Lynken är **\(viewModel.lynkDoorLock.stateToString())** på \(viewModel.address.state)",
+                    font: .title3,
+                    lineLimit: 1,
+                    minimumScaleFactor: 0.5
+                )
+                .padding(.horizontal)
+                INText(viewModel.lynkLastUpdated, font: .buttonFontExtraSmall)
                     .padding(.bottom)
                 HStack {
                     Spacer()
@@ -31,9 +32,7 @@ struct LynkView: View {
                                     degreeRotation: 90,
                                     width: 50,
                                     height: 90)
-                        Text("\(viewModel.lynkBatteryDistance.state)km")
-                            .font(.buttonFontSmall)
-                            .foregroundColor(.white)
+                        INText("\(viewModel.lynkBatteryDistance.state)km", font: .buttonFontSmall)
                             .padding(.top, -32)
                         if viewModel.isCharging {
                             Text(viewModel.chargerStateDescription)
@@ -41,10 +40,6 @@ struct LynkView: View {
                                 .foregroundColor(.white)
                                 .padding(.top, -25)
                         }
-                        Text(viewModel.batteryUpdatedAtDescription)
-                            .font(.buttonFontExtraSmall)
-                            .foregroundColor(.white)
-                            .padding(.top, -20)
                     }
                     Spacer()
                         .frame(width: 90)
@@ -53,79 +48,112 @@ struct LynkView: View {
                                  degreeRotation: 90,
                                  width: 50,
                                  height: 90)
-                        Text("\(viewModel.fuelDistance.state)km")
-                            .font(.buttonFontSmall)
-                            .foregroundColor(.white)
+                        INText("\(viewModel.fuelDistance.state)km", font: .buttonFontSmall)
                             .padding(.top, -27)
-                        Text(viewModel.fuelUpdatedAtDescription)
-                            .font(.buttonFontExtraSmall)
-                            .foregroundColor(.white)
-                            .padding(.top, -23)
                     }
                     Spacer()
                 }
 
                 Spacer()
                     .frame(height: 20)
-                HStack {
-                    VStack(alignment: .trailing) {
-                        Text("Bilen \(String(format: "%.1f", viewModel.lynkInteriorTemperature.state.roundedWithOneDecimal))°C")
-                            .foregroundColor(.white)
-                        Text("Ute \(String(format: "%.1f", viewModel.lynkExteriorTemperature.state.roundedWithOneDecimal))°C")
-                            .foregroundColor(.white)
-                        Text(viewModel.lynkClimateUpdatedAtDescription)
-                            .font(.buttonFontExtraSmall)
-                            .foregroundColor(.white)
-                    }
-                    .padding(.trailing, 16)
-                    ServiceButtonView(buttonTitle: viewModel.lynkClimateTitle,
-                                      isActive: viewModel.isLynkAirConditionActive,
-                                      activeColor: viewModel.lynkClimateIconColor,
-                                      buttonSize: 90,
-                                      icon: .init(systemImageName: .thermometer),
-                                      iconWidth: 25,
-                                      iconHeight: 35,
-                                      isLoading: viewModel.isLynkAirConditionLoading,
-                                      action: viewModel.toggleLynkClimate)
-                    Spacer()
-                    ServiceButtonView(buttonTitle: viewModel.engineTitle,
-                                      isActive: viewModel.isEngineRunning.isActive,
-                                      buttonSize: 75,
-                                      icon: .init(systemImageName: .engineFilled),
-                                      iconWidth: 35,
-                                      iconHeight: 25,
-                                      isLoading: viewModel.isEngineLoading,
-                                      action: {
-                                          if viewModel.isEngineRunning.isActive {
-                                              viewModel.stopEngine()
-                                          } else {
-                                              isEngineAlertVisible = true
+                VStack {
+                    HStack {
+                        ServiceButtonView(buttonTitle: viewModel.lynkClimateTitle,
+                                          isActive: viewModel.isLynkAirConditionActive,
+                                          buttonSize: viewModel.buttonSize,
+                                          icon: .init(systemImageName: .thermometer),
+                                          iconWidth: 25,
+                                          iconHeight: 35,
+                                          isLoading: viewModel.isLynkAirConditionLoading,
+                                          action: viewModel.toggleLynkClimate)
+                        ServiceButtonView(buttonTitle: viewModel.engineTitle,
+                                          isActive: viewModel.isEngineRunning.isActive,
+                                          buttonSize: viewModel.buttonSize,
+                                          icon: .init(systemImageName: .engineFilled),
+                                          iconWidth: 35,
+                                          iconHeight: 25,
+                                          isLoading: viewModel.isEngineLoading,
+                                          action: {
+                                              if viewModel.isEngineRunning.isActive {
+                                                  viewModel.stopEngine()
+                                              } else {
+                                                  isEngineAlertVisible = true
+                                              }
+                                          })
+                                          .alert(isPresented: $isEngineAlertVisible) {
+                                              Alert(title: Text("Starta motorn?"),
+                                                    message: Text(""),
+                                                    primaryButton: .destructive(Text("Ja")) {
+                                                        viewModel.startEngine()
+                                                    },
+                                                    secondaryButton: .cancel())
                                           }
-                                      })
-                                      .alert(isPresented: $isEngineAlertVisible) {
-                                          Alert(title: Text("Starta motorn?"),
-                                                message: Text(""),
-                                                primaryButton: .destructive(Text("Ja")) {
-                                                    viewModel.startEngine()
-                                                },
-                                                secondaryButton: .cancel())
-                                      }
+                        ServiceButtonView(buttonTitle: viewModel.doorLockTitle,
+                                          isActive: viewModel.isLynkUnlocked,
+                                          buttonSize: viewModel.buttonSize,
+                                          icon: viewModel.doorLockIcon,
+                                          iconWidth: viewModel.isLynkUnlocked ? 30 : 20,
+                                          iconHeight: 30,
+                                          isLoading: viewModel.lynkDoorLock.isLoading,
+                                          action: viewModel.toggleDoorLock)
+                            .disabled(viewModel.lynkDoorLock.isLoading)
+                            .contextMenu {
+                                Button(action: viewModel.lockDoors, label: {
+                                    Text("Lås")
+                                })
+                                Button(action: viewModel.unlockDoors, label: {
+                                    Text("Lås upp")
+                                })
+                            }
+
+                        ServiceButtonView(buttonTitle: viewModel.flashLightTitle,
+                                          isActive: viewModel.isLynkFlashing,
+                                          buttonSize: viewModel.buttonSize,
+                                          icon: viewModel.flashLightIcon,
+                                          iconWidth: 30,
+                                          iconHeight: 30,
+                                          action: {
+                                              if !viewModel.isLynkFlashing {
+                                                  isFlashLightAlertVisible = true
+                                              } else {
+                                                  viewModel.stopFlashLights()
+                                              }
+                                          })
+                                          .alert(isPresented: $isFlashLightAlertVisible) {
+                                              Alert(
+                                                  title: Text("Starta lampor"),
+                                                  message: Text(""),
+                                                  primaryButton: .destructive(Text("Ja")) {
+                                                      viewModel.startFlashLights()
+                                                  },
+                                                  secondaryButton: .cancel()
+                                              )
+                                          }
+                                          .disabled(viewModel.lynkDoorLock.isLoading)
+                                          .contextMenu {
+                                              Button(action: viewModel.startFlashLights, label: {
+                                                  Text("Starta lamporna")
+                                              })
+                                              Button(action: viewModel.stopFlashLights, label: {
+                                                  Text("Stäng av lamporna")
+                                              })
+                                          }
+                    }
+                    HStack {
+                        INText("Bilen \(String(format: "%.1f", viewModel.lynkInteriorTemperature.state.roundedWithOneDecimal))°C",
+                               font: .footnote)
+                            .padding(.trailing, 16)
+                        INText("Ute \(String(format: "%.1f", viewModel.lynkExteriorTemperature.state.roundedWithOneDecimal))°C",
+                               font: .footnote)
+                    }
                 }
-                .padding([.horizontal, .top], 32)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 16)
 
-                Spacer()
-                    .frame(height: 50)
-
-                LynkMiscView(viewModel: viewModel)
                 Spacer()
 
                 Divider()
                     .padding(.vertical)
-                Text("Senast uppdaterad: \(viewModel.lynkLastUpdated)")
-                    .font(.buttonFontMedium)
-                    .italic()
-                    .foregroundColor(.white)
-                    .padding(.bottom)
                 LeafView(viewModel: viewModel)
             }
             if viewModel.isShowingHeaterOptions {

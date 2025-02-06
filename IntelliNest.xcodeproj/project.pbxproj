@@ -18,7 +18,6 @@
 		8AC963688E594E56ED469785 /* PurifierSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7AA547F46C2F6F2C2DC77A /* PurifierSpeed.swift */; };
 		CD215FD8D5AD91EE27DAAB00 /* FuelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F941237969DF91783B00BE7 /* FuelView.swift */; };
 		DCB404B87EB18E082778ED09 /* NavigatorHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE35931A9C554E855ADCD646 /* NavigatorHelpers.swift */; };
-		EDA427791B9DF78634D7F957 /* LynkMiscView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA20B3409BB996ED12E461BF /* LynkMiscView.swift */; };
 		F60345C127A7F33700212D04 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C027A7F33700212D04 /* Entity.swift */; };
 		F60345C427A933D700212D04 /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C327A933D700212D04 /* GlobalConstants.swift */; };
 		F60345C927A9379200212D04 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C827A9379200212D04 /* HomeView.swift */; };
@@ -407,7 +406,6 @@
 		F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequestBuilder.swift; sourceTree = "<group>"; };
 		F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockServiceProtocol.swift; sourceTree = "<group>"; };
 		F6FDBE302A1CDA850081BC3D /* HomeViewModelExtension+LockServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeViewModelExtension+LockServiceProtocol.swift"; sourceTree = "<group>"; };
-		FA20B3409BB996ED12E461BF /* LynkMiscView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LynkMiscView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -747,7 +745,6 @@
 			children = (
 				F6EF35AE2A3A33BE00895250 /* DateTimePickerView.swift */,
 				F6F1D08529A94E8900A3292E /* LimitPickerView.swift */,
-				FA20B3409BB996ED12E461BF /* LynkMiscView.swift */,
 				8E1A30B909E2B12A91A30BAA /* LynkHeaterOptionsView.swift */,
 			);
 			path = Lynk;
@@ -1260,7 +1257,6 @@
 				F6F94B5E28B60DED006B1F12 /* LynkViewModel.swift in Sources */,
 				F6EF35AF2A3A33BE00895250 /* DateTimePickerView.swift in Sources */,
 				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
-				EDA427791B9DF78634D7F957 /* LynkMiscView.swift in Sources */,
 				CD215FD8D5AD91EE27DAAB00 /* FuelView.swift in Sources */,
 				3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */,
 				65450E96A215D8CB2443B2D6 /* INText.swift in Sources */,

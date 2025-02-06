@@ -1,8 +1,8 @@
 import SwiftUI
 
 extension LynkViewModel {
-    var isEaseeCharging: Bool {
-        easeeIsEnabled.isActive
+    var buttonSize: CGFloat {
+        75
     }
 
     var lynkClimateTitle: String {
@@ -60,7 +60,7 @@ extension LynkViewModel {
     }
 
     var doorLockTitle: String {
-        isLynkUnlocked ? "Lås dörrarna" : "Lås upp dörrarna"
+        isLynkUnlocked ? "Lås" : "Lås upp"
     }
 
     var doorLockIcon: Image {
@@ -68,15 +68,11 @@ extension LynkViewModel {
     }
 
     var flashLightTitle: String {
-        isLynkFlashing ? "Stäng av lamporna" : "Starta lamporna"
+        isLynkFlashing ? "Stäng av" : "Starta"
     }
 
     var flashLightIcon: Image {
         isLynkFlashing ? .init(systemImageName: .lightbulbSlash) : .init(systemImageName: .headLightBeam)
-    }
-
-    var chargingTitle: String {
-        isEaseeCharging ? "Pausa Easee" : "Starta Easee"
     }
 
     var isCharging: Bool {
@@ -87,19 +83,12 @@ extension LynkViewModel {
         isCharging ? "Laddar, \(lynkTimeUntilCharged.state)min kvar" : "Laddar inte"
     }
 
-    var chargingIcon: Image {
-        isEaseeCharging ? .init(systemImageName: .xmarkCircle) : .init(systemImageName: .boltCar)
-    }
-
     var lynkLastUpdated: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM HH:mm"
         let date = max(doorLockUpdatedAt.date, lynkCarUpdatedAt.date)
-        return formatter.string(from: date)
-    }
-
-    var lynkClimateIconColor: Color {
-        isLynkAirConditionActive ? .yellow : .white
+        return date.humanReadable
+        // return formatter.string(from: date)
     }
 
     var leafClimateTitle: String {
@@ -112,10 +101,6 @@ extension LynkViewModel {
 
     var isLeafAirConditionLoading: Bool {
         !isLeafAirConditionActive && (leafAirConditionInitiatedTime?.addingTimeInterval(5 * 60) ?? Date.distantPast) > Date()
-    }
-
-    var leafClimateIconColor: Color {
-        isLeafAirConditionActive ? .yellow : .white
     }
 
     var leafClimateTimerRemaining: Int? {

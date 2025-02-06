@@ -6,7 +6,7 @@ struct LeafView: View {
 
     var body: some View {
         VStack {
-            Spacer()
+            INText("Leaf", font: .title3)
             HStack {
                 Spacer()
                 VStack {
@@ -15,9 +15,7 @@ struct LeafView: View {
                                 degreeRotation: 90,
                                 width: 50,
                                 height: 90)
-                    Text("\(viewModel.leafRangeAC.state)km")
-                        .font(.buttonFontSmall)
-                        .foregroundColor(.white)
+                    INText("\(viewModel.leafRangeAC.state)km", font: .buttonFontSmall)
                         .padding(.top, -32)
                 }
                 .padding(.trailing, 32)
@@ -25,8 +23,7 @@ struct LeafView: View {
                 VStack {
                     ServiceButtonView(buttonTitle: viewModel.leafClimateTitle,
                                       isActive: viewModel.isLeafAirConditionActive,
-                                      activeColor: viewModel.leafClimateIconColor,
-                                      buttonSize: 90,
+                                      buttonSize: viewModel.buttonSize,
                                       icon: .init(systemImageName: .thermometer),
                                       iconWidth: 25,
                                       iconHeight: 35,
@@ -34,10 +31,10 @@ struct LeafView: View {
                                       action: viewModel.toggleLeafClimate)
                         .contextMenu {
                             Button(action: viewModel.startLeafClimate) {
-                                Text("Starta")
+                                INText("Starta")
                             }
                             Button(action: viewModel.stopLeafClimate) {
-                                Text("Stoppa")
+                                INText("Stoppa")
                             }
                         }
                     if let minutes = viewModel.leafClimateTimerRemaining {
@@ -46,6 +43,8 @@ struct LeafView: View {
                 }
                 Spacer()
             }
+            INText(viewModel.leafLastPoll.date.humanReadable, font: .buttonFontExtraSmall)
+                .padding(.bottom)
             Spacer()
         }
     }

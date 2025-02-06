@@ -39,12 +39,11 @@ class LynkViewModel: ObservableObject {
 
     @Published var engineInitiatedTime: Date?
     @Published var isShowingHeaterOptions = false
-    @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
 
     let entityIDs: [EntityId] = [
         .lynkClimateHeating, .lynkEngineRunning, .lynkTemperatureInterior,
         .lynkTemperatureExterior, .lynkBattery, .lynkBatteryDistance, .lynkFuel, .lynkFuelDistance,
-        .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .easeeIsEnabled, .lynkChargeState,
+        .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .lynkChargeState,
         .lynkChargerConnectionStatus, .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt,
         .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt,
         .lynkChargerUpdatedAt, .leafACTimer, .leafBattery, .leafRangeAC, .leafCharging, .leafPluggedIn,
@@ -124,8 +123,6 @@ class LynkViewModel: ObservableObject {
             }
         case .lynkDoorLock:
             lynkDoorLock.state = state
-        case .easeeIsEnabled:
-            easeeIsEnabled.state = state
         case .lynkEngineRunning:
             isEngineRunning.state = state
             if let lastChanged {
@@ -199,10 +196,6 @@ class LynkViewModel: ObservableObject {
         }
     }
 
-    func toggleEaseeCharging() {
-        restAPIService.callScript(scriptID: .easeeToggle)
-    }
-
     func toggleDoorLock() {
         if isLynkUnlocked {
             lockDoors()
@@ -234,6 +227,7 @@ class LynkViewModel: ObservableObject {
     func startEngine() {
         engineInitiatedTime = Date()
         restAPIService.callScript(scriptID: .lynkStartEngine)
+        isShowingHeaterOptions = false
     }
 
     func stopEngine() {
@@ -249,6 +243,7 @@ class LynkViewModel: ObservableObject {
     func startLynkClimate() {
         lynkAirConditionInitiatedTime = Date()
         restAPIService.callScript(scriptID: .lynkStartClimate)
+        isShowingHeaterOptions = false
     }
 
     func stopLynkClimate() {
@@ -267,6 +262,7 @@ class LynkViewModel: ObservableObject {
     func startLeafClimate() {
         leafAirConditionInitiatedTime = Date()
         restAPIService.callService(serviceID: .leafStartClimate, domain: .leaf)
+        isShowingHeaterOptions = false
     }
 
     func stopLeafClimate() {

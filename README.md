@@ -8,15 +8,15 @@ IntelliNest is a native iOS application that leverages the power of the popular 
 ## Code statistics
 | Indicators                          | Now  | Desired |
 |-------------------------------------|------|---------|
-| Total LOC                           | 11041 | N/A |
-| Swift file count                    | 157 | N/A |
-| Average LOC per file                | 70 | <100 |
+| Total LOC                           | 11093 | N/A |
+| Swift file count                    | 156 | N/A |
+| Average LOC per file                | 71 | <100 |
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
 | Commit count in main                | 108 | N/A |
-| Total deleted lines                 | 10029 | N/A |
-| Total added lines                   | 24814 | N/A |
+| Total deleted lines                 | 10565 | N/A |
+| Total added lines                   | 25253 | N/A |
 
 Last Updated: 2025-02-06
 ## Supported features
