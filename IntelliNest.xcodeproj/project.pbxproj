@@ -45,8 +45,6 @@
 		F62542E62A5C5C7600B4DDD4 /* ServiceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */; };
 		F62542E82A5DD27600B4DDD4 /* ScriptID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E72A5DD27600B4DDD4 /* ScriptID.swift */; };
 		F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */; };
-		F627509B29F9619100C1253F /* ToggleMonitorIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */; };
-		F627509D29F9625F00C1253F /* RequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509C29F9625F00C1253F /* RequestHandler.swift */; };
 		F627509F29FD120F00C1253F /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509E29FD120F00C1253F /* Navigator.swift */; };
 		F62750A129FE39B100C1253F /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A029FE39B100C1253F /* Destination.swift */; };
 		F62750A92A00ED9500C1253F /* UINavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A82A00ED9500C1253F /* UINavigationController.swift */; };
@@ -72,7 +70,6 @@
 		F646EB142B5C30DD002DBD98 /* HomeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F646EB132B5C30DD002DBD98 /* HomeWidget.swift */; };
 		F64A38812B0F5E6900BA9FAC /* DoubleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64A38802B0F5E6900BA9FAC /* DoubleExtension.swift */; };
 		F64A38832B1085B600BA9FAC /* SSIDUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64A38822B1085B600BA9FAC /* SSIDUtil.swift */; };
-		F64A38842B1095AA00BA9FAC /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6830DE12904534200BBE36C /* CollectionExtension.swift */; };
 		F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64D2693283E8FAB0073A7BF /* NetworkTask.swift */; };
 		F6552705281678740035DC72 /* RoborockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6552704281678740035DC72 /* RoborockEntity.swift */; };
 		F655F6502B57D77D00620BCD /* NavigationButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F655F64F2B57D77D00620BCD /* NavigationButtonView.swift */; };
@@ -90,7 +87,6 @@
 		F6591C072B0787BA00D5785E /* ServiceValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6591C062B0787BA00D5785E /* ServiceValues.swift */; };
 		F65FBA532A32F30E00D0F1A7 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */; };
 		F662999027B3AA5A00121C14 /* VerticalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662998F27B3AA5A00121C14 /* VerticalDivider.swift */; };
-		F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */; };
 		F662999627B4185D00121C14 /* BatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999527B4185D00121C14 /* BatteryView.swift */; };
 		F662999A27B7D8DA00121C14 /* HeaterEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F662999927B7D8DA00121C14 /* HeaterEntity.swift */; };
 		F6633F23285DF8E6004D0B76 /* CameraEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F22285DF8E6004D0B76 /* CameraEntity.swift */; };
@@ -127,7 +123,6 @@
 		F67D77222B5130CA00F52EB0 /* CarHeaterWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67D77212B5130CA00F52EB0 /* CarHeaterWidget.swift */; };
 		F67D77262B5130CB00F52EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F67D77252B5130CB00F52EB0 /* Assets.xcassets */; };
 		F67D772A2B5130CB00F52EB0 /* IntelliWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */; };
 		F67FA88B28A16E9A00BE4CBD /* EntityProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */; };
 		F680EE5B2B0F4AC80055334C /* HomeViewModelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F680EE5A2B0F4AC80055334C /* HomeViewModelExtension.swift */; };
 		F6830DE22904534200BBE36C /* CollectionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6830DE12904534200BBE36C /* CollectionExtension.swift */; };
@@ -143,7 +138,6 @@
 		F694D3E428CCF0E90011EE0F /* RoborockViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */; };
 		F6A7B6922B6A4B2600699D50 /* ErrorBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A7B6912B6A4B2600699D50 /* ErrorBannerView.swift */; };
 		F6BA4F5D2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */; };
-		F6BA4F5E2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */; };
 		F6BB7DF0284A29A4007F44D0 /* RoborockMapImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BB7DEF284A29A4007F44D0 /* RoborockMapImageView.swift */; };
 		F6BD968F2B32DD3D00A46C8F /* ElectricityFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BD968E2B32DD3D00A46C8F /* ElectricityFlowView.swift */; };
 		F6BD96912B32E1AF00A46C8F /* SonnenStatusEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BD96902B32E1AF00A46C8F /* SonnenStatusEntity.swift */; };
@@ -156,13 +150,6 @@
 		F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */; };
 		F6DBA4D028E82D6A001BA1C0 /* TaskExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4CF28E82D6A001BA1C0 /* TaskExtension.swift */; };
 		F6DBA4D428F09C7F001BA1C0 /* Closures.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4D328F09C7F001BA1C0 /* Closures.swift */; };
-		F6DE841D29F2A5BC002132A2 /* MyAppIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */; };
-		F6DE842529F2A696002132A2 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6DE842429F2A696002132A2 /* Intents.framework */; };
-		F6DE842829F2A696002132A2 /* IntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE842729F2A696002132A2 /* IntentHandler.swift */; };
-		F6DE843D29F2A696002132A2 /* MyAppIntentsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F6DE844829F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE844729F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift */; };
-		F6DE844929F2AA3E002132A2 /* MyAppIntents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */; };
-		F6DE844A29F2AD01002132A2 /* GlobalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60345C327A933D700212D04 /* GlobalConstants.swift */; };
 		F6DE990929BD13B500B8AABB /* ShipBookSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F6DE990829BD13B500B8AABB /* ShipBookSDK */; };
 		F6DE990B29BD18FB00B8AABB /* LogExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE990A29BD18FB00B8AABB /* LogExtension.swift */; };
 		F6E10FEB2D3FEA410082E5CA /* LynkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E10FEA2D3FEA410082E5CA /* LynkView.swift */; };
@@ -200,13 +187,6 @@
 			remoteGlobalIDString = F67D77162B5130CA00F52EB0;
 			remoteInfo = IntelliWidgetExtension;
 		};
-		F6DE843B29F2A696002132A2 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F67023EF27A177320070FFBB /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F6DE842129F2A696002132A2;
-			remoteInfo = MyAppIntentsExtension;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -217,7 +197,6 @@
 			dstSubfolderSpec = 13;
 			files = (
 				F67D772A2B5130CB00F52EB0 /* IntelliWidgetExtension.appex in Embed Foundation Extensions */,
-				F6DE843D29F2A696002132A2 /* MyAppIntentsExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -266,8 +245,6 @@
 		F62542E52A5C5C7600B4DDD4 /* ServiceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceData.swift; sourceTree = "<group>"; };
 		F62542E72A5DD27600B4DDD4 /* ScriptID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptID.swift; sourceTree = "<group>"; };
 		F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallScriptRequest.swift; sourceTree = "<group>"; };
-		F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleMonitorIntentHandler.swift; sourceTree = "<group>"; };
-		F627509C29F9625F00C1253F /* RequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestHandler.swift; sourceTree = "<group>"; };
 		F627509E29FD120F00C1253F /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		F62750A029FE39B100C1253F /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		F62750A82A00ED9500C1253F /* UINavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UINavigationController.swift; sourceTree = "<group>"; };
@@ -308,7 +285,6 @@
 		F6591C062B0787BA00D5785E /* ServiceValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceValues.swift; sourceTree = "<group>"; };
 		F65FBA522A32F30E00D0F1A7 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
 		F662998F27B3AA5A00121C14 /* VerticalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalDivider.swift; sourceTree = "<group>"; };
-		F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleView.swift; sourceTree = "<group>"; };
 		F662999527B4185D00121C14 /* BatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryView.swift; sourceTree = "<group>"; };
 		F662999927B7D8DA00121C14 /* HeaterEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterEntity.swift; sourceTree = "<group>"; };
 		F6633F22285DF8E6004D0B76 /* CameraEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraEntity.swift; sourceTree = "<group>"; };
@@ -349,7 +325,6 @@
 		F67D77212B5130CA00F52EB0 /* CarHeaterWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarHeaterWidget.swift; sourceTree = "<group>"; };
 		F67D77252B5130CB00F52EB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F67D77272B5130CB00F52EB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EniroClimateScheduleViewModel.swift; sourceTree = "<group>"; };
 		F67FA88A28A16E9A00BE4CBD /* EntityProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityProtocol.swift; sourceTree = "<group>"; };
 		F680EE5A2B0F4AC80055334C /* HomeViewModelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HomeViewModelExtension.swift; path = ../HomeViewModelExtension.swift; sourceTree = "<group>"; };
 		F6830DE12904534200BBE36C /* CollectionExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionExtension.swift; sourceTree = "<group>"; };
@@ -379,16 +354,10 @@
 		F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberPickerScrollView.swift; sourceTree = "<group>"; };
 		F6DBA4CF28E82D6A001BA1C0 /* TaskExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskExtension.swift; sourceTree = "<group>"; };
 		F6DBA4D328F09C7F001BA1C0 /* Closures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Closures.swift; sourceTree = "<group>"; };
-		F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = MyAppIntents.intentdefinition; sourceTree = "<group>"; };
-		F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MyAppIntentsExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6DE842429F2A696002132A2 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
-		F6DE842729F2A696002132A2 /* IntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentHandler.swift; sourceTree = "<group>"; };
-		F6DE842929F2A696002132A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F6DE842F29F2A696002132A2 /* IntentsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IntentsUI.framework; path = System/Library/Frameworks/IntentsUI.framework; sourceTree = SDKROOT; };
-		F6DE844729F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnlockStoreHouseIntentHandler.swift; sourceTree = "<group>"; };
 		F6DE990A29BD18FB00B8AABB /* LogExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExtension.swift; sourceTree = "<group>"; };
 		F6E10FEA2D3FEA410082E5CA /* LynkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LynkView.swift; sourceTree = "<group>"; };
-		F6E18B1B2B10992800BFB906 /* MyAppIntentsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MyAppIntentsExtension.entitlements; sourceTree = "<group>"; };
 		F6EF35AE2A3A33BE00895250 /* DateTimePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateTimePickerView.swift; sourceTree = "<group>"; };
 		F6EF35B02A3CA96E00895250 /* ScriptVariableKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptVariableKeys.swift; sourceTree = "<group>"; };
 		F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModelExtension.swift; sourceTree = "<group>"; };
@@ -432,14 +401,6 @@
 				F67D771B2B5130CA00F52EB0 /* SwiftUI.framework in Frameworks */,
 				F67D77192B5130CA00F52EB0 /* WidgetKit.framework in Frameworks */,
 				F63F1A742B615D92006D8906 /* ShipBookSDK in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F6DE841F29F2A696002132A2 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F6DE842529F2A696002132A2 /* Intents.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,7 +470,6 @@
 			isa = PBXGroup;
 			children = (
 				F685F8042B2C4F2E008E47AF /* ElectricityView.swift */,
-				F662999127B3B38400121C14 /* EniroClimateScheduleView.swift */,
 				F6E10FEA2D3FEA410082E5CA /* LynkView.swift */,
 				F60345CD27AAF84E00212D04 /* HeatersView.swift */,
 				F60345C827A9379200212D04 /* HomeView.swift */,
@@ -575,7 +535,6 @@
 				F68DA61528B0D12B00601726 /* HomeViewModel.swift */,
 				F62CD2E228770D5500462092 /* LightsViewModel.swift */,
 				F6F94B5D28B60DED006B1F12 /* LynkViewModel.swift */,
-				F67F6B4528D4C6970003CE9F /* EniroClimateScheduleViewModel.swift */,
 				F694D3E328CCF0E90011EE0F /* RoborockViewModel.swift */,
 				F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */,
 				F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */,
@@ -682,7 +641,6 @@
 				F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */,
 				F67023F927A177320070FFBB /* IntelliNest */,
 				F6260EF5283280D200B87614 /* IntelliNestTests */,
-				F6DE842629F2A696002132A2 /* MyAppIntentsExtension */,
 				F67D771C2B5130CA00F52EB0 /* IntelliWidget */,
 				F6DE842329F2A696002132A2 /* Frameworks */,
 				F67023F827A177320070FFBB /* Products */,
@@ -694,7 +652,6 @@
 			children = (
 				F67023F727A177320070FFBB /* IntelliNest.app */,
 				F670240727A177340070FFBB /* IntelliNestTests.xctest */,
-				F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */,
 				F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */,
 			);
 			name = Products;
@@ -788,7 +745,6 @@
 			isa = PBXGroup;
 			children = (
 				F617062527C3CA9100183250 /* Info.plist */,
-				F6DE841C29F2A5BC002132A2 /* MyAppIntents.intentdefinition */,
 				F6591BFF2B020DD600D5785E /* IntelliNest.entitlements */,
 				F67023FE27A177330070FFBB /* Assets.xcassets */,
 				F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */,
@@ -852,19 +808,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		F6DE842629F2A696002132A2 /* MyAppIntentsExtension */ = {
-			isa = PBXGroup;
-			children = (
-				F6E18B1B2B10992800BFB906 /* MyAppIntentsExtension.entitlements */,
-				F6DE842729F2A696002132A2 /* IntentHandler.swift */,
-				F6DE842929F2A696002132A2 /* Info.plist */,
-				F6DE844729F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift */,
-				F627509A29F9619100C1253F /* ToggleMonitorIntentHandler.swift */,
-				F627509C29F9625F00C1253F /* RequestHandler.swift */,
-			);
-			path = MyAppIntentsExtension;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -883,7 +826,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				F6DE843C29F2A696002132A2 /* PBXTargetDependency */,
 				F67D77292B5130CB00F52EB0 /* PBXTargetDependency */,
 			);
 			name = IntelliNest;
@@ -933,24 +875,6 @@
 			productReference = F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		F6DE842129F2A696002132A2 /* MyAppIntentsExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F6DE844229F2A696002132A2 /* Build configuration list for PBXNativeTarget "MyAppIntentsExtension" */;
-			buildPhases = (
-				F61BF9B52A19E9AB00C1802E /* SwiftFormat */,
-				F6DE841E29F2A696002132A2 /* Sources */,
-				F6DE841F29F2A696002132A2 /* Frameworks */,
-				F6DE842029F2A696002132A2 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = MyAppIntentsExtension;
-			productName = MyAppIntentsExtension;
-			productReference = F6DE842229F2A696002132A2 /* MyAppIntentsExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -959,7 +883,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1520;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					F67023F627A177320070FFBB = {
 						CreatedOnToolsVersion = 13.2.1;
@@ -971,9 +895,6 @@
 					};
 					F67D77162B5130CA00F52EB0 = {
 						CreatedOnToolsVersion = 15.2;
-					};
-					F6DE842129F2A696002132A2 = {
-						CreatedOnToolsVersion = 14.3;
 					};
 				};
 			};
@@ -996,7 +917,6 @@
 			targets = (
 				F67023F627A177320070FFBB /* IntelliNest */,
 				F670240627A177340070FFBB /* IntelliNestTests */,
-				F6DE842129F2A696002132A2 /* MyAppIntentsExtension */,
 				F67D77162B5130CA00F52EB0 /* IntelliWidgetExtension */,
 			);
 		};
@@ -1028,36 +948,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F6DE842029F2A696002132A2 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F6BA4F5E2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		F61BF9B52A19E9AB00C1802E /* SwiftFormat */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = SwiftFormat;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\n\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --swiftversion 5 --indent 4 --rules indent,linebreaks,trailingSpace,consecutiveBlankLines,blankLinesAtEndOfScope,blankLinesAtStartOfScope,blankLinesBetweenScopes,consecutiveSpaces,duplicateImports,elseOnSameLine,emptyBraces,redundantBreak,redundantInit,redundantLetError,redundantNilInit,redundantType,redundantVoidReturnType,spaceAroundBraces,spaceAroundBrackets,spaceAroundComments,spaceAroundGenerics,spaceAroundOperators,spaceAroundParens,spaceInsideBraces,spaceInsideBrackets,spaceInsideGenerics,spaceInsideParens,void --quiet\n";
-		};
 		F6225E2F2AE2946000D32EF4 /* Swiftformat */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -1164,7 +1057,6 @@
 				F627509F29FD120F00C1253F /* Navigator.swift in Sources */,
 				F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */,
 				F67023FB27A177320070FFBB /* AppMain.swift in Sources */,
-				F67F6B4628D4C6970003CE9F /* EniroClimateScheduleViewModel.swift in Sources */,
 				F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */,
 				F6633F23285DF8E6004D0B76 /* CameraEntity.swift in Sources */,
 				F61BF9AC2A167AC600C1802E /* DoorState.swift in Sources */,
@@ -1185,7 +1077,6 @@
 				F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */,
 				F68DA61B28B4C0C100601726 /* EntityId.swift in Sources */,
 				F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */,
-				F6DE841D29F2A5BC002132A2 /* MyAppIntents.intentdefinition in Sources */,
 				F6035045287F5DB10028DA57 /* SingleRoomLight.swift in Sources */,
 				F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */,
 				F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */,
@@ -1242,7 +1133,6 @@
 				F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */,
 				F6591C012B07784D00D5785E /* ServiceID.swift in Sources */,
 				F6BD968F2B32DD3D00A46C8F /* ElectricityFlowView.swift in Sources */,
-				F662999227B3B38400121C14 /* EniroClimateScheduleView.swift in Sources */,
 				F6F1D08429A67B3200A3292E /* FullScreenBackgroundOverlay.swift in Sources */,
 				F6633F3D28632C03004D0B76 /* SinceEmptiedView.swift in Sources */,
 				F62542E82A5DD27600B4DDD4 /* ScriptID.swift in Sources */,
@@ -1296,20 +1186,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F6DE841E29F2A696002132A2 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F6DE844929F2AA3E002132A2 /* MyAppIntents.intentdefinition in Sources */,
-				F64A38842B1095AA00BA9FAC /* CollectionExtension.swift in Sources */,
-				F6DE842829F2A696002132A2 /* IntentHandler.swift in Sources */,
-				F627509D29F9625F00C1253F /* RequestHandler.swift in Sources */,
-				F6DE844829F2A76D002132A2 /* UnlockStoreHouseIntentHandler.swift in Sources */,
-				F627509B29F9619100C1253F /* ToggleMonitorIntentHandler.swift in Sources */,
-				F6DE844A29F2AD01002132A2 /* GlobalConstants.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1322,11 +1198,6 @@
 			isa = PBXTargetDependency;
 			target = F67D77162B5130CA00F52EB0 /* IntelliWidgetExtension */;
 			targetProxy = F67D77282B5130CB00F52EB0 /* PBXContainerItemProxy */;
-		};
-		F6DE843C29F2A696002132A2 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F6DE842129F2A696002132A2 /* MyAppIntentsExtension */;
-			targetProxy = F6DE843B29F2A696002132A2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1460,7 +1331,6 @@
 		F670241C27A177340070FFBB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
@@ -1494,7 +1364,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1502,7 +1372,6 @@
 		F670241D27A177340070FFBB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
@@ -1536,7 +1405,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1544,7 +1413,6 @@
 		F670241F27A177340070FFBB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1571,7 +1439,6 @@
 		F670242027A177340070FFBB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1603,7 +1470,6 @@
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 71;
-				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -1624,7 +1490,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1638,7 +1504,6 @@
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 71;
-				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -1658,7 +1523,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1672,7 +1537,6 @@
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 71;
-				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 2LLC328P4S;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
@@ -1692,7 +1556,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = "Github actions";
@@ -1761,7 +1625,6 @@
 		F6C2BF39283A34AE002EE9F9 /* Github actions */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
@@ -1795,7 +1658,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = "Github actions";
@@ -1803,7 +1666,6 @@
 		F6C2BF3A283A34AE002EE9F9 /* Github actions */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1823,96 +1685,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IntelliNest.app/IntelliNest";
-			};
-			name = "Github actions";
-		};
-		F6DE844329F2A696002132A2 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 71;
-				DEVELOPMENT_TEAM = 2LLC328P4S;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
-				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access to get SSID";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 2025.02.06;
-				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		F6DE844429F2A696002132A2 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 71;
-				DEVELOPMENT_TEAM = 2LLC328P4S;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
-				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access to get SSID";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 2025.02.06;
-				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		F6DE844529F2A696002132A2 /* Github actions */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_ENTITLEMENTS = MyAppIntentsExtension/MyAppIntentsExtension.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 71;
-				DEVELOPMENT_TEAM = 2LLC328P4S;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = MyAppIntentsExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = MyAppIntentsExtension;
-				INFOPLIST_KEY_NSFileProviderDomainUsageDescription = "";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access to get SSID";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 2025.02.06;
-				PRODUCT_BUNDLE_IDENTIFIER = se.laross.IntelliNest.MyAppIntentsExtension;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = "Github actions";
 		};
@@ -1955,16 +1727,6 @@
 				F67D772B2B5130CB00F52EB0 /* Debug */,
 				F67D772C2B5130CB00F52EB0 /* Release */,
 				F67D772D2B5130CB00F52EB0 /* Github actions */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F6DE844229F2A696002132A2 /* Build configuration list for PBXNativeTarget "MyAppIntentsExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F6DE844329F2A696002132A2 /* Debug */,
-				F6DE844429F2A696002132A2 /* Release */,
-				F6DE844529F2A696002132A2 /* Github actions */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -85,6 +85,9 @@ extension URLRequestBuilder {
             request.setValue(value, forHTTPHeaderField: key)
         }
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        if let timeout = urlRequestParameters.timeout {
+            request.timeoutInterval = timeout
+        }
         if let jsonData = urlRequestParameters.jsonData {
             request.httpBody = jsonData
         }

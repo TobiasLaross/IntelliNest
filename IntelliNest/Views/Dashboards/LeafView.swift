@@ -7,6 +7,8 @@ struct LeafView: View {
     var body: some View {
         VStack {
             INText("Leaf", font: .title3)
+            INText(viewModel.leafLastPoll.date.humanReadable, font: .buttonFontExtraSmall)
+                .padding(.bottom)
             HStack {
                 Spacer()
                 VStack {
@@ -43,8 +45,6 @@ struct LeafView: View {
                 }
                 Spacer()
             }
-            INText(viewModel.leafLastPoll.date.humanReadable, font: .buttonFontExtraSmall)
-                .padding(.bottom)
             Spacer()
         }
     }

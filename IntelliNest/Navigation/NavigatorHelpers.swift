@@ -21,8 +21,6 @@ extension Navigator {
                 showHeaterDetailsView(heaterID: .heaterCorridor)
             case .playroomHeaterDetails:
                 showHeaterDetailsView(heaterID: .heaterPlayroom)
-            case .eniroClimateSchedule:
-                showEniroClimateScheduleView()
             case .roborock:
                 showRoborockView()
             case .lights:
@@ -69,10 +67,6 @@ extension Navigator {
         } else {
             DetailedHeaterView(viewModel: heatersViewModel, selectedHeater: .playroom)
         }
-    }
-
-    func showEniroClimateScheduleView() -> EniroClimateScheduleView {
-        EniroClimateScheduleView(viewModel: eniroClimateScheduleViewModel)
     }
 
     func showRoborockView() -> RoborockView {

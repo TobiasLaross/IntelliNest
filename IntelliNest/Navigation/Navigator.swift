@@ -102,10 +102,7 @@ class Navigator: ObservableObject {
     lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService,
                                            repeatReloadAction: { [weak self] times in
                                                self?.repeatReload(times: times)
-                                           }, showClimateSchedulingAction: { [weak self] in
-                                               self?.push(.eniroClimateSchedule)
                                            })
-    lazy var eniroClimateScheduleViewModel = EniroClimateScheduleViewModel(apiService: restAPIService)
     lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService,
                                                    repeatReloadAction: { [weak self] times in
                                                        self?.repeatReload(times: times)
@@ -123,13 +120,15 @@ class Navigator: ObservableObject {
 
         WidgetCenter.shared.reloadAllTimelines()
 
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(registerAPNSToken(_:)),
+                                               name: Notification.Name("UpdatedAPNSToken"),
+                                               object: nil)
         Task {
             await urlCreator.updateConnectionState()
             await heatersViewModel.reload()
             await reloadHomeCoordinates()
         }
-
-        handlePushNotificationPermissions()
     }
 
     func showLynkHeaterOptions() {
@@ -159,8 +158,6 @@ class Navigator: ObservableObject {
             await heatersViewModel.reload()
         case .lynk:
             await lynkViewModel.reload()
-        case .eniroClimateSchedule:
-            await eniroClimateScheduleViewModel.reload()
         case .lights:
             await lightsViewModel.reload()
         case .roborock:
@@ -332,26 +329,13 @@ private extension Navigator {
         }
     }
 
-    func handlePushNotificationPermissions() {
-        UNUserNotificationCenter.current()
-            .requestAuthorization(options: [.alert, .sound, .badge, .criticalAlert]) { [weak self] granted, error in
-                if granted {
-                    Task { @MainActor in
-                        UIApplication.shared.registerForRemoteNotifications()
+    @objc
+    func registerAPNSToken(_ notification: Notification) {
+        guard let apnsToken = notification.userInfo?["apnsToken"] as? String else {
+            Log.error("Failed to register apnsToken, no token in userInfo")
+            return
+        }
 
-                        try? await Task.sleep(seconds: 1.5)
-
-                        if let apnsToken = UserDefaults.standard.string(forKey: StorageKeys.apnsToken.rawValue) {
-                            self?.registerAPNSToken(apnsToken)
-                        }
-                    }
-                } else if let error {
-                    Log.error("Failed to requestAuthorization for push, \(error.localizedDescription)")
-                }
-            }
-    }
-
-    func registerAPNSToken(_ apnsToken: String) {
         let user = UserManager.currentUser
         #if DEBUG
             if user == .tobias {
@@ -366,6 +350,7 @@ private extension Navigator {
 }
 
 private extension UserManager {
+    @MainActor
     static var currentUserAwayEntityID: EntityId? {
         switch currentUser {
         case .sarah:

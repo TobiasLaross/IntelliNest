@@ -1,10 +1,3 @@
-//
-//  CallServiceRequest.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2023-11-17.
-//
-
 import Foundation
 import ShipBookSDK
 

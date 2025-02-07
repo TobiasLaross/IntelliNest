@@ -54,14 +54,11 @@ class LynkViewModel: ObservableObject {
 
     var restAPIService: RestAPIService
     private let repeatReloadAction: IntClosure
-    let showClimateSchedulingAction: MainActorVoidClosure
 
     init(restAPIService: RestAPIService,
-         repeatReloadAction: @escaping IntClosure,
-         showClimateSchedulingAction: @escaping MainActorVoidClosure) {
+         repeatReloadAction: @escaping IntClosure) {
         self.restAPIService = restAPIService
         self.repeatReloadAction = repeatReloadAction
-        self.showClimateSchedulingAction = showClimateSchedulingAction
     }
 
     func forceUpdateLynk() {

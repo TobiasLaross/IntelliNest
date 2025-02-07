@@ -10,6 +10,7 @@ import ShipBookSDK
 
 class ServiceData: Encodable {}
 
+@MainActor
 class LightServiceData: ServiceData {
     let brightness: Int
     init(brightness: Int) {
@@ -26,6 +27,7 @@ class LightServiceData: ServiceData {
     }
 }
 
+@MainActor
 class InputNumberServiceData: ServiceData {
     let value: Double
 
@@ -43,6 +45,7 @@ class InputNumberServiceData: ServiceData {
     }
 }
 
+@MainActor
 class DateTimeServiceData: ServiceData {
     let date: String?
     let time: String?
@@ -82,13 +85,13 @@ class ScriptServiceData: ServiceData {
         self.variables = variables
     }
 
-    override func encode(to encoder: Encoder) throws {
+    override func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         for (key, value) in variables {
             if let codingKey = CodingKeys(rawValue: key.rawValue) {
                 try container.encode(value, forKey: codingKey)
             } else {
-                Log.error("ScriptServiceData failed to encode key: \(key.rawValue) with value: \(value)")
+                //       Log.error("ScriptServiceData failed to encode key: \(key.rawValue) with value: \(value)")
             }
         }
     }

@@ -33,7 +33,7 @@ enum QuickAction: Equatable {
 
 // 6
 class QuickActionService: ObservableObject {
-    static let shared = QuickActionService()
+    @MainActor static let shared = QuickActionService()
 
     // 7
     @Published var action: QuickAction?
