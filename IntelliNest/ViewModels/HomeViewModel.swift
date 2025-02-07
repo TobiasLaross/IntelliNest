@@ -94,7 +94,6 @@ class HomeViewModel: ObservableObject {
         self.toolbarReloadAction = toolbarReloadAction
     }
 
-    @MainActor
     func reload() async {
         guard !isReloading else {
             return
@@ -275,7 +274,6 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    @MainActor
     func sarahDidTakePills() {
         UserDefaults.shared.setValue(Date(), forKey: StorageKeys.sarahPills.rawValue)
         restAPIService.update(entityID: .sarahTookPill, domain: .inputBoolean, action: .turnOn)

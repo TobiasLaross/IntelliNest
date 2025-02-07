@@ -1,7 +1,6 @@
 import Foundation
 import ShipBookSDK
 
-// swiftlint:disable:next type_body_length file_length
 @MainActor
 class RestAPIService: URLRequestBuilder {
     var urlString: String {

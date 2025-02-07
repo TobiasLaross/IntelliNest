@@ -9,6 +9,18 @@ extension LynkViewModel {
         isLynkAirConditionActive || isLynkAirConditionLoading ? "Stäng av" : "Starta"
     }
 
+    var lynkChargerConnectionDescription: String {
+        if lynkChargerState.state == "Charging" {
+            "laddar"
+        } else if lynkChargerConnectionStatus.state == "Power Not Activated" || lynkChargerConnectionStatus.state == "Connected" {
+            "är inkopplad med ström tillgänglig"
+        } else if lynkChargerConnectionStatus.state == "Disconnected" {
+            "är inte inkopplad"
+        } else {
+            "connection: \(lynkChargerConnectionStatus.state) charger: \(lynkChargerState.state)"
+        }
+    }
+
     var lynkClimateUpdatedAtDescription: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd/MM HH:mm"
