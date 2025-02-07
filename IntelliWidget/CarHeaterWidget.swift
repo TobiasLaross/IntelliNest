@@ -25,17 +25,18 @@ struct CarHeaterEntryView: View {
     }
 }
 
-struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry {
+@MainActor
+struct Provider: @preconcurrency TimelineProvider {
+    @preconcurrency func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), isSarahsPillsTaken: false)
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
+    @preconcurrency func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
         let entry = createEntry()
         completion(entry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
+    @preconcurrency func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
         let entry = createEntry()
 
         var calendar = Calendar.current

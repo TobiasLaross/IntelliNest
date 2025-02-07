@@ -26,9 +26,12 @@ struct Entity: EntityProtocol {
     }
 
     var entityId: EntityId
-    var state: String { didSet {
-        updateDate()
-    }}
+    var state: String {
+        didSet {
+            updateDate()
+        }
+    }
+
     var timerEnabledIcon: Image? {
         isActive ? Image(systemImageName: .clock) : nil
     }
@@ -36,8 +39,8 @@ struct Entity: EntityProtocol {
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
         self.state = state
-        self.lastChanged = .distantPast
-        self.lastUpdated = .distantPast
+        lastChanged = .distantPast
+        lastUpdated = .distantPast
         updateDate()
     }
 
@@ -51,16 +54,16 @@ struct Entity: EntityProtocol {
 
         if let lastChangedString = try container.decodeIfPresent(String.self, forKey: .lastChanged),
            let lastChangedDate = utcDateFormatter.date(from: lastChangedString) {
-            self.lastChanged = lastChangedDate
+            lastChanged = lastChangedDate
         } else {
-            self.lastChanged = .distantPast
+            lastChanged = .distantPast
         }
 
         if let lastUpdatedString = try container.decodeIfPresent(String.self, forKey: .lastUpdated),
            let lastUpdatedDate = utcDateFormatter.date(from: lastUpdatedString) {
-            self.lastUpdated = lastUpdatedDate
+            lastUpdated = lastUpdatedDate
         } else {
-            self.lastUpdated = .distantPast
+            lastUpdated = .distantPast
         }
 
         updateDate()
@@ -81,6 +84,9 @@ struct Entity: EntityProtocol {
     private mutating func updateDate() {
         date = .distantPast
 
+        if entityId == .leafLastPoll {
+            print("")
+        }
         let dateFormatter = DateFormatter()
         let hasDateComponent = state.contains("T") || state.count > 8
         let hasTimeComponent = state.contains(":")
@@ -91,10 +97,13 @@ struct Entity: EntityProtocol {
             dateFormatter.locale = Locale(identifier: "en_US_POSIX") // Ensure the formatter is not affected by the user's locale
             dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
 
-            if state.contains(".") { // Checks for fractional seconds
+            if state.contains(".") {
                 dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXXXX"
             } else if state.contains("Z") {
                 dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+            } else if state.contains("T") {
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
+                dateFormatter.timeZone = .current
             } else {
                 dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
                 dateFormatter.timeZone = .current

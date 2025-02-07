@@ -84,7 +84,6 @@ enum EntityId: String, Decodable, CaseIterable {
     case eniroTurnOffClimateControl = "script.turn_off_kia_climate_control"
     /* Leaf */
     case leafACTimer = "sensor.leaf1sara_ac_timer"
-    case leafClimateRunning = "binary_sensor.leaf1sara_climate_is_running"
     case leafBattery = "sensor.leaf1sara_battery"
     case leafCharging = "binary_sensor.leaf1sara_charging"
     case leafRange = "sensor.leaf1sara_estimated_range"
@@ -112,17 +111,6 @@ enum EntityId: String, Decodable, CaseIterable {
     case lynkFuelUpdatedAt = "sensor.lynk_co_fuel_updated"
     case lynkAddressUpdatedAt = "sensor.lynk_co_position_updated"
     case lynkChargerUpdatedAt = "sensor.lynk_co_charger_updated"
-    /* Eniro climate schedule */
-    case eniroClimateSchedule1Bool = "input_boolean.kia_climate"
-    case eniroClimateSchedule1 = "input_datetime.kia_climate"
-    case eniroClimateSchedule2Bool = "input_boolean.kia_climate2"
-    case eniroClimateSchedule2 = "input_datetime.kia_climate2"
-    case eniroClimateSchedule3Bool = "input_boolean.kia_climate3"
-    case eniroClimateSchedule3 = "input_datetime.kia_climate3"
-    case eniroClimateScheduleMorning = "input_datetime.kia_morning"
-    case eniroClimateScheduleMorningBool = "input_boolean.kia_morning"
-    case eniroClimateScheduleDay = "input_datetime.kia_day"
-    case eniroClimateScheduleDayBool = "input_boolean.kia_day"
     /* Thermometers */
     case thermCorridor = "sensor.temperature_korridoren"
     case thermKitchen = "sensor.temperature_koket"

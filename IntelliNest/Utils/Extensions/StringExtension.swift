@@ -68,4 +68,8 @@ extension String {
 
         append(other)
     }
+
+    var removeDoubleSpaces: String {
+        replacingOccurrences(of: " {2,}", with: " ", options: .regularExpression)
+    }
 }

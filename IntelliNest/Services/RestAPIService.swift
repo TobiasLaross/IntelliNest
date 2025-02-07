@@ -1,16 +1,6 @@
-//
-//  RestAPIService.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2022-07-07.
-//
-
 import Foundation
 import ShipBookSDK
-import SwiftUI
-import UIKit
 
-// swiftlint:disable:next type_body_length
 @MainActor
 class RestAPIService: URLRequestBuilder {
     var urlString: String {
@@ -248,13 +238,8 @@ class RestAPIService: URLRequestBuilder {
         var json = [JSONKey: Any]()
         json[.entityID] = dateEntity.entityId.rawValue
         let formatter = DateFormatter()
-        if dateEntity.entityId == .eniroClimateSchedule3 {
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            json[.dateTime] = formatter.string(from: dateEntity.date)
-        } else {
-            formatter.dateFormat = "HH:mm:ss"
-            json[.time] = formatter.string(from: dateEntity.date)
-        }
+        formatter.dateFormat = "HH:mm:ss"
+        json[.time] = formatter.string(from: dateEntity.date)
 
         await sendPostRequest(json: json,
                               domain: Domain.inputDateTime,
@@ -292,59 +277,6 @@ class RestAPIService: URLRequestBuilder {
             "Accept": "application/json",
             "Authorization": "Bearer \(token)"
         ]
-    }
-
-    func getCameraSnapshot(for cameraID: EntityId) async throws -> Image {
-        guard let request = createURLRequest(path: "/api/camera_proxy/\(cameraID.rawValue)",
-                                             method: .get) else {
-            throw EntityError.badRequest
-        }
-
-        let (data, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw EntityError.badResponse
-        }
-
-        if let uiImage = UIImage(data: data) {
-            return Image(uiImage: uiImage)
-        } else {
-            throw EntityError.badImageData
-        }
-    }
-
-    func downloadImage(urlPath: String, queryParams: [String: String]? = nil) async throws -> UIImage? {
-        guard urlPath.isNotEmpty else {
-            throw EntityError.badRequest
-        }
-
-        let urlPathSeparated = urlPath.components(separatedBy: "?token=")
-        let request: URLRequest? = if urlPathSeparated.count == 2 {
-            createURLRequest(path: urlPathSeparated[0],
-                             queryParams: ["token": urlPathSeparated[1]],
-                             method: .get)
-        } else {
-            createURLRequest(path: urlPath,
-                             queryParams: queryParams,
-                             method: .get)
-        }
-
-        guard let request else {
-            throw EntityError.badRequest
-        }
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw EntityError.badResponse
-        }
-
-        guard httpResponse.statusCode == 200 else {
-            Log.error("Api status for download image: \(httpResponse.statusCode), for \(request.url?.absoluteString ?? "")")
-            throw EntityError.httpRequestFailure
-        }
-
-        return UIImage(data: data)
     }
 
     func registerAPNSToken(_ apnsToken: String) {

@@ -13,11 +13,10 @@
 			</array>
 		</dict>
 	</array>
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-        <string>remote-notification</string>
-    </array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 	<key>EXTERNAL_URL</key>
 	<string>$(EXTERNAL_URL)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -25,10 +24,7 @@
 	<key>LOCAL_SSID</key>
 	<string>$(LOCAL_SSID)</string>
 	<key>NSUserActivityTypes</key>
-	<array>
-		<string>ToggleMonitorIntent</string>
-		<string>UnlockStoreHouseIntent</string>
-	</array>
+	<array/>
 	<key>SECRET_HASS_TOKEN</key>
 	<string>$(SECRET_HASS_TOKEN)</string>
 	<key>SECRET_HASS_TOKEN_SARAH</key>
@@ -66,10 +62,6 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>CarHeater</string>
 		</dict>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
 	</array>
 </dict>
 </plist>

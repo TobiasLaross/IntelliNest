@@ -17,7 +17,7 @@ enum ConnectionState {
 }
 
 @MainActor
-class URLCreator: ObservableObject, @preconcurrency URLRequestBuilder {
+class URLCreator: ObservableObject, URLRequestBuilder {
     @Published var connectionState = ConnectionState.unset
     var nextUpdate = Date().addingTimeInterval(-1)
     var urlString: String {
@@ -102,47 +102,10 @@ class URLCreator: ObservableObject, @preconcurrency URLRequestBuilder {
         let request = createURLRequest(urlRequestParameters: urlRequestParameters)
         if let request {
             do {
-                _ = try await async(timeoutAfter: 0.8) {
-                    try await self.session.data(for: request)
-                }
+                _ = try await session.data(for: request)
                 connectionState = .local
             } catch {
                 retryWithExternalURL()
-            }
-        }
-    }
-
-    enum TimeoutError: Error {
-        case timedOut
-    }
-
-    private func async<R>(timeoutAfter maxDuration: TimeInterval,
-                          do work: @escaping () async throws -> R) async throws -> R {
-        try await withThrowingTaskGroup(of: Result<R, Error>.self) { group in
-            // Start actual work.
-            group.addTask {
-                do {
-                    let result = try await work()
-                    return .success(result)
-                } catch {
-                    return .failure(error)
-                }
-            }
-            // Start timeout child task.
-            group.addTask {
-                try? await Task.sleep(seconds: maxDuration)
-                return .failure(TimeoutError.timedOut)
-            }
-            // First finished child task wins, cancel the other task.
-            guard let result = try await group.next() else {
-                throw TimeoutError.timedOut
-            }
-            group.cancelAll()
-            switch result {
-            case let .success(value):
-                return value
-            case let .failure(error):
-                throw error
             }
         }
     }

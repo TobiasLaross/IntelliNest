@@ -14,7 +14,7 @@ class InputNumberEntityTests: XCTestCase {
     }
 
     func testInitFromDecoder() throws {
-        let json = """
+        let json = Data("""
         {
             "entity_id": "input_number.kia_climate_temperature",
             "state": "21.0",
@@ -36,7 +36,7 @@ class InputNumberEntityTests: XCTestCase {
                 "user_id": null
             }
         }
-        """.data(using: .utf8)!
+        """.utf8)
         let decoder = JSONDecoder()
         let date = try XCTUnwrap(Date.fromISO8601("2023-02-24T05:40:30.846631+00:00"))
         let entity = try decoder.decode(InputNumberEntity.self, from: json)

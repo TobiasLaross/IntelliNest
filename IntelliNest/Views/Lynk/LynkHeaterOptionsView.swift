@@ -2,6 +2,8 @@ import SwiftUI
 
 struct LynkHeaterOptionsView: View {
     @ObservedObject var viewModel: LynkViewModel
+    let buttonWidth = 80.0
+    let buttonHeight = 50.0
 
     var body: some View {
         ZStack {
@@ -15,27 +17,43 @@ struct LynkHeaterOptionsView: View {
                 .overlay {
                     ZStack {
                         VStack {
-                            INText("Laddkabeln är \(viewModel.chargerConnectionStatus.state) och \(viewModel.chargerState.state)",
-                                   font: .buttonFontLarge)
+                            INText("Lynk \(viewModel.lynkChargerConnectionDescription)",
+                                   font: .body)
                                 .padding(.horizontal)
                                 .padding(.bottom, 4)
                             HStack {
                                 ServiceButtonView(buttonTitle: "Starta Klimatet",
-                                                  buttonWidth: 90,
-                                                  buttonHeight: 60,
+                                                  isActive: viewModel.isLynkAirConditionActive,
+                                                  buttonWidth: buttonWidth,
+                                                  buttonHeight: buttonHeight,
                                                   cornerRadius: 20,
-                                                  isLoading: viewModel.isAirConditionLoading,
-                                                  action: viewModel.startClimate)
-                                    .disabled(viewModel.isAirConditionLoading)
+                                                  isLoading: viewModel.isLynkAirConditionLoading,
+                                                  action: viewModel.startLynkClimate)
+                                    .disabled(viewModel.isLynkAirConditionLoading)
                                 ServiceButtonView(buttonTitle: "Starta Motorn",
-                                                  buttonWidth: 90,
-                                                  buttonHeight: 60,
+                                                  isActive: viewModel.isEngineRunning.isActive,
+                                                  buttonWidth: buttonWidth,
+                                                  buttonHeight: buttonHeight,
                                                   cornerRadius: 20,
                                                   isLoading: viewModel.isEngineLoading,
                                                   action: viewModel.startEngine)
                                     .disabled(viewModel.isEngineLoading)
                             }
+                            INText("Leaf", font: .body)
+                                .padding(.horizontal)
+                                .padding(.vertical, 4)
+                            HStack {
+                                ServiceButtonView(buttonTitle: "Starta Klimatet",
+                                                  isActive: viewModel.isLeafAirConditionActive,
+                                                  buttonWidth: buttonWidth,
+                                                  buttonHeight: buttonHeight,
+                                                  cornerRadius: 20,
+                                                  isLoading: viewModel.isLeafAirConditionLoading,
+                                                  action: viewModel.startLeafClimate)
+                                    .disabled(viewModel.isLynkAirConditionLoading)
+                            }
                         }
+                        .padding(.vertical, 8)
                     }
                 }
         }

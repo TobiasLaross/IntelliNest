@@ -117,6 +117,7 @@ class HeatersViewModel: ObservableObject {
                               action: action)
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func reload(entityID: EntityId, state: String) {
         switch entityID {
         case .resetCorridorHeaterTime:

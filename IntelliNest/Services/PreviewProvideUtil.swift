@@ -14,7 +14,7 @@ class PreviewProviderUtil {
     static var electricityViewModel = ElectricityViewModel(sonnenBattery: .init(entityID: .sonnenBattery),
                                                            restAPIService: PreviewProviderUtil.restAPIService)
     static var heatersViewModel = HeatersViewModel(restAPIService: restAPIService, showHeaterDetails: { _ in })
-    static var lynkViewModel = LynkViewModel(restAPIService: restAPIService, repeatReloadAction: { _ in }, showClimateSchedulingAction: {})
+    static var lynkViewModel = LynkViewModel(restAPIService: restAPIService, repeatReloadAction: { _ in })
 
     private init() {}
 }

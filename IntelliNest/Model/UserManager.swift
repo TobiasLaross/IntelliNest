@@ -1,10 +1,3 @@
-//
-//  UserManager.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2023-06-18.
-//
-
 import Foundation
 
 enum User: String, CaseIterable {
@@ -29,6 +22,7 @@ enum User: String, CaseIterable {
 
 struct UserManager {
     static let shared = UserManager()
+    @MainActor
     static var currentUser: User {
         if let storedValue = UserDefaults.shared.string(forKey: StorageKeys.userInitials.rawValue),
            let user = User(rawValue: storedValue) {
@@ -38,6 +32,7 @@ struct UserManager {
         return .unknownUser
     }
 
+    @MainActor
     var isUserNotSet: Bool {
         UserDefaults.shared.string(forKey: StorageKeys.userInitials.rawValue) == nil
     }
@@ -45,6 +40,8 @@ struct UserManager {
     private init() {}
 
     func setUser(_ user: User) {
-        UserDefaults.shared.set(user.rawValue, forKey: StorageKeys.userInitials.rawValue)
+        Task { @MainActor in
+            UserDefaults.shared.set(user.rawValue, forKey: StorageKeys.userInitials.rawValue)
+        }
     }
 }

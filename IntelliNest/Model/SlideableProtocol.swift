@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol Slideable {
     func value(isSliding: Bool) -> Int
     var isOn: Bool { get }

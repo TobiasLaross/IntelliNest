@@ -9,11 +9,11 @@ import SwiftUI
 
 struct RoborockMainButtons: View {
     var roborock: RoborockEntity
-    let toggleCleaningClosure: VoidClosure
-    let dockRoborockClosure: VoidClosure
-    let sendRoborockToBinClosure: VoidClosure
-    let locateRoborockClosure: VoidClosure
-    let manualEmptyClosure: VoidClosure
+    let toggleCleaningClosure: MainActorVoidClosure
+    let dockRoborockClosure: MainActorVoidClosure
+    let sendRoborockToBinClosure: MainActorVoidClosure
+    let locateRoborockClosure: MainActorVoidClosure
+    let manualEmptyClosure: MainActorVoidClosure
 
     var body: some View {
         HStack {

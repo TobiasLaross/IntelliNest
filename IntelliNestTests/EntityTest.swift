@@ -15,7 +15,7 @@ class EntityTests: XCTestCase {
     }
 
     func testInitFromDecoder() throws {
-        let json = """
+        let json = Data("""
         {
             "entity_id": "switch.kaffemaskinen",
             "state": "off",
@@ -31,7 +31,7 @@ class EntityTests: XCTestCase {
                 "user_id": null
             }
         }
-        """.data(using: .utf8)!
+        """.utf8)
         let decoder = JSONDecoder()
         let date = try XCTUnwrap(Date.fromISO8601("2023-06-17T13:30:00.215607+00:00"))
         let entity = try decoder.decode(Entity.self, from: json)
@@ -45,14 +45,14 @@ class EntityTests: XCTestCase {
     }
 
     func testDecodeWithStateAsDateTime() throws {
-        let json = """
+        let json = Data("""
         {
             "entity_id": "input_datetime.kia_climate3",
             "state": "2023-06-22 19:25:00",
             "last_changed": "2023-06-21T22:00:00.300355+00:00",
             "last_updated": "2023-06-21T22:00:00.300355+00:00"
         }
-        """.data(using: .utf8)!
+        """.utf8)
         let decoder = JSONDecoder()
         let entity = try decoder.decode(Entity.self, from: json)
 
@@ -107,14 +107,14 @@ class EntityTests: XCTestCase {
     }
 
     func testDecodeWithDifferentDateFormats() throws {
-        let json = """
+        let json = Data("""
         {
             "entity_id": "switch.kaffemaskinen",
             "state": "off",
             "last_changed": "2023-06-17T13:30:00.215607+00:00",
             "last_updated": "2023-06-17T13:30:00.215607+00:00"
         }
-        """.data(using: .utf8)!
+        """.utf8)
         let decoder = JSONDecoder()
         let entity = try decoder.decode(Entity.self, from: json)
 
@@ -133,11 +133,11 @@ class EntityTests: XCTestCase {
     }
 
     func testDecodeWithIncompleteData() throws {
-        let json = """
+        let json = Data("""
         {
             "entity_id": "switch.kaffemaskinen",
         }
-        """.data(using: .utf8)!
+        """.utf8)
         let decoder = JSONDecoder()
         let entity = try decoder.decode(Entity.self, from: json)
 

@@ -92,13 +92,7 @@ private struct NavigationButtonsView: View {
         VStack {
             HStack(spacing: 15) {
                 NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), action: viewModel.showHeatersAction)
-                NavigationButtonView(buttonTitle: "Lynk", image: Image(systemName: "car.fill"), action: viewModel.showLynkAction)
-                NavigationButtonView(
-                    buttonTitle: "Leaf",
-                    image: Image(systemName: "car.2.fill"),
-                    buttonImageWidth: 40,
-                    action: viewModel.showLeafAction
-                )
+                NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.2.fill"), action: viewModel.showLynkAction)
             }
             HStack(spacing: 15) {
                 NavigationButtonView(image: Image(imageName: .powerGrid),
@@ -193,6 +187,13 @@ private struct ServiceButtonsView: View {
                                    Text("Schemalägg nästa start")
                                })
                     }
+                ServiceButtonView(buttonTitle: "Easee",
+                                  isActive: viewModel.isEaseeCharging,
+                                  buttonSize: 90,
+                                  icon: viewModel.chargingIcon,
+                                  iconWidth: viewModel.isEaseeCharging ? 35 : 35,
+                                  iconHeight: viewModel.isEaseeCharging ? 35 : 40,
+                                  action: viewModel.toggleEaseeCharging)
                 if UserManager.currentUser == .tobias {
                     ServiceButtonView(buttonTitle: "Hitta Sarah's iPhone?",
                                       customFont: .buttonFontSmall,
@@ -238,7 +239,6 @@ struct Home_Previews: PreviewProvider {
                                       urlCreator: PreviewProviderUtil.urlCreator,
                                       showHeatersAction: {},
                                       showLynkAction: {},
-                                      showLeafAction: {},
                                       showRoborockAction: {},
                                       showPowerGridAction: {},
                                       showLightsAction: {},

@@ -5,7 +5,7 @@
 //  Created by Tobias on 2023-11-24.
 //
 
-import CoreLocation
+@preconcurrency import CoreLocation
 import Foundation
 import NetworkExtension
 import ShipBookSDK
@@ -13,7 +13,7 @@ import SystemConfiguration.CaptiveNetwork
 
 struct SSIDUtil {
     private static let locationManager = CLLocationManager()
-    private static let locationManagerDelegate = LocationManagerDelegate()
+    @MainActor private static let locationManagerDelegate = LocationManagerDelegate()
     private class LocationManagerDelegate: NSObject, CLLocationManagerDelegate {
         var permissionHandler: ((Bool) -> Void)?
 
@@ -35,6 +35,7 @@ struct SSIDUtil {
         return currentNetwork.ssid
     }
 
+    @MainActor
     private static func requestLocationPermission() async -> Bool {
         await withCheckedContinuation { continuation in
             locationManager.delegate = locationManagerDelegate

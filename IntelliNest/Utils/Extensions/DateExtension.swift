@@ -37,6 +37,35 @@ extension Date {
         return nil
     }
 
+    var humanReadable: String {
+        let now = Date()
+        let calendar = Calendar.current
+
+        if let minutesAgo = calendar.dateComponents([.minute], from: self, to: now).minute, minutesAgo < 60 {
+            if minutesAgo == 0 {
+                return "Just now"
+            } else if minutesAgo == 1 {
+                return "\(minutesAgo) minute ago"
+            } else {
+                return "\(minutesAgo) minutes ago"
+            }
+        }
+
+        if let hoursAgo = calendar.dateComponents([.hour], from: self, to: now).hour, hoursAgo < 24 {
+            return "\(hoursAgo) \(hoursAgo == 1 ? "hour" : "hours") ago"
+        }
+
+        if calendar.isDateInYesterday(self) {
+            return "Yesterday"
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        formatter.locale = Locale.current
+        return formatter.string(from: self)
+    }
+
     func minutesLeft() -> Int {
         let timeZoneOffset = TimeZone.current.secondsFromGMT()
         let selfInLocalTimezone = addingTimeInterval(TimeInterval(timeZoneOffset))

@@ -36,14 +36,29 @@ class HomeViewModel: ObservableObject {
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
     @Published var gardenWasteDate = Entity(entityId: .gardenWasteDate)
 
+    @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var isSarahsPillsTaken = false
     @Published var noLocationAccess = false
 
     private var isReloading = false
-    let entityIDs: [EntityId] = [.hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
-                                 .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
-                                 .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower,
-                                 .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights]
+    let entityIDs: [EntityId] = [
+        .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
+        .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
+        .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower,
+        .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights, .easeeIsEnabled
+    ]
+
+    var chargingTitle: String {
+        isEaseeCharging ? "Pausa" : "Starta"
+    }
+
+    var isEaseeCharging: Bool {
+        easeeIsEnabled.isActive
+    }
+
+    var chargingIcon: Image {
+        isEaseeCharging ? .init(systemImageName: .evCharger) : .init(systemImageName: .evChargerSlash)
+    }
 
     private var restAPIService: RestAPIService
     private let locationManager = CLLocationManager()
@@ -51,7 +66,6 @@ class HomeViewModel: ObservableObject {
     var urlCreator: URLCreator
     let showHeatersAction: MainActorVoidClosure
     let showLynkAction: MainActorVoidClosure
-    let showLeafAction: MainActorVoidClosure
     let showRoborockAction: MainActorVoidClosure
     let showPowerGridAction: MainActorVoidClosure
     let showLightsAction: MainActorVoidClosure
@@ -63,7 +77,6 @@ class HomeViewModel: ObservableObject {
          urlCreator: URLCreator,
          showHeatersAction: @escaping MainActorVoidClosure,
          showLynkAction: @escaping MainActorVoidClosure,
-         showLeafAction: @escaping MainActorVoidClosure,
          showRoborockAction: @escaping MainActorVoidClosure,
          showPowerGridAction: @escaping MainActorVoidClosure,
          showLightsAction: @escaping MainActorVoidClosure,
@@ -74,7 +87,6 @@ class HomeViewModel: ObservableObject {
         self.urlCreator = urlCreator
         self.showHeatersAction = showHeatersAction
         self.showLynkAction = showLynkAction
-        self.showLeafAction = showLeafAction
         self.showRoborockAction = showRoborockAction
         self.showPowerGridAction = showPowerGridAction
         self.showLightsAction = showLightsAction
@@ -82,7 +94,6 @@ class HomeViewModel: ObservableObject {
         self.toolbarReloadAction = toolbarReloadAction
     }
 
-    @MainActor
     func reload() async {
         guard !isReloading else {
             return
@@ -120,6 +131,11 @@ class HomeViewModel: ObservableObject {
     func toggleCoffeeMachine() {
         let action: Action = coffeeMachine.isActive ? .turnOff : .turnOn
         restAPIService.update(entityID: .coffeeMachine, domain: .switchDomain, action: action)
+        repeatReloadAction(2)
+    }
+
+    func toggleEaseeCharging() {
+        restAPIService.callScript(scriptID: .easeeToggle)
         repeatReloadAction(2)
     }
 
@@ -228,6 +244,8 @@ class HomeViewModel: ObservableObject {
             plasticWasteDate.state = state
         case .gardenWasteDate:
             gardenWasteDate.state = state
+        case .easeeIsEnabled:
+            easeeIsEnabled.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }
@@ -256,7 +274,6 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    @MainActor
     func sarahDidTakePills() {
         UserDefaults.shared.setValue(Date(), forKey: StorageKeys.sarahPills.rawValue)
         restAPIService.update(entityID: .sarahTookPill, domain: .inputBoolean, action: .turnOn)
@@ -279,5 +296,3 @@ class HomeViewModel: ObservableObject {
         isSarahsPillsTaken = Calendar.current.isDateInToday(lastTakenPillsDate ?? .distantPast)
     }
 }
-
-// swiftlint:enable cyclomatic_complexity

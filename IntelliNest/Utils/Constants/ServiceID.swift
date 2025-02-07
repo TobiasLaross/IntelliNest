@@ -44,6 +44,7 @@ enum ServiceID: String, Decodable, CaseIterable {
     case sonnenCharge = "rest_command.sonnen_charge"
     case sonnenDischarge = "rest_command.sonnen_discharge"
 
+    @MainActor
     var toAction: Action? {
         if let action = Action(rawValue: rawValue.components(separatedBy: ".").last ?? "") {
             return action

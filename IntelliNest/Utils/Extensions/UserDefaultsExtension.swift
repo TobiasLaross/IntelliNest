@@ -9,6 +9,7 @@ import Foundation
 import ShipBookSDK
 
 extension UserDefaults {
+    @MainActor
     func setCoordinates(_ coordinates: Coordinates, forKey key: StorageKeys) {
         do {
             let encodedData = try JSONEncoder().encode(coordinates)

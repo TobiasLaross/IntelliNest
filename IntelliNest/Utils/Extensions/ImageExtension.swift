@@ -43,6 +43,8 @@ enum SystemImageName: String {
     case bolt = "bolt.fill"
     case boltSlash = "bolt.slash"
     case boltCar = "bolt.car"
+    case evCharger = "ev.charger"
+    case evChargerSlash = "ev.charger.slash"
     case cctv = "video.fill"
     case clock
     case engineFilled = "engine.combustion.fill"
