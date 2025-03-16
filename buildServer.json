@@ -12,8 +12,9 @@
 	"argv": [
 		"/opt/homebrew/bin/xcode-build-server"
 	],
-	"workspace": "/Users/tobias/Developer/Tobias/IntelliNest/IntelliNest.xcodeproj/project.xcworkspace",
+	"workspace": "/Users/tobias/Developer/personal/IntelliNest/IntelliNest.xcodeproj/project.xcworkspace",
 	"build_root": "/Users/tobias/Library/Developer/Xcode/DerivedData/IntelliNest-cbwiubgqcokqaibodmnmmfcjdzzu",
 	"scheme": "IntelliNest",
 	"kind": "xcode"
 }
+

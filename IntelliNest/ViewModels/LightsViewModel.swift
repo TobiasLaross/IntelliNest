@@ -38,12 +38,9 @@ class LightsViewModel: ObservableObject {
     let laundryRoomName = "Tvättstugan"
 
     private var restAPIService: RestAPIService
-    private let repeatReloadAction: IntClosure
 
-    init(restAPIService: RestAPIService,
-         repeatReloadAction: @escaping IntClosure) {
+    init(restAPIService: RestAPIService) {
         self.restAPIService = restAPIService
-        self.repeatReloadAction = repeatReloadAction
     }
 
     func reload() async {
@@ -86,8 +83,7 @@ class LightsViewModel: ObservableObject {
                 lightIDs.insert(contentsOf: groupedLightIDs, at: 0)
             }
 
-            restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness)
-            repeatReloadAction(2)
+            restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness, reloadTimes: 2)
         }
     }
 
@@ -106,8 +102,7 @@ class LightsViewModel: ObservableObject {
                 lightIDs.insert(contentsOf: groupedLightIDs, at: 0)
             }
 
-            restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness)
-            repeatReloadAction(2)
+            restAPIService.update(lightIDs: lightIDs, action: action, brightness: light.brightness, reloadTimes: 2)
         }
     }
 }

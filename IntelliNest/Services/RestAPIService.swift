@@ -15,11 +15,18 @@ class RestAPIService: URLRequestBuilder {
     private let urlCreator: URLCreator
     private let session: URLSession
     private let setErrorBannerText: StringStringClosure
+    private let repeatReloadAction: IntClosure
 
-    init(urlCreator: URLCreator, session: URLSession = .shared, setErrorBannerText: @escaping StringStringClosure) {
+    init(
+        urlCreator: URLCreator,
+        session: URLSession = .shared,
+        setErrorBannerText: @escaping StringStringClosure,
+        repeatReloadAction: @escaping IntClosure
+    ) {
         self.urlCreator = urlCreator
         self.session = session
         self.setErrorBannerText = setErrorBannerText
+        self.repeatReloadAction = repeatReloadAction
     }
 
     func reload<T: EntityProtocol>(entityId: EntityId, entityType: T.Type) async throws -> T {
@@ -115,15 +122,16 @@ class RestAPIService: URLRequestBuilder {
 
     // MARK: Post requests
 
-    func update(entityID: EntityId, domain: Domain, action: Action) {
+    func update(entityID: EntityId, domain: Domain, action: Action, reloadTimes: Int = 1) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func update(lightIDs: [EntityId], action: Action, brightness: Int) {
+    func update(lightIDs: [EntityId], action: Action, brightness: Int, reloadTimes: Int = 1) {
         Task {
             await withTaskGroup(of: Void.self) { group in
                 for lightID in lightIDs {
@@ -138,55 +146,62 @@ class RestAPIService: URLRequestBuilder {
                     }
                 }
             }
+
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func update(dateEntityID: EntityId, date: Date) {
+    func update(dateEntityID: EntityId, date: Date, reloadTimes: Int = 1) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = dateEntityID.rawValue
             json[.dateTime] = date
             await sendPostRequest(json: json, domain: .inputDateTime, action: .setDateTime)
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: String) {
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: String, reloadTimes: Int = 1) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
             await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Int) {
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Int, reloadTimes: Int = 1) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
             await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double) {
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double, reloadTimes: Int = 1) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
             await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func update(numberEntityID: EntityId, number: Double) {
+    func update(numberEntityID: EntityId, number: Double, reloadTimes: Int = 1) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = numberEntityID.rawValue
             json[.value] = number
             await sendPostRequest(json: json, domain: .inputNumber, action: .setValue)
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil) {
+    func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil, reloadTimes: Int = 1) {
         Task {
             if let action = serviceID.toAction {
                 await sendPostRequest(json: json, domain: domain, action: action)
@@ -194,6 +209,7 @@ class RestAPIService: URLRequestBuilder {
                 setErrorBannerText("Misslyckades med att anropa service",
                                    "\(serviceID.rawValue) gick inte att konvertera till action")
             }
+            repeatReloadAction(reloadTimes)
         }
     }
 
@@ -206,19 +222,21 @@ class RestAPIService: URLRequestBuilder {
         await setStateFor(entity: lock, domain: .lock, action: action)
     }
 
-    func setState(for entityId: EntityId, in domain: Domain, using action: Action) async {
+    func setState(for entityId: EntityId, in domain: Domain, using action: Action, reloadTimes: Int = 1) async {
         var json = [JSONKey: Any]()
         json[JSONKey.entityID] = entityId.rawValue
         await sendPostRequest(json: json, domain: domain, action: action)
+        repeatReloadAction(reloadTimes)
     }
 
-    func setStateFor(entity: some EntityProtocol, domain: Domain, action: Action) async {
+    func setStateFor(entity: some EntityProtocol, domain: Domain, action: Action, reloadTimes: Int = 1) async {
         var json = [JSONKey: Any]()
         json[JSONKey.entityID] = entity.entityId.rawValue
         await sendPostRequest(json: json, domain: domain, action: action)
+        repeatReloadAction(reloadTimes)
     }
 
-    func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil) {
+    func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil, reloadTimes: Int = 1) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = scriptID.rawValue
@@ -231,10 +249,11 @@ class RestAPIService: URLRequestBuilder {
                 json[.variables] = variableDict
             }
             await sendPostRequest(json: json, domain: .script, action: .turnOn)
+            repeatReloadAction(reloadTimes)
         }
     }
 
-    func setDateTimeEntity(dateEntity: Entity) async {
+    func setDateTimeEntity(dateEntity: Entity, reloadTimes: Int = 1) async {
         var json = [JSONKey: Any]()
         json[.entityID] = dateEntity.entityId.rawValue
         let formatter = DateFormatter()
@@ -244,6 +263,7 @@ class RestAPIService: URLRequestBuilder {
         await sendPostRequest(json: json,
                               domain: Domain.inputDateTime,
                               action: Action.setDateTime)
+        repeatReloadAction(reloadTimes)
     }
 
     func sendRequest(_ request: URLRequest) async -> (Int, Data?) {

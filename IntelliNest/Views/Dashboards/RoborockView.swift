@@ -92,6 +92,6 @@ struct RoborockView: View {
 
 struct Roborock_Previews: PreviewProvider {
     static var previews: some View {
-        RoborockView(viewModel: .init(restAPIService: PreviewProviderUtil.restAPIService, repeatReloadAction: { _ in }))
+        RoborockView(viewModel: .init(restAPIService: PreviewProviderUtil.restAPIService))
     }
 }

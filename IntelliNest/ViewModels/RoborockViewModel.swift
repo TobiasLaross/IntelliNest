@@ -64,12 +64,9 @@ class RoborockViewModel: ObservableObject {
     let entityIDs: [EntityId] = [.roborock, .roborockAutomation, .roborockWaterShortage, .roborockEmptiedAtDate, .roborockLastCleanArea,
                                  .roborockAreaSinceEmptied, .roborockMapImage]
     private var restAPIService: RestAPIService
-    private let repeatReloadAction: IntClosure
 
-    init(restAPIService: RestAPIService,
-         repeatReloadAction: @escaping IntClosure) {
+    init(restAPIService: RestAPIService) {
         self.restAPIService = restAPIService
-        self.repeatReloadAction = repeatReloadAction
     }
 
     func reload() async {
@@ -157,14 +154,12 @@ class RoborockViewModel: ObservableObject {
 
     func toggleCleaning() {
         let action: Action = roborock.isCleaning ? .stop : .start
-        restAPIService.update(entityID: .roborock, domain: .vacuum, action: action)
-        repeatReloadAction(6)
+        restAPIService.update(entityID: .roborock, domain: .vacuum, action: action, reloadTimes: 6)
     }
 
     func dockRoborock() {
         if roborock.isReturning {
-            restAPIService.update(entityID: .roborock, domain: .vacuum, action: .stop)
-            repeatReloadAction(6)
+            restAPIService.update(entityID: .roborock, domain: .vacuum, action: .stop, reloadTimes: 6)
         } else {
             callScript(scriptID: .roborockDock)
         }
@@ -175,14 +170,12 @@ class RoborockViewModel: ObservableObject {
     }
 
     func callScript(scriptID: ScriptID) {
-        restAPIService.callScript(scriptID: scriptID)
-        repeatReloadAction(6)
+        restAPIService.callScript(scriptID: scriptID, reloadTimes: 6)
     }
 
     func toggleRoborockAutomation() {
         let action: Action = roborockAutomation.isActive ? .turnOff : .turnOn
         roborockAutomation.isActive.toggle()
-        restAPIService.update(entityID: .roborockAutomation, domain: .automation, action: action)
-        repeatReloadAction(2)
+        restAPIService.update(entityID: .roborockAutomation, domain: .automation, action: action, reloadTimes: 2)
     }
 }

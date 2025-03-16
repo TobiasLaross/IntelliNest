@@ -94,7 +94,6 @@ struct LightsView: View {
 
 struct Lights_Previews: PreviewProvider {
     static var previews: some View {
-        LightsView(viewModel: .init(restAPIService: PreviewProviderUtil.restAPIService,
-                                    repeatReloadAction: { _ in }))
+        LightsView(viewModel: .init(restAPIService: PreviewProviderUtil.restAPIService))
     }
 }
