@@ -242,7 +242,6 @@ struct Home_Previews: PreviewProvider {
                                       showRoborockAction: {},
                                       showPowerGridAction: {},
                                       showLightsAction: {},
-                                      repeatReloadAction: { _ in },
                                       toolbarReloadAction: {})
 
         HomeView(viewModel: viewModel)

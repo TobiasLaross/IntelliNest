@@ -44,7 +44,8 @@ class HeatersViewModel: ObservableObject {
                               domain: .climate,
                               action: .setTemperature,
                               dataKey: .temperature,
-                              dataValue: "\(temperature)")
+                              dataValue: "\(temperature)",
+                              reloadTimes: 5)
     }
 
     func setPurifierFanSpeed(_ speed: Double) {
@@ -52,7 +53,8 @@ class HeatersViewModel: ObservableObject {
                               domain: .fan,
                               action: .setPercentage,
                               dataKey: .percentage,
-                              dataValue: speed.toFanSpeedPercentage)
+                              dataValue: speed.toFanSpeedPercentage,
+                              reloadTimes: 5)
     }
 
     func setHvacMode(heater: HeaterEntity, hvacMode: HvacMode) {
@@ -60,7 +62,8 @@ class HeatersViewModel: ObservableObject {
                               domain: .climate,
                               action: .setHvacMode,
                               dataKey: .hvacMode,
-                              dataValue: hvacMode.rawValue)
+                              dataValue: hvacMode.rawValue,
+                              reloadTimes: 5)
     }
 
     func setFanMode(_ heater: HeaterEntity, _ fanMode: HeaterFanMode) {
@@ -69,7 +72,8 @@ class HeatersViewModel: ObservableObject {
                                   domain: .climate,
                                   action: .setFanMode,
                                   dataKey: .fanMode,
-                                  dataValue: fanMode.rawValue)
+                                  dataValue: fanMode.rawValue,
+                                  reloadTimes: 5)
         }
     }
 
@@ -78,7 +82,8 @@ class HeatersViewModel: ObservableObject {
                               domain: .melcloud,
                               action: .setVaneHorizontal,
                               dataKey: .position,
-                              dataValue: horizontalMode.rawValue)
+                              dataValue: horizontalMode.rawValue,
+                              reloadTimes: 5)
     }
 
     func verticalModeSelectedCallback(_ heater: HeaterEntity, _ verticalMode: HeaterVerticalMode) {
@@ -86,7 +91,8 @@ class HeatersViewModel: ObservableObject {
                               domain: .melcloud,
                               action: .setVaneVertical,
                               dataKey: .position,
-                              dataValue: verticalMode.rawValue)
+                              dataValue: verticalMode.rawValue,
+                              reloadTimes: 5)
     }
 
     func setClimateSchedule(dateEntity: Entity) {
@@ -179,11 +185,6 @@ private extension HeatersViewModel {
                     restAPIService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
                 }
             }
-        }
-
-        Task { @MainActor in
-            try? await Task.sleep(seconds: 0.3)
-            await reload()
         }
     }
 }

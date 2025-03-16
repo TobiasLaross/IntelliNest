@@ -65,6 +65,9 @@ class Navigator: ObservableObject {
     lazy var restAPIService = RestAPIService(urlCreator: urlCreator,
                                              setErrorBannerText: { [weak self] title, message in
                                                  self?.setErrorBannerText(title: title, message: message)
+                                             },
+                                             repeatReloadAction: { [weak self] times in
+                                                 self?.repeatReload(times: times)
                                              })
     lazy var yaleApiService = YaleApiService(hassAPIService: restAPIService)
     lazy var homeViewModel = HomeViewModel(restAPIService: restAPIService,
@@ -85,9 +88,6 @@ class Navigator: ObservableObject {
                                            showLightsAction: { [weak self] in
                                                self?.push(.lights)
                                            },
-                                           repeatReloadAction: { [weak self] times in
-                                               self?.repeatReload(times: times)
-                                           },
                                            toolbarReloadAction: toolbarReload)
     lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
                                                          restAPIService: restAPIService)
@@ -99,19 +99,9 @@ class Navigator: ObservableObject {
                                                          self?.push(.playroomHeaterDetails)
                                                      }
                                                  })
-    lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService,
-                                           repeatReloadAction: { [weak self] times in
-                                               self?.repeatReload(times: times)
-                                           })
-    lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService,
-                                                   repeatReloadAction: { [weak self] times in
-                                                       self?.repeatReload(times: times)
-                                                   })
-
-    lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService,
-                                               repeatReloadAction: { [weak self] times in
-                                                   self?.repeatReload(times: times)
-                                               })
+    lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService)
+    lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService)
+    lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService)
 
     init() {
         if UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) == nil {
@@ -233,6 +223,9 @@ class Navigator: ObservableObject {
 
 private extension Navigator {
     func repeatReload(times: Int) {
+        guard times > 0 else {
+            return
+        }
         repeatReloadTask?.cancel()
         repeatReloadTask = Task {
             do {

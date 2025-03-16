@@ -69,7 +69,6 @@ class HomeViewModel: ObservableObject {
     let showRoborockAction: MainActorVoidClosure
     let showPowerGridAction: MainActorVoidClosure
     let showLightsAction: MainActorVoidClosure
-    let repeatReloadAction: IntClosure
     private(set) var toolbarReloadAction: MainActorAsyncVoidClosure
 
     init(restAPIService: RestAPIService,
@@ -80,7 +79,6 @@ class HomeViewModel: ObservableObject {
          showRoborockAction: @escaping MainActorVoidClosure,
          showPowerGridAction: @escaping MainActorVoidClosure,
          showLightsAction: @escaping MainActorVoidClosure,
-         repeatReloadAction: @escaping IntClosure,
          toolbarReloadAction: @escaping MainActorAsyncVoidClosure) {
         self.restAPIService = restAPIService
         self.yaleApiService = yaleApiService
@@ -90,7 +88,6 @@ class HomeViewModel: ObservableObject {
         self.showRoborockAction = showRoborockAction
         self.showPowerGridAction = showPowerGridAction
         self.showLightsAction = showLightsAction
-        self.repeatReloadAction = repeatReloadAction
         self.toolbarReloadAction = toolbarReloadAction
     }
 
@@ -118,25 +115,21 @@ class HomeViewModel: ObservableObject {
     }
 
     func turnOffAllLights() {
-        restAPIService.update(lightIDs: [.allLights], action: .turnOff, brightness: 0)
-        repeatReloadAction(4)
+        restAPIService.update(lightIDs: [.allLights], action: .turnOff, brightness: 0, reloadTimes: 4)
     }
 
     func toggleStateForSarahsIphone() {
         let action: Action = sarahsIphone.isActive ? .turnOff : .turnOn
-        restAPIService.update(entityID: .hittaSarahsIphone, domain: .script, action: action)
-        repeatReloadAction(7)
+        restAPIService.update(entityID: .hittaSarahsIphone, domain: .script, action: action, reloadTimes: 7)
     }
 
     func toggleCoffeeMachine() {
         let action: Action = coffeeMachine.isActive ? .turnOff : .turnOn
-        restAPIService.update(entityID: .coffeeMachine, domain: .switchDomain, action: action)
-        repeatReloadAction(2)
+        restAPIService.update(entityID: .coffeeMachine, domain: .switchDomain, action: action, reloadTimes: 2)
     }
 
     func toggleEaseeCharging() {
-        restAPIService.callScript(scriptID: .easeeToggle)
-        repeatReloadAction(2)
+        restAPIService.callScript(scriptID: .easeeToggle, reloadTimes: 2)
     }
 
     func showCoffeeMachineScheduling() {
@@ -155,27 +148,23 @@ class HomeViewModel: ObservableObject {
 
     func toggleCoffeeMachineStarTimeEnabled() {
         let action: Action = coffeeMachineStartTimeEnabled.isActive ? .turnOff : .turnOn
-        restAPIService.update(entityID: .coffeeMachineStartTimeEnabled, domain: .inputBoolean, action: action)
-        repeatReloadAction(2)
+        restAPIService.update(entityID: .coffeeMachineStartTimeEnabled, domain: .inputBoolean, action: action, reloadTimes: 2)
     }
 
     func toggleStateForStorageLock() {
         let action: Action = storageLock.lockState == .unlocked ? .lock : .unlock
         storageLock.expectedState = action == .lock ? .locked : .unlocked
-        restAPIService.update(entityID: .storageLock, domain: .lock, action: action)
-        repeatReloadAction(6)
+        restAPIService.update(entityID: .storageLock, domain: .lock, action: action, reloadTimes: 6)
     }
 
     func lockStorage() {
         storageLock.expectedState = .locked
-        restAPIService.update(entityID: .storageLock, domain: .lock, action: .lock)
-        repeatReloadAction(6)
+        restAPIService.update(entityID: .storageLock, domain: .lock, action: .lock, reloadTimes: 6)
     }
 
     func unlockStorage() {
         storageLock.expectedState = .unlocked
-        restAPIService.update(entityID: .storageLock, domain: .lock, action: .unlock)
-        repeatReloadAction(6)
+        restAPIService.update(entityID: .storageLock, domain: .lock, action: .unlock, reloadTimes: 6)
     }
 
     func resetExpectedLockStates() {
@@ -276,8 +265,7 @@ class HomeViewModel: ObservableObject {
 
     func sarahDidTakePills() {
         UserDefaults.shared.setValue(Date(), forKey: StorageKeys.sarahPills.rawValue)
-        restAPIService.update(entityID: .sarahTookPill, domain: .inputBoolean, action: .turnOn)
-        repeatReloadAction(2)
+        restAPIService.update(entityID: .sarahTookPill, domain: .inputBoolean, action: .turnOn, reloadTimes: 2)
         WidgetCenter.shared.reloadAllTimelines()
         isSarahsPillsTaken = true
     }

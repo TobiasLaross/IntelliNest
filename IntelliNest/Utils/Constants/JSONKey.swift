@@ -46,5 +46,6 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case operationMode
     case yaleAccessTokenFull = "yale_access_token_full"
     case value
+    case vin
     case watt
 }

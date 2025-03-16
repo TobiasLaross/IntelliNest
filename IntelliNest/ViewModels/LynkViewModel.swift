@@ -53,12 +53,9 @@ class LynkViewModel: ObservableObject {
     var isLynkFlashing = false
 
     var restAPIService: RestAPIService
-    private let repeatReloadAction: IntClosure
 
-    init(restAPIService: RestAPIService,
-         repeatReloadAction: @escaping IntClosure) {
+    init(restAPIService: RestAPIService) {
         self.restAPIService = restAPIService
-        self.repeatReloadAction = repeatReloadAction
     }
 
     func forceUpdateLynk() {
@@ -67,7 +64,7 @@ class LynkViewModel: ObservableObject {
     }
 
     func forceUpdateLeaf() {
-        restAPIService.callService(serviceID: .leafUpdate, domain: .leaf)
+        restAPIService.callService(serviceID: .leafUpdate, domain: .leaf, json: [.vin: GlobalConstants.leafVIN])
         UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.leafReloadTime.rawValue)
     }
 
@@ -258,12 +255,12 @@ class LynkViewModel: ObservableObject {
 
     func startLeafClimate() {
         leafAirConditionInitiatedTime = Date()
-        restAPIService.callService(serviceID: .leafStartClimate, domain: .leaf)
+        restAPIService.callService(serviceID: .leafStartClimate, domain: .leaf, json: [.vin: GlobalConstants.leafVIN])
         isShowingHeaterOptions = false
     }
 
     func stopLeafClimate() {
         leafAirConditionInitiatedTime = nil
-        restAPIService.callService(serviceID: .leafStopClimate, domain: .leaf)
+        restAPIService.callService(serviceID: .leafStopClimate, domain: .leaf, json: [.vin: GlobalConstants.leafVIN])
     }
 }
