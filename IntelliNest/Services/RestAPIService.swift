@@ -106,11 +106,12 @@ class RestAPIService: URLRequestBuilder {
         }
 
         /* Testing purposes
-         if entityId == .roborockLastCleanArea {
-         if let string = String(data: data, encoding: .utf8) {
-         print(string)
+         if entityId == .roborockMapImage {
+             if let string = String(data: data, encoding: .utf8) {
+                 print("TLA91: string = \(string)")
+             }
          }
-         } */
+          */
 
         guard httpResponse.statusCode == 200 else {
             throw EntityError.httpRequestFailure

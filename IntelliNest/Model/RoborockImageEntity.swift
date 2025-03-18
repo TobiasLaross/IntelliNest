@@ -31,12 +31,12 @@ struct RoborockImageEntity: EntityProtocol {
         state = try container.decode(String.self, forKey: .state)
 
         let attributes = try container.decode(RoborockImageAttributes.self, forKey: .attributes)
-        urlPath = attributes.entityPicture
+        urlPath = attributes.entityPicture ?? "missingPath"
     }
 }
 
 struct RoborockImageAttributes: Decodable {
-    let entityPicture: String
+    let entityPicture: String?
 
     enum CodingKeys: String, CodingKey {
         case entityPicture = "entity_picture"

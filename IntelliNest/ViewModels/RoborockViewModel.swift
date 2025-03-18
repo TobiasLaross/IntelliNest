@@ -121,7 +121,6 @@ class RoborockViewModel: ObservableObject {
             let mapImage = try await restAPIService.reload(entityId: .roborockMapImage, entityType: RoborockImageEntity.self)
             roborockMapImage.urlPath = mapImage.urlPath
             roborockMapImage.state = mapImage.state
-            print("reloaded map")
         } catch {
             Log.error("Failed to reload roborock map: \(error)")
         }
@@ -145,7 +144,7 @@ class RoborockViewModel: ObservableObject {
     }
 
     func locateRoborock() {
-        restAPIService.update(entityID: .roborock, domain: .vacuum, action: .locate)
+        restAPIService.update(entityID: .roborock, domain: .vacuum, action: .locate, reloadTimes: 0)
     }
 
     func manualEmpty() {
