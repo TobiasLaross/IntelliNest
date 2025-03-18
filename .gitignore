@@ -7,3 +7,4 @@ IntelliNest-Info.xcconfig
 # CocoaPods
 Pods/
 .nvim/
+buildserver.json

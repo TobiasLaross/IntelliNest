@@ -13,8 +13,7 @@
 		"/opt/homebrew/bin/xcode-build-server"
 	],
 	"workspace": "/Users/tobias/Developer/personal/IntelliNest/IntelliNest.xcodeproj/project.xcworkspace",
-	"build_root": "/Users/tobias/Library/Developer/Xcode/DerivedData/IntelliNest-cbwiubgqcokqaibodmnmmfcjdzzu",
+	"build_root": "/Users/tobias/Library/Developer/Xcode/DerivedData/IntelliNest-dadbqqzjlyieqohfxijjwikewmvx",
 	"scheme": "IntelliNest",
 	"kind": "xcode"
 }
-

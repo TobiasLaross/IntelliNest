@@ -15,7 +15,6 @@ class Navigator: ObservableObject {
     @ObservedObject var urlCreator = URLCreator()
     @Published var navigationPath = [Destination]() {
         didSet {
-            updateActiveView()
             if navigationPath.isEmpty {
                 Task {
                     await homeViewModel.reload()
@@ -157,7 +156,6 @@ class Navigator: ObservableObject {
 
     func didEnterForeground() {
         isAppInForeground = true
-        updateActiveView()
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
@@ -170,7 +168,6 @@ class Navigator: ObservableObject {
 
     func didResignForeground() {
         isAppInForeground = false
-        electricityViewModel.isViewActive = false
         homeViewModel.resetExpectedLockStates()
         repeatReloadTask?.cancel()
         continousReloadTask?.cancel()
@@ -214,10 +211,6 @@ class Navigator: ObservableObject {
 
     func reloadConnection(ignoreLocalSSID _: Bool = false) async {
         await urlCreator.updateConnectionState(ignoreLocalSSID: false)
-    }
-
-    func updateActiveView() {
-        electricityViewModel.isViewActive = currentDestination == .electricity
     }
 }
 

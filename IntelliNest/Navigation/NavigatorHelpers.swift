@@ -3,7 +3,6 @@ import SwiftUI
 extension Navigator {
     func pop() {
         navigationPath.removeLast()
-        updateActiveView()
     }
 
     func show(destination: Destination) -> some View {
@@ -41,7 +40,6 @@ extension Navigator {
 
                 await reloadCurrentModel()
             }
-            updateActiveView()
         }
     }
 

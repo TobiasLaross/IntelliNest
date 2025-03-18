@@ -201,7 +201,7 @@ class RestAPIService: URLRequestBuilder {
         }
     }
 
-    func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil, reloadTimes: Int = 1) {
+    func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil, reloadTimes: Int = 2) {
         Task {
             if let action = serviceID.toAction {
                 await sendPostRequest(json: json, domain: domain, action: action)
