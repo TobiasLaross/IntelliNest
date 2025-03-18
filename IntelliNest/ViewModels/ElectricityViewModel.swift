@@ -65,8 +65,8 @@ class ElectricityViewModel: ObservableObject {
                     let nordPool = try await restAPIService.reload(entityId: entityID, entityType: NordPoolEntity.self)
                     self.nordPool = nordPool
                 } else {
-                    let state = try await restAPIService.reloadState(entityID: entityID)
-                    reload(entityID: entityID, state: state)
+                    let entity = try await restAPIService.reloadState(entityID: entityID)
+                    reload(entityID: entityID, state: entity.state)
                 }
             } catch {
                 Log.error("Failed to reload entity: \(entityID): \(error)")

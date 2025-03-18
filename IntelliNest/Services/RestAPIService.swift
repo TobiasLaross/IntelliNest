@@ -50,7 +50,7 @@ class RestAPIService: URLRequestBuilder {
         throw EntityError.genericError
     }
 
-    func reloadState(entityID: EntityId) async throws -> String {
+    func reloadState(entityID: EntityId) async throws -> Entity {
         guard let request = createURLRequest(path: "/api/states/\(entityID.rawValue)", method: .get) else {
             throw EntityError.badRequest
         }
@@ -66,8 +66,8 @@ class RestAPIService: URLRequestBuilder {
         }
 
         let decoder = JSONDecoder()
-        let entity = try decoder.decode(EntityMinimized.self, from: data)
-        return entity.state
+        let entity = try decoder.decode(Entity.self, from: data)
+        return entity
     }
 
     func reload<T: EntityProtocol>(hassEntity: T, entityType: T.Type) async -> T {

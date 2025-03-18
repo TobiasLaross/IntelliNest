@@ -82,8 +82,8 @@ class RoborockViewModel: ObservableObject {
                 } else if entityID == .roborock {
                     await reloadRoborock()
                 } else {
-                    let state = try await restAPIService.reloadState(entityID: entityID)
-                    reload(entityID: entityID, state: state)
+                    let entity = try await restAPIService.reloadState(entityID: entityID)
+                    reload(entityID: entityID, state: entity.state)
                 }
             } catch {
                 Log.error("Failed to reload entity: \(entityID): \(error)")

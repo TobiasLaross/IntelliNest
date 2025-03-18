@@ -137,9 +137,7 @@ class HeatersViewModel: ObservableObject {
         case .purifierMode:
             purifier.fanMode = PurifierFanMode(rawValue: state) ?? .off
         case .purifierFanSpeed:
-            print("speed raw: \(state)")
             purifier.speed = Double(state)?.toFanSpeedTargetNumber ?? 0
-            print("speed target: \(purifier.speed)")
         case .purifierTemperature:
             purifier.temperature = Double(state) ?? 0
         case .purifierHumidity:

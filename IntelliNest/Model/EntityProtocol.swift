@@ -33,4 +33,8 @@ extension EntityProtocol {
 
 struct EntityMinimized: Decodable {
     let state: String
+
+    enum CodingKeys: String, CodingKey {
+        case state
+    }
 }
