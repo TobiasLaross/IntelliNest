@@ -99,8 +99,8 @@ class LynkViewModel: ObservableObject {
     private func reloadEntities() async {
         for entityID in entityIDs {
             do {
-                let state = try await restAPIService.reloadState(entityID: entityID)
-                reload(entityID: entityID, state: state)
+                let entity = try await restAPIService.reloadState(entityID: entityID)
+                reload(entityID: entityID, state: entity.state, lastChanged: entity.lastChanged)
             } catch {
                 Log.error("Failed to reload entity: \(entityID): \(error)")
             }

@@ -11,18 +11,6 @@ class ElectricityViewModel: ObservableObject {
     @Published var sonnenAutomationEnabled = Entity(entityId: .sonnenAutomation)
     @Published var isShowingSonnenSettings = false
 
-    var sonnenUpdateTask: Task<Void, Error>?
-    var isViewActive = false {
-        didSet {
-            if isViewActive {
-                updateSonnenContinously()
-            } else {
-                sonnenUpdateTask?.cancel()
-                sonnenUpdateTask = nil
-            }
-        }
-    }
-
     var gridPower: String {
         let pulsePower = pulsePower.state
         let sonnenPower = Double(sonnenBattery.gridPower)
@@ -58,10 +46,12 @@ class ElectricityViewModel: ObservableObject {
         isReloading = true
         restAPIService.callService(serviceID: .updateEntity,
                                    domain: .homeassistant,
-                                   json: [.entityID: EntityId.sonnenBattery.rawValue])
+                                   json: [.entityID: EntityId.sonnenBattery.rawValue],
+                                   reloadTimes: 0)
         restAPIService.callService(serviceID: .updateEntity,
                                    domain: .homeassistant,
-                                   json: [.entityID: EntityId.sonnenBatteryStatus.rawValue])
+                                   json: [.entityID: EntityId.sonnenBatteryStatus.rawValue],
+                                   reloadTimes: 0)
         try? await Task.sleep(seconds: 0.2)
         for entityID in entityIDs {
             do {
@@ -75,8 +65,8 @@ class ElectricityViewModel: ObservableObject {
                     let nordPool = try await restAPIService.reload(entityId: entityID, entityType: NordPoolEntity.self)
                     self.nordPool = nordPool
                 } else {
-                    let state = try await restAPIService.reloadState(entityID: entityID)
-                    reload(entityID: entityID, state: state)
+                    let entity = try await restAPIService.reloadState(entityID: entityID)
+                    reload(entityID: entityID, state: entity.state)
                 }
             } catch {
                 Log.error("Failed to reload entity: \(entityID): \(error)")
@@ -97,15 +87,6 @@ class ElectricityViewModel: ObservableObject {
             sonnenAutomationEnabled.state = state
         default:
             Log.error("ElectricityViewModel doesn't reload entityID: \(entityID)")
-        }
-    }
-
-    func updateSonnenContinously() {
-        sonnenUpdateTask?.cancel()
-        sonnenUpdateTask = Task {
-            while isViewActive && false {
-                try? await Task.sleep(seconds: 2)
-            }
         }
     }
 

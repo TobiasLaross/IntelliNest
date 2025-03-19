@@ -50,7 +50,7 @@ class RestAPIService: URLRequestBuilder {
         throw EntityError.genericError
     }
 
-    func reloadState(entityID: EntityId) async throws -> String {
+    func reloadState(entityID: EntityId) async throws -> Entity {
         guard let request = createURLRequest(path: "/api/states/\(entityID.rawValue)", method: .get) else {
             throw EntityError.badRequest
         }
@@ -66,8 +66,8 @@ class RestAPIService: URLRequestBuilder {
         }
 
         let decoder = JSONDecoder()
-        let entity = try decoder.decode(EntityMinimized.self, from: data)
-        return entity.state
+        let entity = try decoder.decode(Entity.self, from: data)
+        return entity
     }
 
     func reload<T: EntityProtocol>(hassEntity: T, entityType: T.Type) async -> T {
@@ -106,11 +106,12 @@ class RestAPIService: URLRequestBuilder {
         }
 
         /* Testing purposes
-         if entityId == .roborockLastCleanArea {
-         if let string = String(data: data, encoding: .utf8) {
-         print(string)
+         if entityId == .roborockMapImage {
+             if let string = String(data: data, encoding: .utf8) {
+                 print("TLA91: string = \(string)")
+             }
          }
-         } */
+          */
 
         guard httpResponse.statusCode == 200 else {
             throw EntityError.httpRequestFailure
@@ -201,7 +202,7 @@ class RestAPIService: URLRequestBuilder {
         }
     }
 
-    func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil, reloadTimes: Int = 1) {
+    func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil, reloadTimes: Int = 2) {
         Task {
             if let action = serviceID.toAction {
                 await sendPostRequest(json: json, domain: domain, action: action)

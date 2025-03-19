@@ -100,8 +100,8 @@ class HomeViewModel: ObservableObject {
         reloadSarahsPill()
         for entityID in entityIDs {
             do {
-                let state = try await restAPIService.reloadState(entityID: entityID)
-                reload(entityID: entityID, state: state)
+                let updatedEntity = try await restAPIService.reloadState(entityID: entityID)
+                reload(entityID: entityID, state: updatedEntity.state, lastChanged: updatedEntity.lastChanged)
             } catch {
                 Log.error("Failed to reload entity: \(entityID): \(error)")
             }

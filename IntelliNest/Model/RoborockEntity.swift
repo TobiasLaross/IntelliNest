@@ -76,6 +76,6 @@ private struct RoborockAttributes: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        batteryLevel = try container.decode(Int.self, forKey: .batteryLevel)
+        batteryLevel = try container.decodeIfPresent(Int.self, forKey: .batteryLevel) ?? -1
     }
 }

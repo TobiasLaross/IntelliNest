@@ -19,6 +19,7 @@ struct SwitchEntity: EntityProtocol {
         }
 
         let now = Date()
+
         let elapsed = now.timeIntervalSince(lastChanged) / 60.0
         let minutesBeforeBlending = 1.0
         let minutesUntilPowered = 15.0
