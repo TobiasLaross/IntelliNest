@@ -28,7 +28,7 @@ extension HomeViewModel {
             text.addNewLineAndAppend("Torktumlaren: \(timeRemainingFormatter(minutesRemaining: dryerCompletionInMinutes))")
         }
 
-        if let chargingPower = Double(easeeCharger.state), chargingPower > 0 {
+        if let chargingPower = Double(easeePower.state), chargingPower > 0 {
             text.addNewLineAndAppend("Laddbox: \(chargingPower.roundedWithOneDecimal)kW")
         }
 

@@ -31,12 +31,13 @@ class HomeViewModel: ObservableObject {
     @Published var washerState = Entity(entityId: .washerState)
     @Published var dryerCompletionTime = Entity(entityId: .dryerCompletionTime)
     @Published var dryerState = Entity(entityId: .dryerState)
-    @Published var easeeCharger = Entity(entityId: .easeePower)
+    @Published var easeePower = Entity(entityId: .easeePower)
+    @Published var easeeNoCurrentReason = Entity(entityId: .easeeNoCurrentReason)
+    @Published var easeeStatus = Entity(entityId: .easeeStatus)
     @Published var generalWasteDate = Entity(entityId: .generalWasteDate)
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
     @Published var gardenWasteDate = Entity(entityId: .gardenWasteDate)
 
-    @Published var easeeIsEnabled = Entity(entityId: .easeeIsEnabled)
     @Published var isSarahsPillsTaken = false
     @Published var noLocationAccess = false
 
@@ -44,20 +45,20 @@ class HomeViewModel: ObservableObject {
     let entityIDs: [EntityId] = [
         .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
         .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
-        .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower,
-        .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights, .easeeIsEnabled
+        .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower, .easeeNoCurrentReason,
+        .easeeStatus, .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights
     ]
 
-    var chargingTitle: String {
-        isEaseeCharging ? "Pausa" : "Starta"
+    var isEaseeCharging: Bool {
+        easeeStatus.state.lowercased() == "charging"
     }
 
-    var isEaseeCharging: Bool {
-        easeeIsEnabled.isActive
+    var isEaseeAwaitingSchedule: Bool {
+        easeeNoCurrentReason.state.lowercased() == "pending_schedule" || easeeStatus.state.lowercased() == "awaiting_start"
     }
 
     var chargingIcon: Image {
-        isEaseeCharging ? .init(systemImageName: .evCharger) : .init(systemImageName: .evChargerSlash)
+        isEaseeAwaitingSchedule ? .init(systemImageName: .evChargerSlash) : .init(systemImageName: .evCharger)
     }
 
     private var restAPIService: RestAPIService
@@ -226,15 +227,17 @@ class HomeViewModel: ObservableObject {
         case .dryerState:
             dryerState.state = state
         case .easeePower:
-            easeeCharger.state = state
+            easeePower.state = state
+        case .easeeNoCurrentReason:
+            easeeNoCurrentReason.state = state
+        case .easeeStatus:
+            easeeStatus.state = state
         case .generalWasteDate:
             generalWasteDate.state = state
         case .plasticWasteDate:
             plasticWasteDate.state = state
         case .gardenWasteDate:
             gardenWasteDate.state = state
-        case .easeeIsEnabled:
-            easeeIsEnabled.state = state
         default:
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }

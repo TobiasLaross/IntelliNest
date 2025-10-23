@@ -1,10 +1,3 @@
-//
-//  NordPoolEntity.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2023-02-06.
-//
-
 import Foundation
 
 enum NordPoolDay: String {
@@ -15,7 +8,7 @@ enum NordPoolDay: String {
 struct NordPoolPriceData: Identifiable {
     var id = UUID()
     var day: NordPoolDay
-    var hour: Int
+    var quarter: Int
     var price: Int
 }
 
@@ -32,8 +25,13 @@ struct NordPoolEntity: EntityProtocol {
 
     var nextUpdate = Date().addingTimeInterval(-1)
     var isActive = true
-    var hours: [Int] {
-        stride(from: 0, to: 24, by: 3).map { $0 }
+
+    var quarters: [Int] {
+        Array(0 ..< 96)
+    }
+
+    var hourTicks: [Int] {
+        stride(from: 0, to: 96, by: 16).map { $0 }
     }
 
     var today: [Int] = [] {
@@ -87,27 +85,29 @@ struct NordPoolEntity: EntityProtocol {
         populatePriceData()
     }
 
-    func price(hour: Int) -> Int {
-        priceData.count > hour ? priceData[hour].price : 0
+    func price(quarter: Int) -> Int {
+        guard quarter >= 0, quarter < priceData.count else { return 0 }
+        return priceData[quarter].price
     }
 
-    func priceTomorrow(hour: Int) -> Int {
-        tomorrow.count > hour ? tomorrow[hour] : 0
+    func priceTomorrow(quarter: Int) -> Int {
+        guard quarter >= 0, quarter < tomorrow.count else { return 0 }
+        return tomorrow[quarter]
     }
 
     private mutating func populatePriceData() {
         priceData = []
-        var hour = 0
+        var quarter = 0
         for price in today {
-            priceData.append(.init(day: .today, hour: hour, price: price))
-            hour += 1
+            priceData.append(.init(day: .today, quarter: quarter, price: price))
+            quarter += 1
         }
 
-        hour = 0
+        quarter = 0
         if tomorrowValid {
             for price in tomorrow {
-                priceData.append(.init(day: .tomorrow, hour: hour, price: price))
-                hour += 1
+                priceData.append(.init(day: .tomorrow, quarter: quarter, price: price))
+                quarter += 1
             }
         }
     }

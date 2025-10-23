@@ -13,14 +13,8 @@
 			</array>
 		</dict>
 	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-	</array>
 	<key>EXTERNAL_URL</key>
 	<string>$(EXTERNAL_URL)</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>LOCAL_SSID</key>
 	<string>$(LOCAL_SSID)</string>
 	<key>NSUserActivityTypes</key>
@@ -62,6 +56,12 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>CarHeater</string>
 		</dict>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+		<string>remote-notification</string>
 	</array>
 </dict>
 </plist>
