@@ -170,62 +170,81 @@ private struct ServiceButtonsView: View {
                     }
             }
 
-            HStack {
-                ServiceButtonView(buttonTitle: viewModel.coffeeMachine.title,
-                                  customFont: .buttonFontSmall,
-                                  isActive: viewModel.coffeeMachine.isActive,
-                                  activeColor: viewModel.coffeeMachine.activeColor,
-                                  buttonSize: buttonSize,
-                                  icon: viewModel.coffeeMachine.image,
-                                  iconWidth: 25,
-                                  iconHeight: 35,
-                                  indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
-                                  action: viewModel.toggleCoffeeMachine)
-                    .contextMenu {
-                        Button(action: viewModel.showCoffeeMachineScheduling,
-                               label: {
-                                   Text("Schemalägg nästa start")
-                               })
+            VStack {
+                HStack {
+                    ServiceButtonView(buttonTitle: viewModel.coffeeMachine.title,
+                                      customFont: .buttonFontSmall,
+                                      isActive: viewModel.coffeeMachine.isActive,
+                                      activeColor: viewModel.coffeeMachine.activeColor,
+                                      buttonSize: buttonSize,
+                                      icon: viewModel.coffeeMachine.image,
+                                      iconWidth: 25,
+                                      iconHeight: 35,
+                                      indicatorIcon: viewModel.coffeeMachineStartTimeEnabled.timerEnabledIcon,
+                                      action: viewModel.toggleCoffeeMachine)
+                        .contextMenu {
+                            Button(action: viewModel.showCoffeeMachineScheduling,
+                                   label: {
+                                       Text("Schemalägg nästa start")
+                                   })
+                        }
+                    ServiceButtonView(buttonTitle: "Easee",
+                                      isActive: !viewModel.isEaseeAwaitingSchedule,
+                                      buttonSize: 90,
+                                      icon: viewModel.chargingIcon,
+                                      iconWidth: viewModel.isEaseeAwaitingSchedule ? 35 : 35,
+                                      iconHeight: viewModel.isEaseeAwaitingSchedule ? 40 : 35,
+                                      action: viewModel.toggleEaseeCharging)
+                    if UserManager.currentUser == .tobias {
+                        ServiceButtonView(buttonTitle: "Hitta Sarah's iPhone?",
+                                          customFont: .buttonFontSmall,
+                                          isActive: viewModel.sarahsIphone.isActive,
+                                          buttonSize: buttonSize,
+                                          icon: viewModel.sarahIphoneimage,
+                                          iconWidth: viewModel.sarahsIphone.isActive ? 40 : 20,
+                                          iconHeight: 30,
+                                          action: {
+                                              isShowingAlert = true
+                                          })
+                                          .alert(isPresented: $isShowingAlert) {
+                                              Alert(
+                                                  title: Text("Hitta Sarah's iPhone?"),
+                                                  message: Text(""),
+                                                  primaryButton: .destructive(
+                                                      Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
+                                                          viewModel.toggleStateForSarahsIphone()
+                                                      },
+                                                  secondaryButton: .cancel()
+                                              )
+                                          }
+                    } else if UserManager.currentUser == .sarah && !viewModel.isSarahsPillsTaken {
+                        ServiceButtonView(buttonTitle: "Tagit medicin",
+                                          customFont: .buttonFontSmall,
+                                          buttonSize: buttonSize,
+                                          icon: .init(systemImageName: .pills),
+                                          iconWidth: 30,
+                                          iconHeight: 30,
+                                          action: {
+                                              viewModel.sarahDidTakePills()
+                                          })
                     }
-                ServiceButtonView(buttonTitle: "Easee",
-                                  isActive: viewModel.isEaseeCharging,
-                                  buttonSize: 90,
-                                  icon: viewModel.chargingIcon,
-                                  iconWidth: viewModel.isEaseeCharging ? 35 : 35,
-                                  iconHeight: viewModel.isEaseeCharging ? 35 : 40,
-                                  action: viewModel.toggleEaseeCharging)
-                if UserManager.currentUser == .tobias {
-                    ServiceButtonView(buttonTitle: "Hitta Sarah's iPhone?",
-                                      customFont: .buttonFontSmall,
-                                      isActive: viewModel.sarahsIphone.isActive,
-                                      buttonSize: buttonSize,
-                                      icon: viewModel.sarahIphoneimage,
-                                      iconWidth: viewModel.sarahsIphone.isActive ? 40 : 20,
-                                      iconHeight: 30,
-                                      action: {
-                                          isShowingAlert = true
-                                      })
-                                      .alert(isPresented: $isShowingAlert) {
-                                          Alert(
-                                              title: Text("Hitta Sarah's iPhone?"),
-                                              message: Text(""),
-                                              primaryButton: .destructive(
-                                                  Text(viewModel.sarahsIphone.state == "on" ? "Hittad" : "Hitta")) {
-                                                      viewModel.toggleStateForSarahsIphone()
-                                                  },
-                                              secondaryButton: .cancel()
-                                          )
-                                      }
-                } else if UserManager.currentUser == .sarah && !viewModel.isSarahsPillsTaken {
-                    ServiceButtonView(buttonTitle: "Tagit medicin",
-                                      customFont: .buttonFontSmall,
-                                      buttonSize: buttonSize,
-                                      icon: .init(systemImageName: .pills),
-                                      iconWidth: 30,
-                                      iconHeight: 30,
-                                      action: {
-                                          viewModel.sarahDidTakePills()
-                                      })
+                }
+                if !viewModel.isEaseeCharging {
+                    Text(
+                        viewModel.easeeNoCurrentReason.state
+                            .replacingOccurrences(of: "_", with: " ")
+                            .capitalized
+                    )
+                    .foregroundStyle(.white)
+                    .font(.footnote)
+                    .padding(.top, 8)
+                    Text(
+                        viewModel.easeeStatus.state
+                            .replacingOccurrences(of: "_", with: " ")
+                            .capitalized
+                    )
+                    .foregroundStyle(.white)
+                    .font(.footnote)
                 }
             }
         }

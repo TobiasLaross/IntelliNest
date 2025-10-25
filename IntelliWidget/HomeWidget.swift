@@ -46,6 +46,9 @@ struct HomeWidget: Widget {
     }
 }
 
-#Preview {
-    HomeWidgetEntryView(entry: .init(date: Date(), isSarahsPillsTaken: true))
+#Preview(as: .accessoryCircular) {
+    HomeWidget()
+} timeline: {
+    SimpleEntry(date: Date(), isSarahsPillsTaken: false)
+    SimpleEntry(date: Date().addingTimeInterval(300), isSarahsPillsTaken: true)
 }
