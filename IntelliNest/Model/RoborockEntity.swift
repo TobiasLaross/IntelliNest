@@ -61,21 +61,5 @@ struct RoborockEntity: EntityProtocol {
         let entityId = try EntityId(rawValue: container.decode(String.self, forKey: .entityId))
         self.entityId = entityId ?? EntityId.unknown
         state = try container.decode(String.self, forKey: .state)
-
-        let attributes = try container.decode(RoborockAttributes.self, forKey: .attributes)
-        batteryLevel = attributes.batteryLevel
-    }
-}
-
-private struct RoborockAttributes: Decodable {
-    var batteryLevel: Int
-
-    private enum CodingKeys: String, CodingKey {
-        case batteryLevel = "battery_level"
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        batteryLevel = try container.decodeIfPresent(Int.self, forKey: .batteryLevel) ?? -1
     }
 }

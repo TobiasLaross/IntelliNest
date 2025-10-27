@@ -12,9 +12,11 @@ import UIKit
 @MainActor
 class RoborockViewModel: ObservableObject {
     @Published var roborock = RoborockEntity(entityId: .roborock)
+    @Published var roborockBattery = Entity(entityId: .roborockBattery)
     @Published var roborockAutomation = Entity(entityId: .roborockAutomation)
     @Published var roborockLastCleanArea = Entity(entityId: .roborockLastCleanArea)
-    @Published var roborockAreaSinceEmptied = Entity(entityId: .roborockAreaSinceEmptied)
+    @Published var roborockAreaWhenEmptied = Entity(entityId: .roborockAreaWhenEmptied)
+    @Published var roborockTotalCleaningArea = Entity(entityId: .roborockTotalCleaningArea)
     @Published var roborockEmptiedAtDate = Entity(entityId: .roborockEmptiedAtDate)
     @Published var roborockWaterShortage = Entity(entityId: .roborockWaterShortage, state: "off")
     @Published var roborockMapImage = RoborockImageEntity(entityId: .roborockMapImage)
@@ -47,6 +49,10 @@ class RoborockViewModel: ObservableObject {
         baseURLString.removingTrailingSlash + roborockMapImage.urlPath
     }
 
+    var cleaningAreaSinceEmptied: Double {
+        (Double(roborockTotalCleaningArea.state) ?? 0) - (Double(roborockAreaWhenEmptied.state) ?? 0)
+    }
+
     var status: String {
         let status = roborock.status.lowercased()
         let state = roborock.state.lowercased()
@@ -62,7 +68,7 @@ class RoborockViewModel: ObservableObject {
     private var isReloading = false
     private var isReloadingMap = false
     let entityIDs: [EntityId] = [.roborock, .roborockAutomation, .roborockWaterShortage, .roborockEmptiedAtDate, .roborockLastCleanArea,
-                                 .roborockAreaSinceEmptied, .roborockMapImage]
+                                 .roborockAreaWhenEmptied, .roborockTotalCleaningArea, .roborockMapImage, .roborockBattery]
     private var restAPIService: RestAPIService
 
     init(restAPIService: RestAPIService) {
@@ -96,10 +102,14 @@ class RoborockViewModel: ObservableObject {
         switch entityID {
         case .roborockAutomation:
             roborockAutomation.state = state
+        case .roborockBattery:
+            roborockBattery.state = state
         case .roborockLastCleanArea:
             roborockLastCleanArea.state = state
-        case .roborockAreaSinceEmptied:
-            roborockAreaSinceEmptied.state = state
+        case .roborockAreaWhenEmptied:
+            roborockAreaWhenEmptied.state = state
+        case .roborockTotalCleaningArea:
+            roborockTotalCleaningArea.state = state
         case .roborockEmptiedAtDate:
             roborockEmptiedAtDate.state = state
         case .roborockWaterShortage:
@@ -137,12 +147,6 @@ class RoborockViewModel: ObservableObject {
         }
     }
 
-    func reloadRoborock(state: String, status: String?, batteryLevel: Int?) {
-        roborock.state = state
-        roborock.status = status ?? ""
-        roborock.batteryLevel = batteryLevel ?? -1
-    }
-
     func locateRoborock() {
         restAPIService.update(entityID: .roborock, domain: .vacuum, action: .locate, reloadTimes: 0)
     }
@@ -173,8 +177,7 @@ class RoborockViewModel: ObservableObject {
     }
 
     func toggleRoborockAutomation() {
-        let action: Action = roborockAutomation.isActive ? .turnOff : .turnOn
-        roborockAutomation.isActive.toggle()
+        let action: Action = roborockAutomation.isActive ? .turnOn : .turnOff // Just toggled
         restAPIService.update(entityID: .roborockAutomation, domain: .automation, action: action, reloadTimes: 2)
     }
 }
