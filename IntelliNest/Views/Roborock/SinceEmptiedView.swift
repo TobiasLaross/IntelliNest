@@ -1,15 +1,8 @@
-//
-//  SinceEmptiedView.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2022-06-22.
-//
-
 import SwiftUI
 
 struct SinceEmptiedView: View {
     var emptiedAtDate: String
-    var areaSinceEmpty: String
+    var areaSinceEmpty: Double
 
     var body: some View {
         HStack(alignment: .top) {
@@ -18,7 +11,7 @@ struct SinceEmptiedView: View {
             VStack(alignment: .trailing) {
                 Text("\(emptiedAtDate.components(separatedBy: " ")[0])")
                     .foregroundColor(.white)
-                Text("\(areaSinceEmpty.components(separatedBy: ".")[0]) m²")
+                Text("\(Int(areaSinceEmpty)) m²")
                     .foregroundColor(.white)
             }
             Spacer()
@@ -28,6 +21,6 @@ struct SinceEmptiedView: View {
 
 struct SinceEmptied_Previews: PreviewProvider {
     static var previews: some View {
-        SinceEmptiedView(emptiedAtDate: "", areaSinceEmpty: "")
+        SinceEmptiedView(emptiedAtDate: "", areaSinceEmpty: 15)
     }
 }

@@ -31,11 +31,11 @@ struct RoborockView: View {
                     }
 
                     SinceEmptiedView(emptiedAtDate: viewModel.roborockEmptiedAtDate.state,
-                                     areaSinceEmpty: viewModel.roborockAreaSinceEmptied.state)
+                                     areaSinceEmpty: viewModel.cleaningAreaSinceEmptied)
                         .padding([.top])
                     HStack {
                         RoborockInfoView(lastCleanArea: viewModel.roborockLastCleanArea.state,
-                                         batteryLevel: viewModel.roborock.batteryLevel,
+                                         batteryLevel: Int(viewModel.roborockBattery.state) ?? -1,
                                          showingMapView: $viewModel.isShowingMapView)
                         Spacer()
                     }
@@ -43,8 +43,8 @@ struct RoborockView: View {
                     HStack {
                         Toggle("Automation", isOn: $viewModel.roborockAutomation.isActive)
                             .foregroundColor(.white)
-                            .frame(width: 150, height: 30, alignment: .leading)
-                            .onTapGesture {
+                            .frame(width: 190, height: 30, alignment: .leading)
+                            .onChange(of: viewModel.roborockAutomation.isActive) {
                                 viewModel.toggleRoborockAutomation()
                             }
                         Spacer()
