@@ -34,18 +34,10 @@ struct NordPoolEntity: EntityProtocol {
         stride(from: 0, to: 96, by: 16).map { $0 }
     }
 
-    var today: [Int] = [] {
-        didSet {
-            populatePriceData()
-        }
-    }
+    var today: [Int] = []
 
     var priceData: [NordPoolPriceData] = []
-    var tomorrow: [Int] = [] {
-        didSet {
-            populatePriceData()
-        }
-    }
+    var tomorrow: [Int] = []
 
     var tomorrowValid = false
 
@@ -58,18 +50,6 @@ struct NordPoolEntity: EntityProtocol {
     init(entityId: EntityId, state: String = "Loading") {
         self.entityId = entityId
         self.state = state
-    }
-
-    init(entityId: EntityId, state: String, attributes: [String: Any]) {
-        self.init(entityId: entityId, state: state)
-        if let tempTodayPrices = attributes["today"] as? [Double?] {
-            today = tempTodayPrices.map { Int($0?.rounded() ?? 0) }
-        }
-        if let tempTomorrowPrices = attributes["tomorrow"] as? [Double?] {
-            tomorrow = tempTomorrowPrices.map { Int($0?.rounded() ?? 0) }
-        }
-        tomorrowValid = attributes[AttributesCodingKeys.tomorrowValid.rawValue] as? Bool ?? false
-        populatePriceData()
     }
 
     init(from decoder: Decoder) throws {

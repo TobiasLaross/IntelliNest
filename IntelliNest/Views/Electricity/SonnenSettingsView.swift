@@ -13,7 +13,7 @@ struct SonnenSettingsView: View {
     @State private var selectedMode: SonnenOperationModes
     @State private var selectedWatt: Int
 
-    let chargeValues = [0, 1000, 5000, 7000, 10000]
+    let chargeValues = [0, 1000, 3000, 5000, 7000, 10000]
 
     var body: some View {
         ZStack {
@@ -23,9 +23,9 @@ struct SonnenSettingsView: View {
                 }
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.primaryContentBackground)
-                .frame(width: 300, height: 200)
+                .frame(width: 380, height: 230)
                 .overlay {
-                    VStack(spacing: 8) {
+                    VStack(alignment: .leading) {
                         Group {
                             HStack {
                                 Toggle("Automation", isOn: $isAutomationEnabled)
@@ -33,31 +33,31 @@ struct SonnenSettingsView: View {
                                         viewModel.setSonnenAutomationEnabled(isAutomationEnabled)
                                     }
                                     .foregroundColor(.white)
-                                    .frame(width: 150, height: 30, alignment: .leading)
-
-                                Spacer()
+                                    .frame(width: 170, height: 30, alignment: .leading)
                             }
                             .padding(.top)
                             HStack {
                                 INText("Mode:")
                                 Picker("", selection: $selectedMode) {
                                     ForEach(SonnenOperationModes.allCases.filter { $0 != .unknown }, id: \.self) {
-                                        INText($0.title)
+                                        Text($0.title)
+                                            .foregroundStyle(.white)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.7)
                                     }
                                 }
                                 .onChange(of: selectedMode) {
                                     viewModel.setSonnenOperationMode(selectedMode)
                                 }
-                                Spacer()
                             }
                             HStack {
                                 INText("Watt:")
                                 Picker("", selection: $selectedWatt) {
                                     ForEach(chargeValues, id: \.self) {
-                                        INText("\($0)")
+                                        Text("\($0)")
+                                            .foregroundStyle(.white)
                                     }
                                 }
-                                Spacer()
                             }
                             HStack {
                                 ServiceButtonView(buttonTitle: "Charge", buttonWidth: 75, buttonHeight: 40, cornerRadius: 20, action: {
@@ -66,8 +66,6 @@ struct SonnenSettingsView: View {
                                 ServiceButtonView(buttonTitle: "Discharge", buttonWidth: 75, buttonHeight: 40, cornerRadius: 20, action: {
                                     viewModel.discharge(watt: selectedWatt)
                                 })
-
-                                Spacer()
                             }
                             .padding(.top, 8)
                         }
