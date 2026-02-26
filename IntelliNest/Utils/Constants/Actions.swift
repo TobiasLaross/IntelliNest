@@ -41,7 +41,4 @@ enum Action: String, Codable {
     case setPercentage = "set_percentage"
     case setHvacMode = "set_hvac_mode"
     case updateEntity = "update_entity"
-    case sonnenOperationMode = "sonnen_put_config_operation_mode"
-    case sonnenCharge = "sonnen_charge"
-    case sonnenDischarge = "sonnen_discharge"
 }

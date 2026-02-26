@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FlowIndicatorView: View {
-    @Binding var isFlowing: Bool
+    let isFlowing: Bool
     var flowIntensity: Double
     let arrowCount: Int
 
@@ -43,5 +43,5 @@ private struct ArrowShape: Shape {
 }
 
 #Preview {
-    FlowIndicatorView(isFlowing: .constant(true), flowIntensity: 1, arrowCount: 3)
+    FlowIndicatorView(isFlowing: true, flowIntensity: 1, arrowCount: 3)
 }

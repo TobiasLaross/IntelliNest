@@ -107,6 +107,13 @@ struct AppMain: App {
                             try? await Task.sleep(seconds: 1.0)
                             navigator.snoozeWashingMachine()
                         }
+                    } else if path == NotificationActionIdentifier.fondSarahsPhone.rawValue {
+                        navigator.navigationPath = []
+                        Task {
+                            await navigator.foundSarahsPhone()
+                            try? await Task.sleep(seconds: 0.6)
+                            await navigator.foundSarahsPhone()
+                        }
                     } else {
                         navigator.navigationPath = []
                     }

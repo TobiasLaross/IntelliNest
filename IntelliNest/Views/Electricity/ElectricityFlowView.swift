@@ -30,87 +30,37 @@ private struct PowerView: View {
 }
 
 struct ElectricityFlowView: View {
-    var hasFlowBatteryToGrid: Binding<Bool> {
-        Binding(
-            get: { viewModel.sonnenBattery.hasFlowBatteryToGrid },
-            set: { _ in }
-        )
-    }
-
     @ObservedObject var viewModel: ElectricityViewModel
 
     var body: some View {
-        HStack {
-            PowerView(text: viewModel.gridPower, imageName: .powerGrid)
-                .overlay(alignment: .trailing) {
-                    FlowIndicatorView(isFlowing: $viewModel.sonnenBattery.hasFlowGridToHouse,
-                                      flowIntensity: abs(viewModel.sonnenBattery.gridPower.toKW) > 3 ? 3.0 : 1.0,
-                                      arrowCount: 6)
-                        .offset(x: 140)
+        VStack(alignment: .center) {
+            PowerView(text: viewModel.solarPower.toKWString, imageName: .solarPanel)
+                .overlay(alignment: .bottomLeading) {
+                    FlowIndicatorView(isFlowing: viewModel.isSolarToGrid,
+                                      flowIntensity: abs(viewModel.solarPower.toKW) >= 3 ? 2.0 : 1.0,
+                                      arrowCount: 4)
+                        .rotationEffect(.degrees(120))
+                        .offset(x: -50, y: 35)
                 }
                 .overlay(alignment: .bottomTrailing) {
-                    FlowIndicatorView(isFlowing: $viewModel.sonnenBattery.hasFlowGridToBattery,
-                                      flowIntensity: abs(viewModel.sonnenBattery.gridPower.toKW) > 3 ? 3.0 : 1.0,
-                                      arrowCount: 3)
-                        .rotationEffect(.degrees(45))
-                        .offset(x: 50)
+                    FlowIndicatorView(isFlowing: viewModel.isSolarToHouse,
+                                      flowIntensity: abs(viewModel.solarPower.toKW) >= 3 ? 2.0 : 1.0,
+                                      arrowCount: 4)
+                        .rotationEffect(.degrees(70))
+                        .offset(x: 40, y: 35)
                 }
-            Spacer()
-                .frame(width: 50)
-            VStack {
-                PowerView(text: viewModel.sonnenBattery.solarProduction.toKWString, imageName: .solarPanel)
+            HStack {
+                PowerView(text: viewModel.gridPower.toKWString, imageName: .powerGrid)
                     .overlay(alignment: .bottomLeading) {
-                        FlowIndicatorView(isFlowing: $viewModel.sonnenBattery.hasFlowSolarToGrid,
-                                          flowIntensity: abs(viewModel.sonnenBattery.solarProduction.toKW) >= 3 ? 2.0 : 1.0,
+                        FlowIndicatorView(isFlowing: viewModel.isGridToHouse,
+                                          flowIntensity: abs(viewModel.gridPower.toKW) >= 3 ? 2.0 : 1.0,
                                           arrowCount: 4)
-                            .rotationEffect(.degrees(145))
-                            .offset(x: -50, y: 30)
+                            .offset(x: 50, y: -20)
                     }
-                    .overlay(alignment: .bottom) {
-                        FlowIndicatorView(isFlowing: $viewModel.sonnenBattery.hasFlowSolarToBattery,
-                                          flowIntensity: abs(viewModel.sonnenBattery.solarProduction.toKW) >= 3 ? 2.0 : 1.0,
-                                          arrowCount: 2)
-                            .rotationEffect(.degrees(90))
-                            .offset(y: 30)
-                    }
-                    .overlay(alignment: .bottomTrailing) {
-                        FlowIndicatorView(isFlowing: $viewModel.sonnenBattery.hasFlowSolarToHouse,
-                                          flowIntensity: abs(viewModel.sonnenBattery.solarProduction.toKW) >= 3 ? 2.0 : 1.0,
-                                          arrowCount: 3)
-                            .rotationEffect(.degrees(45))
-                            .offset(x: 50, y: 30)
-                    }
-
-                Spacer()
-                    .frame(height: 65)
-                PowerView(text: viewModel.sonnenBattery.batteryPower.toKWString,
-                          batteryView: BatteryView(level: viewModel.sonnenBattery.chargedPercent,
-                                                   isCharging: viewModel.sonnenBattery.batteryPower > 100,
-                                                   width: 45,
-                                                   height: 80))
-                    .onTapGesture {
-                        viewModel.isShowingSonnenSettings = true
-                    }
-                    .overlay(alignment: .leading) {
-                        FlowIndicatorView(isFlowing: hasFlowBatteryToGrid,
-                                          flowIntensity: abs(viewModel.sonnenBattery.batteryPower.toKW) > 3 ? 3.0 : 1.5,
-                                          arrowCount: 3)
-                            .rotationEffect(.degrees(225))
-                            .offset(x: -60, y: -20)
-                    }
-                    .overlay(alignment: .trailing) {
-                        FlowIndicatorView(isFlowing: $viewModel.sonnenBattery.hasFlowBatteryToHouse,
-                                          flowIntensity: abs(viewModel.sonnenBattery.batteryPower.toKW) > 3 ? 3.0 : 1.5,
-                                          arrowCount: 3)
-                            .rotationEffect(.degrees(-45))
-                            .offset(x: 60, y: -20)
-                    }
+                    .padding(.trailing, 80)
+                PowerView(text: viewModel.housePower.toKWString, imageSystemName: .house)
             }
-
-            Spacer()
-                .frame(width: 50)
-            PowerView(text: viewModel.sonnenBattery.houseConsumption.toKWString, imageSystemName: .house)
-            Spacer()
+            .padding(.top, 65)
         }
     }
 }
@@ -122,7 +72,7 @@ struct ElectricityFlowView: View {
 #Preview {
     PowerView(text: "22.3kW", imageName: .solarPanel)
         .overlay(alignment: .bottomTrailing) {
-            FlowIndicatorView(isFlowing: .constant(true), flowIntensity: 0.5, arrowCount: 3)
+            FlowIndicatorView(isFlowing: true, flowIntensity: 0.5, arrowCount: 3)
                 .rotationEffect(.degrees(45))
                 .offset(x: 25)
         }
