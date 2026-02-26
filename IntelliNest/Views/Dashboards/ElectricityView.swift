@@ -1,10 +1,3 @@
-//
-//  ElectricityView.swift
-//  IntelliNest
-//
-//  Created by Tobias on 2023-12-15.
-//
-
 import SwiftUI
 
 struct ElectricityView: View {
@@ -15,28 +8,23 @@ struct ElectricityView: View {
             VStack {
                 HStack(alignment: .top) {
                     ElectricityFlowView(viewModel: viewModel)
-                        .frame(width: 230)
+                        .frame(width: 230, height: 230)
                         .padding([.top, .leading], 16)
                     Group {
                         Text("Kostnad idag: ") + Text("\(viewModel.tibberCostToday.state.toKr)").bold() +
-                            Text("\nKöpt idag: ") + Text("\(viewModel.pulseConsumptionToday.state.toKWh)").bold() +
-                            Text("\nMode: ") + Text("\(viewModel.sonnenBattery.operationMode.title)").bold()
+                            Text("\nKöpt idag: ") + Text("\(viewModel.pulseConsumptionToday.state.toKWh)").bold()
                     }
                     .font(.buttonFontMedium)
                     .lineLimit(3)
                     .minimumScaleFactor(0.1)
-                    .padding(.top, 8)
+                    .padding(.top, 16)
                     Spacer()
                 }
                 Spacer()
                 NordPoolHistoryView(nordPool: $viewModel.nordPool)
-                    .frame(height: 350)
+                    .frame(height: 480)
                     .padding(.bottom, 16)
                     .padding(.horizontal, 8)
-            }
-
-            if viewModel.isShowingSonnenSettings {
-                SonnenSettingsView(viewModel: viewModel)
             }
         }
         .foregroundStyle(.white)

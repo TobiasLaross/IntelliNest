@@ -88,8 +88,7 @@ class Navigator: ObservableObject {
                                                self?.push(.lights)
                                            },
                                            toolbarReloadAction: toolbarReload)
-    lazy var electricityViewModel = ElectricityViewModel(sonnenBattery: SonnenEntity(entityID: .sonnenBattery),
-                                                         restAPIService: restAPIService)
+    lazy var electricityViewModel = ElectricityViewModel(restAPIService: restAPIService)
     lazy var heatersViewModel = HeatersViewModel(restAPIService: restAPIService,
                                                  showHeaterDetails: { [weak self] heaterID in
                                                      if heaterID == .heaterCorridor {
@@ -132,6 +131,10 @@ class Navigator: ObservableObject {
         Task {
             await restAPIService.setState(for: .snoozeWashingMachine, in: .inputBoolean, using: .turnOn)
         }
+    }
+
+    func foundSarahsPhone() async {
+        await restAPIService.setState(for: .foundSarahsPhone, in: .inputBoolean, using: .turnOn)
     }
 
     func reload(for destination: Destination) async {

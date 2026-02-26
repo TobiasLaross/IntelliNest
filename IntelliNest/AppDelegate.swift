@@ -10,10 +10,12 @@ import UIKit
 
 private enum CategoryIdentifier: String {
     case washerReminder
+    case findSarahsPhone = "hittasarah"
 }
 
 enum NotificationActionIdentifier: String {
     case snoozeWashingMachine
+    case fondSarahsPhone
     case startCarHeater = "start-car-heater"
 }
 
@@ -68,6 +70,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if response.notification.request.content.categoryIdentifier == CategoryIdentifier.washerReminder.rawValue &&
             response.actionIdentifier == NotificationActionIdentifier.snoozeWashingMachine.rawValue {
             if let deepLinkURL = URL(string: "IntelliNest://\(response.actionIdentifier)") {
+                DispatchQueue.main.async {
+                    UIApplication.shared.open(deepLinkURL)
+                }
+            }
+        } else if response.notification.request.content.categoryIdentifier == CategoryIdentifier.findSarahsPhone.rawValue {
+            if let deepLinkURL = URL(string: "IntelliNest://\(NotificationActionIdentifier.fondSarahsPhone)") {
                 DispatchQueue.main.async {
                     UIApplication.shared.open(deepLinkURL)
                 }
