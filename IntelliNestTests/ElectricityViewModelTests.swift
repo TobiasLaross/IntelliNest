@@ -30,17 +30,6 @@ class ElectricityViewModelTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeEntityJSON(entityId: String, state: String) -> Data {
-        Data("""
-        {
-            "entity_id": "\(entityId)",
-            "state": "\(state)",
-            "last_changed": "2023-06-17T13:30:00.215607+00:00",
-            "last_updated": "2023-06-17T13:30:00.215607+00:00"
-        }
-        """.utf8)
-    }
-
     private func makeNordPoolJSON(state: String, today: [Int], tomorrow: [Int], tomorrowValid: Bool) -> Data {
         let todayJSON = today.map(String.init).joined(separator: ", ")
         let tomorrowJSON = tomorrow.map(String.init).joined(separator: ", ")
@@ -55,14 +44,6 @@ class ElectricityViewModelTests: XCTestCase {
             }
         }
         """.utf8)
-    }
-
-    private func stubEntityURL(entityID: EntityId, data: Data) {
-        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
-        components.path = "/api/states/\(entityID.rawValue)"
-        let url = components.url!
-        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-        URLProtocolStub.setStub(for: url, data: data, response: response, error: nil)
     }
 
     // MARK: - Initial State
@@ -244,8 +225,7 @@ class ElectricityViewModelTests: XCTestCase {
             .solarPower: "1000"
         ]
         for (entityID, state) in entityStates {
-            let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
-            stubEntityURL(entityID: entityID, data: data)
+            stubEntityURL(entityID: entityID, state: state)
         }
         // Stub NordPool with valid JSON so reload() doesn't fail for it
         let nordPoolData = makeNordPoolJSON(
@@ -279,8 +259,7 @@ class ElectricityViewModelTests: XCTestCase {
         stubEntityURL(entityID: .nordPool, data: nordPoolData)
         // Stub remaining entities so the reload loop doesn't stall on them
         for entityID in viewModel.entityIDs where entityID != .nordPool {
-            let data = makeEntityJSON(entityId: entityID.rawValue, state: "0")
-            stubEntityURL(entityID: entityID, data: data)
+            stubEntityURL(entityID: entityID, state: "0")
         }
 
         // When
@@ -312,13 +291,11 @@ class ElectricityViewModelTests: XCTestCase {
             }
         }
         for entityID in viewModel.entityIDs {
-            let data: Data
             if entityID == .nordPool {
-                data = self.makeNordPoolJSON(state: "100", today: [100], tomorrow: [], tomorrowValid: false)
+                stubEntityURL(entityID: entityID, data: makeNordPoolJSON(state: "100", today: [100], tomorrow: [], tomorrowValid: false))
             } else {
-                data = self.makeEntityJSON(entityId: entityID.rawValue, state: "0")
+                stubEntityURL(entityID: entityID, state: "0")
             }
-            stubEntityURL(entityID: entityID, data: data)
         }
 
         // When

@@ -41,28 +41,6 @@ class HomeViewModelTests: XCTestCase {
         urlCreator = nil
     }
 
-    // MARK: - Helpers
-
-    private func makeEntityJSON(entityId: String, state: String) -> Data {
-        Data("""
-        {
-            "entity_id": "\(entityId)",
-            "state": "\(state)",
-            "last_changed": "2023-06-17T13:30:00.215607+00:00",
-            "last_updated": "2023-06-17T13:30:00.215607+00:00"
-        }
-        """.utf8)
-    }
-
-    private func stubEntityURL(entityID: EntityId, state: String) {
-        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
-        components.path = "/api/states/\(entityID.rawValue)"
-        let url = components.url!
-        let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
-        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-        URLProtocolStub.setStub(for: url, data: data, response: response, error: nil)
-    }
-
     // MARK: - Initial State
 
     func testInitialState() {
