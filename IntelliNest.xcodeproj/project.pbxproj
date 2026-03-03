@@ -103,6 +103,12 @@
 		F6633F3F28632C81004D0B76 /* RoborockInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */; };
 		F6633F4328632EED004D0B76 /* RoborockRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */; };
 		F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4628633122004D0B76 /* RoborockMainButtons.swift */; };
+		AA000001000000000000001 /* NordPoolEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000002 /* NordPoolEntityTests.swift */; };
+		AA000003000000000000003 /* SwitchEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000004000000000000004 /* SwitchEntityTests.swift */; };
+		AA000005000000000000005 /* DateExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000006000000000000006 /* DateExtensionTests.swift */; };
+		AA000007000000000000007 /* DoubleExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000008000000000000008 /* DoubleExtensionTests.swift */; };
+		AA000009000000000000009 /* StringExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000A00000000000000A /* StringExtensionTests.swift */; };
+		AA00000B00000000000000B /* HeaterEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000C00000000000000C /* HeaterEntityTests.swift */; };
 		F664BA7229B48AF80092CB2E /* EntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7129B48AF80092CB2E /* EntityTest.swift */; };
 		F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7329B48C510092CB2E /* DateExtension.swift */; };
 		F664BA7629B48F860092CB2E /* InputNumberEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */; };
@@ -298,6 +304,12 @@
 		F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockInfoView.swift; sourceTree = "<group>"; };
 		F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockRoomsView.swift; sourceTree = "<group>"; };
 		F6633F4628633122004D0B76 /* RoborockMainButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockMainButtons.swift; sourceTree = "<group>"; };
+		AA000002000000000000002 /* NordPoolEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NordPoolEntityTests.swift; sourceTree = "<group>"; };
+		AA000004000000000000004 /* SwitchEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchEntityTests.swift; sourceTree = "<group>"; };
+		AA000006000000000000006 /* DateExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensionTests.swift; sourceTree = "<group>"; };
+		AA000008000000000000008 /* DoubleExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleExtensionTests.swift; sourceTree = "<group>"; };
+		AA00000A00000000000000A /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
+		AA00000C00000000000000C /* HeaterEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaterEntityTests.swift; sourceTree = "<group>"; };
 		F664BA7129B48AF80092CB2E /* EntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityTest.swift; sourceTree = "<group>"; };
 		F664BA7329B48C510092CB2E /* DateExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
 		F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputNumberEntityTest.swift; sourceTree = "<group>"; };
@@ -505,6 +517,12 @@
 				F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */,
 				F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */,
 				F62750B22A066B4500C1253F /* URLProtocolStub.swift */,
+			AA000002000000000000002 /* NordPoolEntityTests.swift */,
+			AA000004000000000000004 /* SwitchEntityTests.swift */,
+			AA000006000000000000006 /* DateExtensionTests.swift */,
+			AA000008000000000000008 /* DoubleExtensionTests.swift */,
+			AA00000A00000000000000A /* StringExtensionTests.swift */,
+			AA00000C00000000000000C /* HeaterEntityTests.swift */,
 			);
 			path = IntelliNestTests;
 			sourceTree = "<group>";
@@ -1158,6 +1176,12 @@
 				F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */,
 				F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */,
 				F6EF35B52A3E1BB500895250 /* LightEntityTests.swift in Sources */,
+			AA000001000000000000001 /* NordPoolEntityTests.swift in Sources */,
+			AA000003000000000000003 /* SwitchEntityTests.swift in Sources */,
+			AA000005000000000000005 /* DateExtensionTests.swift in Sources */,
+			AA000007000000000000007 /* DoubleExtensionTests.swift in Sources */,
+			AA000009000000000000009 /* StringExtensionTests.swift in Sources */,
+			AA00000B00000000000000B /* HeaterEntityTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
