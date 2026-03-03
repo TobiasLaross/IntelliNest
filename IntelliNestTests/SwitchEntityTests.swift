@@ -1,4 +1,5 @@
 @testable import IntelliNest
+import SwiftUI
 import XCTest
 
 class SwitchEntityTests: XCTestCase {

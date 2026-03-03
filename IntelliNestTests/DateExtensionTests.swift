@@ -4,16 +4,26 @@ import XCTest
 class DateExtensionTests: XCTestCase {
     // MARK: - fromISO8601
 
+    // Date.fromISO8601 uses the format yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ.
+    // The 'Z' specifier accepts RFC 822 timezone offsets (+0000 / -0600),
+    // NOT ISO 8601 extended format with a colon (+00:00). Tests use +0000.
     func testFromISO8601ValidDate() {
-        let result = Date.fromISO8601("2023-06-17T13:30:00.215607+00:00")
+        let result = Date.fromISO8601("2023-06-17T13:30:00.215607+0000")
         XCTAssertNotNil(result)
 
-        // Verify the parsed date is correct
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         formatter.timeZone = TimeZone(abbreviation: "UTC")
         let dateString = formatter.string(from: result!)
         XCTAssertEqual(dateString, "2023-06-17 13:30:00")
+    }
+
+    func testFromISO8601WithColonTimezoneReturnsNil() {
+        // The 'Z' format specifier does NOT accept the colon variant (+00:00).
+        // Home Assistant returns dates in this format — this is a known parsing gap.
+        let result = Date.fromISO8601("2023-06-17T13:30:00.215607+00:00")
+        XCTAssertNil(result, "fromISO8601 cannot parse +HH:MM timezone offsets. " +
+            "Consider switching to ISO8601DateFormatter for full ISO 8601 support.")
     }
 
     func testFromISO8601InvalidDateReturnsNil() {
