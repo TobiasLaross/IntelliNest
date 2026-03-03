@@ -13,7 +13,6 @@ enum StorageKeys: String {
     case isHome
     case lynkReloadTime
     case leafReloadTime
-    case sarahPills
     case userInitials
     case webhookID
     case yaleAccessToken

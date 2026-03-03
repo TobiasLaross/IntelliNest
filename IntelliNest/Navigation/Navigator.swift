@@ -102,10 +102,6 @@ class Navigator: ObservableObject {
     lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService)
 
     init() {
-        if UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) == nil {
-            UserDefaults.shared.setValue(Date.distantPast, forKey: StorageKeys.sarahPills.rawValue)
-        }
-
         WidgetCenter.shared.reloadAllTimelines()
 
         NotificationCenter.default.addObserver(self,

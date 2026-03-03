@@ -55,7 +55,6 @@ enum SystemImageName: String {
     case locked = "lock.fill"
     case lockSlash = "lock.slash.fill"
     case pause = "pause.fill"
-    case pills = "pills.fill"
     case play = "play.fill"
     case playTV = "play.tv"
     case powerplug

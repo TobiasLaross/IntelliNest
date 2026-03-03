@@ -9,9 +9,6 @@ import SwiftUI
 import WidgetKit
 
 struct CarHeaterEntryView: View {
-    var entry: SimpleEntry
-    let frameSize = 55.0
-
     var body: some View {
         ZStack {
             AccessoryWidgetBackground()
@@ -28,7 +25,7 @@ struct CarHeaterEntryView: View {
 @MainActor
 struct Provider: @preconcurrency TimelineProvider {
     @preconcurrency func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), isSarahsPillsTaken: false)
+        SimpleEntry(date: Date())
     }
 
     @preconcurrency func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) {
@@ -50,29 +47,26 @@ struct Provider: @preconcurrency TimelineProvider {
             return
         }
 
-        let midnightEntry = SimpleEntry(date: nextMidnight, isSarahsPillsTaken: false)
+        let midnightEntry = SimpleEntry(date: nextMidnight)
         let timeline = Timeline(entries: [entry, midnightEntry], policy: .after(nextMidnight))
         completion(timeline)
     }
 
     private func createEntry() -> SimpleEntry {
-        let lastTakenPillsDate = UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) as? Date
-        let isSarahsPillsTaken = Calendar.current.isDateInToday(lastTakenPillsDate ?? .distantPast)
-        return SimpleEntry(date: Date(), isSarahsPillsTaken: isSarahsPillsTaken)
+        SimpleEntry(date: Date())
     }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let isSarahsPillsTaken: Bool
 }
 
 struct CarHeaterWidget: Widget {
     let kind: String = "CarHeaterWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            CarHeaterEntryView(entry: entry)
+        StaticConfiguration(kind: kind, provider: Provider()) { _ in
+            CarHeaterEntryView()
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("IntelliWidget")
@@ -83,7 +77,7 @@ struct CarHeaterWidget: Widget {
 
 struct IntelliWidget_Previews: PreviewProvider {
     static var previews: some View {
-        CarHeaterEntryView(entry: SimpleEntry(date: Date(), isSarahsPillsTaken: false))
+        CarHeaterEntryView()
             .containerBackground(.fill.tertiary, for: .widget)
             .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
     }

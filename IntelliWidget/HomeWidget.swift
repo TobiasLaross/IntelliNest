@@ -9,24 +9,14 @@ import SwiftUI
 import WidgetKit
 
 struct HomeWidgetEntryView: View {
-    var entry: SimpleEntry
-
     var body: some View {
         ZStack {
             AccessoryWidgetBackground()
             Link(destination: URL(string: "IntelliNest://home")!) {
-                if UserManager.currentUser == .sarah && !entry.isSarahsPillsTaken {
-                    Image(systemName: "pills.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(10)
-                } else {
-                    // Image("widget-home-icon")
-                    Image(systemName: "house")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(12)
-                }
+                Image(systemName: "house")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding(12)
             }
         }
     }
@@ -36,8 +26,8 @@ struct HomeWidget: Widget {
     let kind: String = "HomeWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            HomeWidgetEntryView(entry: entry)
+        StaticConfiguration(kind: kind, provider: Provider()) { _ in
+            HomeWidgetEntryView()
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("IntelliWidget")
@@ -49,6 +39,6 @@ struct HomeWidget: Widget {
 #Preview(as: .accessoryCircular) {
     HomeWidget()
 } timeline: {
-    SimpleEntry(date: Date(), isSarahsPillsTaken: false)
-    SimpleEntry(date: Date().addingTimeInterval(300), isSarahsPillsTaken: true)
+    SimpleEntry(date: Date())
+    SimpleEntry(date: Date().addingTimeInterval(300))
 }
