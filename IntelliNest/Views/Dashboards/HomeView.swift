@@ -217,17 +217,6 @@ private struct ServiceButtonsView: View {
                                                   secondaryButton: .cancel()
                                               )
                                           }
-                    } else if UserManager.currentUser == .sarah && !viewModel.isSarahsPillsTaken {
-                        ServiceButtonView(buttonTitle: "Tagit medicin",
-                                          customFont: .buttonFontSmall,
-                                          buttonSize: buttonSize,
-                                          icon: .init(systemImageName: .pills),
-                                          iconWidth: 30,
-                                          iconHeight: 30,
-                                          action: {
-                                              viewModel.sarahDidTakePills()
-                                          })
-                    }
                 }
                 if !viewModel.isEaseeCharging {
                     Text(

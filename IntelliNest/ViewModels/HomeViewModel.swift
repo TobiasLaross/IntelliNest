@@ -10,7 +10,6 @@ import Foundation
 import ShipBookSDK
 import SwiftUI
 import UIKit
-import WidgetKit
 
 @MainActor
 class HomeViewModel: ObservableObject {
@@ -38,7 +37,6 @@ class HomeViewModel: ObservableObject {
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
     @Published var gardenWasteDate = Entity(entityId: .gardenWasteDate)
 
-    @Published var isSarahsPillsTaken = false
     @Published var noLocationAccess = false
 
     private var isReloading = false
@@ -98,7 +96,6 @@ class HomeViewModel: ObservableObject {
         }
 
         isReloading = true
-        reloadSarahsPill()
         for entityID in entityIDs {
             do {
                 let updatedEntity = try await restAPIService.reloadState(entityID: entityID)
@@ -266,13 +263,6 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    func sarahDidTakePills() {
-        UserDefaults.shared.setValue(Date(), forKey: StorageKeys.sarahPills.rawValue)
-        restAPIService.update(entityID: .sarahTookPill, domain: .inputBoolean, action: .turnOn, reloadTimes: 2)
-        WidgetCenter.shared.reloadAllTimelines()
-        isSarahsPillsTaken = true
-    }
-
     private func reload(lockID: LockID) async -> LockState {
         do {
             return try await yaleApiService.getLockState(lockID: lockID)
@@ -282,8 +272,4 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    private func reloadSarahsPill() {
-        let lastTakenPillsDate = UserDefaults.shared.value(forKey: StorageKeys.sarahPills.rawValue) as? Date
-        isSarahsPillsTaken = Calendar.current.isDateInToday(lastTakenPillsDate ?? .distantPast)
-    }
 }

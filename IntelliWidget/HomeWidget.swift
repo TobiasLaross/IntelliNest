@@ -15,18 +15,11 @@ struct HomeWidgetEntryView: View {
         ZStack {
             AccessoryWidgetBackground()
             Link(destination: URL(string: "IntelliNest://home")!) {
-                if UserManager.currentUser == .sarah && !entry.isSarahsPillsTaken {
-                    Image(systemName: "pills.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(10)
-                } else {
-                    // Image("widget-home-icon")
-                    Image(systemName: "house")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(12)
-                }
+                // Image("widget-home-icon")
+                Image(systemName: "house")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding(12)
             }
         }
     }
@@ -49,6 +42,6 @@ struct HomeWidget: Widget {
 #Preview(as: .accessoryCircular) {
     HomeWidget()
 } timeline: {
-    SimpleEntry(date: Date(), isSarahsPillsTaken: false)
-    SimpleEntry(date: Date().addingTimeInterval(300), isSarahsPillsTaken: true)
+    SimpleEntry(date: Date())
+    SimpleEntry(date: Date().addingTimeInterval(300))
 }
