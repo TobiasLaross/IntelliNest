@@ -217,6 +217,7 @@ private struct ServiceButtonsView: View {
                                                   secondaryButton: .cancel()
                                               )
                                           }
+                    }
                 }
                 if !viewModel.isEaseeCharging {
                     Text(
