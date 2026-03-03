@@ -9,9 +9,6 @@ import SwiftUI
 import WidgetKit
 
 struct CarHeaterEntryView: View {
-    var entry: SimpleEntry
-    let frameSize = 55.0
-
     var body: some View {
         ZStack {
             AccessoryWidgetBackground()
@@ -68,8 +65,8 @@ struct CarHeaterWidget: Widget {
     let kind: String = "CarHeaterWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            CarHeaterEntryView(entry: entry)
+        StaticConfiguration(kind: kind, provider: Provider()) { _ in
+            CarHeaterEntryView()
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("IntelliWidget")
@@ -80,7 +77,7 @@ struct CarHeaterWidget: Widget {
 
 struct IntelliWidget_Previews: PreviewProvider {
     static var previews: some View {
-        CarHeaterEntryView(entry: SimpleEntry(date: Date()))
+        CarHeaterEntryView()
             .containerBackground(.fill.tertiary, for: .widget)
             .previewContext(WidgetPreviewContext(family: .accessoryRectangular))
     }

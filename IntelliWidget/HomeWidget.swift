@@ -9,8 +9,6 @@ import SwiftUI
 import WidgetKit
 
 struct HomeWidgetEntryView: View {
-    var entry: SimpleEntry
-
     var body: some View {
         ZStack {
             AccessoryWidgetBackground()
@@ -28,8 +26,8 @@ struct HomeWidget: Widget {
     let kind: String = "HomeWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: Provider()) { entry in
-            HomeWidgetEntryView(entry: entry)
+        StaticConfiguration(kind: kind, provider: Provider()) { _ in
+            HomeWidgetEntryView()
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("IntelliWidget")
