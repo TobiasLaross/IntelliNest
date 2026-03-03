@@ -15,7 +15,6 @@ struct HomeWidgetEntryView: View {
         ZStack {
             AccessoryWidgetBackground()
             Link(destination: URL(string: "IntelliNest://home")!) {
-                // Image("widget-home-icon")
                 Image(systemName: "house")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
