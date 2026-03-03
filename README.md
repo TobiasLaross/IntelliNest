@@ -14,11 +14,11 @@ IntelliNest is a native iOS application that leverages the power of the popular 
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
 | unowned reference count             | 0 | 0 |
-| Commit count in main                | 115 | N/A |
-| Total deleted lines                 | 12169 | N/A |
-| Total added lines                   | 26101 | N/A |
+| Commit count in main                | 116 | N/A |
+| Total deleted lines                 | 12663 | N/A |
+| Total added lines                   | 26230 | N/A |
 
-Last Updated: 2025-11-26
+Last Updated: 2026-02-26
 ## Supported features
 ### Rest API and Websocket support
 Most views now use WebSocket instead of REST API for improved real-time updates.

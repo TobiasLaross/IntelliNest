@@ -24,7 +24,7 @@ enum EntityId: String, Decodable, CaseIterable {
     case coffeeMachineStartTimeEnabled = "input_boolean.kaffemaskinen_starta"
     case sidodorren = "lock.sidodorren"
     case framdorren = "lock.framdorren"
-    case storageLock = "lock.forradet"
+    case storageLock = "lock.storage_st"
     case hittaSarahsIphone = "script.hitta_sarahs_iphone"
     case sarahTookPill = "input_boolean.sarah_took_pill"
     case snoozeWashingMachine = "input_boolean.washer_snooze"
