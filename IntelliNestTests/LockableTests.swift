@@ -100,8 +100,10 @@ class LockableTests: XCTestCase {
     // When lockState is .unknown and expectedStateSetDate is old (>30s ago) → isLoading = false
     func testIsLoadingFalseWhenLockStateUnknownAndExpectedStateDateIsOld() {
         var entity = LockEntity(entityId: .storageLock, state: "Loading") // lockState = .unknown
-        entity.expectedStateSetDate = Date().addingTimeInterval(-31) // 31 seconds ago
+        // Set expectedState first — its didSet updates expectedStateSetDate to now.
+        // Then override to an old date AFTER so expectedStateIsOld returns true.
         entity.expectedState = .unknown
+        entity.expectedStateSetDate = Date().addingTimeInterval(-31)
         // isLoading = false || (true && !true) = false
         XCTAssertFalse(entity.isLoading)
     }
