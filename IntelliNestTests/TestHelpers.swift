@@ -1,5 +1,5 @@
-@testable import IntelliNest
 import Foundation
+@testable import IntelliNest
 
 func makeEntityJSON(entityId: String, state: String) -> Data {
     Data("""

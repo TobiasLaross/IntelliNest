@@ -271,5 +271,4 @@ class HomeViewModel: ObservableObject {
             return .unknown
         }
     }
-
 }
