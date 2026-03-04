@@ -190,14 +190,13 @@ class Navigator: ObservableObject {
     }
 
     func reloadHomeCoordinates() async {
-        homeCoordinates = UserDefaults.standard.value(forKey: StorageKeys.homeCoordinatesDual.rawValue) as? Coordinates
+        homeCoordinates = UserDefaults.standard.coordinates(forKey: StorageKeys.homeCoordinatesDual.rawValue)
         do {
             let homeLocation = try await restAPIService.reload(entityId: .homeLocation, entityType: HomeLocationEntity.self)
-            let homeCoordinates = Coordinates(longitude: homeLocation.longitude, latitude: homeLocation.latitude)
-            if self.homeCoordinates != homeCoordinates {
-                geoFenceManager.configureGeoFence(homeCoordinates: homeCoordinates)
-                self.homeCoordinates = homeCoordinates
-                UserDefaults.standard.setCoordinates(homeCoordinates, forKey: StorageKeys.homeCoordinatesDual)
+            let fetchedCoordinates = Coordinates(longitude: homeLocation.longitude, latitude: homeLocation.latitude)
+            if homeCoordinates != fetchedCoordinates {
+                homeCoordinates = fetchedCoordinates
+                UserDefaults.standard.setCoordinates(fetchedCoordinates, forKey: StorageKeys.homeCoordinatesDual)
             }
         } catch {
             Log.error("Failed to load home coordinates: \(error)")
@@ -289,12 +288,11 @@ private extension Navigator {
 
     func didExitHome() {
         updateYaleLocks(with: .lock)
-        guard UserManager.currentUser == .sarah || UserManager.currentUser == .tobias else {
+        guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
             Log.warning("Geofence utan användare: \(UserManager.currentUser)")
             return
         }
-        let entityID: EntityId = UserManager.currentUser == .sarah ? .sarahIsAway : .tobiasIsAway
-        restAPIService.update(entityID: entityID, domain: .inputBoolean, action: .turnOn)
+        restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOn)
     }
 
     func updateYaleLocks(with action: Action) {
