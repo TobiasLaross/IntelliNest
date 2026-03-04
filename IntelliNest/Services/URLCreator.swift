@@ -47,6 +47,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
             let ssid = await SSIDUtil.getCurrentSSID()
             if ssid == GlobalConstants.localSSID {
                 connectionState = .local
+                shouldRetryOnFailure = true
             } else {
                 retryWithExternalURL()
             }
@@ -75,6 +76,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
                 do {
                     _ = try await session.data(for: remoteRequest)
                     connectionState = .internet
+                    shouldRetryOnFailure = true
                 } catch {
                     connectionState = .disconnected
                     if shouldRetryOnFailure {
@@ -104,6 +106,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
             do {
                 _ = try await session.data(for: request)
                 connectionState = .local
+                shouldRetryOnFailure = true
             } catch {
                 retryWithExternalURL()
             }
