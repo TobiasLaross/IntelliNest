@@ -103,6 +103,9 @@
 		F6633F3F28632C81004D0B76 /* RoborockInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */; };
 		F6633F4328632EED004D0B76 /* RoborockRoomsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */; };
 		F6633F4728633122004D0B76 /* RoborockMainButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6633F4628633122004D0B76 /* RoborockMainButtons.swift */; };
+		CC0000001000000000000001 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000002000000000000002 /* TestHelpers.swift */; };
+		CC0000003000000000000003 /* HomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000004000000000000004 /* HomeViewModelTests.swift */; };
+		CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000006000000000000006 /* ElectricityViewModelTests.swift */; };
 		BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000002000000000000002 /* HeatersViewModelTests.swift */; };
 		BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000004000000000000004 /* LightsViewModelTests.swift */; };
 		BB0000005000000000000005 /* RoborockEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000006000000000000006 /* RoborockEntityTests.swift */; };
@@ -308,6 +311,9 @@
 		F6633F3E28632C81004D0B76 /* RoborockInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockInfoView.swift; sourceTree = "<group>"; };
 		F6633F4228632EED004D0B76 /* RoborockRoomsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockRoomsView.swift; sourceTree = "<group>"; };
 		F6633F4628633122004D0B76 /* RoborockMainButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockMainButtons.swift; sourceTree = "<group>"; };
+		CC0000002000000000000002 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
+		CC0000004000000000000004 /* HomeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
+		CC0000006000000000000006 /* ElectricityViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000002000000000000002 /* HeatersViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000004000000000000004 /* LightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000006000000000000006 /* RoborockEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockEntityTests.swift; sourceTree = "<group>"; };
@@ -525,6 +531,9 @@
 				F664BA7529B48F860092CB2E /* InputNumberEntityTest.swift */,
 				F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */,
 				F62750B22A066B4500C1253F /* URLProtocolStub.swift */,
+			CC0000002000000000000002 /* TestHelpers.swift */,
+			CC0000004000000000000004 /* HomeViewModelTests.swift */,
+			CC0000006000000000000006 /* ElectricityViewModelTests.swift */,
 			BB0000002000000000000002 /* HeatersViewModelTests.swift */,
 			BB0000004000000000000004 /* LightsViewModelTests.swift */,
 			BB0000006000000000000006 /* RoborockEntityTests.swift */,
@@ -1188,6 +1197,9 @@
 				F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */,
 				F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */,
 				F6EF35B52A3E1BB500895250 /* LightEntityTests.swift in Sources */,
+			CC0000001000000000000001 /* TestHelpers.swift in Sources */,
+			CC0000003000000000000003 /* HomeViewModelTests.swift in Sources */,
+			CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */,
 			BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */,
 			BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */,
 			BB0000005000000000000005 /* RoborockEntityTests.swift in Sources */,

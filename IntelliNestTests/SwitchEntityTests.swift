@@ -134,7 +134,7 @@ class SwitchEntityTests: XCTestCase {
     // MARK: - setNextUpdateTime
 
     func testSetNextUpdateTime() {
-        var entity = SwitchEntity(entityId: .coffeeMachine)
+        let entity = SwitchEntity(entityId: .coffeeMachine)
         // nextUpdate starts in the past (Date().addingTimeInterval(-1))
         XCTAssertLessThan(entity.nextUpdate.timeIntervalSinceNow, 0)
 
