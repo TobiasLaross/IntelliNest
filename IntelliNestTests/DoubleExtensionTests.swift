@@ -17,7 +17,9 @@ class DoubleExtensionTests: XCTestCase {
     }
 
     func testRoundedWithOneDecimalNegative() {
-        XCTAssertEqual((-1.25).roundedWithOneDecimal, -1.2, accuracy: 0.001)
+        // round() uses .toNearestOrAwayFromZero: -12.5 rounds to -13, giving -1.3
+        XCTAssertEqual((-1.25).roundedWithOneDecimal, -1.3, accuracy: 0.001)
+        XCTAssertEqual((-1.24).roundedWithOneDecimal, -1.2, accuracy: 0.001)
     }
 
     func testRoundedWithOneDecimalZero() {
@@ -27,10 +29,16 @@ class DoubleExtensionTests: XCTestCase {
     // MARK: - toPercent
 
     func testToPercentBelowThresholdReturnsZeroPercent() {
-        // Values below 0.06 should return "0%"
+        // toPercent applies the threshold to the *rounded* value.
+        // Only values whose roundedWithOneDecimal is 0.0 (raw < 0.05) return "0%".
         XCTAssertEqual((0.0).toPercent, "0%")
-        XCTAssertEqual((0.05).toPercent, "0%")
-        XCTAssertEqual((0.059).toPercent, "0%")
+        XCTAssertEqual((0.04).toPercent, "0%")
+    }
+
+    func testToPercentSmallNonZeroValues() {
+        // 0.05 rounds to 0.1 (≥ 0.06), so toPercent returns "0.1%", not "0%"
+        XCTAssertEqual((0.05).toPercent, "0.1%")
+        XCTAssertEqual((0.059).toPercent, "0.1%")
     }
 
     func testToPercentAtThresholdReturnsFormattedValue() {

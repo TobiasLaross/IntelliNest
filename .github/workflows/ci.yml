@@ -31,6 +31,8 @@ jobs:
             -testPlan "IntelliNest-github" \
             -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
             -configuration "Github actions" \
+            -parallel-testing-enabled YES \
+            -maximum-parallel-testing-workers 2 \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
 
