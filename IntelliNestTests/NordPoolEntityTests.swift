@@ -6,10 +6,10 @@ class NordPoolEntityTests: XCTestCase {
 
     private func makeJSON(state: String = "42.5", today: [Float?] = [], tomorrow: [Float?] = [], tomorrowValid: Bool = false) -> Data {
         let todayStr = today.map { val -> String in
-            if let v = val { return "\(v)" } else { return "null" }
+            if let value = val { "\(value)" } else { "null" }
         }.joined(separator: ", ")
         let tomorrowStr = tomorrow.map { val -> String in
-            if let v = val { return "\(v)" } else { return "null" }
+            if let value = val { "\(value)" } else { "null" }
         }.joined(separator: ", ")
         return Data("""
         {

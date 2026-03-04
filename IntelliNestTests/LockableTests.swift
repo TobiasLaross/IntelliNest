@@ -70,8 +70,8 @@ class LockableTests: XCTestCase {
     // When expectedState differs from lockState and expectedState is set → isLoading = true
     func testIsLoadingWhenExpectedStateDiffers() {
         var entity = LockEntity(entityId: .storageLock)
-        entity.state = "locked"             // lockState = .locked
-        entity.expectedState = .unlocked    // expecting unlock
+        entity.state = "locked" // lockState = .locked
+        entity.expectedState = .unlocked // expecting unlock
         XCTAssertTrue(entity.isLoading)
     }
 
