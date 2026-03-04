@@ -7,22 +7,20 @@ class HeatersViewModelTests: XCTestCase {
     var restAPIService: RestAPIService!
     var urlCreator: URLCreator!
 
-    override func setUp() async throws {
-        URLProtocolStub.startInterceptingRequests()
-        let stubbedSession = URLProtocolStub.createStubbedURLSession()
-        urlCreator = URLCreator(session: stubbedSession)
+    override func setUp() {
+        let session = URLSession(configuration: .ephemeral)
+        urlCreator = URLCreator(session: session)
         urlCreator.connectionState = .local
         restAPIService = RestAPIService(
             urlCreator: urlCreator,
-            session: stubbedSession,
+            session: session,
             setErrorBannerText: { _, _ in },
             repeatReloadAction: { _ in }
         )
         viewModel = HeatersViewModel(restAPIService: restAPIService, showHeaterDetails: { _ in })
     }
 
-    override func tearDown() async throws {
-        URLProtocolStub.stopInterceptingRequests()
+    override func tearDown() {
         viewModel = nil
         restAPIService = nil
         urlCreator = nil

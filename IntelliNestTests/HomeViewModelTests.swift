@@ -358,13 +358,16 @@ class HomeViewModelTests: XCTestCase {
     }
 
     func testReloadSilentlyHandlesNetworkFailure() async {
-        // Given: no stubs registered – all requests will fail
-        // When
+        // Stub all entities except one to avoid 20 serial URLErrors (≈1s overhead).
+        // A single network failure is sufficient to verify the error is silently swallowed.
+        for entityID in viewModel.entityIDs where entityID != .pulsePower {
+            stubEntityURL(entityID: entityID, state: "off")
+        }
         await viewModel.reload()
-        // Then: entities remain in their initial Loading state
-        XCTAssertEqual(viewModel.coffeeMachine.state, "Loading")
+        // The one unstubbed entity stays in its initial "Loading" state.
         XCTAssertEqual(viewModel.pulsePower.state, "Loading")
-        XCTAssertEqual(viewModel.easeeStatus.state, "Loading")
+        // At least one stubbed entity updated, proving reload() ran.
+        XCTAssertEqual(viewModel.coffeeMachine.state, "off")
     }
 
     func testReloadObservesCorrectURLs() async {
