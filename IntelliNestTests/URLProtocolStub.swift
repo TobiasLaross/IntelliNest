@@ -57,9 +57,15 @@ class URLProtocolStub: URLProtocol {
 
             if let error = stub.error {
                 client?.urlProtocol(self, didFailWithError: error)
+            } else {
+                client?.urlProtocolDidFinishLoading(self)
             }
+        } else {
+            // No stub registered – simulate a network failure so background Tasks
+            // complete quickly and don't call urlProtocolDidFinishLoading without a
+            // response (which violates the URLProtocol contract and can crash URLSession).
+            client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
         }
-        client?.urlProtocolDidFinishLoading(self)
     }
 
     override func stopLoading() {}

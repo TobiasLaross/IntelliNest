@@ -5,8 +5,8 @@ class DateExtensionTests: XCTestCase {
     // MARK: - fromISO8601
 
     // Date.fromISO8601 uses the format yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ.
-    // The 'Z' specifier accepts RFC 822 timezone offsets (+0000 / -0600),
-    // NOT ISO 8601 extended format with a colon (+00:00). Tests use +0000.
+    // Despite 'Z' being the RFC 822 specifier (+HHMM), Apple's DateFormatter
+    // also accepts the ISO 8601 colon form (+HH:MM) in practice.
     func testFromISO8601ValidDate() {
         let result = Date.fromISO8601("2023-06-17T13:30:00.215607+0000")
         XCTAssertNotNil(result)
@@ -18,12 +18,11 @@ class DateExtensionTests: XCTestCase {
         XCTAssertEqual(dateString, "2023-06-17 13:30:00")
     }
 
-    func testFromISO8601WithColonTimezoneReturnsNil() {
-        // The 'Z' format specifier does NOT accept the colon variant (+00:00).
-        // Home Assistant returns dates in this format — this is a known parsing gap.
+    func testFromISO8601WithColonTimezoneAlsoParsesSuccessfully() {
+        // Apple's DateFormatter accepts both +HHMM and +HH:MM timezone offsets
+        // with the 'Z' specifier. Home Assistant sends +00:00 — confirm it works.
         let result = Date.fromISO8601("2023-06-17T13:30:00.215607+00:00")
-        XCTAssertNil(result, "fromISO8601 cannot parse +HH:MM timezone offsets. " +
-            "Consider switching to ISO8601DateFormatter for full ISO 8601 support.")
+        XCTAssertNotNil(result, "fromISO8601 should parse the +HH:MM timezone format used by Home Assistant")
     }
 
     func testFromISO8601InvalidDateReturnsNil() {
@@ -79,9 +78,11 @@ class DateExtensionTests: XCTestCase {
     }
 
     func testHumanReadableYesterday() {
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
-            .addingTimeInterval(12 * 60 * 60) // noon yesterday
-        XCTAssertEqual(yesterday.humanReadable, "Yesterday")
+        // Midnight yesterday is always ≥24h before now, so it skips the "<24 hours ago"
+        // branch and reaches the isDateInYesterday check, returning "Yesterday".
+        // Noon yesterday would be <24h ago in the morning and return "N hours ago".
+        let midnightYesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
+        XCTAssertEqual(midnightYesterday.humanReadable, "Yesterday")
     }
 
     func testHumanReadableOlderDatesReturnFormattedString() {
@@ -112,8 +113,12 @@ class DateExtensionTests: XCTestCase {
     }
 
     func testDaysRemainingInThePastReturnsNil() {
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
-        XCTAssertNil(yesterday.daysRemainingDescription())
+        // Use midnight yesterday: always exactly -1 calendar day from startOfDay(today),
+        // so dateComponents([.day]) returns -1 → default case → nil.
+        // Using "now - 24h" would land at today's current time yesterday, which is
+        // 0 full days before startOfDay(today) and would incorrectly return "idag".
+        let midnightYesterday = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: Date()))!
+        XCTAssertNil(midnightYesterday.daysRemainingDescription())
     }
 
     // MARK: - minutesLeft

@@ -61,11 +61,13 @@ class SwitchEntityTests: XCTestCase {
     // MARK: - JSON Decoding
 
     func testDecodeFromJSON() throws {
+        // SwitchEntity uses ISO8601DateFormatter (default options) which requires
+        // +HH:MM colon form and does NOT parse fractional seconds.
         let json = Data("""
         {
             "entity_id": "switch.kaffemaskinen",
             "state": "on",
-            "last_changed": "2023-06-17T13:30:00.000000+0000"
+            "last_changed": "2023-06-17T13:30:00+00:00"
         }
         """.utf8)
         let entity = try JSONDecoder().decode(SwitchEntity.self, from: json)
