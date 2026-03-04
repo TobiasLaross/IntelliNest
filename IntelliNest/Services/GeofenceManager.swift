@@ -43,7 +43,6 @@ class GeofenceManager: NSObject {
     private func startMonitoring(geofenceRegion: CLCircularRegion) {
         if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
             locationManager.startMonitoring(for: geofenceRegion)
-            locationManager.requestState(for: geofenceRegion)
         }
     }
 }
@@ -64,24 +63,6 @@ extension GeofenceManager: CLLocationManagerDelegate {
                 UserDefaults.standard.set(false, forKey: StorageKeys.isHome.rawValue)
                 didExitHomeAction()
             }
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState, for region: CLRegion) {
-        guard region is CLCircularRegion else { return }
-        switch state {
-        case .inside:
-            if !UserDefaults.standard.bool(forKey: StorageKeys.isHome.rawValue) {
-                UserDefaults.standard.set(true, forKey: StorageKeys.isHome.rawValue)
-                didEnterHomeAction()
-            }
-        case .outside:
-            if UserDefaults.standard.bool(forKey: StorageKeys.isHome.rawValue) {
-                UserDefaults.standard.set(false, forKey: StorageKeys.isHome.rawValue)
-                didExitHomeAction()
-            }
-        case .unknown:
-            break
         }
     }
 
