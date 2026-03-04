@@ -51,23 +51,37 @@ class RestAPIService: URLRequestBuilder {
     }
 
     func reloadState(entityID: EntityId) async throws -> Entity {
-        guard let request = createURLRequest(path: "/api/states/\(entityID.rawValue)", method: .get) else {
+        let path = "/api/states/\(entityID.rawValue)"
+        guard let request = createURLRequest(path: path, method: .get) else {
             throw EntityError.badRequest
         }
 
-        let (data, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw EntityError.badResponse
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw EntityError.badResponse
+            }
+            guard httpResponse.statusCode == 200 else {
+                throw EntityError.httpRequestFailure
+            }
+            return try JSONDecoder().decode(Entity.self, from: data)
+        } catch {
+            let url = request.url?.absoluteString ?? ""
+            guard !url.contains(GlobalConstants.baseExternalUrlString) else {
+                throw error
+            }
+            guard let externalRequest = createURLRequest(shouldForceExternalURL: true, path: path, method: .get) else {
+                throw EntityError.badRequest
+            }
+            let (externalData, externalResponse) = try await session.data(for: externalRequest)
+            guard let httpResponse = externalResponse as? HTTPURLResponse else {
+                throw EntityError.badResponse
+            }
+            guard httpResponse.statusCode == 200 else {
+                throw EntityError.httpRequestFailure
+            }
+            return try JSONDecoder().decode(Entity.self, from: externalData)
         }
-
-        guard httpResponse.statusCode == 200 else {
-            throw EntityError.httpRequestFailure
-        }
-
-        let decoder = JSONDecoder()
-        let entity = try decoder.decode(Entity.self, from: data)
-        return entity
     }
 
     func reload<T: EntityProtocol>(hassEntity: T, entityType: T.Type) async -> T {
@@ -94,31 +108,37 @@ class RestAPIService: URLRequestBuilder {
 
     @MainActor
     func get<T: EntityProtocol>(entityId: EntityId, entityType: T.Type) async throws -> T {
-        guard let request = createURLRequest(path: "/api/states/\(entityId.rawValue)",
-                                             method: .get) else {
+        let path = "/api/states/\(entityId.rawValue)"
+        guard let request = createURLRequest(path: path, method: .get) else {
             throw EntityError.badRequest
         }
 
-        let (data, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw EntityError.badResponse
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw EntityError.badResponse
+            }
+            guard httpResponse.statusCode == 200 else {
+                throw EntityError.httpRequestFailure
+            }
+            return try JSONDecoder().decode(entityType.self, from: data)
+        } catch {
+            let url = request.url?.absoluteString ?? ""
+            guard !url.contains(GlobalConstants.baseExternalUrlString) else {
+                throw error
+            }
+            guard let externalRequest = createURLRequest(shouldForceExternalURL: true, path: path, method: .get) else {
+                throw EntityError.badRequest
+            }
+            let (externalData, externalResponse) = try await session.data(for: externalRequest)
+            guard let httpResponse = externalResponse as? HTTPURLResponse else {
+                throw EntityError.badResponse
+            }
+            guard httpResponse.statusCode == 200 else {
+                throw EntityError.httpRequestFailure
+            }
+            return try JSONDecoder().decode(entityType.self, from: externalData)
         }
-
-        /* Testing purposes
-         if entityId == .roborockMapImage {
-             if let string = String(data: data, encoding: .utf8) {
-                 print("TLA91: string = \(string)")
-             }
-         }
-          */
-
-        guard httpResponse.statusCode == 200 else {
-            throw EntityError.httpRequestFailure
-        }
-
-        let decoder = JSONDecoder()
-        return try decoder.decode(entityType.self, from: data)
     }
 
     // MARK: Post requests
