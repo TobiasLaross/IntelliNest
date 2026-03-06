@@ -15,10 +15,13 @@ class URLProtocolStub: URLProtocol {
         let data: Data?
         let response: URLResponse?
         let error: Error?
+        let delay: TimeInterval
     }
 
-    static func setStub(for url: URL, data: Data?, response: URLResponse?, error: Error?) {
-        let stub = Stub(data: data, response: response, error: error)
+    private var pendingWork: DispatchWorkItem?
+
+    static func setStub(for url: URL, data: Data?, response: URLResponse?, error: Error?, delay: TimeInterval = 0) {
+        let stub = Stub(data: data, response: response, error: error, delay: delay)
         stubs[url] = stub
     }
 
@@ -46,29 +49,41 @@ class URLProtocolStub: URLProtocol {
     }
 
     override func startLoading() {
-        if let url = request.url, let stub = URLProtocolStub.stubs[url] {
-            if let data = stub.data {
-                client?.urlProtocol(self, didLoad: data)
-            }
-
-            if let response = stub.response {
-                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            }
-
-            if let error = stub.error {
-                client?.urlProtocol(self, didFailWithError: error)
-            } else {
-                client?.urlProtocolDidFinishLoading(self)
-            }
-        } else {
+        guard let url = request.url, let stub = URLProtocolStub.stubs[url] else {
             // No stub registered – simulate a network failure so background Tasks
             // complete quickly and don't call urlProtocolDidFinishLoading without a
             // response (which violates the URLProtocol contract and can crash URLSession).
             client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
+            return
+        }
+
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            if let data = stub.data {
+                self.client?.urlProtocol(self, didLoad: data)
+            }
+            if let response = stub.response {
+                self.client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            }
+            if let error = stub.error {
+                self.client?.urlProtocol(self, didFailWithError: error)
+            } else {
+                self.client?.urlProtocolDidFinishLoading(self)
+            }
+        }
+        pendingWork = work
+
+        if stub.delay > 0 {
+            DispatchQueue.global().asyncAfter(deadline: .now() + stub.delay, execute: work)
+        } else {
+            work.perform()
         }
     }
 
-    override func stopLoading() {}
+    override func stopLoading() {
+        pendingWork?.cancel()
+        pendingWork = nil
+    }
 
     static func createStubbedURLSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
