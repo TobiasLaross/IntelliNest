@@ -6,6 +6,7 @@ extension HomeViewModelTests {
         // Given
         let lock = NSLock()
         var observedPaths: [String] = []
+        XCTAssertTrue(observedPaths.isEmpty)
         // Requests arrive from URLSession's internal threads concurrently after parallelisation,
         // so access to observedPaths must be protected.
         URLProtocolStub.observerRequests { request in
@@ -31,8 +32,11 @@ extension HomeViewModelTests {
 
     func testReloadFetchesEntitiesInParallel() async {
         // Given: each entity stub has a 0.1 s delay.
-        // Sequential execution would take 20 × 0.1 s = 2 s; parallel should be well under 1 s.
+        // Sequential execution would take n × 0.1 s; parallel should finish in ~0.1 s.
         let delayPerEntity = 0.1
+        XCTAssertNotEqual(viewModel.coffeeMachine.state, "on")
+        XCTAssertNotEqual(viewModel.easeeStatus.state, "on")
+        XCTAssertNotEqual(viewModel.allLights.state, "on")
         for entityID in viewModel.entityIDs {
             var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
             components.path = "/api/states/\(entityID.rawValue)"
@@ -47,9 +51,9 @@ extension HomeViewModelTests {
         await viewModel.reload()
         let elapsed = Date().timeIntervalSince(start)
 
-        // Then: all entities loaded, and total time is much less than sequential would require
+        // Then: all entities loaded, and total time is well under sequential execution time
         let sequentialTime = Double(viewModel.entityIDs.count) * delayPerEntity
-        XCTAssertLessThan(elapsed, sequentialTime, "Parallel: \(elapsed)s; sequential would be \(sequentialTime)s")
+        XCTAssertLessThan(elapsed, sequentialTime * 0.7, "Parallel: \(elapsed)s; sequential would be \(sequentialTime)s")
         XCTAssertEqual(viewModel.coffeeMachine.state, "on")
         XCTAssertEqual(viewModel.easeeStatus.state, "on")
         XCTAssertEqual(viewModel.allLights.state, "on")
