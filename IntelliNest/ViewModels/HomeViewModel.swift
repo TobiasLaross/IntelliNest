@@ -96,12 +96,24 @@ class HomeViewModel: ObservableObject {
         }
 
         isReloading = true
-        for entityID in entityIDs {
-            do {
-                let updatedEntity = try await restAPIService.reloadState(entityID: entityID)
-                reload(entityID: entityID, state: updatedEntity.state, lastChanged: updatedEntity.lastChanged)
-            } catch {
-                Log.error("Failed to reload entity: \(entityID): \(error)")
+        let service = restAPIService
+        await withTaskGroup(of: (EntityId, Entity)?.self) { group in
+            for entityID in entityIDs {
+                group.addTask {
+                    do {
+                        let entity = try await service.reloadState(entityID: entityID)
+                        return (entityID, entity)
+                    } catch {
+                        Log.error("Failed to reload entity: \(entityID): \(error)")
+                        return nil
+                    }
+                }
+            }
+
+            for await result in group {
+                if let (entityID, entity) = result {
+                    self.reload(entityID: entityID, state: entity.state, lastChanged: entity.lastChanged)
+                }
             }
         }
         isReloading = false

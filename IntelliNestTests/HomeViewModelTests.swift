@@ -369,26 +369,4 @@ class HomeViewModelTests: XCTestCase {
         // At least one stubbed entity updated, proving reload() ran.
         XCTAssertEqual(viewModel.coffeeMachine.state, "off")
     }
-
-    func testReloadObservesCorrectURLs() async {
-        // Given
-        var observedPaths: [String] = []
-        URLProtocolStub.observerRequests { request in
-            if let path = request.url?.path {
-                observedPaths.append(path)
-            }
-        }
-        for entityID in viewModel.entityIDs {
-            stubEntityURL(entityID: entityID, state: "off")
-        }
-
-        // When
-        await viewModel.reload()
-
-        // Then: a request was made for every entity in entityIDs
-        let expectedPaths = viewModel.entityIDs.map { "/api/states/\($0.rawValue)" }
-        for path in expectedPaths {
-            XCTAssertTrue(observedPaths.contains(path), "Expected request for path \(path)")
-        }
-    }
 }

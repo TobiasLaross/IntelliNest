@@ -70,7 +70,7 @@ class URLCreator: ObservableObject, URLRequestBuilder {
             let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
                                                             path: apiPath,
                                                             method: .get,
-                                                            timeout: 3)
+                                                            timeout: 5)
             let remoteRequest = createURLRequest(urlRequestParameters: urlRequestParameters)
             if let remoteRequest {
                 do {
@@ -97,19 +97,57 @@ class URLCreator: ObservableObject, URLRequestBuilder {
 
     @MainActor
     private func updateConnectionStateUsingRequest() async {
-        let urlRequestParameters = URLRequestParameters(forceURLString: GlobalConstants.baseInternalUrlString,
-                                                        path: apiPath,
-                                                        method: .get,
-                                                        timeout: 0.8)
-        let request = createURLRequest(urlRequestParameters: urlRequestParameters)
-        if let request {
-            do {
-                _ = try await session.data(for: request)
-                connectionState = .local
-                shouldRetryOnFailure = true
-            } catch {
-                retryWithExternalURL()
+        let internalParams = URLRequestParameters(forceURLString: GlobalConstants.baseInternalUrlString,
+                                                  path: apiPath,
+                                                  method: .get,
+                                                  timeout: 2)
+        let externalParams = URLRequestParameters(forceURLString: GlobalConstants.baseExternalUrlString,
+                                                  path: apiPath,
+                                                  method: .get,
+                                                  timeout: 5)
+
+        guard let internalRequest = createURLRequest(urlRequestParameters: internalParams),
+              let externalRequest = createURLRequest(urlRequestParameters: externalParams) else {
+            connectionState = .disconnected
+            return
+        }
+
+        let urlSession = session
+        let result = await withTaskGroup(of: ConnectionState.self) { group -> ConnectionState in
+            group.addTask {
+                do {
+                    _ = try await urlSession.data(for: internalRequest)
+                    return .local
+                } catch {
+                    return .disconnected
+                }
             }
+            group.addTask {
+                do {
+                    _ = try await urlSession.data(for: externalRequest)
+                    return .internet
+                } catch {
+                    return .disconnected
+                }
+            }
+
+            for await state in group {
+                if state != .disconnected {
+                    group.cancelAll()
+                    return state
+                }
+            }
+            return .disconnected
+        }
+
+        connectionState = result
+        if result == .disconnected {
+            if shouldRetryOnFailure {
+                shouldRetryOnFailure = false
+                retryUpdateConnectionAfterSleep()
+            }
+        } else {
+            shouldRetryOnFailure = true
         }
     }
 }
