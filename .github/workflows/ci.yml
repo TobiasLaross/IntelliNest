@@ -11,10 +11,14 @@ jobs:
     name: Build and Test
     runs-on: macos-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Show Xcode version
         run: xcodebuild -version
@@ -23,7 +27,14 @@ jobs:
         run: brew install xcbeautify swiftlint
 
       - name: SwiftFormat
-        run: BuildTools/SwiftFormat/swiftformat . --indent 4 --lint
+        run: |
+          BuildTools/SwiftFormat/swiftformat . --indent 4
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -am "Applied SwiftFormat"
+            git push
+          fi
 
       - name: SwiftLint
         run: swiftlint --config .swiftlint
