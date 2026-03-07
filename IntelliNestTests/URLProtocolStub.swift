@@ -47,12 +47,12 @@ class URLProtocolStub: URLProtocol {
 
     override func startLoading() {
         if let url = request.url, let stub = URLProtocolStub.stubs[url] {
-            if let data = stub.data {
-                client?.urlProtocol(self, didLoad: data)
-            }
-
             if let response = stub.response {
                 client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            }
+
+            if let data = stub.data {
+                client?.urlProtocol(self, didLoad: data)
             }
 
             if let error = stub.error {
