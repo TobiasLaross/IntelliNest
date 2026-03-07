@@ -60,15 +60,15 @@ class URLProtocolStub: URLProtocol {
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
             if let data = stub.data {
-                self.client?.urlProtocol(self, didLoad: data)
+                client?.urlProtocol(self, didLoad: data)
             }
             if let response = stub.response {
-                self.client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             }
             if let error = stub.error {
-                self.client?.urlProtocol(self, didFailWithError: error)
+                client?.urlProtocol(self, didFailWithError: error)
             } else {
-                self.client?.urlProtocolDidFinishLoading(self)
+                client?.urlProtocolDidFinishLoading(self)
             }
         }
         pendingWork = work
