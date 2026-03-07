@@ -19,8 +19,14 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: Install xcbeautify
-        run: brew install xcbeautify
+      - name: Install tools
+        run: brew install xcbeautify swiftlint
+
+      - name: SwiftFormat
+        run: BuildTools/SwiftFormat/swiftformat . --indent 4 --lint
+
+      - name: SwiftLint
+        run: swiftlint --config .swiftlint
 
       - name: Build and Test
         run: |
