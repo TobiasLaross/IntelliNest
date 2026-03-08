@@ -2,6 +2,7 @@
 import XCTest
 
 @MainActor
+// swiftlint:disable type_body_length
 class LynkViewModelTests: XCTestCase {
     var viewModel: LynkViewModel!
     var restAPIService: RestAPIService!
