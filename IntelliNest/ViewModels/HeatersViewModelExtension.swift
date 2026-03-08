@@ -11,6 +11,11 @@ import ShipBookSDK
 extension HeatersViewModel {
     @MainActor
     func reload() async {
+        guard !isReloading else {
+            return
+        }
+        isReloading = true
+        defer { isReloading = false }
         async let tmpThermCorridor = reload(entity: thermCorridor)
         async let tmpThermBedroom = reload(entity: thermBedroom)
         async let tmpThermGym = reload(entity: thermGym)

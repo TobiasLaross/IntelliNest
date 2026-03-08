@@ -53,7 +53,7 @@ extension HomeViewModelTests {
 
         // Then: all entities loaded, and total time is well under sequential execution time
         let sequentialTime = Double(viewModel.entityIDs.count) * delayPerEntity
-        XCTAssertLessThan(elapsed, sequentialTime * 0.7, "Parallel: \(elapsed)s; sequential would be \(sequentialTime)s")
+        XCTAssertLessThan(elapsed, sequentialTime * 0.5, "Parallel: \(elapsed)s; sequential would be \(sequentialTime)s")
         XCTAssertEqual(viewModel.coffeeMachine.state, "on")
         XCTAssertEqual(viewModel.easeeStatus.state, "on")
         XCTAssertEqual(viewModel.allLights.state, "on")

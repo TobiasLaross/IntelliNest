@@ -7,20 +7,22 @@ class HeatersViewModelTests: XCTestCase {
     var restAPIService: RestAPIService!
     var urlCreator: URLCreator!
 
-    override func setUp() {
-        let session = URLSession(configuration: .ephemeral)
-        urlCreator = URLCreator(session: session)
+    override func setUp() async throws {
+        URLProtocolStub.startInterceptingRequests()
+        let stubbedSession = URLProtocolStub.createStubbedURLSession()
+        urlCreator = URLCreator(session: stubbedSession)
         urlCreator.connectionState = .local
         restAPIService = RestAPIService(
             urlCreator: urlCreator,
-            session: session,
+            session: stubbedSession,
             setErrorBannerText: { _, _ in },
             repeatReloadAction: { _ in }
         )
         viewModel = HeatersViewModel(restAPIService: restAPIService, showHeaterDetails: { _ in })
     }
 
-    override func tearDown() {
+    override func tearDown() async throws {
+        URLProtocolStub.stopInterceptingRequests()
         viewModel = nil
         restAPIService = nil
         urlCreator = nil
@@ -176,4 +178,99 @@ class HeatersViewModelTests: XCTestCase {
         viewModel.setFanMode(viewModel.heaterCorridor, .auto)
         XCTAssertEqual(viewModel.heaterCorridor.fanMode, .auto)
     }
+
+    // MARK: - Network Reload (entityIDs loop only — therm async let bypassed in CI)
+
+    func testReloadFetchesEntityIDEntitiesFromNetwork() async {
+        // Stub all entityIDs except purifierFanSpeed (tested separately)
+        for entityID in viewModel.entityIDs where entityID != .purifierFanSpeed {
+            stubEntityURL(entityID: entityID, state: "on")
+        }
+        // purifierFanSpeed requires attributes JSON
+        let purifierData = makeEntityJSON(
+            entityId: EntityId.purifierFanSpeed.rawValue,
+            state: "100",
+            attributes: ["percentage": 100.0]
+        )
+        stubEntityURL(entityID: .purifierFanSpeed, data: purifierData)
+
+        await viewModel.reload()
+
+        XCTAssertEqual(viewModel.heaterCorridorTimerMode.state, "on")
+        XCTAssertEqual(viewModel.heaterPlayroomTimerMode.state, "on")
+        XCTAssertEqual(viewModel.purifierTimerMode.state, "on")
+        XCTAssertEqual(viewModel.resetCorridorHeaterTime.state, "on")
+        XCTAssertEqual(viewModel.resetPlayroomHeaterTime.state, "on")
+        XCTAssertEqual(viewModel.purifier.speed, 8.0)
+    }
+
+    func testReloadFetchesPurifierSpeed() async {
+        let purifierData = makeEntityJSON(
+            entityId: EntityId.purifierFanSpeed.rawValue,
+            state: "100",
+            attributes: ["percentage": 100.0]
+        )
+        stubEntityURL(entityID: .purifierFanSpeed, data: purifierData)
+
+        await viewModel.reload()
+
+        XCTAssertEqual(viewModel.purifier.speed, 8.0)
+    }
+
+    func testReloadSilentlyHandlesNetworkFailure() async {
+        // No stubs — all requests fail; entities stay at initial state
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.heaterCorridorTimerMode.state, "Loading")
+        XCTAssertEqual(viewModel.purifierTimerMode.state, "Loading")
+        XCTAssertEqual(viewModel.purifier.speed, 0.0)
+    }
+
+    // MARK: - Concurrent Reload Guard
+
+    func testReloadGuard_preventsConcurrentReload() async {
+        for entityID in viewModel.entityIDs where entityID != .purifierFanSpeed {
+            stubEntityURL(entityID: entityID, state: "on", delay: 0.05)
+        }
+        let purifierData = makeEntityJSON(
+            entityId: EntityId.purifierFanSpeed.rawValue,
+            state: "100",
+            attributes: ["percentage": 100.0]
+        )
+        stubEntityURL(entityID: .purifierFanSpeed, data: purifierData)
+
+        let lock = NSLock()
+        var requestCount = 0
+        URLProtocolStub.observerRequests { request in
+            guard request.httpMethod == "GET" else { return }
+            lock.lock()
+            requestCount += 1
+            lock.unlock()
+        }
+
+        async let first: () = viewModel.reload()
+        async let second: () = viewModel.reload()
+        _ = await (first, second)
+
+        XCTAssertLessThanOrEqual(requestCount, viewModel.entityIDs.count,
+                                 "Concurrent guard failed: \(requestCount) requests > \(viewModel.entityIDs.count)")
+    }
+}
+
+// MARK: - Helpers (delay variants — no-delay versions live in TestHelpers.swift)
+
+private func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterval) {
+    var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+    components.path = "/api/states/\(entityID.rawValue)"
+    let url = components.url!
+    let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
+    let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
+}
+
+private func stubEntityURL(entityID: EntityId, data: Data) {
+    var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+    components.path = "/api/states/\(entityID.rawValue)"
+    let url = components.url!
+    let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil)
 }

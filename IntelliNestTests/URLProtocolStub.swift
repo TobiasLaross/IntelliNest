@@ -8,6 +8,7 @@
 import Foundation
 
 class URLProtocolStub: URLProtocol {
+    private static let stubLock = NSLock()
     private static var stubs: [URL: Stub] = [:]
     private static var requestObserver: ((URLRequest) -> Void)?
 
@@ -22,11 +23,15 @@ class URLProtocolStub: URLProtocol {
 
     static func setStub(for url: URL, data: Data?, response: URLResponse?, error: Error?, delay: TimeInterval = 0) {
         let stub = Stub(data: data, response: response, error: error, delay: delay)
+        stubLock.lock()
         stubs[url] = stub
+        stubLock.unlock()
     }
 
     static func observerRequests(observer: @escaping (URLRequest) -> Void) {
+        stubLock.lock()
         requestObserver = observer
+        stubLock.unlock()
     }
 
     static func startInterceptingRequests() {
@@ -35,12 +40,17 @@ class URLProtocolStub: URLProtocol {
 
     static func stopInterceptingRequests() {
         URLProtocolStub.unregisterClass(URLProtocolStub.self)
+        stubLock.lock()
         stubs.removeAll()
         requestObserver = nil
+        stubLock.unlock()
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
-        requestObserver?(request)
+        stubLock.lock()
+        let observer = requestObserver
+        stubLock.unlock()
+        observer?(request)
         return true
     }
 
@@ -49,7 +59,15 @@ class URLProtocolStub: URLProtocol {
     }
 
     override func startLoading() {
-        guard let url = request.url, let stub = URLProtocolStub.stubs[url] else {
+        guard let url = request.url else {
+            client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
+            return
+        }
+        URLProtocolStub.stubLock.lock()
+        let stub = URLProtocolStub.stubs[url]
+        URLProtocolStub.stubLock.unlock()
+
+        guard let stub else {
             // No stub registered – simulate a network failure so background Tasks
             // complete quickly and don't call urlProtocolDidFinishLoading without a
             // response (which violates the URLProtocol contract and can crash URLSession).

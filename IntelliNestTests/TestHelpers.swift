@@ -12,6 +12,20 @@ func makeEntityJSON(entityId: String, state: String) -> Data {
     """.utf8)
 }
 
+/// Builds entity JSON with an `attributes` dictionary serialised safely via JSONSerialization.
+/// NOTE: Stub values for credential-adjacent entities (Yale token parts) must use
+/// clearly fake placeholder strings — never real credentials.
+func makeEntityJSON(entityId: String, state: String, attributes: [String: Any]) -> Data {
+    let dict: [String: Any] = [
+        "entity_id": entityId,
+        "state": state,
+        "last_changed": "2023-06-17T13:30:00.215607+00:00",
+        "last_updated": "2023-06-17T13:30:00.215607+00:00",
+        "attributes": attributes
+    ]
+    return (try? JSONSerialization.data(withJSONObject: dict)) ?? Data()
+}
+
 func stubEntityURL(entityID: EntityId, state: String) {
     let url = entityStateURL(for: entityID)
     let data = makeEntityJSON(entityId: entityID.rawValue, state: state)

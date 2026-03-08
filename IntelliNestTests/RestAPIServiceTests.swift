@@ -102,4 +102,94 @@ class RestAPIServiceTests: XCTestCase {
             XCTAssertNotNil(error)
         }
     }
+
+    // MARK: - POST tests
+
+    func testCallServiceInvokesCorrectURL() async {
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/switch/turn_on"
+        let url = components.url!
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
+
+        var capturedPath: String?
+        URLProtocolStub.observerRequests { request in
+            if request.httpMethod == "POST" {
+                capturedPath = request.url?.path
+            }
+        }
+
+        await restAPIService.setState(for: .coffeeMachine, in: .switchDomain, using: .turnOn)
+
+        XCTAssertTrue(capturedPath?.contains("/switch/turn_on") == true,
+                      "Expected POST to /switch/turn_on, got \(capturedPath ?? "nil")")
+    }
+
+    func testSendPostRequest_fallsBackToExternalURL() async {
+        // Internal URL has no stub — only external succeeds
+        var components = URLComponents(string: GlobalConstants.baseExternalUrlString)!
+        components.path = "/api/services/switch/turn_on"
+        let url = components.url!
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
+
+        var errorBannerCalled = false
+        let localService = RestAPIService(
+            urlCreator: urlCreator,
+            session: URLProtocolStub.createStubbedURLSession(),
+            setErrorBannerText: { _, _ in errorBannerCalled = true },
+            repeatReloadAction: { _ in }
+        )
+
+        await localService.setState(for: .coffeeMachine, in: .switchDomain, using: .turnOn)
+
+        XCTAssertFalse(errorBannerCalled, "Error banner should not be shown when external POST succeeds")
+    }
+
+    func testSendPostRequest_bothFailure_setsErrorBanner() async {
+        // No stubs — both internal and external POST requests fail
+        var errorBannerCallCount = 0
+        let localService = RestAPIService(
+            urlCreator: urlCreator,
+            session: URLProtocolStub.createStubbedURLSession(),
+            setErrorBannerText: { _, _ in errorBannerCallCount += 1 },
+            repeatReloadAction: { _ in }
+        )
+
+        await localService.setState(for: .coffeeMachine, in: .switchDomain, using: .turnOn)
+
+        XCTAssertGreaterThanOrEqual(errorBannerCallCount, 1, "Error banner should be shown when both POST URLs fail")
+    }
+
+    // MARK: - sendRequest tests
+
+    func testSendRequest_nonHTTPResponse_returnsBadResponse() async {
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/test/nonhttp"
+        let url = components.url!
+        // Return a plain URLResponse (not HTTPURLResponse) to trigger the bad-response path
+        let nonHttpResponse = URLResponse(url: url, mimeType: nil, expectedContentLength: 0, textEncodingName: nil)
+        URLProtocolStub.setStub(for: url, data: nil, response: nonHttpResponse, error: nil)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (statusCode, _) = await restAPIService.sendRequest(request)
+
+        // statusCodeBadResponse == 2
+        XCTAssertEqual(statusCode, 2)
+    }
+
+    func testSendRequest_HTTP500_propagatesStatusCode() async {
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/test/500"
+        let url = components.url!
+        let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: nil, response: response, error: nil)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (statusCode, _) = await restAPIService.sendRequest(request)
+
+        XCTAssertEqual(statusCode, 500)
+    }
 }

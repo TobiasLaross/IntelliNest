@@ -266,6 +266,23 @@ class HomeViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isEaseeAwaitingSchedule)
     }
 
+    // MARK: - chargingIcon
+
+    func testChargingIcon_whenAwaitingSchedule_usesSlashVariant() {
+        // SwiftUI.Image has no Equatable conformance; verify the driving condition and
+        // that the property can be computed without crashing.
+        viewModel.reload(entityID: .easeeStatus, state: "awaiting_start")
+        XCTAssertTrue(viewModel.isEaseeAwaitingSchedule)
+        _ = viewModel.chargingIcon // exercises the evChargerSlash branch
+    }
+
+    func testChargingIcon_whenCharging_usesStandardVariant() {
+        viewModel.reload(entityID: .easeeNoCurrentReason, state: "idle")
+        viewModel.reload(entityID: .easeeStatus, state: "charging")
+        XCTAssertFalse(viewModel.isEaseeAwaitingSchedule)
+        _ = viewModel.chargingIcon // exercises the evCharger branch
+    }
+
     // MARK: - Lock State
 
     func testResetExpectedLockStates() {
