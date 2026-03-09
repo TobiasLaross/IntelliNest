@@ -256,7 +256,7 @@ class HeatersViewModelTests: XCTestCase {
     }
 }
 
-// MARK: - Helpers (delay variants — no-delay versions live in TestHelpers.swift)
+// MARK: - Helpers (delay variant — no-delay versions live in TestHelpers.swift)
 
 private func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterval) {
     var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
@@ -265,12 +265,4 @@ private func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterva
     let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
     let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
     URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
-}
-
-private func stubEntityURL(entityID: EntityId, data: Data) {
-    var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
-    components.path = "/api/states/\(entityID.rawValue)"
-    let url = components.url!
-    let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil)
 }
