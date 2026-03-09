@@ -203,9 +203,17 @@ class RoborockViewModelTests: XCTestCase {
     // MARK: - Concurrent Reload Guard
 
     func testReloadGuard_preventsConcurrentReload() async {
-        for entityID in viewModel.entityIDs where entityID != .roborock && entityID != .roborockMapImage {
+        // Stub all entities so decoding succeeds on internal URL (no external fallback).
+        // RoborockImageEntity requires an `attributes` key; RoborockEntity only needs state.
+        for entityID in viewModel.entityIDs where entityID != .roborockMapImage {
             stubEntityURL(entityID: entityID, state: "on", delay: 0.05)
         }
+        let mapImageData = makeEntityJSON(
+            entityId: EntityId.roborockMapImage.rawValue,
+            state: "ok",
+            attributes: ["entity_picture": "/api/camera_proxy/camera.roborock_map"]
+        )
+        stubEntityURL(entityID: .roborockMapImage, data: mapImageData, delay: 0.05)
 
         let lock = NSLock()
         var requestCount = 0
@@ -234,6 +242,14 @@ private func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterva
     components.path = "/api/states/\(entityID.rawValue)"
     let url = components.url!
     let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
+    let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
+}
+
+private func stubEntityURL(entityID: EntityId, data: Data, delay: TimeInterval) {
+    var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+    components.path = "/api/states/\(entityID.rawValue)"
+    let url = components.url!
     let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
     URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
 }
