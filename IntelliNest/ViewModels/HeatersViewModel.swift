@@ -32,6 +32,8 @@ class HeatersViewModel: ObservableObject {
                                  .purifierTimerMode, .purifierFanSpeed, .purifierHumidity, .purifierTemperature, .purifierMode,
                                  .resetPurifierTime]
 
+    var isReloading = false
+
     let restAPIService: RestAPIService
     let showHeaterDetails: MainActorEntityIDClosure
     init(restAPIService: RestAPIService, showHeaterDetails: @escaping MainActorEntityIDClosure) {

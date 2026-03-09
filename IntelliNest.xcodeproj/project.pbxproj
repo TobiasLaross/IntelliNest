@@ -107,6 +107,8 @@
 		CC0000003000000000000003 /* HomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000004000000000000004 /* HomeViewModelTests.swift */; };
 		CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000006000000000000006 /* ElectricityViewModelTests.swift */; };
 		BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000002000000000000002 /* HeatersViewModelTests.swift */; };
+		DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000002000000000000002 /* LynkViewModelTests.swift */; };
+		DD0000003000000000000003 /* RoborockViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000004000000000000004 /* RoborockViewModelTests.swift */; };
 		BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000004000000000000004 /* LightsViewModelTests.swift */; };
 		BB0000005000000000000005 /* RoborockEntityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000006000000000000006 /* RoborockEntityTests.swift */; };
 		BB0000007000000000000007 /* LockableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000008000000000000008 /* LockableTests.swift */; };
@@ -315,6 +317,8 @@
 		CC0000004000000000000004 /* HomeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
 		CC0000006000000000000006 /* ElectricityViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000002000000000000002 /* HeatersViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModelTests.swift; sourceTree = "<group>"; };
+		DD0000002000000000000002 /* LynkViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LynkViewModelTests.swift; sourceTree = "<group>"; };
+		DD0000004000000000000004 /* RoborockViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000004000000000000004 /* LightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000006000000000000006 /* RoborockEntityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoborockEntityTests.swift; sourceTree = "<group>"; };
 		BB0000008000000000000008 /* LockableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockableTests.swift; sourceTree = "<group>"; };
@@ -535,6 +539,8 @@
 			CC0000004000000000000004 /* HomeViewModelTests.swift */,
 			CC0000006000000000000006 /* ElectricityViewModelTests.swift */,
 			BB0000002000000000000002 /* HeatersViewModelTests.swift */,
+			DD0000002000000000000002 /* LynkViewModelTests.swift */,
+			DD0000004000000000000004 /* RoborockViewModelTests.swift */,
 			BB0000004000000000000004 /* LightsViewModelTests.swift */,
 			BB0000006000000000000006 /* RoborockEntityTests.swift */,
 			BB0000008000000000000008 /* LockableTests.swift */,
@@ -1201,6 +1207,8 @@
 			CC0000003000000000000003 /* HomeViewModelTests.swift in Sources */,
 			CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */,
 			BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */,
+			DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */,
+			DD0000003000000000000003 /* RoborockViewModelTests.swift in Sources */,
 			BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */,
 			BB0000005000000000000005 /* RoborockEntityTests.swift in Sources */,
 			BB0000007000000000000007 /* LockableTests.swift in Sources */,

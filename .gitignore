@@ -8,3 +8,6 @@ IntelliNest-Info.xcconfig
 Pods/
 .nvim/
 buildserver.json
+
+Claude Code/
+.claude/settings.local.json
