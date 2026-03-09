@@ -540,14 +540,3 @@ class LynkViewModelTests: XCTestCase {
                        "Expected \(viewModel.entityIDs.count) GETs (1 pass); got \(requestCount)")
     }
 }
-
-// MARK: - Helpers
-
-private func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterval = 0) {
-    var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
-    components.path = "/api/states/\(entityID.rawValue)"
-    let url = components.url!
-    let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
-    let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
-}

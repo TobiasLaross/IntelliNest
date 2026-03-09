@@ -26,11 +26,11 @@ func makeEntityJSON(entityId: String, state: String, attributes: [String: Any]) 
     return (try? JSONSerialization.data(withJSONObject: dict)) ?? Data()
 }
 
-func stubEntityURL(entityID: EntityId, state: String) {
+func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterval = 0) {
     let url = entityStateURL(for: entityID)
     let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
     let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil)
+    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
 }
 
 func stubEntityURL(entityID: EntityId, data: Data) {

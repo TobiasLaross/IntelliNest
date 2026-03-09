@@ -255,14 +255,3 @@ class HeatersViewModelTests: XCTestCase {
                                  "Concurrent guard failed: \(requestCount) requests > \(viewModel.entityIDs.count)")
     }
 }
-
-// MARK: - Helpers (delay variant — no-delay versions live in TestHelpers.swift)
-
-private func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterval) {
-    var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
-    components.path = "/api/states/\(entityID.rawValue)"
-    let url = components.url!
-    let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
-    let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
-}

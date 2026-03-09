@@ -9,5 +9,5 @@ Pods/
 .nvim/
 buildserver.json
 
-Claude Code
+Claude Code/
 .claude/settings.local.json
