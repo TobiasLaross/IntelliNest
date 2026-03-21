@@ -7,14 +7,14 @@ class RestAPIService: URLRequestBuilder {
         urlCreator.urlString
     }
 
-    private let statusCodeOK = 0
+    let statusCodeOK = 0
     private let statusCodeBadRequest = 1
     private let statusCodeBadResponse = 2
     private let statusCodeFailedRequest = 3
 
     private let urlCreator: URLCreator
     private let session: URLSession
-    private let setErrorBannerText: StringStringClosure
+    let setErrorBannerText: StringStringClosure
     private let repeatReloadAction: IntClosure
 
     init(
