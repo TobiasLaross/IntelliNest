@@ -9,7 +9,7 @@ import Foundation
 import ShipBookSDK
 
 @MainActor
-class HeatersViewModel: ObservableObject {
+class HeatersViewModel: ObservableObject, Reloadable {
     @Published var heaterCorridor = HeaterEntity(entityId: .heaterCorridor)
     @Published var heaterPlayroom = HeaterEntity(entityId: .heaterPlayroom)
     @Published var purifier = PurifierEntity()
@@ -32,7 +32,7 @@ class HeatersViewModel: ObservableObject {
                                  .purifierTimerMode, .purifierFanSpeed, .purifierHumidity, .purifierTemperature, .purifierMode,
                                  .resetPurifierTime]
 
-    private(set) var isReloading = false
+    var isReloading = false
 
     let restAPIService: RestAPIService
     let showHeaterDetails: MainActorEntityIDClosure
@@ -125,30 +125,28 @@ class HeatersViewModel: ObservableObject {
                               action: action)
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
+    private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<HeatersViewModel, Entity>] = [
+        .resetCorridorHeaterTime: \.resetCorridorHeaterTime,
+        .resetPlayroomHeaterTime: \.resetPlayroomHeaterTime,
+        .heaterCorridorTimerMode: \.heaterCorridorTimerMode,
+        .heaterPlayroomTimerMode: \.heaterPlayroomTimerMode,
+        .resetPurifierTime: \.resetPurifierTime,
+        .purifierTimerMode: \.purifierTimerMode,
+    ]
+
+    private lazy var purifierReloaders: [EntityId: (String) -> Void] = [
+        .purifierMode: { [unowned self] state in purifier.fanMode = PurifierFanMode(rawValue: state) ?? .off },
+        .purifierFanSpeed: { [unowned self] state in purifier.speed = Double(state)?.toFanSpeedTargetNumber ?? 0 },
+        .purifierTemperature: { [unowned self] state in purifier.temperature = Double(state) ?? 0 },
+        .purifierHumidity: { [unowned self] state in purifier.humidity = Int(state) ?? 0 },
+    ]
+
     func reload(entityID: EntityId, state: String) {
-        switch entityID {
-        case .resetCorridorHeaterTime:
-            resetCorridorHeaterTime.state = state
-        case .resetPlayroomHeaterTime:
-            resetPlayroomHeaterTime.state = state
-        case .heaterCorridorTimerMode:
-            heaterCorridorTimerMode.state = state
-        case .heaterPlayroomTimerMode:
-            heaterPlayroomTimerMode.state = state
-        case .purifierMode:
-            purifier.fanMode = PurifierFanMode(rawValue: state) ?? .off
-        case .purifierFanSpeed:
-            purifier.speed = Double(state)?.toFanSpeedTargetNumber ?? 0
-        case .purifierTemperature:
-            purifier.temperature = Double(state) ?? 0
-        case .purifierHumidity:
-            purifier.humidity = Int(state) ?? 0
-        case .resetPurifierTime:
-            resetPurifierTime.state = state
-        case .purifierTimerMode:
-            purifierTimerMode.state = state
-        default:
+        if let keyPath = entityKeyPaths[entityID] {
+            self[keyPath: keyPath].state = state
+        } else if let reloader = purifierReloaders[entityID] {
+            reloader(state)
+        } else {
             Log.error("HeatersViewModel doesn't reload entityID: \(entityID)")
         }
     }

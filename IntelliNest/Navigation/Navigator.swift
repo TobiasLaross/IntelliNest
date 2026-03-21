@@ -207,8 +207,8 @@ class Navigator: ObservableObject {
         }
     }
 
-    func reloadConnection(ignoreLocalSSID _: Bool = false) async {
-        await urlCreator.updateConnectionState(ignoreLocalSSID: false)
+    func reloadConnection(ignoreLocalSSID: Bool = false) async {
+        await urlCreator.updateConnectionState(ignoreLocalSSID: ignoreLocalSSID)
     }
 }
 

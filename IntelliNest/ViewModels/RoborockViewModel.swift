@@ -10,7 +10,7 @@ import ShipBookSDK
 import UIKit
 
 @MainActor
-class RoborockViewModel: ObservableObject {
+class RoborockViewModel: ObservableObject, Reloadable {
     @Published var roborock = RoborockEntity(entityId: .roborock)
     @Published var roborockBattery = Entity(entityId: .roborockBattery)
     @Published var roborockAutomation = Entity(entityId: .roborockAutomation)
@@ -65,7 +65,7 @@ class RoborockViewModel: ObservableObject {
         }
     }
 
-    private var isReloading = false
+    var isReloading = false
     private var isReloadingMap = false
     let entityIDs: [EntityId] = [.roborock, .roborockAutomation, .roborockWaterShortage, .roborockEmptiedAtDate, .roborockLastCleanArea,
                                  .roborockAreaWhenEmptied, .roborockTotalCleaningArea, .roborockMapImage, .roborockBattery]
@@ -76,62 +76,55 @@ class RoborockViewModel: ObservableObject {
     }
 
     func reload() async {
-        guard !isReloading else {
-            return
-        }
-
-        isReloading = true
-        defer { isReloading = false }
-        let service = restAPIService
-        let simpleEntityIDs = entityIDs.filter { $0 != .roborockMapImage && $0 != .roborock }
-        await withTaskGroup(of: (EntityId, Entity)?.self) { group in
-            group.addTask {
-                await self.reloadMapImage()
-                return nil
-            }
-            group.addTask {
-                await self.reloadRoborock()
-                return nil
-            }
-            for entityID in simpleEntityIDs {
+        await withReloadGuard {
+            let service = self.restAPIService
+            let simpleEntityIDs = self.entityIDs.filter { $0 != .roborockMapImage && $0 != .roborock }
+            await withTaskGroup(of: (EntityId, Entity)?.self) { group in
                 group.addTask {
-                    do {
-                        let entity = try await service.reloadState(entityID: entityID)
-                        return (entityID, entity)
-                    } catch {
-                        Log.error("Failed to reload entity: \(entityID): \(error)")
-                        return nil
+                    await self.reloadMapImage()
+                    return nil
+                }
+                group.addTask {
+                    await self.reloadRoborock()
+                    return nil
+                }
+                for entityID in simpleEntityIDs {
+                    group.addTask {
+                        do {
+                            let entity = try await service.reloadState(entityID: entityID)
+                            return (entityID, entity)
+                        } catch {
+                            Log.error("Failed to reload entity: \(entityID): \(error)")
+                            return nil
+                        }
                     }
                 }
-            }
 
-            for await result in group {
-                if let (entityID, entity) = result {
-                    self.reload(entityID: entityID, state: entity.state)
+                for await result in group {
+                    if let (entityID, entity) = result {
+                        self.reload(entityID: entityID, state: entity.state)
+                    }
                 }
             }
         }
     }
 
+    private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<RoborockViewModel, Entity>] = [
+        .roborockAutomation: \.roborockAutomation,
+        .roborockBattery: \.roborockBattery,
+        .roborockLastCleanArea: \.roborockLastCleanArea,
+        .roborockAreaWhenEmptied: \.roborockAreaWhenEmptied,
+        .roborockTotalCleaningArea: \.roborockTotalCleaningArea,
+        .roborockEmptiedAtDate: \.roborockEmptiedAtDate,
+        .roborockWaterShortage: \.roborockWaterShortage,
+    ]
+
     func reload(entityID: EntityId, state: String) {
-        switch entityID {
-        case .roborockAutomation:
-            roborockAutomation.state = state
-        case .roborockBattery:
-            roborockBattery.state = state
-        case .roborockLastCleanArea:
-            roborockLastCleanArea.state = state
-        case .roborockAreaWhenEmptied:
-            roborockAreaWhenEmptied.state = state
-        case .roborockTotalCleaningArea:
-            roborockTotalCleaningArea.state = state
-        case .roborockEmptiedAtDate:
-            roborockEmptiedAtDate.state = state
-        case .roborockWaterShortage:
-            roborockWaterShortage.state = state
-        case .roborockMapImage:
+        if let keyPath = entityKeyPaths[entityID] {
+            self[keyPath: keyPath].state = state
+        } else if entityID == .roborockMapImage {
             roborockMapImage.state = state
-        default:
+        } else {
             Log.error("RoborockViewModel doesn't reload entityID: \(entityID)")
         }
     }

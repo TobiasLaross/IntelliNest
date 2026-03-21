@@ -35,6 +35,7 @@
 		F61BF9A22A166C4900C1802E /* YaleLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A12A166C4900C1802E /* YaleLock.swift */; };
 		F61BF9A42A166E0D00C1802E /* LockState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A32A166E0D00C1802E /* LockState.swift */; };
 		F61BF9A62A166F9A00C1802E /* Lockable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A52A166F9A00C1802E /* Lockable.swift */; };
+		C10DE00200000000RELOADAB /* Reloadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10DE00100000000RELOADAB /* Reloadable.swift */; };
 		F61BF9A82A1672C300C1802E /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A72A1672C300C1802E /* HTTPMethod.swift */; };
 		F61BF9AA2A16749D00C1802E /* JSONKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9A92A16749D00C1802E /* JSONKey.swift */; };
 		F61BF9AC2A167AC600C1802E /* DoorState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61BF9AB2A167AC600C1802E /* DoorState.swift */; };
@@ -247,6 +248,7 @@
 		F61BF9A12A166C4900C1802E /* YaleLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YaleLock.swift; sourceTree = "<group>"; };
 		F61BF9A32A166E0D00C1802E /* LockState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockState.swift; sourceTree = "<group>"; };
 		F61BF9A52A166F9A00C1802E /* Lockable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lockable.swift; sourceTree = "<group>"; };
+		C10DE00100000000RELOADAB /* Reloadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reloadable.swift; sourceTree = "<group>"; };
 		F61BF9A72A1672C300C1802E /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
 		F61BF9A92A16749D00C1802E /* JSONKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONKey.swift; sourceTree = "<group>"; };
 		F61BF9AB2A167AC600C1802E /* DoorState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoorState.swift; sourceTree = "<group>"; };
@@ -456,6 +458,7 @@
 				F61BF9A12A166C4900C1802E /* YaleLock.swift */,
 				F61BF9AD2A167D0E00C1802E /* YaleLockResponse.swift */,
 				F61BF9A52A166F9A00C1802E /* Lockable.swift */,
+				C10DE00100000000RELOADAB /* Reloadable.swift */,
 				F662999927B7D8DA00121C14 /* HeaterEntity.swift */,
 				F6633F22285DF8E6004D0B76 /* CameraEntity.swift */,
 				F6F60E5E27F1FBE3009F3966 /* InputNumberEntity.swift */,
@@ -1115,6 +1118,7 @@
 				F67C0B6D298D07E50096AE49 /* DeviceID.swift in Sources */,
 				F61BF99C2A1653E600C1802E /* YaleApiService.swift in Sources */,
 				F61BF9A62A166F9A00C1802E /* Lockable.swift in Sources */,
+				C10DE00200000000RELOADAB /* Reloadable.swift in Sources */,
 				F61726352B627512007C1E99 /* PrimaryContentBorderView.swift in Sources */,
 				F6633F38286328E8004D0B76 /* HorizontalModeView.swift in Sources */,
 				F6F1D08229A27A6100A3292E /* ImageExtension.swift in Sources */,

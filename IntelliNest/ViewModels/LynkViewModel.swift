@@ -3,7 +3,7 @@ import ShipBookSDK
 import SwiftUI
 
 @MainActor
-class LynkViewModel: ObservableObject {
+class LynkViewModel: ObservableObject, Reloadable {
     // Lynk
     @Published var lynkClimateHeating = Entity(entityId: .lynkClimateHeating)
     @Published var isEngineRunning = Entity(entityId: .lynkEngineRunning)
@@ -49,7 +49,7 @@ class LynkViewModel: ObservableObject {
         .lynkChargerUpdatedAt, .leafACTimer, .leafBattery, .leafRangeAC, .leafCharging, .leafPluggedIn,
         .leafLastPoll
     ]
-    private var isReloading = false
+    var isReloading = false
     var isLynkFlashing = false
 
     private let restAPIService: RestAPIService
@@ -69,31 +69,27 @@ class LynkViewModel: ObservableObject {
     }
 
     func reload() async {
-        guard !isReloading else {
-            return
-        }
+        await withReloadGuard {
+            var shouldSleep = false
+            let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
+            if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
+                self.forceUpdateLynk()
+                await self.reloadEntities()
+                shouldSleep = true
+            }
 
-        isReloading = true
-        defer { isReloading = false }
-        var shouldSleep = false
-        let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
-        if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
-            forceUpdateLynk()
-            await reloadEntities()
-            shouldSleep = true
-        }
+            let lastLeafReloadTime = UserDefaults.shared.value(forKey: StorageKeys.leafReloadTime.rawValue) as? Date
+            if (lastLeafReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
+                self.forceUpdateLeaf()
+                await self.reloadEntities()
+                shouldSleep = true
+            }
 
-        let lastLeafReloadTime = UserDefaults.shared.value(forKey: StorageKeys.leafReloadTime.rawValue) as? Date
-        if (lastLeafReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
-            forceUpdateLeaf()
-            await reloadEntities()
-            shouldSleep = true
+            if shouldSleep {
+                try? await Task.sleep(seconds: 5)
+            }
+            await self.reloadEntities()
         }
-
-        if shouldSleep {
-            try? await Task.sleep(seconds: 5)
-        }
-        await reloadEntities()
     }
 
     private func reloadEntities() async {
@@ -119,77 +115,54 @@ class LynkViewModel: ObservableObject {
         }
     }
 
-    // swiftlint:disable:next cyclomatic_complexity function_body_length
+    private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<LynkViewModel, Entity>] = [
+        .lynkClimateHeating: \.lynkClimateHeating,
+        .lynkEngineRunning: \.isEngineRunning,
+        .lynkTemperatureInterior: \.lynkInteriorTemperature,
+        .lynkTemperatureExterior: \.lynkExteriorTemperature,
+        .lynkBatteryDistance: \.lynkBatteryDistance,
+        .lynkFuelDistance: \.fuelDistance,
+        .lynkAddress: \.address,
+        .lynkChargeState: \.lynkChargerState,
+        .lynkChargerConnectionStatus: \.lynkChargerConnectionStatus,
+        .lynkTimeUntilCharged: \.lynkTimeUntilCharged,
+        .lynkCarUpdatedAt: \.lynkCarUpdatedAt,
+        .lynkClimateUpdatedAt: \.lynkClimateUpdatedAt,
+        .lynkDoorLockUpdatedAt: \.doorLockUpdatedAt,
+        .lynkBatteryUpdatedAt: \.batteryUpdatedAt,
+        .lynkFuelUpdatedAt: \.fuelUpdatedAt,
+        .lynkAddressUpdatedAt: \.addressUpdatedAt,
+        .lynkChargerUpdatedAt: \.chargerUpdatedAt,
+        .leafACTimer: \.leafClimateTimer,
+        .leafRangeAC: \.leafRangeAC,
+        .leafCharging: \.isLeafCharging,
+        .leafPluggedIn: \.isLeafPluggedIn,
+        .leafLastPoll: \.leafLastPoll,
+    ]
+
+    private lazy var lastChangedKeyPaths: [EntityId: ReferenceWritableKeyPath<LynkViewModel, Entity>] = [
+        .lynkClimateHeating: \.lynkClimateHeating,
+        .lynkEngineRunning: \.isEngineRunning,
+        .lynkTemperatureInterior: \.lynkInteriorTemperature,
+        .lynkTemperatureExterior: \.lynkExteriorTemperature,
+        .leafACTimer: \.leafClimateTimer,
+    ]
+
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
-        switch entityID {
-        case .lynkClimateHeating:
-            lynkClimateHeating.state = state
-            if let lastChanged {
-                lynkClimateHeating.lastChanged = lastChanged
+        if let keyPath = entityKeyPaths[entityID] {
+            self[keyPath: keyPath].state = state
+            if let lastChanged, let lastChangedKeyPath = lastChangedKeyPaths[entityID] {
+                self[keyPath: lastChangedKeyPath].lastChanged = lastChanged
             }
-        case .lynkDoorLock:
+        } else if entityID == .lynkDoorLock {
             lynkDoorLock.state = state
-        case .lynkEngineRunning:
-            isEngineRunning.state = state
-            if let lastChanged {
-                isEngineRunning.lastChanged = lastChanged
-            }
-        case .lynkTemperatureInterior:
-            lynkInteriorTemperature.state = state
-            if let lastChanged {
-                lynkInteriorTemperature.lastChanged = lastChanged
-            }
-        case .lynkTemperatureExterior:
-            lynkExteriorTemperature.state = state
-            if let lastChanged {
-                lynkExteriorTemperature.lastChanged = lastChanged
-            }
-        case .lynkBattery:
+        } else if entityID == .lynkBattery {
             lynkBattery.state = state
-        case .lynkBatteryDistance:
-            lynkBatteryDistance.state = state
-        case .lynkFuel:
+        } else if entityID == .lynkFuel {
             fuel.state = state
-        case .lynkFuelDistance:
-            fuelDistance.state = state
-        case .lynkAddress:
-            address.state = state
-        case .lynkChargeState:
-            lynkChargerState.state = state
-        case .lynkChargerConnectionStatus:
-            lynkChargerConnectionStatus.state = state
-        case .lynkTimeUntilCharged:
-            lynkTimeUntilCharged.state = state
-        case .lynkCarUpdatedAt:
-            lynkCarUpdatedAt.state = state
-        case .lynkClimateUpdatedAt:
-            lynkClimateUpdatedAt.state = state
-        case .lynkDoorLockUpdatedAt:
-            doorLockUpdatedAt.state = state
-        case .lynkBatteryUpdatedAt:
-            batteryUpdatedAt.state = state
-        case .lynkFuelUpdatedAt:
-            fuelUpdatedAt.state = state
-        case .lynkAddressUpdatedAt:
-            addressUpdatedAt.state = state
-        case .lynkChargerUpdatedAt:
-            chargerUpdatedAt.state = state
-        case .leafACTimer:
-            leafClimateTimer.state = state
-            if let lastChanged {
-                leafClimateTimer.lastChanged = lastChanged
-            }
-        case .leafBattery:
+        } else if entityID == .leafBattery {
             leafBattery.state = state
-        case .leafRangeAC:
-            leafRangeAC.state = state
-        case .leafCharging:
-            isLeafCharging.state = state
-        case .leafPluggedIn:
-            isLeafPluggedIn.state = state
-        case .leafLastPoll:
-            leafLastPoll.state = state
-        default:
+        } else {
             Log.error("LynkViewModel doesn't reload entityID: \(entityID)")
         }
     }
