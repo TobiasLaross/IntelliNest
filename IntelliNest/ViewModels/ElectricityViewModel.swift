@@ -2,7 +2,7 @@ import Foundation
 import ShipBookSDK
 
 @MainActor
-class ElectricityViewModel: ObservableObject {
+class ElectricityViewModel: ObservableObject, Reloadable {
     @Published var nordPool = NordPoolEntity(entityId: .nordPool)
     @Published private var pulsePowerEntity = Entity(entityId: .pulsePower)
     @Published private var solarPowerEntity = Entity(entityId: .solarPower)
@@ -16,7 +16,7 @@ class ElectricityViewModel: ObservableObject {
         .solarPower,
         .nordPool
     ]
-    private var isReloading = false
+    var isReloading = false
     private let restAPIService: RestAPIService
 
     var solarPower: Double {
@@ -48,39 +48,53 @@ class ElectricityViewModel: ObservableObject {
     }
 
     func reload() async {
-        guard !isReloading else {
-            return
+        await withReloadGuard {
+            await self.reloadEntities()
         }
-
-        isReloading = true
-        for entityID in entityIDs {
-            do {
-                if entityID == .nordPool {
-                    let nordPool = try await restAPIService.reload(entityId: entityID, entityType: NordPoolEntity.self)
-                    self.nordPool = nordPool
-                } else {
-                    let entity = try await restAPIService.reloadState(entityID: entityID)
-                    reload(entityID: entityID, state: entity.state)
-                }
-            } catch {
-                Log.error("Failed to reload entity: \(entityID): \(error)")
-            }
-        }
-        isReloading = false
     }
 
-    func reload(entityID: EntityId, state: String) {
-        switch entityID {
-        case .pulsePower:
-            pulsePowerEntity.state = state
-        case .tibberCostToday:
-            tibberCostToday.state = state
-        case .pulseConsumptionToday:
-            pulseConsumptionToday.state = state
-        case .solarPower:
-            solarPowerEntity.state = state
-        default:
-            Log.error("ElectricityViewModel doesn't reload entityID: \(entityID)")
+    private func reloadEntities() async {
+        let service = restAPIService
+        await withTaskGroup(of: (EntityId, Entity?, NordPoolEntity?).self) { group in
+            for entityID in entityIDs {
+                group.addTask {
+                    do {
+                        if entityID == .nordPool {
+                            let nordPool = try await service.reload(entityId: entityID, entityType: NordPoolEntity.self)
+                            return (entityID, nil, nordPool)
+                        } else {
+                            let entity = try await service.reloadState(entityID: entityID)
+                            return (entityID, entity, nil)
+                        }
+                    } catch {
+                        Log.error("Failed to reload entity: \(entityID): \(error)")
+                        return (entityID, nil, nil)
+                    }
+                }
+            }
+
+            for await (entityID, entity, nordPoolEntity) in group {
+                if let nordPoolEntity {
+                    self.nordPool = nordPoolEntity
+                } else if let entity {
+                    self.reload(entityID: entityID, state: entity.state)
+                }
+            }
         }
+    }
+
+    private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<ElectricityViewModel, Entity>] = [
+        .pulsePower: \.pulsePowerEntity,
+        .tibberCostToday: \.tibberCostToday,
+        .pulseConsumptionToday: \.pulseConsumptionToday,
+        .solarPower: \.solarPowerEntity
+    ]
+
+    func reload(entityID: EntityId, state: String) {
+        guard let keyPath = entityKeyPaths[entityID] else {
+            Log.error("ElectricityViewModel doesn't reload entityID: \(entityID)")
+            return
+        }
+        self[keyPath: keyPath].state = state
     }
 }

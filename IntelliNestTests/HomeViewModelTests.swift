@@ -146,9 +146,9 @@ class HomeViewModelTests: XCTestCase {
 
     func testReloadEntityIDUpdatesSolarProductionToday() {
         // Given / When
-        viewModel.reload(entityID: .solarProducdtionToday, state: "8.7")
+        viewModel.reload(entityID: .solarProductionToday, state: "8.7")
         // Then
-        XCTAssertEqual(viewModel.solarProducdtionToday.state, "8.7")
+        XCTAssertEqual(viewModel.solarProductionToday.state, "8.7")
     }
 
     func testReloadEntityIDUpdatesWasherCompletionTime() {
@@ -344,7 +344,7 @@ class HomeViewModelTests: XCTestCase {
             .tibberPrice: "1.23",
             .pulseConsumptionToday: "12.5",
             .washerCompletionTime: "2023-06-17 15:30:00",
-            .solarProducdtionToday: "5.2",
+            .solarProductionToday: "5.2",
             .dryerCompletionTime: "2023-06-17 17:00:00",
             .washerState: "run",
             .dryerState: "cooling",

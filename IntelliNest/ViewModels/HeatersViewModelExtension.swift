@@ -11,44 +11,41 @@ import ShipBookSDK
 extension HeatersViewModel {
     @MainActor
     func reload() async {
-        guard !isReloading else {
-            return
-        }
-        isReloading = true
-        defer { isReloading = false }
-        async let tmpThermCorridor = reload(entity: thermCorridor)
-        async let tmpThermBedroom = reload(entity: thermBedroom)
-        async let tmpThermGym = reload(entity: thermGym)
-        async let tmpThermVince = reload(entity: thermVince)
-        async let tmpThermKitchen = reload(entity: thermKitchen)
-        async let tmpThermCommonarea = reload(entity: thermCommonarea)
-        async let tmpThermPlayroom = reload(entity: thermPlayroom)
-        async let tmpThermGuest = reload(entity: thermGuest)
-        async let tmpHeaterCorridor = reload(entity: heaterCorridor)
-        async let tmpHeaterPlayroom = reload(entity: heaterPlayroom)
+        await withReloadGuard {
+            async let tmpThermCorridor = self.reload(entity: self.thermCorridor)
+            async let tmpThermBedroom = self.reload(entity: self.thermBedroom)
+            async let tmpThermGym = self.reload(entity: self.thermGym)
+            async let tmpThermVince = self.reload(entity: self.thermVince)
+            async let tmpThermKitchen = self.reload(entity: self.thermKitchen)
+            async let tmpThermCommonarea = self.reload(entity: self.thermCommonarea)
+            async let tmpThermPlayroom = self.reload(entity: self.thermPlayroom)
+            async let tmpThermGuest = self.reload(entity: self.thermGuest)
+            async let tmpHeaterCorridor = self.reload(entity: self.heaterCorridor)
+            async let tmpHeaterPlayroom = self.reload(entity: self.heaterPlayroom)
 
-        thermCorridor = await tmpThermCorridor
-        thermBedroom = await tmpThermBedroom
-        thermGym = await tmpThermGym
-        thermVince = await tmpThermVince
-        thermKitchen = await tmpThermKitchen
-        thermCommonarea = await tmpThermCommonarea
-        thermPlayroom = await tmpThermPlayroom
-        thermGuest = await tmpThermGuest
-        heaterCorridor = await tmpHeaterCorridor
-        heaterPlayroom = await tmpHeaterPlayroom
+            self.thermCorridor = await tmpThermCorridor
+            self.thermBedroom = await tmpThermBedroom
+            self.thermGym = await tmpThermGym
+            self.thermVince = await tmpThermVince
+            self.thermKitchen = await tmpThermKitchen
+            self.thermCommonarea = await tmpThermCommonarea
+            self.thermPlayroom = await tmpThermPlayroom
+            self.thermGuest = await tmpThermGuest
+            self.heaterCorridor = await tmpHeaterCorridor
+            self.heaterPlayroom = await tmpHeaterPlayroom
 
-        for entityID in entityIDs {
-            do {
-                if entityID == .purifierFanSpeed {
-                    let purifierSpeed = try await restAPIService.reload(entityId: entityID, entityType: PurifierSpeed.self)
-                    purifier.speed = purifierSpeed.speed
-                } else {
-                    let entity = try await restAPIService.reloadState(entityID: entityID)
-                    reload(entityID: entityID, state: entity.state)
+            for entityID in self.entityIDs {
+                do {
+                    if entityID == .purifierFanSpeed {
+                        let purifierSpeed = try await self.restAPIService.reload(entityId: entityID, entityType: PurifierSpeed.self)
+                        self.purifier.speed = purifierSpeed.speed
+                    } else {
+                        let entity = try await self.restAPIService.reloadState(entityID: entityID)
+                        self.reload(entityID: entityID, state: entity.state)
+                    }
+                } catch {
+                    Log.error("Failed to reload entity: \(entityID): \(error)")
                 }
-            } catch {
-                Log.error("Failed to reload entity: \(entityID): \(error)")
             }
         }
     }

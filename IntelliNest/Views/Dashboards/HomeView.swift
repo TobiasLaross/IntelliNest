@@ -73,7 +73,7 @@ private struct HouseInfoView: View {
                 Text("""
                 Elnät: ***\(viewModel.pulsePower.state.toKW)***
                 Pris: ***\(viewModel.tibberPrice.state.toOre)***
-                Producerat idag: ***\(viewModel.solarProducdtionToday.state.toKWh)***
+                Producerat idag: ***\(viewModel.solarProductionToday.state.toKWh)***
                 Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
                 """)
                 .font(.buttonFontMedium)

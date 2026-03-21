@@ -9,7 +9,7 @@ import Foundation
 import ShipBookSDK
 
 @MainActor
-class LightsViewModel: ObservableObject {
+class LightsViewModel: ObservableObject, Reloadable {
     @Published var lightEntities: [EntityId: LightEntity] = [
         .sofa: LightEntity(entityId: .sofa),
         .cozyCorner: LightEntity(entityId: .cozyCorner),
@@ -23,7 +23,7 @@ class LightsViewModel: ObservableObject {
                                         groupedLightIDs: [.guestRoomCeiling1, .guestRoomCeiling2, .guestRoomCeiling3]),
         .laundryRoom: LightEntity(entityId: .laundryRoom)
     ]
-    private var isReloading = false
+    var isReloading = false
 
     let corridorName = "Korridoren"
     let corridorSouthName = "Södra"
@@ -44,20 +44,30 @@ class LightsViewModel: ObservableObject {
     }
 
     func reload() async {
-        guard !isReloading else {
-            return
-        }
-        isReloading = true
-        for (entityID, light) in lightEntities {
-            do {
-                var updatedLight = try await restAPIService.reload(entityId: entityID, entityType: LightEntity.self)
-                updatedLight.groupedLightIDs = light.groupedLightIDs
-                lightEntities[entityID] = updatedLight
-            } catch {
-                Log.error("Failed to reload light: \(entityID): \(error)")
+        await withReloadGuard {
+            let service = self.restAPIService
+            let currentEntities = self.lightEntities
+            await withTaskGroup(of: (EntityId, LightEntity)?.self) { group in
+                for (entityID, light) in currentEntities {
+                    group.addTask {
+                        do {
+                            var updatedLight = try await service.reload(entityId: entityID, entityType: LightEntity.self)
+                            updatedLight.groupedLightIDs = light.groupedLightIDs
+                            return (entityID, updatedLight)
+                        } catch {
+                            Log.error("Failed to reload light: \(entityID): \(error)")
+                            return nil
+                        }
+                    }
+                }
+
+                for await result in group {
+                    if let (entityID, updatedLight) = result {
+                        self.lightEntities[entityID] = updatedLight
+                    }
+                }
             }
         }
-        isReloading = false
     }
 
     func onSliderChange(slideable: Slideable, brightness: Int) {

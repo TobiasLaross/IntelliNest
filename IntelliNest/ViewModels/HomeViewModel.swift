@@ -12,7 +12,7 @@ import SwiftUI
 import UIKit
 
 @MainActor
-class HomeViewModel: ObservableObject {
+class HomeViewModel: ObservableObject, Reloadable {
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
     @Published var storageLock = LockEntity(entityId: .storageLock)
@@ -25,7 +25,7 @@ class HomeViewModel: ObservableObject {
     @Published var pulsePower = Entity(entityId: .pulsePower)
     @Published var tibberPrice = Entity(entityId: .tibberPrice)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
-    @Published var solarProducdtionToday = Entity(entityId: .solarProducdtionToday)
+    @Published var solarProductionToday = Entity(entityId: .solarProductionToday)
     @Published var washerCompletionTime = Entity(entityId: .washerCompletionTime)
     @Published var washerState = Entity(entityId: .washerState)
     @Published var dryerCompletionTime = Entity(entityId: .dryerCompletionTime)
@@ -39,11 +39,11 @@ class HomeViewModel: ObservableObject {
 
     @Published var noLocationAccess = false
 
-    private var isReloading = false
+    var isReloading = false
     let entityIDs: [EntityId] = [
         .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
         .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
-        .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower, .easeeNoCurrentReason,
+        .solarProductionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower, .easeeNoCurrentReason,
         .easeeStatus, .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights
     ]
 
@@ -91,32 +91,28 @@ class HomeViewModel: ObservableObject {
     }
 
     func reload() async {
-        guard !isReloading else {
-            return
-        }
+        await withReloadGuard {
+            let service = self.restAPIService
+            await withTaskGroup(of: (EntityId, Entity)?.self) { group in
+                for entityID in self.entityIDs {
+                    group.addTask {
+                        do {
+                            let entity = try await service.reloadState(entityID: entityID)
+                            return (entityID, entity)
+                        } catch {
+                            Log.error("Failed to reload entity: \(entityID): \(error)")
+                            return nil
+                        }
+                    }
+                }
 
-        isReloading = true
-        let service = restAPIService
-        await withTaskGroup(of: (EntityId, Entity)?.self) { group in
-            for entityID in entityIDs {
-                group.addTask {
-                    do {
-                        let entity = try await service.reloadState(entityID: entityID)
-                        return (entityID, entity)
-                    } catch {
-                        Log.error("Failed to reload entity: \(entityID): \(error)")
-                        return nil
+                for await result in group {
+                    if let (entityID, entity) = result {
+                        self.reload(entityID: entityID, state: entity.state, lastChanged: entity.lastChanged)
                     }
                 }
             }
-
-            for await result in group {
-                if let (entityID, entity) = result {
-                    self.reload(entityID: entityID, state: entity.state, lastChanged: entity.lastChanged)
-                }
-            }
         }
-        isReloading = false
     }
 
     func reloadYaleLocks() async {
@@ -201,53 +197,39 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    // swiftlint:disable cyclomatic_complexity
+    private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<HomeViewModel, Entity>] = [
+        .hittaSarahsIphone: \.sarahsIphone,
+        .coffeeMachineStartTime: \.coffeeMachineStartTime,
+        .coffeeMachineStartTimeEnabled: \.coffeeMachineStartTimeEnabled,
+        .pulsePower: \.pulsePower,
+        .tibberPrice: \.tibberPrice,
+        .pulseConsumptionToday: \.pulseConsumptionToday,
+        .solarProductionToday: \.solarProductionToday,
+        .washerCompletionTime: \.washerCompletionTime,
+        .washerState: \.washerState,
+        .dryerCompletionTime: \.dryerCompletionTime,
+        .dryerState: \.dryerState,
+        .easeePower: \.easeePower,
+        .easeeNoCurrentReason: \.easeeNoCurrentReason,
+        .easeeStatus: \.easeeStatus,
+        .generalWasteDate: \.generalWasteDate,
+        .plasticWasteDate: \.plasticWasteDate,
+        .gardenWasteDate: \.gardenWasteDate
+    ]
+
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
-        switch entityID {
-        case .allLights:
+        if let keyPath = entityKeyPaths[entityID] {
+            self[keyPath: keyPath].state = state
+        } else if entityID == .allLights {
             allLights.state = state
-        case .hittaSarahsIphone:
-            sarahsIphone.state = state
-        case .coffeeMachine:
+        } else if entityID == .coffeeMachine {
             coffeeMachine.state = state
             if let lastChanged {
                 coffeeMachine.lastChanged = lastChanged
             }
-        case .storageLock:
+        } else if entityID == .storageLock {
             storageLock.state = state
-        case .coffeeMachineStartTime:
-            coffeeMachineStartTime.state = state
-        case .coffeeMachineStartTimeEnabled:
-            coffeeMachineStartTimeEnabled.state = state
-        case .pulsePower:
-            pulsePower.state = state
-        case .tibberPrice:
-            tibberPrice.state = state
-        case .pulseConsumptionToday:
-            pulseConsumptionToday.state = state
-        case .solarProducdtionToday:
-            solarProducdtionToday.state = state
-        case .washerCompletionTime:
-            washerCompletionTime.state = state
-        case .washerState:
-            washerState.state = state
-        case .dryerCompletionTime:
-            dryerCompletionTime.state = state
-        case .dryerState:
-            dryerState.state = state
-        case .easeePower:
-            easeePower.state = state
-        case .easeeNoCurrentReason:
-            easeeNoCurrentReason.state = state
-        case .easeeStatus:
-            easeeStatus.state = state
-        case .generalWasteDate:
-            generalWasteDate.state = state
-        case .plasticWasteDate:
-            plasticWasteDate.state = state
-        case .gardenWasteDate:
-            gardenWasteDate.state = state
-        default:
+        } else {
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
         }
     }
