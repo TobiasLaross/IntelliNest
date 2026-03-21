@@ -131,11 +131,9 @@ class URLCreator: ObservableObject, URLRequestBuilder {
                 }
             }
 
-            for await state in group {
-                if state != .disconnected {
-                    group.cancelAll()
-                    return state
-                }
+            for await state in group where state != .disconnected {
+                group.cancelAll()
+                return state
             }
             return .disconnected
         }
