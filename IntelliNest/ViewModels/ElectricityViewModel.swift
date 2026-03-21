@@ -87,7 +87,7 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         .pulsePower: \.pulsePowerEntity,
         .tibberCostToday: \.tibberCostToday,
         .pulseConsumptionToday: \.pulseConsumptionToday,
-        .solarPower: \.solarPowerEntity,
+        .solarPower: \.solarPowerEntity
     ]
 
     func reload(entityID: EntityId, state: String) {

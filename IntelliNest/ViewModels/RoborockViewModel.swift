@@ -116,7 +116,7 @@ class RoborockViewModel: ObservableObject, Reloadable {
         .roborockAreaWhenEmptied: \.roborockAreaWhenEmptied,
         .roborockTotalCleaningArea: \.roborockTotalCleaningArea,
         .roborockEmptiedAtDate: \.roborockEmptiedAtDate,
-        .roborockWaterShortage: \.roborockWaterShortage,
+        .roborockWaterShortage: \.roborockWaterShortage
     ]
 
     func reload(entityID: EntityId, state: String) {

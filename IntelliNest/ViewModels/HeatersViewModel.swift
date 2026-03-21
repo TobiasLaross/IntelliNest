@@ -131,14 +131,14 @@ class HeatersViewModel: ObservableObject, Reloadable {
         .heaterCorridorTimerMode: \.heaterCorridorTimerMode,
         .heaterPlayroomTimerMode: \.heaterPlayroomTimerMode,
         .resetPurifierTime: \.resetPurifierTime,
-        .purifierTimerMode: \.purifierTimerMode,
+        .purifierTimerMode: \.purifierTimerMode
     ]
 
     private lazy var purifierReloaders: [EntityId: (String) -> Void] = [
         .purifierMode: { [unowned self] state in purifier.fanMode = PurifierFanMode(rawValue: state) ?? .off },
         .purifierFanSpeed: { [unowned self] state in purifier.speed = Double(state)?.toFanSpeedTargetNumber ?? 0 },
         .purifierTemperature: { [unowned self] state in purifier.temperature = Double(state) ?? 0 },
-        .purifierHumidity: { [unowned self] state in purifier.humidity = Int(state) ?? 0 },
+        .purifierHumidity: { [unowned self] state in purifier.humidity = Int(state) ?? 0 }
     ]
 
     func reload(entityID: EntityId, state: String) {

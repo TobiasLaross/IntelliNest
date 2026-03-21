@@ -137,7 +137,7 @@ class LynkViewModel: ObservableObject, Reloadable {
         .leafRangeAC: \.leafRangeAC,
         .leafCharging: \.isLeafCharging,
         .leafPluggedIn: \.isLeafPluggedIn,
-        .leafLastPoll: \.leafLastPoll,
+        .leafLastPoll: \.leafLastPoll
     ]
 
     private lazy var lastChangedKeyPaths: [EntityId: ReferenceWritableKeyPath<LynkViewModel, Entity>] = [
@@ -145,7 +145,7 @@ class LynkViewModel: ObservableObject, Reloadable {
         .lynkEngineRunning: \.isEngineRunning,
         .lynkTemperatureInterior: \.lynkInteriorTemperature,
         .lynkTemperatureExterior: \.lynkExteriorTemperature,
-        .leafACTimer: \.leafClimateTimer,
+        .leafACTimer: \.leafClimateTimer
     ]
 
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {

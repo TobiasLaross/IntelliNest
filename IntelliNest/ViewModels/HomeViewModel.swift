@@ -214,7 +214,7 @@ class HomeViewModel: ObservableObject, Reloadable {
         .easeeStatus: \.easeeStatus,
         .generalWasteDate: \.generalWasteDate,
         .plasticWasteDate: \.plasticWasteDate,
-        .gardenWasteDate: \.gardenWasteDate,
+        .gardenWasteDate: \.gardenWasteDate
     ]
 
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
