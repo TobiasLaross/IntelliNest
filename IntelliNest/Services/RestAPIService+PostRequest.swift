@@ -49,12 +49,8 @@ extension RestAPIService {
         }
     }
 
-    private func logCreateRequestFailed(path _: String, domain: Domain, action: Action, json: [JSONKey: Any]? = nil, jsonData: Data? = nil) {
-        Log.error("""
-        Failed to create request \(json ?? [.invalid: ""]),
-        \(jsonData?.debugDescription ?? "Bad JSON data"),
-        \(domain), \(action)
-        """)
+    private func logCreateRequestFailed(path _: String, domain: Domain, action: Action, json _: [JSONKey: Any]? = nil, jsonData _: Data? = nil) {
+        Log.error("Failed to create request (\(domain), \(action))")
     }
 
     private func handleSuccessfulResponse(domain: Domain, action: Action, data: Data) {
@@ -62,7 +58,6 @@ extension RestAPIService {
             do {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                     if let webhookId = jsonResponse["webhook_id"] as? String {
-                        print("Webhook response: \(webhookId)")
                         UserDefaults.standard.setValue(webhookId, forKey: StorageKeys.webhookID.rawValue)
                     } else {
                         Log.error("webhook_id not found in response")
