@@ -49,7 +49,13 @@ extension RestAPIService {
         }
     }
 
-    private func logCreateRequestFailed(path _: String, domain: Domain, action: Action, json _: [JSONKey: Any]? = nil, jsonData _: Data? = nil) {
+    private func logCreateRequestFailed(
+        path _: String,
+        domain: Domain,
+        action: Action,
+        json _: [JSONKey: Any]? = nil,
+        jsonData _: Data? = nil
+    ) {
         Log.error("Failed to create request (\(domain), \(action))")
     }
 
