@@ -53,20 +53,34 @@ class ElectricityViewModel: ObservableObject {
         }
 
         isReloading = true
-        for entityID in entityIDs {
-            do {
-                if entityID == .nordPool {
-                    let nordPool = try await restAPIService.reload(entityId: entityID, entityType: NordPoolEntity.self)
-                    self.nordPool = nordPool
-                } else {
-                    let entity = try await restAPIService.reloadState(entityID: entityID)
-                    reload(entityID: entityID, state: entity.state)
+        defer { isReloading = false }
+        let service = restAPIService
+        await withTaskGroup(of: (EntityId, Entity?, NordPoolEntity?).self) { group in
+            for entityID in entityIDs {
+                group.addTask {
+                    do {
+                        if entityID == .nordPool {
+                            let nordPool = try await service.reload(entityId: entityID, entityType: NordPoolEntity.self)
+                            return (entityID, nil, nordPool)
+                        } else {
+                            let entity = try await service.reloadState(entityID: entityID)
+                            return (entityID, entity, nil)
+                        }
+                    } catch {
+                        Log.error("Failed to reload entity: \(entityID): \(error)")
+                        return (entityID, nil, nil)
+                    }
                 }
-            } catch {
-                Log.error("Failed to reload entity: \(entityID): \(error)")
+            }
+
+            for await (entityID, entity, nordPoolEntity) in group {
+                if let nordPoolEntity {
+                    self.nordPool = nordPoolEntity
+                } else if let entity {
+                    self.reload(entityID: entityID, state: entity.state)
+                }
             }
         }
-        isReloading = false
     }
 
     func reload(entityID: EntityId, state: String) {

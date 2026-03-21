@@ -81,21 +81,36 @@ class RoborockViewModel: ObservableObject {
         }
 
         isReloading = true
-        for entityID in entityIDs {
-            do {
-                if entityID == .roborockMapImage {
-                    await reloadMapImage()
-                } else if entityID == .roborock {
-                    await reloadRoborock()
-                } else {
-                    let entity = try await restAPIService.reloadState(entityID: entityID)
-                    reload(entityID: entityID, state: entity.state)
+        defer { isReloading = false }
+        let service = restAPIService
+        let simpleEntityIDs = entityIDs.filter { $0 != .roborockMapImage && $0 != .roborock }
+        await withTaskGroup(of: (EntityId, Entity)?.self) { group in
+            group.addTask {
+                await self.reloadMapImage()
+                return nil
+            }
+            group.addTask {
+                await self.reloadRoborock()
+                return nil
+            }
+            for entityID in simpleEntityIDs {
+                group.addTask {
+                    do {
+                        let entity = try await service.reloadState(entityID: entityID)
+                        return (entityID, entity)
+                    } catch {
+                        Log.error("Failed to reload entity: \(entityID): \(error)")
+                        return nil
+                    }
                 }
-            } catch {
-                Log.error("Failed to reload entity: \(entityID): \(error)")
+            }
+
+            for await result in group {
+                if let (entityID, entity) = result {
+                    self.reload(entityID: entityID, state: entity.state)
+                }
             }
         }
-        isReloading = false
     }
 
     func reload(entityID: EntityId, state: String) {

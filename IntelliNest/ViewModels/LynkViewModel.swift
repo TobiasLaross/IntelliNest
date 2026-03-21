@@ -49,10 +49,10 @@ class LynkViewModel: ObservableObject {
         .lynkChargerUpdatedAt, .leafACTimer, .leafBattery, .leafRangeAC, .leafCharging, .leafPluggedIn,
         .leafLastPoll
     ]
-    var isReloading = false
+    private var isReloading = false
     var isLynkFlashing = false
 
-    var restAPIService: RestAPIService
+    private let restAPIService: RestAPIService
 
     init(restAPIService: RestAPIService) {
         self.restAPIService = restAPIService
@@ -74,6 +74,7 @@ class LynkViewModel: ObservableObject {
         }
 
         isReloading = true
+        defer { isReloading = false }
         var shouldSleep = false
         let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
         if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
@@ -93,16 +94,27 @@ class LynkViewModel: ObservableObject {
             try? await Task.sleep(seconds: 5)
         }
         await reloadEntities()
-        isReloading = false
     }
 
     private func reloadEntities() async {
-        for entityID in entityIDs {
-            do {
-                let entity = try await restAPIService.reloadState(entityID: entityID)
-                reload(entityID: entityID, state: entity.state, lastChanged: entity.lastChanged)
-            } catch {
-                Log.error("Failed to reload entity: \(entityID): \(error)")
+        let service = restAPIService
+        await withTaskGroup(of: (EntityId, Entity)?.self) { group in
+            for entityID in entityIDs {
+                group.addTask {
+                    do {
+                        let entity = try await service.reloadState(entityID: entityID)
+                        return (entityID, entity)
+                    } catch {
+                        Log.error("Failed to reload entity: \(entityID): \(error)")
+                        return nil
+                    }
+                }
+            }
+
+            for await result in group {
+                if let (entityID, entity) = result {
+                    self.reload(entityID: entityID, state: entity.state, lastChanged: entity.lastChanged)
+                }
             }
         }
     }

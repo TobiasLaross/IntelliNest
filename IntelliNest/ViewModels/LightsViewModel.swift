@@ -48,16 +48,29 @@ class LightsViewModel: ObservableObject {
             return
         }
         isReloading = true
-        for (entityID, light) in lightEntities {
-            do {
-                var updatedLight = try await restAPIService.reload(entityId: entityID, entityType: LightEntity.self)
-                updatedLight.groupedLightIDs = light.groupedLightIDs
-                lightEntities[entityID] = updatedLight
-            } catch {
-                Log.error("Failed to reload light: \(entityID): \(error)")
+        defer { isReloading = false }
+        let service = restAPIService
+        let currentEntities = lightEntities
+        await withTaskGroup(of: (EntityId, LightEntity)?.self) { group in
+            for (entityID, light) in currentEntities {
+                group.addTask {
+                    do {
+                        var updatedLight = try await service.reload(entityId: entityID, entityType: LightEntity.self)
+                        updatedLight.groupedLightIDs = light.groupedLightIDs
+                        return (entityID, updatedLight)
+                    } catch {
+                        Log.error("Failed to reload light: \(entityID): \(error)")
+                        return nil
+                    }
+                }
+            }
+
+            for await result in group {
+                if let (entityID, updatedLight) = result {
+                    self.lightEntities[entityID] = updatedLight
+                }
             }
         }
-        isReloading = false
     }
 
     func onSliderChange(slideable: Slideable, brightness: Int) {

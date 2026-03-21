@@ -25,7 +25,7 @@ class HomeViewModel: ObservableObject {
     @Published var pulsePower = Entity(entityId: .pulsePower)
     @Published var tibberPrice = Entity(entityId: .tibberPrice)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
-    @Published var solarProducdtionToday = Entity(entityId: .solarProducdtionToday)
+    @Published var solarProductionToday = Entity(entityId: .solarProductionToday)
     @Published var washerCompletionTime = Entity(entityId: .washerCompletionTime)
     @Published var washerState = Entity(entityId: .washerState)
     @Published var dryerCompletionTime = Entity(entityId: .dryerCompletionTime)
@@ -43,7 +43,7 @@ class HomeViewModel: ObservableObject {
     let entityIDs: [EntityId] = [
         .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
         .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
-        .solarProducdtionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower, .easeeNoCurrentReason,
+        .solarProductionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower, .easeeNoCurrentReason,
         .easeeStatus, .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights
     ]
 
@@ -96,6 +96,7 @@ class HomeViewModel: ObservableObject {
         }
 
         isReloading = true
+        defer { isReloading = false }
         let service = restAPIService
         await withTaskGroup(of: (EntityId, Entity)?.self) { group in
             for entityID in entityIDs {
@@ -116,7 +117,6 @@ class HomeViewModel: ObservableObject {
                 }
             }
         }
-        isReloading = false
     }
 
     func reloadYaleLocks() async {
@@ -225,8 +225,8 @@ class HomeViewModel: ObservableObject {
             tibberPrice.state = state
         case .pulseConsumptionToday:
             pulseConsumptionToday.state = state
-        case .solarProducdtionToday:
-            solarProducdtionToday.state = state
+        case .solarProductionToday:
+            solarProductionToday.state = state
         case .washerCompletionTime:
             washerCompletionTime.state = state
         case .washerState:
