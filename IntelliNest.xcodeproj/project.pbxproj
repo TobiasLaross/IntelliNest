@@ -55,6 +55,7 @@
 		F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2DF286D950A00462092 /* LightEntity.swift */; };
 		F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E228770D5500462092 /* LightsViewModel.swift */; };
 		F62CD2E528770F3B00462092 /* RestAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E428770F3B00462092 /* RestAPIService.swift */; };
+		F6CC110128770F3B00CC0001 /* RestAPIService+PostRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6CC110028770F3B00CC0001 /* RestAPIService+PostRequest.swift */; };
 		F62CD2E82877140800462092 /* EntityError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E72877140800462092 /* EntityError.swift */; };
 		F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */; };
 		F63D1C6F2B0A605C004294D9 /* ServiceButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D1C6E2B0A605C004294D9 /* ServiceButtonView.swift */; };
@@ -268,6 +269,7 @@
 		F62CD2DF286D950A00462092 /* LightEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightEntity.swift; sourceTree = "<group>"; };
 		F62CD2E228770D5500462092 /* LightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModel.swift; sourceTree = "<group>"; };
 		F62CD2E428770F3B00462092 /* RestAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestAPIService.swift; sourceTree = "<group>"; };
+		F6CC110028770F3B00CC0001 /* RestAPIService+PostRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RestAPIService+PostRequest.swift"; sourceTree = "<group>"; };
 		F62CD2E72877140800462092 /* EntityError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityError.swift; sourceTree = "<group>"; };
 		F62CD2EA2877276B00462092 /* DualBulbRoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualBulbRoomView.swift; sourceTree = "<group>"; };
 		F63D1C6E2B0A605C004294D9 /* ServiceButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceButtonView.swift; sourceTree = "<group>"; };
@@ -509,6 +511,7 @@
 			isa = PBXGroup;
 			children = (
 				F62CD2E428770F3B00462092 /* RestAPIService.swift */,
+				F6CC110028770F3B00CC0001 /* RestAPIService+PostRequest.swift */,
 				F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */,
 				F60345CB27A93BD700212D04 /* URLCreator.swift */,
 				F64D2693283E8FAB0073A7BF /* NetworkTask.swift */,
@@ -1135,6 +1138,7 @@
 				F6633F2C286324EB004D0B76 /* DetailedHeaterView.swift in Sources */,
 				F6225E2C2AE1354700D32EF4 /* CoffeeMachineSchedulingView.swift in Sources */,
 				F62CD2E528770F3B00462092 /* RestAPIService.swift in Sources */,
+				F6CC110128770F3B00CC0001 /* RestAPIService+PostRequest.swift in Sources */,
 				F62CD2E82877140800462092 /* EntityError.swift in Sources */,
 				F67D77102B4FFA4200F52EB0 /* ServiceTargetKeys.swift in Sources */,
 				F664BA7429B48C510092CB2E /* DateExtension.swift in Sources */,
