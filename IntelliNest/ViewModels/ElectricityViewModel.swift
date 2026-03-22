@@ -23,12 +23,13 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         Double(solarPowerEntity.state) ?? 0
     }
 
-    var housePower: Double {
+    // Positive = importing from grid, negative = exporting to grid
+    var gridPower: Double {
         Double(pulsePowerEntity.state) ?? 0
     }
 
-    var gridPower: Double {
-        housePower - solarPower
+    var housePower: Double {
+        solarPower + gridPower
     }
 
     var isSolarToGrid: Bool {
@@ -55,6 +56,9 @@ class ElectricityViewModel: ObservableObject, Reloadable {
 
     private func reloadEntities() async {
         let service = restAPIService
+        var entityUpdates: [(EntityId, Entity)] = []
+        var newNordPool: NordPoolEntity?
+
         await withTaskGroup(of: (EntityId, Entity?, NordPoolEntity?).self) { group in
             for entityID in entityIDs {
                 group.addTask {
@@ -75,11 +79,20 @@ class ElectricityViewModel: ObservableObject, Reloadable {
 
             for await (entityID, entity, nordPoolEntity) in group {
                 if let nordPoolEntity {
-                    self.nordPool = nordPoolEntity
+                    newNordPool = nordPoolEntity
                 } else if let entity {
-                    self.reload(entityID: entityID, state: entity.state)
+                    entityUpdates.append((entityID, entity))
                 }
             }
+        }
+
+        // Apply all updates together after all fetches complete so derived
+        // properties like housePower never observe a partial/inconsistent snapshot.
+        if let newNordPool {
+            nordPool = newNordPool
+        }
+        for (entityID, entity) in entityUpdates {
+            reload(entityID: entityID, state: entity.state)
         }
     }
 
