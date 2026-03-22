@@ -266,8 +266,9 @@ class ElectricityViewModelTests: XCTestCase {
         await viewModel.reload()
 
         // Then: housePower = solarPower + gridPower = 1000 + 2000 = 3000
-        XCTAssertEqual(viewModel.housePower, 3000)
+        XCTAssertEqual(viewModel.gridPower, 2000)
         XCTAssertEqual(viewModel.solarPower, 1000)
+        XCTAssertEqual(viewModel.housePower, 3000)
         XCTAssertEqual(viewModel.tibberCostToday.state, "55.0")
         XCTAssertEqual(viewModel.pulseConsumptionToday.state, "20.5")
     }
