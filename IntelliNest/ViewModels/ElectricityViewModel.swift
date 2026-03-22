@@ -89,10 +89,10 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         // Apply all updates together after all fetches complete so derived
         // properties like housePower never observe a partial/inconsistent snapshot.
         if let newNordPool {
-            self.nordPool = newNordPool
+            nordPool = newNordPool
         }
         for (entityID, entity) in entityUpdates {
-            self.reload(entityID: entityID, state: entity.state)
+            reload(entityID: entityID, state: entity.state)
         }
     }
 
