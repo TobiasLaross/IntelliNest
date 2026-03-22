@@ -23,12 +23,13 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         Double(solarPowerEntity.state) ?? 0
     }
 
-    var housePower: Double {
+    // Positive = importing from grid, negative = exporting to grid
+    var gridPower: Double {
         Double(pulsePowerEntity.state) ?? 0
     }
 
-    var gridPower: Double {
-        housePower - solarPower
+    var housePower: Double {
+        solarPower + gridPower
     }
 
     var isSolarToGrid: Bool {
