@@ -23,12 +23,12 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         Double(solarPowerEntity.state) ?? 0
     }
 
-    var housePower: Double {
+    var gridPower: Double {
         Double(pulsePowerEntity.state) ?? 0
     }
 
-    var gridPower: Double {
-        housePower - solarPower
+    var housePower: Double {
+        gridPower + solarPower
     }
 
     var isSolarToGrid: Bool {

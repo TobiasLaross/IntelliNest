@@ -120,20 +120,22 @@ class ElectricityViewModelTests: XCTestCase {
 
     // MARK: - Computed Property: gridPower
 
-    func testGridPower_isHousePowerMinusSolarPower() {
+    func testGridPower_equalsPulsePower() {
         // Given / When
         viewModel.reload(entityID: .pulsePower, state: "3000")
         viewModel.reload(entityID: .solarPower, state: "1000")
         // Then
-        XCTAssertEqual(viewModel.gridPower, 2000)
+        XCTAssertEqual(viewModel.gridPower, 3000)
+        XCTAssertEqual(viewModel.housePower, 4000)
     }
 
-    func testGridPower_isNegativeWhenSolarExceedsConsumption() {
-        // Given / When
-        viewModel.reload(entityID: .pulsePower, state: "1000")
+    func testGridPower_isNegativeWhenExportingToGrid() {
+        // Given / When: exporting 3 kW to grid
+        viewModel.reload(entityID: .pulsePower, state: "-3000")
         viewModel.reload(entityID: .solarPower, state: "4000")
         // Then
         XCTAssertEqual(viewModel.gridPower, -3000)
+        XCTAssertEqual(viewModel.housePower, 1000)
     }
 
     // MARK: - Computed Property: isSolarToGrid
@@ -141,7 +143,7 @@ class ElectricityViewModelTests: XCTestCase {
     func testIsSolarToGrid_whenSolarExceedsHouseConsumption() {
         // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid
         viewModel.reload(entityID: .solarPower, state: "5000")
-        viewModel.reload(entityID: .pulsePower, state: "1000")
+        viewModel.reload(entityID: .pulsePower, state: "-4000")
         // Then
         XCTAssertTrue(viewModel.isSolarToGrid)
     }
@@ -173,9 +175,9 @@ class ElectricityViewModelTests: XCTestCase {
     }
 
     func testIsSolarToHouse_whenSolarFullyCoversPlusExports() {
-        // Given: solar exceeds house consumption and exports to grid
+        // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid
         viewModel.reload(entityID: .solarPower, state: "5000")
-        viewModel.reload(entityID: .pulsePower, state: "1000")
+        viewModel.reload(entityID: .pulsePower, state: "-4000")
         // Then
         XCTAssertTrue(viewModel.isSolarToHouse)
     }
@@ -199,17 +201,17 @@ class ElectricityViewModelTests: XCTestCase {
     }
 
     func testIsGridToHouse_whenSolarCoversAllConsumption() {
-        // Given: solar covers all house consumption and exports surplus
+        // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid
         viewModel.reload(entityID: .solarPower, state: "5000")
-        viewModel.reload(entityID: .pulsePower, state: "1000")
+        viewModel.reload(entityID: .pulsePower, state: "-4000")
         // Then
         XCTAssertFalse(viewModel.isGridToHouse)
     }
 
     func testIsGridToHouse_whenSolarPartiallyCoversConsumption() {
-        // Given: solar covers 1 kW but house needs 3 kW → drawing 2 kW from grid
+        // Given: solar covers 1 kW, house needs 3 kW → drawing 2 kW from grid
         viewModel.reload(entityID: .solarPower, state: "1000")
-        viewModel.reload(entityID: .pulsePower, state: "3000")
+        viewModel.reload(entityID: .pulsePower, state: "2000")
         // Then
         XCTAssertTrue(viewModel.isGridToHouse)
     }
@@ -240,7 +242,7 @@ class ElectricityViewModelTests: XCTestCase {
         await viewModel.reload()
 
         // Then
-        XCTAssertEqual(viewModel.housePower, 2000)
+        XCTAssertEqual(viewModel.housePower, 3000)
         XCTAssertEqual(viewModel.solarPower, 1000)
         XCTAssertEqual(viewModel.tibberCostToday.state, "55.0")
         XCTAssertEqual(viewModel.pulseConsumptionToday.state, "20.5")
