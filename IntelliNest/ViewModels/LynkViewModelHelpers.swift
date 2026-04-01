@@ -102,5 +102,4 @@ extension LynkViewModel {
         return date.humanReadable
         // return formatter.string(from: date)
     }
-
 }

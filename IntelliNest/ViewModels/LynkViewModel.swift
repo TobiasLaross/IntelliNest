@@ -199,5 +199,4 @@ class LynkViewModel: ObservableObject, Reloadable {
         lynkAirConditionInitiatedTime = nil
         restAPIService.callScript(scriptID: .lynkStopClimate)
     }
-
 }

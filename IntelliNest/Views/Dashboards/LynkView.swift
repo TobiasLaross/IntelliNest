@@ -151,7 +151,6 @@ struct LynkView: View {
                 .padding(.bottom, 16)
 
                 Spacer()
-
             }
             if viewModel.isShowingHeaterOptions {
                 LynkHeaterOptionsView(viewModel: viewModel)
