@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		15D16E8AB702D79269A6BD39 /* RoborockImageEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386D85613C7069D1CC652E21 /* RoborockImageEntity.swift */; };
-		21F16FCFD796322F432CEDBD /* LeafView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF213DF2635314B9672C3252 /* LeafView.swift */; };
 		3BE58BE3D740734914B1C7DD /* HomeLocationEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */; };
 		3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DC1A4298196BF77982508A /* PurifierView.swift */; };
 		40D2B2C064DFFA29F5082543 /* PurifierEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171E57CCB554528320B69CFA /* PurifierEntity.swift */; };
@@ -230,7 +229,6 @@
 		AE35931A9C554E855ADCD646 /* NavigatorHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NavigatorHelpers.swift; sourceTree = "<group>"; };
 		B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeLocationEntity.swift; sourceTree = "<group>"; };
 		D89BCA06BE3A45F2A8E3DAE4 /* LynkViewModelHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LynkViewModelHelpers.swift; sourceTree = "<group>"; };
-		EF213DF2635314B9672C3252 /* LeafView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LeafView.swift; sourceTree = "<group>"; };
 		F60345C027A7F33700212D04 /* Entity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
 		F60345C327A933D700212D04 /* GlobalConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalConstants.swift; sourceTree = "<group>"; };
 		F60345C827A9379200212D04 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -502,7 +500,6 @@
 				F60345C827A9379200212D04 /* HomeView.swift */,
 				F60345D327ABE49100212D04 /* LightsView.swift */,
 				F60345D527ABE49700212D04 /* RoborockView.swift */,
-				EF213DF2635314B9672C3252 /* LeafView.swift */,
 			);
 			path = Dashboards;
 			sourceTree = "<group>";
@@ -1196,7 +1193,6 @@
 				8AC963688E594E56ED469785 /* PurifierSpeed.swift in Sources */,
 				15D16E8AB702D79269A6BD39 /* RoborockImageEntity.swift in Sources */,
 				3BE58BE3D740734914B1C7DD /* HomeLocationEntity.swift in Sources */,
-				21F16FCFD796322F432CEDBD /* LeafView.swift in Sources */,
 				475E14194877F6B833C57FD5 /* LynkViewModelHelpers.swift in Sources */,
 				DCB404B87EB18E082778ED09 /* NavigatorHelpers.swift in Sources */,
 			);

@@ -20,15 +20,13 @@ class LynkViewModelTests: XCTestCase {
             repeatReloadAction: { _ in }
         )
         viewModel = LynkViewModel(restAPIService: restAPIService)
-        // Seed both time keys so reload() skips forceUpdate and the 5-second sleep.
+        // Seed reload time key so reload() skips forceUpdate and the 5-second sleep.
         UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.lynkReloadTime.rawValue)
-        UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.leafReloadTime.rawValue)
     }
 
     override func tearDown() async throws {
         URLProtocolStub.stopInterceptingRequests()
         UserDefaults.shared.removeObject(forKey: StorageKeys.lynkReloadTime.rawValue)
-        UserDefaults.shared.removeObject(forKey: StorageKeys.leafReloadTime.rawValue)
         viewModel = nil
         restAPIService = nil
         urlCreator = nil
@@ -58,17 +56,10 @@ class LynkViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.fuelUpdatedAt.state, "Loading")
         XCTAssertEqual(viewModel.addressUpdatedAt.state, "Loading")
         XCTAssertEqual(viewModel.chargerUpdatedAt.state, "Loading")
-        XCTAssertEqual(viewModel.leafClimateTimer.state, "Loading")
-        XCTAssertEqual(viewModel.leafBattery.state, "Loading")
-        XCTAssertEqual(viewModel.leafRangeAC.state, "Loading")
-        XCTAssertEqual(viewModel.isLeafCharging.state, "Loading")
-        XCTAssertEqual(viewModel.isLeafPluggedIn.state, "Loading")
-        XCTAssertEqual(viewModel.leafLastPoll.state, "Loading")
         XCTAssertFalse(viewModel.isLynkFlashing)
         XCTAssertFalse(viewModel.isShowingHeaterOptions)
         XCTAssertNil(viewModel.lynkAirConditionInitiatedTime)
         XCTAssertNil(viewModel.engineInitiatedTime)
-        XCTAssertNil(viewModel.leafAirConditionInitiatedTime)
     }
 
     // MARK: - reload(entityID:state:) dispatch
@@ -204,48 +195,6 @@ class LynkViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.chargerUpdatedAt.state, "2024-01-01T10:30:00")
     }
 
-    func testReloadUpdatesLeafACTimer() {
-        viewModel.reload(entityID: .leafACTimer, state: "2024-01-01T11:00:00+00:00")
-        XCTAssertEqual(viewModel.leafClimateTimer.state, "2024-01-01T11:00:00+00:00")
-    }
-
-    func testReloadUpdatesLeafACTimerLastChanged() {
-        let date = Date(timeIntervalSinceReferenceDate: 700_000_004)
-        viewModel.reload(entityID: .leafACTimer, state: "2024-01-01T11:00:00+00:00", lastChanged: date)
-        XCTAssertEqual(viewModel.leafClimateTimer.lastChanged, date)
-    }
-
-    func testReloadDoesNotOverwriteLeafACTimerLastChangedWhenNil() {
-        let original = viewModel.leafClimateTimer.lastChanged
-        viewModel.reload(entityID: .leafACTimer, state: "2024-01-01T11:00:00+00:00", lastChanged: nil)
-        XCTAssertEqual(viewModel.leafClimateTimer.lastChanged, original)
-    }
-
-    func testReloadUpdatesLeafBattery() {
-        viewModel.reload(entityID: .leafBattery, state: "80")
-        XCTAssertEqual(viewModel.leafBattery.state, "80")
-    }
-
-    func testReloadUpdatesLeafRangeAC() {
-        viewModel.reload(entityID: .leafRangeAC, state: "200")
-        XCTAssertEqual(viewModel.leafRangeAC.state, "200")
-    }
-
-    func testReloadUpdatesLeafCharging() {
-        viewModel.reload(entityID: .leafCharging, state: "on")
-        XCTAssertEqual(viewModel.isLeafCharging.state, "on")
-    }
-
-    func testReloadUpdatesLeafPluggedIn() {
-        viewModel.reload(entityID: .leafPluggedIn, state: "on")
-        XCTAssertEqual(viewModel.isLeafPluggedIn.state, "on")
-    }
-
-    func testReloadUpdatesLeafLastPoll() {
-        viewModel.reload(entityID: .leafLastPoll, state: "2024-01-01T12:00:00")
-        XCTAssertEqual(viewModel.leafLastPoll.state, "2024-01-01T12:00:00")
-    }
-
     func testReloadUnknownEntityIDDoesNotCrash() {
         // .coffeeMachine is not in LynkViewModel's switch — exercises the default/error branch
         viewModel.reload(entityID: .coffeeMachine, state: "on")
@@ -354,44 +303,6 @@ class LynkViewModelTests: XCTestCase {
         viewModel.reload(entityID: .lynkChargeState, state: "Unknown")
         viewModel.reload(entityID: .lynkChargerConnectionStatus, state: "SomeNewState")
         XCTAssertTrue(viewModel.lynkChargerConnectionDescription.contains("SomeNewState"))
-    }
-
-    func testLeafClimateTimerRemaining_futureDate_returnsPositiveMinutes() {
-        let futureDate = Date().addingTimeInterval(30 * 60)
-        let formatter = ISO8601DateFormatter()
-        viewModel.reload(entityID: .leafACTimer, state: formatter.string(from: futureDate))
-        let remaining = viewModel.leafClimateTimerRemaining
-        XCTAssertNotNil(remaining)
-        XCTAssertGreaterThan(remaining!, 0)
-    }
-
-    func testLeafClimateTimerRemaining_pastDate_returnsNil() {
-        let pastDate = Date().addingTimeInterval(-60)
-        let formatter = ISO8601DateFormatter()
-        viewModel.reload(entityID: .leafACTimer, state: formatter.string(from: pastDate))
-        XCTAssertNil(viewModel.leafClimateTimerRemaining)
-    }
-
-    func testLeafClimateTimerRemaining_unavailable_returnsNil() {
-        viewModel.reload(entityID: .leafACTimer, state: "unavailable")
-        XCTAssertNil(viewModel.leafClimateTimerRemaining)
-    }
-
-    func testLeafClimateTimerRemaining_malformedString_returnsNil() {
-        viewModel.reload(entityID: .leafACTimer, state: "not-a-date")
-        XCTAssertNil(viewModel.leafClimateTimerRemaining)
-    }
-
-    func testIsLeafAirConditionActive_whenTimerInFuture() {
-        let futureDate = Date().addingTimeInterval(20 * 60)
-        let formatter = ISO8601DateFormatter()
-        viewModel.reload(entityID: .leafACTimer, state: formatter.string(from: futureDate))
-        XCTAssertTrue(viewModel.isLeafAirConditionActive)
-    }
-
-    func testIsLeafAirConditionActive_whenTimerExpired() {
-        viewModel.reload(entityID: .leafACTimer, state: "unavailable")
-        XCTAssertFalse(viewModel.isLeafAirConditionActive)
     }
 
     func testIsLynkAirConditionLoading_withRecentInitiatedTime() {
@@ -503,8 +414,6 @@ class LynkViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.isEngineRunning.state, "test_\(EntityId.lynkEngineRunning.rawValue)")
         XCTAssertEqual(viewModel.lynkInteriorTemperature.state, "test_\(EntityId.lynkTemperatureInterior.rawValue)")
         XCTAssertEqual(viewModel.lynkBattery.state, "test_\(EntityId.lynkBattery.rawValue)")
-        XCTAssertEqual(viewModel.leafBattery.state, "test_\(EntityId.leafBattery.rawValue)")
-        XCTAssertEqual(viewModel.leafLastPoll.state, "test_\(EntityId.leafLastPoll.rawValue)")
     }
 
     func testReloadSilentlyHandlesNetworkFailure() async {

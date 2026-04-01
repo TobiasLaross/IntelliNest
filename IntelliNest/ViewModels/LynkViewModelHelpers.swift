@@ -103,26 +103,4 @@ extension LynkViewModel {
         // return formatter.string(from: date)
     }
 
-    var leafClimateTitle: String {
-        isLeafAirConditionActive || isLeafAirConditionLoading ? "Stäng av" : "Starta"
-    }
-
-    var isLeafAirConditionActive: Bool {
-        leafClimateTimerRemaining != nil
-    }
-
-    var isLeafAirConditionLoading: Bool {
-        !isLeafAirConditionActive && (leafAirConditionInitiatedTime?.addingTimeInterval(5 * 60) ?? Date.distantPast) > Date()
-    }
-
-    var leafClimateTimerRemaining: Int? {
-        let formatter = ISO8601DateFormatter()
-        let timerDate = leafClimateTimer.state.lowercased() != "unavailable"
-            ? formatter.date(from: leafClimateTimer.state)
-            : nil
-        if let minutes = timerDate?.minutesLeft(), minutes >= 0 {
-            return minutes
-        }
-        return nil
-    }
 }

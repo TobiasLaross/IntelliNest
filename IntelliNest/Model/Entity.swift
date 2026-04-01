@@ -84,9 +84,6 @@ struct Entity: EntityProtocol {
     private mutating func updateDate() {
         date = .distantPast
 
-        if entityId == .leafLastPoll {
-            print("")
-        }
         let dateFormatter = DateFormatter()
         let hasDateComponent = state.contains("T") || state.count > 8
         let hasTimeComponent = state.contains(":")
