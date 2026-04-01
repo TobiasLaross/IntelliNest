@@ -13,7 +13,7 @@ struct LynkHeaterOptionsView: View {
                 }
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.primaryContentBackground)
-                .frame(width: 300, height: 200)
+                .frame(width: 300, height: 130)
                 .overlay {
                     ZStack {
                         VStack {
@@ -38,19 +38,6 @@ struct LynkHeaterOptionsView: View {
                                                   isLoading: viewModel.isEngineLoading,
                                                   action: viewModel.startEngine)
                                     .disabled(viewModel.isEngineLoading)
-                            }
-                            INText("Leaf", font: .body)
-                                .padding(.horizontal)
-                                .padding(.vertical, 4)
-                            HStack {
-                                ServiceButtonView(buttonTitle: "Starta Klimatet",
-                                                  isActive: viewModel.isLeafAirConditionActive,
-                                                  buttonWidth: buttonWidth,
-                                                  buttonHeight: buttonHeight,
-                                                  cornerRadius: 20,
-                                                  isLoading: viewModel.isLeafAirConditionLoading,
-                                                  action: viewModel.startLeafClimate)
-                                    .disabled(viewModel.isLynkAirConditionLoading)
                             }
                         }
                         .padding(.vertical, 8)

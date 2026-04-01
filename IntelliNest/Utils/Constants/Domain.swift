@@ -19,7 +19,6 @@ enum Domain: String, Encodable {
     case automation
     case homeassistant
     case restCommand = "rest_command"
-    case leaf = "nissan_carwings"
     case light
     case lynkco
     case inputBoolean = "input_boolean"

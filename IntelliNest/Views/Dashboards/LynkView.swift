@@ -151,10 +151,6 @@ struct LynkView: View {
                 .padding(.bottom, 16)
 
                 Spacer()
-
-                Divider()
-                    .padding(.vertical)
-                LeafView(viewModel: viewModel)
             }
             if viewModel.isShowingHeaterOptions {
                 LynkHeaterOptionsView(viewModel: viewModel)

@@ -176,7 +176,6 @@ class Navigator: ObservableObject {
     func toolbarReload() async {
         if currentDestination == .lynk {
             lynkViewModel.forceUpdateLynk()
-            lynkViewModel.forceUpdateLeaf()
             try? await Task.sleep(seconds: 2)
             repeatReload(times: 6)
         } else {

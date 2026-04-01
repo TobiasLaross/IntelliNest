@@ -28,15 +28,6 @@ class LynkViewModel: ObservableObject, Reloadable {
     @Published var chargerUpdatedAt = Entity(entityId: .lynkChargerUpdatedAt)
     @Published var lynkAirConditionInitiatedTime: Date?
 
-    // Leaf
-    @Published var leafClimateTimer = Entity(entityId: .leafACTimer)
-    @Published var leafBattery = InputNumberEntity(entityId: .leafBattery)
-    @Published var leafRangeAC = Entity(entityId: .leafRangeAC)
-    @Published var isLeafCharging = Entity(entityId: .leafCharging)
-    @Published var isLeafPluggedIn = Entity(entityId: .leafPluggedIn)
-    @Published var leafLastPoll = Entity(entityId: .leafLastPoll)
-    @Published var leafAirConditionInitiatedTime: Date?
-
     @Published var engineInitiatedTime: Date?
     @Published var isShowingHeaterOptions = false
 
@@ -46,8 +37,7 @@ class LynkViewModel: ObservableObject, Reloadable {
         .lynkDoorLock, .lynkAddress, .lynkCarUpdatedAt, .lynkChargeState,
         .lynkChargerConnectionStatus, .lynkTimeUntilCharged, .lynkClimateUpdatedAt, .lynkDoorLockUpdatedAt,
         .lynkBatteryUpdatedAt, .lynkFuelUpdatedAt, .lynkAddressUpdatedAt,
-        .lynkChargerUpdatedAt, .leafACTimer, .leafBattery, .leafRangeAC, .leafCharging, .leafPluggedIn,
-        .leafLastPoll
+        .lynkChargerUpdatedAt
     ]
     var isReloading = false
     var isLynkFlashing = false
@@ -63,24 +53,12 @@ class LynkViewModel: ObservableObject, Reloadable {
         UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.lynkReloadTime.rawValue)
     }
 
-    func forceUpdateLeaf() {
-        restAPIService.callService(serviceID: .leafUpdate, domain: .leaf, json: [.vin: GlobalConstants.leafVIN])
-        UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.leafReloadTime.rawValue)
-    }
-
     func reload() async {
         await withReloadGuard {
             var shouldSleep = false
             let lastReloadTime = UserDefaults.shared.value(forKey: StorageKeys.lynkReloadTime.rawValue) as? Date
             if (lastReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
                 self.forceUpdateLynk()
-                await self.reloadEntities()
-                shouldSleep = true
-            }
-
-            let lastLeafReloadTime = UserDefaults.shared.value(forKey: StorageKeys.leafReloadTime.rawValue) as? Date
-            if (lastLeafReloadTime?.addingTimeInterval(60 * 60) ?? Date.distantPast) < Date.now {
-                self.forceUpdateLeaf()
                 await self.reloadEntities()
                 shouldSleep = true
             }
@@ -132,20 +110,14 @@ class LynkViewModel: ObservableObject, Reloadable {
         .lynkBatteryUpdatedAt: \.batteryUpdatedAt,
         .lynkFuelUpdatedAt: \.fuelUpdatedAt,
         .lynkAddressUpdatedAt: \.addressUpdatedAt,
-        .lynkChargerUpdatedAt: \.chargerUpdatedAt,
-        .leafACTimer: \.leafClimateTimer,
-        .leafRangeAC: \.leafRangeAC,
-        .leafCharging: \.isLeafCharging,
-        .leafPluggedIn: \.isLeafPluggedIn,
-        .leafLastPoll: \.leafLastPoll
+        .lynkChargerUpdatedAt: \.chargerUpdatedAt
     ]
 
     private lazy var lastChangedKeyPaths: [EntityId: ReferenceWritableKeyPath<LynkViewModel, Entity>] = [
         .lynkClimateHeating: \.lynkClimateHeating,
         .lynkEngineRunning: \.isEngineRunning,
         .lynkTemperatureInterior: \.lynkInteriorTemperature,
-        .lynkTemperatureExterior: \.lynkExteriorTemperature,
-        .leafACTimer: \.leafClimateTimer
+        .lynkTemperatureExterior: \.lynkExteriorTemperature
     ]
 
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
@@ -160,8 +132,6 @@ class LynkViewModel: ObservableObject, Reloadable {
             lynkBattery.state = state
         } else if entityID == .lynkFuel {
             fuel.state = state
-        } else if entityID == .leafBattery {
-            leafBattery.state = state
         } else {
             Log.error("LynkViewModel doesn't reload entityID: \(entityID)")
         }
@@ -228,24 +198,5 @@ class LynkViewModel: ObservableObject, Reloadable {
     func stopLynkClimate() {
         lynkAirConditionInitiatedTime = nil
         restAPIService.callScript(scriptID: .lynkStopClimate)
-    }
-
-    func toggleLeafClimate() {
-        if isLeafAirConditionActive {
-            stopLeafClimate()
-        } else {
-            startLeafClimate()
-        }
-    }
-
-    func startLeafClimate() {
-        leafAirConditionInitiatedTime = Date()
-        restAPIService.callService(serviceID: .leafStartClimate, domain: .leaf, json: [.vin: GlobalConstants.leafVIN])
-        isShowingHeaterOptions = false
-    }
-
-    func stopLeafClimate() {
-        leafAirConditionInitiatedTime = nil
-        restAPIService.callService(serviceID: .leafStopClimate, domain: .leaf, json: [.vin: GlobalConstants.leafVIN])
     }
 }
