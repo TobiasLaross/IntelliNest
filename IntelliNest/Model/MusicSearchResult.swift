@@ -169,11 +169,13 @@ struct MusicPlaylistBrowseResponse: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: DynamicKey.self)
-        guard let entityKey = container.allKeys.first,
-              let node = try? container.decode(Node.self, forKey: entityKey) else {
-            tracks = []
-            return
+        guard let entityKey = container.allKeys.first else {
+            throw DecodingError.dataCorrupted(.init(
+                codingPath: decoder.codingPath,
+                debugDescription: "Expected a browsed playlist node keyed by entity id."
+            ))
         }
+        let node = try container.decode(Node.self, forKey: entityKey)
         tracks = (node.children ?? []).compactMap { child in
             guard let uri = child.mediaContentID, let title = child.title else {
                 return nil

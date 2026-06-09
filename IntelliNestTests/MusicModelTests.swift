@@ -333,6 +333,12 @@ final class MusicModelTests: XCTestCase {
         XCTAssertTrue(response.tracks.isEmpty)
     }
 
+    func testPlaylistBrowseResponseThrowsOnMalformedPayload() {
+        // No entity-id node at all — must surface as a failure, not an empty playlist.
+        let json = "{}"
+        XCTAssertThrowsError(try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8)))
+    }
+
     @MainActor
     func testBrowsePlaylistTracksUnwrapsEnvelopeAndFallsBackToExternalURL() async throws {
         URLProtocolStub.startInterceptingRequests()
