@@ -29,9 +29,17 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Drives the search-results sheet, which presents the grouped results in a
     /// separate view with a tab per media-type category.
     @Published var isShowingSearchResults = false
+    /// The playlist the user drilled into (nil = showing the result list). Tapping
+    /// a playlist opens it here instead of playing it immediately.
+    @Published var openedPlaylist: MusicSearchItem?
+    @Published var playlistTracks: [MusicPlaylistTrack] = []
+    @Published var isLoadingPlaylist = false
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
+    /// Increments on every search so a slow, older response can't overwrite the
+    /// results of a newer query.
+    private var searchRequestToken = 0
 
     private let restAPIService: RestAPIService
     private let setErrorBannerText: StringStringClosure
@@ -120,18 +128,33 @@ class MusicViewModel: ObservableObject, Reloadable {
             return
         }
 
+        searchRequestToken += 1
+        let token = searchRequestToken
+        openedPlaylist = nil
         isShowingSearchResults = true
         isSearching = true
         hasSearched = true
         do {
             let response = try await restAPIService.searchMusic(query: query)
+            guard token == searchRequestToken else {
+                return
+            }
             searchSections = response.sections
         } catch {
+            guard token == searchRequestToken else {
+                return
+            }
             Log.error("Music search failed: \(error)")
+            // Don't leave the UI in a "no results" state — close the results
+            // sheet and surface the failure through the error banner instead.
             searchSections = []
+            hasSearched = false
+            isShowingSearchResults = false
             setErrorBannerText("Sökningen misslyckades", "Kunde inte söka efter musik")
         }
-        isSearching = false
+        if token == searchRequestToken {
+            isSearching = false
+        }
     }
 
     var hasNoResults: Bool {
@@ -151,23 +174,82 @@ class MusicViewModel: ObservableObject, Reloadable {
     }
 
     func play(item: MusicSearchItem) async {
+        if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist) {
+            closeSearchResults()
+        }
+    }
+
+    /// Starts (or enqueues) playback of a media item on the active speaker's
+    /// group leader. Returns whether the request succeeded so callers can chain
+    /// follow-up actions and avoid showing a false playing state.
+    @discardableResult
+    private func startPlayback(uri: String,
+                               mediaType: MusicMediaType,
+                               title: String?,
+                               artist: String?,
+                               enqueue: String = "replace") async -> Bool {
         guard let activeSpeakerID, let targetID = playbackTargetID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
-            return
+            return false
         }
 
-        let success = await restAPIService.playMedia(on: targetID,
-                                                     mediaID: item.uri,
-                                                     mediaType: item.mediaType)
+        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType, enqueue: enqueue)
         if success {
             // Optimistically reflect what we just started; a reload confirms it.
             speakers[activeSpeakerID]?.state = "playing"
-            speakers[activeSpeakerID]?.mediaTitle = item.name
-            speakers[activeSpeakerID]?.mediaArtist = item.artist
+            speakers[activeSpeakerID]?.mediaTitle = title
+            speakers[activeSpeakerID]?.mediaArtist = artist
             restAPIService.triggerRepeatReload(times: 3)
         } else {
             setErrorBannerText("Kunde inte spela", "Det gick inte att starta uppspelningen")
         }
+        return success
+    }
+
+    // MARK: - Playlists
+
+    /// Opens a playlist for browsing instead of playing it: records the opened
+    /// playlist (which drills the sheet into the detail view) and loads its
+    /// tracks. Browsing reads the playlist contents and never changes playback.
+    func openPlaylist(_ playlist: MusicSearchItem) async {
+        openedPlaylist = playlist
+        playlistTracks = []
+        isLoadingPlaylist = true
+        let browseSpeaker = activeSpeakerID ?? availableSpeakers.first?.entityId
+        if let browseSpeaker {
+            do {
+                playlistTracks = try await restAPIService.browsePlaylistTracks(playlistURI: playlist.uri, on: browseSpeaker)
+            } catch {
+                Log.error("Failed to browse playlist: \(error)")
+                setErrorBannerText("Kunde inte öppna spellistan", "Det gick inte att hämta låtarna")
+            }
+        }
+        isLoadingPlaylist = false
+    }
+
+    /// Plays the whole playlist from the start on the active speaker.
+    func playPlaylist(_ playlist: MusicSearchItem) async {
+        if await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) {
+            closeSearchResults()
+        }
+    }
+
+    /// Plays the chosen track now, then queues the rest of the playlist after it,
+    /// so the tapped song is followed by the playlist.
+    func playTrackInPlaylist(_ track: MusicPlaylistTrack, from playlist: MusicSearchItem) async {
+        guard await startPlayback(uri: track.uri, mediaType: .track, title: track.title, artist: nil) else {
+            return
+        }
+        if let targetID = playbackTargetID {
+            await restAPIService.playMedia(on: targetID, mediaID: playlist.uri, mediaType: .playlist, enqueue: "add")
+        }
+        closeSearchResults()
+    }
+
+    /// Dismisses the search-results sheet and clears any opened playlist.
+    func closeSearchResults() {
+        isShowingSearchResults = false
+        openedPlaylist = nil
     }
 
     func togglePlayPause() {

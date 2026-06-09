@@ -139,7 +139,9 @@ final class MusicModelTests: XCTestCase {
         base.volumeLevel = 0.5
         base.mediaTitle = trackName
         base.mediaArtist = trackArtist
+        base.mediaAlbumName = "A Night at the Opera"
         base.mediaContentID = trackURI
+        base.entityPicture = "/api/media_player_proxy/kitchen.jpg"
         base.groupMembers = [.mediaPlayerLivingRoom]
         base.shuffle = true
         base.repeatMode = .one
@@ -149,10 +151,13 @@ final class MusicModelTests: XCTestCase {
 
         // Each mutated property must break equality, exercising every clause of ==.
         same = base; same.state = "paused"; XCTAssertNotEqual(base, same)
+        same = base; same.friendlyName = "Köket"; XCTAssertNotEqual(base, same)
         same = base; same.volumeLevel = 0.9; XCTAssertNotEqual(base, same)
         same = base; same.mediaTitle = "Other"; XCTAssertNotEqual(base, same)
         same = base; same.mediaArtist = "Other"; XCTAssertNotEqual(base, same)
+        same = base; same.mediaAlbumName = "Other album"; XCTAssertNotEqual(base, same)
         same = base; same.mediaContentID = "spotify://track/other"; XCTAssertNotEqual(base, same)
+        same = base; same.entityPicture = "/api/media_player_proxy/other.jpg"; XCTAssertNotEqual(base, same)
         same = base; same.groupMembers = []; XCTAssertNotEqual(base, same)
         same = base; same.shuffle = false; XCTAssertNotEqual(base, same)
         same = base; same.repeatMode = .off; XCTAssertNotEqual(base, same)
@@ -301,5 +306,58 @@ final class MusicModelTests: XCTestCase {
         let success = await service.playMedia(on: .mediaPlayerKitchen, mediaID: trackURI, mediaType: .track)
 
         XCTAssertFalse(success)
+    }
+
+    // MARK: - Playlist browse
+
+    func testPlaylistBrowseResponseDecodesTracksAndDropsInvalid() throws {
+        let json = """
+        {"media_player.kitchen":{"title":"Sommar","media_class":"playlist","children":[
+          {"title":"Song A","media_content_id":"spotify://track/a","thumbnail":"https://img/a.jpg"},
+          {"title":"Song B","media_content_id":"spotify://track/b","thumbnail":null},
+          {"title":null,"media_content_id":"spotify://track/c"},
+          {"title":"Missing uri","media_content_id":null}
+        ]}}
+        """
+        let response = try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8))
+        XCTAssertEqual(response.tracks.count, 2)
+        XCTAssertEqual(response.tracks.first?.uri, "spotify://track/a")
+        XCTAssertEqual(response.tracks.first?.title, "Song A")
+        XCTAssertEqual(response.tracks.first?.imageURL, "https://img/a.jpg")
+        XCTAssertNil(response.tracks.last?.imageURL)
+    }
+
+    func testPlaylistBrowseResponseEmptyWhenNoChildren() throws {
+        let json = "{\"media_player.kitchen\":{\"title\":\"Sommar\"}}"
+        let response = try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8))
+        XCTAssertTrue(response.tracks.isEmpty)
+    }
+
+    func testPlaylistBrowseResponseThrowsOnMalformedPayload() {
+        // No entity-id node at all — must surface as a failure, not an empty playlist.
+        let json = "{}"
+        XCTAssertThrowsError(try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8)))
+    }
+
+    @MainActor
+    func testBrowsePlaylistTracksUnwrapsEnvelopeAndFallsBackToExternalURL() async throws {
+        URLProtocolStub.startInterceptingRequests()
+        defer { URLProtocolStub.stopInterceptingRequests() }
+        let (service, _) = makeService()
+        // Only the external URL is stubbed, so the internal attempt must fail over.
+        var components = URLComponents(string: GlobalConstants.baseExternalUrlString)!
+        components.path = "/api/services/media_player/browse_media"
+        components.queryItems = [URLQueryItem(name: "return_response", value: "true")]
+        let url = components.url!
+        let body = "{\"service_response\":{\"media_player.kitchen\":{\"children\":" +
+            "[{\"title\":\"Song A\",\"media_content_id\":\"spotify://track/a\"}]}}}"
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(body.utf8), response: response, error: nil)
+
+        let tracks = try await service.browsePlaylistTracks(playlistURI: "spotify://playlist/p1", on: .mediaPlayerKitchen)
+
+        XCTAssertEqual(tracks.count, 1)
+        XCTAssertEqual(tracks.first?.uri, "spotify://track/a")
+        XCTAssertEqual(tracks.first?.title, "Song A")
     }
 }

@@ -31,7 +31,7 @@ enum MusicMediaType: String, CaseIterable, Decodable {
 
 /// A single Music Assistant search result item. `uri` is the playable media id
 /// (e.g. `spotify://track/3SjXx3rbNGk8nCho8YEoz5`).
-struct MusicSearchItem: Identifiable, Equatable {
+struct MusicSearchItem: Identifiable, Equatable, Hashable {
     let uri: String
     let name: String
     let mediaType: MusicMediaType
@@ -118,5 +118,69 @@ struct MusicSearchResponse: Decodable {
             }
         }
         sections = builtSections
+    }
+}
+
+/// A single track inside a playlist, decoded from a `browse_media` response.
+struct MusicPlaylistTrack: Identifiable, Equatable {
+    let uri: String
+    let title: String
+    let imageURL: String?
+
+    var id: String { uri }
+}
+
+/// Decodes a `media_player.browse_media` response for a playlist. The browsed
+/// node is nested under a single dynamic entity-id key; its `children` are the
+/// playlist's tracks (each a track uri in `media_content_id`, a `title`, and an
+/// optional `thumbnail`).
+struct MusicPlaylistBrowseResponse: Decodable {
+    let tracks: [MusicPlaylistTrack]
+
+    private struct Node: Decodable {
+        let children: [Child]?
+    }
+
+    private struct Child: Decodable {
+        let title: String?
+        let mediaContentID: String?
+        let thumbnail: String?
+
+        private enum CodingKeys: String, CodingKey {
+            case title
+            case mediaContentID = "media_content_id"
+            case thumbnail
+        }
+    }
+
+    private struct DynamicKey: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+            intValue = nil
+        }
+
+        init?(intValue: Int) {
+            self.intValue = intValue
+            stringValue = String(intValue)
+        }
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: DynamicKey.self)
+        guard let entityKey = container.allKeys.first else {
+            throw DecodingError.dataCorrupted(.init(
+                codingPath: decoder.codingPath,
+                debugDescription: "Expected a browsed playlist node keyed by entity id."
+            ))
+        }
+        let node = try container.decode(Node.self, forKey: entityKey)
+        tracks = (node.children ?? []).compactMap { child in
+            guard let uri = child.mediaContentID, let title = child.title else {
+                return nil
+            }
+            return MusicPlaylistTrack(uri: uri, title: title, imageURL: child.thumbnail)
+        }
     }
 }

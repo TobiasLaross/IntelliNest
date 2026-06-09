@@ -49,7 +49,7 @@ jobs:
             -project IntelliNest.xcodeproj \
             -scheme "IntelliNest-github" \
             -testPlan "IntelliNest-github" \
-            -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
+            -destination "platform=iOS Simulator,name=iPhone 17,OS=latest" \
             -configuration "Github actions" \
             -parallel-testing-enabled YES \
             -maximum-parallel-testing-workers 2 \

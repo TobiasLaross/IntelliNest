@@ -69,15 +69,15 @@ private struct HouseInfoView: View {
                     .lineLimit(6)
             }
             Spacer()
-            VStack {
-                Text("""
-                Elnät: ***\(viewModel.pulsePower.state.toKW)***
-                Pris: ***\(viewModel.tibberPrice.state.toOre)***
-                Producerat idag: ***\(viewModel.solarProductionToday.state.toKWh)***
-                Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***
-                """)
-                .font(.buttonFontMedium)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Elnät: ***\(viewModel.pulsePower.state.toKW)***")
+                Text("Pris: ***\(viewModel.tibberPrice.state.toOre)***")
+                Text("Producerat idag: ***\(viewModel.solarProductionToday.state.toKWh)***")
+                Text("Köpt idag: ***\(viewModel.pulseConsumptionToday.state.toKWh)***")
             }
+            .font(.buttonFontMedium)
+            .fixedSize(horizontal: true, vertical: false)
+            .layoutPriority(1)
             .padding(.trailing, 20)
         }
         .foregroundStyle(.white)
