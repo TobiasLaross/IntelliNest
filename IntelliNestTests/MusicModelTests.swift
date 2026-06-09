@@ -307,4 +307,51 @@ final class MusicModelTests: XCTestCase {
 
         XCTAssertFalse(success)
     }
+
+    // MARK: - Playlist browse
+
+    func testPlaylistBrowseResponseDecodesTracksAndDropsInvalid() throws {
+        let json = """
+        {"media_player.kitchen":{"title":"Sommar","media_class":"playlist","children":[
+          {"title":"Song A","media_content_id":"spotify://track/a","thumbnail":"https://img/a.jpg"},
+          {"title":"Song B","media_content_id":"spotify://track/b","thumbnail":null},
+          {"title":null,"media_content_id":"spotify://track/c"},
+          {"title":"Missing uri","media_content_id":null}
+        ]}}
+        """
+        let response = try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8))
+        XCTAssertEqual(response.tracks.count, 2)
+        XCTAssertEqual(response.tracks.first?.uri, "spotify://track/a")
+        XCTAssertEqual(response.tracks.first?.title, "Song A")
+        XCTAssertEqual(response.tracks.first?.imageURL, "https://img/a.jpg")
+        XCTAssertNil(response.tracks.last?.imageURL)
+    }
+
+    func testPlaylistBrowseResponseEmptyWhenNoChildren() throws {
+        let json = "{\"media_player.kitchen\":{\"title\":\"Sommar\"}}"
+        let response = try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8))
+        XCTAssertTrue(response.tracks.isEmpty)
+    }
+
+    @MainActor
+    func testBrowsePlaylistTracksUnwrapsEnvelopeAndFallsBackToExternalURL() async throws {
+        URLProtocolStub.startInterceptingRequests()
+        defer { URLProtocolStub.stopInterceptingRequests() }
+        let (service, _) = makeService()
+        // Only the external URL is stubbed, so the internal attempt must fail over.
+        var components = URLComponents(string: GlobalConstants.baseExternalUrlString)!
+        components.path = "/api/services/media_player/browse_media"
+        components.queryItems = [URLQueryItem(name: "return_response", value: "true")]
+        let url = components.url!
+        let body = "{\"service_response\":{\"media_player.kitchen\":{\"children\":" +
+            "[{\"title\":\"Song A\",\"media_content_id\":\"spotify://track/a\"}]}}}"
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(body.utf8), response: response, error: nil)
+
+        let tracks = try await service.browsePlaylistTracks(playlistURI: "spotify://playlist/p1", on: .mediaPlayerKitchen)
+
+        XCTAssertEqual(tracks.count, 1)
+        XCTAssertEqual(tracks.first?.uri, "spotify://track/a")
+        XCTAssertEqual(tracks.first?.title, "Song A")
+    }
 }

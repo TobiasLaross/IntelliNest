@@ -53,4 +53,5 @@ enum Action: String, Codable {
     case repeatSet = "repeat_set"
     case join
     case unjoin
+    case browseMedia = "browse_media"
 }

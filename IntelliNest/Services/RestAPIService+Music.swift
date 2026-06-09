@@ -16,12 +16,39 @@ extension RestAPIService {
     /// discards bodies).
     func searchMusic(query: String, limit: Int = 10) async throws -> MusicSearchResponse {
         let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.search.rawValue)"
-        let queryParams = ["return_response": "true"]
         var json = [JSONKey: Any]()
         json[.configEntryID] = GlobalConstants.musicAssistantConfigEntryID
         json[.name] = query
         json[.mediaType] = MusicMediaType.allCases.map(\.rawValue)
         json[.limit] = limit
+
+        let data = try await postExpectingResponseData(path: path, json: json)
+        return try decodeSearchResponse(from: data)
+    }
+
+    /// Browses a playlist's tracks via `media_player.browse_media`. The browse
+    /// runs against `entityID` (any available speaker), but only reads the
+    /// playlist contents — it does not change what that speaker is playing.
+    func browsePlaylistTracks(playlistURI: String, on entityID: EntityId) async throws -> [MusicPlaylistTrack] {
+        let path = "/api/services/\(Domain.mediaPlayer.rawValue)/\(Action.browseMedia.rawValue)"
+        var json = [JSONKey: Any]()
+        json[.entityID] = entityID.rawValue
+        json[.mediaContentType] = MusicMediaType.playlist.rawValue
+        json[.mediaContentID] = playlistURI
+
+        let data = try await postExpectingResponseData(path: path, json: json)
+        let decoder = JSONDecoder()
+        if let wrapper = try? decoder.decode(MusicPlaylistBrowseServiceResponse.self, from: data) {
+            return wrapper.serviceResponse.tracks
+        }
+        return try decoder.decode(MusicPlaylistBrowseResponse.self, from: data).tracks
+    }
+
+    /// POSTs a service call with `?return_response` and returns the response
+    /// body, retrying against the external URL when the internal one fails.
+    /// Used by the music services that read data back (search, browse).
+    private func postExpectingResponseData(path: String, json: [JSONKey: Any]) async throws -> Data {
+        let queryParams = ["return_response": "true"]
         let jsonData = createJSONData(json: json)
 
         guard let request = createURLRequest(path: path, jsonData: jsonData, queryParams: queryParams, method: .post) else {
@@ -30,7 +57,7 @@ extension RestAPIService {
 
         let (statusCode, data) = await sendRequest(request)
         if statusCode == statusCodeOK, let data {
-            return try decodeSearchResponse(from: data)
+            return data
         }
 
         let url = request.url?.absoluteString ?? ""
@@ -48,7 +75,7 @@ extension RestAPIService {
         guard externalStatusCode == statusCodeOK, let externalData else {
             throw EntityError.httpRequestFailure
         }
-        return try decodeSearchResponse(from: externalData)
+        return externalData
     }
 
     /// The service envelope wraps the actual result under `service_response`.
@@ -65,12 +92,12 @@ extension RestAPIService {
     /// (a `spotify://…` uri). Returns whether the request succeeded so the
     /// caller can surface a failure instead of showing a false playing state.
     @discardableResult
-    func playMedia(on entityID: EntityId, mediaID: String, mediaType: MusicMediaType) async -> Bool {
+    func playMedia(on entityID: EntityId, mediaID: String, mediaType: MusicMediaType, enqueue: String = "replace") async -> Bool {
         var json = [JSONKey: Any]()
         json[.entityID] = entityID.rawValue
         json[.mediaID] = mediaID
         json[.mediaType] = mediaType.rawValue
-        json[.enqueue] = "replace"
+        json[.enqueue] = enqueue
         return await sendMusicPostExpectingSuccess(domain: .musicAssistant, action: .playMedia, json: json)
     }
 
@@ -155,6 +182,15 @@ extension RestAPIService {
 /// Wrapper for the Home Assistant service-call response envelope.
 private struct MusicSearchServiceResponse: Decodable {
     let serviceResponse: MusicSearchResponse
+
+    enum CodingKeys: String, CodingKey {
+        case serviceResponse = "service_response"
+    }
+}
+
+/// Wrapper for the `browse_media` service-call response envelope.
+private struct MusicPlaylistBrowseServiceResponse: Decodable {
+    let serviceResponse: MusicPlaylistBrowseResponse
 
     enum CodingKeys: String, CodingKey {
         case serviceResponse = "service_response"

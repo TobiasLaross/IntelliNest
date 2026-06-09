@@ -9,10 +9,10 @@ import SwiftUI
 
 /// Presents the search results in their own sheet with a tab per media-type
 /// category (Låtar / Album / Artister / Spellistor). Shows a spinner while the
-/// search runs and a Swedish "no results" state when nothing matched.
+/// search runs and a Swedish "no results" state when nothing matched. Tapping a
+/// playlist drills into ``MusicPlaylistView`` rather than playing immediately.
 struct MusicSearchResultsView: View {
     @ObservedObject var viewModel: MusicViewModel
-    @Environment(\.dismiss) private var dismiss
     @State private var selectedType: MusicMediaType?
 
     var body: some View {
@@ -29,9 +29,12 @@ struct MusicSearchResultsView: View {
                             .lineLimit(1)
                     }
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Stäng") { dismiss() }
+                        Button("Stäng") { viewModel.closeSearchResults() }
                             .foregroundStyle(.white)
                     }
+                }
+                .navigationDestination(item: $viewModel.openedPlaylist) { playlist in
+                    MusicPlaylistView(viewModel: viewModel, playlist: playlist)
                 }
         }
     }
@@ -69,10 +72,14 @@ struct MusicSearchResultsView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 8) {
                     ForEach(section.items) { item in
-                        MusicResultRow(item: item) {
-                            Task {
-                                await viewModel.play(item: item)
-                                dismiss()
+                        if item.mediaType == .playlist {
+                            // A playlist opens its track list instead of playing.
+                            MusicResultRow(item: item, trailingSystemImage: "chevron.right") {
+                                Task { await viewModel.openPlaylist(item) }
+                            }
+                        } else {
+                            MusicResultRow(item: item) {
+                                Task { await viewModel.play(item: item) }
                             }
                         }
                     }
@@ -102,8 +109,97 @@ struct MusicSearchResultsView: View {
     }
 }
 
+/// The drill-in view for a playlist: a header with cover art and a play button
+/// that plays the whole list, plus the track list where tapping a song plays
+/// that song followed by the rest of the playlist.
+struct MusicPlaylistView: View {
+    @ObservedObject var viewModel: MusicViewModel
+    let playlist: MusicSearchItem
+
+    var body: some View {
+        VStack(spacing: 16) {
+            header
+            trackList
+        }
+        .padding(.horizontal)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .backgroundModifier()
+        .foregroundStyle(.white)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(playlist.name)
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+            }
+        }
+    }
+
+    private var header: some View {
+        VStack(spacing: 12) {
+            AlbumArtView(urlString: playlist.imageURL, size: 140)
+            Text(playlist.name)
+                .font(.title3)
+                .bold()
+                .multilineTextAlignment(.center)
+            Button {
+                Task { await viewModel.playPlaylist(playlist) }
+            } label: {
+                Label("Spela", systemImage: "play.fill")
+                    .font(.headline)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 28)
+                    .background(Color.white.opacity(0.15))
+                    .clipShape(Capsule())
+            }
+            .accessibilityLabel("Spela spellistan \(playlist.name)")
+        }
+        .padding(.top, 12)
+    }
+
+    @ViewBuilder private var trackList: some View {
+        if viewModel.isLoadingPlaylist {
+            ProgressView()
+                .tint(.white)
+                .padding(.top, 40)
+            Spacer()
+        } else if viewModel.playlistTracks.isEmpty {
+            Text("Inga låtar")
+                .foregroundStyle(.white.opacity(0.7))
+                .padding(.top, 40)
+            Spacer()
+        } else {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    ForEach(viewModel.playlistTracks) { track in
+                        Button {
+                            Task { await viewModel.playTrackInPlaylist(track, from: playlist) }
+                        } label: {
+                            HStack(spacing: 12) {
+                                AlbumArtView(urlString: track.imageURL, size: 44)
+                                Text(track.title)
+                                    .font(.body)
+                                    .lineLimit(1)
+                                Spacer()
+                                Image(systemName: "play.fill")
+                                    .foregroundStyle(.white.opacity(0.6))
+                            }
+                            .padding(.vertical, 4)
+                        }
+                        .foregroundStyle(.white)
+                        .accessibilityLabel("Spela \(track.title)")
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+}
+
 private struct MusicResultRow: View {
     let item: MusicSearchItem
+    var trailingSystemImage = "play.fill"
     let onTap: MainActorVoidClosure
 
     var body: some View {
@@ -122,12 +218,12 @@ private struct MusicResultRow: View {
                     }
                 }
                 Spacer()
-                Image(systemName: "play.fill")
+                Image(systemName: trailingSystemImage)
                     .foregroundStyle(.white.opacity(0.6))
             }
             .padding(.vertical, 4)
         }
         .foregroundStyle(.white)
-        .accessibilityLabel("Spela \(item.name)")
+        .accessibilityLabel(item.mediaType == .playlist ? "Öppna \(item.name)" : "Spela \(item.name)")
     }
 }

@@ -458,4 +458,84 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.volumeLevel, 0.9)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, trackName)
     }
+
+    // MARK: - Playlists
+
+    private var playlistItem: MusicSearchItem {
+        MusicSearchItem(uri: "spotify://playlist/p1", name: "Sommar", mediaType: .playlist, imageURL: nil, artist: nil)
+    }
+
+    private func browseURL() -> URL {
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/media_player/browse_media"
+        components.queryItems = [URLQueryItem(name: "return_response", value: "true")]
+        return components.url!
+    }
+
+    private func stubBrowse(json: String, statusCode: Int = 200) {
+        let url = browseURL()
+        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(json.utf8), response: response, error: nil)
+    }
+
+    func testOpenPlaylistDrillsInAndLoadsTracks() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubBrowse(json: "{\"service_response\":{\"media_player.kitchen\":{\"children\":" +
+            "[{\"title\":\"Song A\",\"media_content_id\":\"spotify://track/a\"}]}}}")
+        await viewModel.openPlaylist(playlistItem)
+        XCTAssertEqual(viewModel.openedPlaylist, playlistItem)
+        XCTAssertEqual(viewModel.playlistTracks.count, 1)
+        XCTAssertEqual(viewModel.playlistTracks.first?.uri, "spotify://track/a")
+        XCTAssertFalse(viewModel.isLoadingPlaylist)
+    }
+
+    func testOpenPlaylistFailureShowsBanner() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubBrowse(json: "boom", statusCode: 500)
+        await viewModel.openPlaylist(playlistItem)
+        XCTAssertTrue(viewModel.playlistTracks.isEmpty)
+        XCTAssertTrue(bannerTitles.contains("Kunde inte öppna spellistan"))
+        XCTAssertFalse(viewModel.isLoadingPlaylist)
+    }
+
+    func testPlayPlaylistStartsPlaybackAndClosesSheet() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        viewModel.isShowingSearchResults = true
+        viewModel.openedPlaylist = playlistItem
+        stubPlayMedia(statusCode: 200)
+        await viewModel.playPlaylist(playlistItem)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
+        XCTAssertFalse(viewModel.isShowingSearchResults)
+        XCTAssertNil(viewModel.openedPlaylist)
+    }
+
+    func testPlayTrackInPlaylistPlaysTrackThenClosesSheet() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        viewModel.isShowingSearchResults = true
+        viewModel.openedPlaylist = playlistItem
+        stubPlayMedia(statusCode: 200)
+        let track = MusicPlaylistTrack(uri: "spotify://track/a", title: "Song A", imageURL: nil)
+        await viewModel.playTrackInPlaylist(track, from: playlistItem)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, "Song A")
+        XCTAssertFalse(viewModel.isShowingSearchResults)
+        XCTAssertNil(viewModel.openedPlaylist)
+    }
+
+    func testCloseSearchResultsResetsState() {
+        viewModel.isShowingSearchResults = true
+        viewModel.openedPlaylist = playlistItem
+        viewModel.closeSearchResults()
+        XCTAssertFalse(viewModel.isShowingSearchResults)
+        XCTAssertNil(viewModel.openedPlaylist)
+    }
+
+    func testSearchClearsOpenedPlaylist() async {
+        viewModel.openedPlaylist = playlistItem
+        stubSearch(json: "{\"tracks\":[{\"uri\":\"spotify://track/a\",\"name\":\"Song A\"}]}")
+        viewModel.searchText = "song"
+        await viewModel.search()
+        XCTAssertNil(viewModel.openedPlaylist)
+        XCTAssertTrue(viewModel.isShowingSearchResults)
+    }
 }
