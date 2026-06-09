@@ -87,6 +87,9 @@ class Navigator: ObservableObject {
                                            showLightsAction: { [weak self] in
                                                self?.push(.lights)
                                            },
+                                           showMusicAction: { [weak self] in
+                                               self?.push(.music)
+                                           },
                                            toolbarReloadAction: toolbarReload)
     lazy var electricityViewModel = ElectricityViewModel(restAPIService: restAPIService)
     lazy var heatersViewModel = HeatersViewModel(restAPIService: restAPIService,
@@ -100,6 +103,10 @@ class Navigator: ObservableObject {
     lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService)
     lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService)
     lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService)
+    lazy var musicViewModel = MusicViewModel(restAPIService: restAPIService,
+                                             setErrorBannerText: { [weak self] title, message in
+                                                 self?.setErrorBannerText(title: title, message: message)
+                                             })
 
     init() {
         WidgetCenter.shared.reloadAllTimelines()
@@ -150,6 +157,8 @@ class Navigator: ObservableObject {
             await lightsViewModel.reload()
         case .roborock:
             await roborockViewModel.reload()
+        case .music:
+            await musicViewModel.reload()
         }
     }
 

@@ -287,6 +287,10 @@ class RestAPIService: URLRequestBuilder {
         repeatReloadAction(reloadTimes)
     }
 
+    func triggerRepeatReload(times: Int) {
+        repeatReloadAction(times)
+    }
+
     func sendRequest(_ request: URLRequest) async -> (Int, Data?) {
         do {
             let (data, response) = try await session.data(for: request)

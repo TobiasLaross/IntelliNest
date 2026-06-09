@@ -16,6 +16,7 @@ enum Destination: String {
     case playroomHeaterDetails
     case roborock
     case lights
+    case music
 
     var title: String {
         switch self {
@@ -35,6 +36,8 @@ enum Destination: String {
             "Roborock"
         case .lights:
             "Lampor"
+        case .music:
+            "Musik"
         }
     }
 }

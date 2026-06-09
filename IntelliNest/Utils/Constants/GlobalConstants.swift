@@ -90,6 +90,7 @@ enum GlobalConstants {
         return ""
     }
 
+    static let musicAssistantConfigEntryID = "01JZ57QTQPB79NSC7GJ2VQPA8V"
     static let baseInternalUrlString = "http://192.168.1.205:8123/"
     static let githubFakeUrlString = "https://192.218.223.123/"
     static var shouldUseLocalSSID: Bool {

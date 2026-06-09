@@ -51,6 +51,18 @@
 		F62750AB2A00EE8800C1253F /* ToolbarBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */; };
 		F62750AF2A01123500C1253F /* ToolbarItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AE2A01123500C1253F /* ToolbarItems.swift */; };
 		F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750B22A066B4500C1253F /* URLProtocolStub.swift */; };
+		EE0000010000000000000001 /* MediaPlayerEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000010000000000000001 /* MediaPlayerEntity.swift */; };
+		EE0000020000000000000002 /* MusicSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000020000000000000002 /* MusicSearchResult.swift */; };
+		EE0000030000000000000003 /* RestAPIService+Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000030000000000000003 /* RestAPIService+Music.swift */; };
+		EE0000040000000000000004 /* MusicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000040000000000000004 /* MusicViewModel.swift */; };
+		EE0000050000000000000005 /* MusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000050000000000000005 /* MusicView.swift */; };
+		EE0000060000000000000006 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000060000000000000006 /* NowPlayingView.swift */; };
+		EE0000070000000000000007 /* AlbumArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000070000000000000007 /* AlbumArtView.swift */; };
+		EE0000080000000000000008 /* SpeakerPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000080000000000000008 /* SpeakerPickerView.swift */; };
+		EE0000090000000000000009 /* SpeakerGroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000090000000000000009 /* SpeakerGroupingView.swift */; };
+		EE000010000000000000000A /* MusicSearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000010000000000000000A /* MusicSearchResultsView.swift */; };
+		EE000011000000000000000B /* MusicViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000011000000000000000B /* MusicViewModelTests.swift */; };
+		EE000012000000000000000C /* MusicModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000012000000000000000C /* MusicModelTests.swift */; };
 		F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2DF286D950A00462092 /* LightEntity.swift */; };
 		F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E228770D5500462092 /* LightsViewModel.swift */; };
 		F62CD2E528770F3B00462092 /* RestAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E428770F3B00462092 /* RestAPIService.swift */; };
@@ -265,6 +277,18 @@
 		F62750AE2A01123500C1253F /* ToolbarItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarItems.swift; sourceTree = "<group>"; };
 		F62750B22A066B4500C1253F /* URLProtocolStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolStub.swift; sourceTree = "<group>"; };
 		F62CD2DF286D950A00462092 /* LightEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightEntity.swift; sourceTree = "<group>"; };
+		EF0000010000000000000001 /* MediaPlayerEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerEntity.swift; sourceTree = "<group>"; };
+		EF0000020000000000000002 /* MusicSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchResult.swift; sourceTree = "<group>"; };
+		EF0000030000000000000003 /* RestAPIService+Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RestAPIService+Music.swift"; sourceTree = "<group>"; };
+		EF0000040000000000000004 /* MusicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModel.swift; sourceTree = "<group>"; };
+		EF0000050000000000000005 /* MusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicView.swift; sourceTree = "<group>"; };
+		EF0000060000000000000006 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
+		EF0000070000000000000007 /* AlbumArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtView.swift; sourceTree = "<group>"; };
+		EF0000080000000000000008 /* SpeakerPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerPickerView.swift; sourceTree = "<group>"; };
+		EF0000090000000000000009 /* SpeakerGroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerGroupingView.swift; sourceTree = "<group>"; };
+		EF000010000000000000000A /* MusicSearchResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchResultsView.swift; sourceTree = "<group>"; };
+		EF000011000000000000000B /* MusicViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelTests.swift; sourceTree = "<group>"; };
+		EF000012000000000000000C /* MusicModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicModelTests.swift; sourceTree = "<group>"; };
 		F62CD2E228770D5500462092 /* LightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModel.swift; sourceTree = "<group>"; };
 		F62CD2E428770F3B00462092 /* RestAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestAPIService.swift; sourceTree = "<group>"; };
 		F6CC110028770F3B00CC0001 /* RestAPIService+PostRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RestAPIService+PostRequest.swift"; sourceTree = "<group>"; };
@@ -471,6 +495,8 @@
 				8D7AA547F46C2F6F2C2DC77A /* PurifierSpeed.swift */,
 				386D85613C7069D1CC652E21 /* RoborockImageEntity.swift */,
 				B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */,
+				EF0000010000000000000001 /* MediaPlayerEntity.swift */,
+				EF0000020000000000000002 /* MusicSearchResult.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -485,6 +511,7 @@
 				F62CD2E92877275400462092 /* Light */,
 				F6633F2A286324DE004D0B76 /* Heater */,
 				F6633F3B28632BF1004D0B76 /* Roborock */,
+				EFA000000000000000000000 /* Music */,
 				F6D167C827C1282500DCC155 /* Labels */,
 				F60345C727A9378300212D04 /* Dashboards */,
 			);
@@ -509,6 +536,7 @@
 			children = (
 				F62CD2E428770F3B00462092 /* RestAPIService.swift */,
 				F6CC110028770F3B00CC0001 /* RestAPIService+PostRequest.swift */,
+				EF0000030000000000000003 /* RestAPIService+Music.swift */,
 				F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */,
 				F60345CB27A93BD700212D04 /* URLCreator.swift */,
 				F64D2693283E8FAB0073A7BF /* NetworkTask.swift */,
@@ -553,6 +581,8 @@
 			AA0000008000000000000008 /* DoubleExtensionTests.swift */,
 			AA000000A00000000000000A /* StringExtensionTests.swift */,
 			AA000000C00000000000000C /* HeaterEntityTests.swift */,
+				EF000011000000000000000B /* MusicViewModelTests.swift */,
+				EF000012000000000000000C /* MusicModelTests.swift */,
 			);
 			path = IntelliNestTests;
 			sourceTree = "<group>";
@@ -582,6 +612,7 @@
 				F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */,
 				F685F8002B2B153C008E47AF /* ElectricityViewModel.swift */,
 				D89BCA06BE3A45F2A8E3DAE4 /* LynkViewModelHelpers.swift */,
+				EF0000040000000000000004 /* MusicViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -672,6 +703,19 @@
 				F6633F4628633122004D0B76 /* RoborockMainButtons.swift */,
 			);
 			path = Roborock;
+			sourceTree = "<group>";
+		};
+		EFA000000000000000000000 /* Music */ = {
+			isa = PBXGroup;
+			children = (
+				EF0000050000000000000005 /* MusicView.swift */,
+				EF0000060000000000000006 /* NowPlayingView.swift */,
+				EF0000070000000000000007 /* AlbumArtView.swift */,
+				EF0000080000000000000008 /* SpeakerPickerView.swift */,
+				EF0000090000000000000009 /* SpeakerGroupingView.swift */,
+				EF000010000000000000000A /* MusicSearchResultsView.swift */,
+			);
+			path = Music;
 			sourceTree = "<group>";
 		};
 		F67023EE27A177320070FFBB = {
@@ -1185,6 +1229,16 @@
 				F6F94B5E28B60DED006B1F12 /* LynkViewModel.swift in Sources */,
 				F6EF35AF2A3A33BE00895250 /* DateTimePickerView.swift in Sources */,
 				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
+				EE0000010000000000000001 /* MediaPlayerEntity.swift in Sources */,
+				EE0000020000000000000002 /* MusicSearchResult.swift in Sources */,
+				EE0000030000000000000003 /* RestAPIService+Music.swift in Sources */,
+				EE0000040000000000000004 /* MusicViewModel.swift in Sources */,
+				EE0000050000000000000005 /* MusicView.swift in Sources */,
+				EE0000060000000000000006 /* NowPlayingView.swift in Sources */,
+				EE0000070000000000000007 /* AlbumArtView.swift in Sources */,
+				EE0000080000000000000008 /* SpeakerPickerView.swift in Sources */,
+				EE0000090000000000000009 /* SpeakerGroupingView.swift in Sources */,
+				EE000010000000000000000A /* MusicSearchResultsView.swift in Sources */,
 				CD215FD8D5AD91EE27DAAB00 /* FuelView.swift in Sources */,
 				3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */,
 				65450E96A215D8CB2443B2D6 /* INText.swift in Sources */,
@@ -1213,6 +1267,8 @@
 			BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */,
 			DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */,
 			DD0000003000000000000003 /* RoborockViewModelTests.swift in Sources */,
+				EE000011000000000000000B /* MusicViewModelTests.swift in Sources */,
+				EE000012000000000000000C /* MusicModelTests.swift in Sources */,
 			BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */,
 			BB0000005000000000000005 /* RoborockEntityTests.swift in Sources */,
 			BB0000007000000000000007 /* LockableTests.swift in Sources */,

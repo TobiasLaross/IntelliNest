@@ -1,0 +1,162 @@
+//
+//  RestAPIService+Music.swift
+//  IntelliNest
+//
+//  Created by Tobias on 2026-06-09.
+//
+
+import Foundation
+import ShipBookSDK
+
+extension RestAPIService {
+    /// Calls `music_assistant.search` with `?return_response` and decodes the
+    /// grouped result body. Music Assistant search is the only service in the
+    /// app that returns a response body, so it gets a dedicated POST path that
+    /// reads the JSON back instead of going through `sendPostRequest` (which
+    /// discards bodies).
+    func searchMusic(query: String, limit: Int = 10) async throws -> MusicSearchResponse {
+        let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.search.rawValue)"
+        let queryParams = ["return_response": "true"]
+        var json = [JSONKey: Any]()
+        json[.configEntryID] = GlobalConstants.musicAssistantConfigEntryID
+        json[.name] = query
+        json[.mediaType] = MusicMediaType.allCases.map(\.rawValue)
+        json[.limit] = limit
+        let jsonData = createJSONData(json: json)
+
+        guard let request = createURLRequest(path: path, jsonData: jsonData, queryParams: queryParams, method: .post) else {
+            throw EntityError.badRequest
+        }
+
+        let (statusCode, data) = await sendRequest(request)
+        if statusCode == statusCodeOK, let data {
+            return try decodeSearchResponse(from: data)
+        }
+
+        let url = request.url?.absoluteString ?? ""
+        guard !url.contains(GlobalConstants.baseExternalUrlString) else {
+            throw EntityError.httpRequestFailure
+        }
+        guard let externalRequest = createURLRequest(shouldForceExternalURL: true,
+                                                     path: path,
+                                                     jsonData: jsonData,
+                                                     queryParams: queryParams,
+                                                     method: .post) else {
+            throw EntityError.badRequest
+        }
+        let (externalStatusCode, externalData) = await sendRequest(externalRequest)
+        guard externalStatusCode == statusCodeOK, let externalData else {
+            throw EntityError.httpRequestFailure
+        }
+        return try decodeSearchResponse(from: externalData)
+    }
+
+    /// The service envelope wraps the actual result under `service_response`.
+    /// Decode that wrapper when present, otherwise decode the body directly.
+    private func decodeSearchResponse(from data: Data) throws -> MusicSearchResponse {
+        let decoder = JSONDecoder()
+        if let wrapper = try? decoder.decode(MusicSearchServiceResponse.self, from: data) {
+            return wrapper.serviceResponse
+        }
+        return try decoder.decode(MusicSearchResponse.self, from: data)
+    }
+
+    /// Replaces the active speaker's queue and starts playback of `mediaID`
+    /// (a `spotify://…` uri). Returns whether the request succeeded so the
+    /// caller can surface a failure instead of showing a false playing state.
+    @discardableResult
+    func playMedia(on entityID: EntityId, mediaID: String, mediaType: MusicMediaType) async -> Bool {
+        var json = [JSONKey: Any]()
+        json[.entityID] = entityID.rawValue
+        json[.mediaID] = mediaID
+        json[.mediaType] = mediaType.rawValue
+        json[.enqueue] = "replace"
+        return await sendMusicPostExpectingSuccess(domain: .musicAssistant, action: .playMedia, json: json)
+    }
+
+    func mediaTransport(entityID: EntityId, action: Action, reloadTimes: Int = 2) {
+        update(entityID: entityID, domain: .mediaPlayer, action: action, reloadTimes: reloadTimes)
+    }
+
+    func setVolume(entityID: EntityId, volume: Double, reloadTimes: Int = 1) {
+        update(entityID: entityID,
+               domain: .mediaPlayer,
+               action: .volumeSet,
+               dataKey: .volumeLevel,
+               dataValue: volume,
+               reloadTimes: reloadTimes)
+    }
+
+    func setShuffle(entityID: EntityId, shuffle: Bool, reloadTimes: Int = 2) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
+            json[.shuffle] = shuffle
+            await sendPostRequest(json: json, domain: .mediaPlayer, action: .shuffleSet)
+            triggerRepeatReload(times: reloadTimes)
+        }
+    }
+
+    func setRepeat(entityID: EntityId, repeatMode: MediaRepeatMode, reloadTimes: Int = 2) {
+        update(entityID: entityID,
+               domain: .mediaPlayer,
+               action: .repeatSet,
+               dataKey: .repeatMode,
+               dataValue: repeatMode.rawValue,
+               reloadTimes: reloadTimes)
+    }
+
+    /// Adds `memberIDs` into the group led by `leaderID`.
+    func joinSpeakers(leaderID: EntityId, memberIDs: [EntityId], reloadTimes: Int = 3) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = leaderID.rawValue
+            json[.groupMembers] = memberIDs.map(\.rawValue)
+            await sendPostRequest(json: json, domain: .mediaPlayer, action: .join)
+            triggerRepeatReload(times: reloadTimes)
+        }
+    }
+
+    /// Removes `memberID` from whatever group it is currently in.
+    func unjoinSpeaker(memberID: EntityId, reloadTimes: Int = 3) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = memberID.rawValue
+            await sendPostRequest(json: json, domain: .mediaPlayer, action: .unjoin)
+            triggerRepeatReload(times: reloadTimes)
+        }
+    }
+
+    private func sendMusicPostExpectingSuccess(domain: Domain, action: Action, json: [JSONKey: Any]) async -> Bool {
+        let path = "/api/services/\(domain.rawValue)/\(action.rawValue)"
+        let jsonData = createJSONData(json: json)
+        guard let request = createURLRequest(path: path, jsonData: jsonData, method: .post) else {
+            return false
+        }
+
+        let (statusCode, _) = await sendRequest(request)
+        if statusCode == statusCodeOK {
+            return true
+        }
+
+        let url = request.url?.absoluteString ?? ""
+        guard !url.contains(GlobalConstants.baseExternalUrlString),
+              let externalRequest = createURLRequest(shouldForceExternalURL: true,
+                                                     path: path,
+                                                     jsonData: jsonData,
+                                                     method: .post) else {
+            return false
+        }
+        let (externalStatusCode, _) = await sendRequest(externalRequest)
+        return externalStatusCode == statusCodeOK
+    }
+}
+
+/// Wrapper for the Home Assistant service-call response envelope.
+private struct MusicSearchServiceResponse: Decodable {
+    let serviceResponse: MusicSearchResponse
+
+    enum CodingKeys: String, CodingKey {
+        case serviceResponse = "service_response"
+    }
+}

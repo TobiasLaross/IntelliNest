@@ -68,6 +68,7 @@ class HomeViewModel: ObservableObject, Reloadable {
     let showRoborockAction: MainActorVoidClosure
     let showPowerGridAction: MainActorVoidClosure
     let showLightsAction: MainActorVoidClosure
+    let showMusicAction: MainActorVoidClosure
     private(set) var toolbarReloadAction: MainActorAsyncVoidClosure
 
     init(restAPIService: RestAPIService,
@@ -78,6 +79,7 @@ class HomeViewModel: ObservableObject, Reloadable {
          showRoborockAction: @escaping MainActorVoidClosure,
          showPowerGridAction: @escaping MainActorVoidClosure,
          showLightsAction: @escaping MainActorVoidClosure,
+         showMusicAction: @escaping MainActorVoidClosure,
          toolbarReloadAction: @escaping MainActorAsyncVoidClosure) {
         self.restAPIService = restAPIService
         self.yaleApiService = yaleApiService
@@ -87,6 +89,7 @@ class HomeViewModel: ObservableObject, Reloadable {
         self.showRoborockAction = showRoborockAction
         self.showPowerGridAction = showPowerGridAction
         self.showLightsAction = showLightsAction
+        self.showMusicAction = showMusicAction
         self.toolbarReloadAction = toolbarReloadAction
     }
 

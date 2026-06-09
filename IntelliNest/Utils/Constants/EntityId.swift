@@ -142,6 +142,14 @@ enum EntityId: String, Decodable, CaseIterable {
     case cameraCarport = "camera.carporten_frigate"
     case cameraBack = "camera.baksidan_frigate"
 
+    /* Music Assistant speakers */
+    case mediaPlayerKitchen = "media_player.kitchen"
+    case mediaPlayerGuestRoom = "media_player.gastrummet"
+    case mediaPlayerPlayroom = "media_player.lekrummet"
+    case mediaPlayerLivingRoom = "media_player.vardagsrummet"
+    case mediaPlayerOutdoorTable = "media_player.matbord_ute"
+    case mediaPlayerSpa = "media_player.spa"
+
     /* Yale Access token */
     case yaleAccessTokenPart1 = "input_text.yale_access_token_part1"
     case yaleAccessTokenPart2 = "input_text.yale_access_token_part2"
