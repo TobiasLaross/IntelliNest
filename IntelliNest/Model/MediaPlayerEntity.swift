@@ -114,10 +114,13 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
     static func == (lhs: MediaPlayerEntity, rhs: MediaPlayerEntity) -> Bool {
         lhs.entityId == rhs.entityId &&
             lhs.state == rhs.state &&
+            lhs.friendlyName == rhs.friendlyName &&
             lhs.volumeLevel == rhs.volumeLevel &&
             lhs.mediaTitle == rhs.mediaTitle &&
             lhs.mediaArtist == rhs.mediaArtist &&
+            lhs.mediaAlbumName == rhs.mediaAlbumName &&
             lhs.mediaContentID == rhs.mediaContentID &&
+            lhs.entityPicture == rhs.entityPicture &&
             lhs.groupMembers == rhs.groupMembers &&
             lhs.shuffle == rhs.shuffle &&
             lhs.repeatMode == rhs.repeatMode

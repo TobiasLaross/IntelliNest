@@ -32,6 +32,9 @@ class MusicViewModel: ObservableObject, Reloadable {
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
+    /// Increments on every search so a slow, older response can't overwrite the
+    /// results of a newer query.
+    private var searchRequestToken = 0
 
     private let restAPIService: RestAPIService
     private let setErrorBannerText: StringStringClosure
@@ -120,18 +123,32 @@ class MusicViewModel: ObservableObject, Reloadable {
             return
         }
 
+        searchRequestToken += 1
+        let token = searchRequestToken
         isShowingSearchResults = true
         isSearching = true
         hasSearched = true
         do {
             let response = try await restAPIService.searchMusic(query: query)
+            guard token == searchRequestToken else {
+                return
+            }
             searchSections = response.sections
         } catch {
+            guard token == searchRequestToken else {
+                return
+            }
             Log.error("Music search failed: \(error)")
+            // Don't leave the UI in a "no results" state — close the results
+            // sheet and surface the failure through the error banner instead.
             searchSections = []
+            hasSearched = false
+            isShowingSearchResults = false
             setErrorBannerText("Sökningen misslyckades", "Kunde inte söka efter musik")
         }
-        isSearching = false
+        if token == searchRequestToken {
+            isSearching = false
+        }
     }
 
     var hasNoResults: Bool {

@@ -210,6 +210,9 @@ class MusicViewModelTests: XCTestCase {
         await viewModel.search()
         XCTAssertTrue(viewModel.searchSections.isEmpty)
         XCTAssertTrue(bannerTitles.contains("Sökningen misslyckades"))
+        // A failure must not look like an empty result, and it closes the sheet.
+        XCTAssertFalse(viewModel.hasNoResults)
+        XCTAssertFalse(viewModel.isShowingSearchResults)
     }
 
     // MARK: - Play

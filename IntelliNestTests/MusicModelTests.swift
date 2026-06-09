@@ -139,7 +139,9 @@ final class MusicModelTests: XCTestCase {
         base.volumeLevel = 0.5
         base.mediaTitle = trackName
         base.mediaArtist = trackArtist
+        base.mediaAlbumName = "A Night at the Opera"
         base.mediaContentID = trackURI
+        base.entityPicture = "/api/media_player_proxy/kitchen.jpg"
         base.groupMembers = [.mediaPlayerLivingRoom]
         base.shuffle = true
         base.repeatMode = .one
@@ -149,10 +151,13 @@ final class MusicModelTests: XCTestCase {
 
         // Each mutated property must break equality, exercising every clause of ==.
         same = base; same.state = "paused"; XCTAssertNotEqual(base, same)
+        same = base; same.friendlyName = "Köket"; XCTAssertNotEqual(base, same)
         same = base; same.volumeLevel = 0.9; XCTAssertNotEqual(base, same)
         same = base; same.mediaTitle = "Other"; XCTAssertNotEqual(base, same)
         same = base; same.mediaArtist = "Other"; XCTAssertNotEqual(base, same)
+        same = base; same.mediaAlbumName = "Other album"; XCTAssertNotEqual(base, same)
         same = base; same.mediaContentID = "spotify://track/other"; XCTAssertNotEqual(base, same)
+        same = base; same.entityPicture = "/api/media_player_proxy/other.jpg"; XCTAssertNotEqual(base, same)
         same = base; same.groupMembers = []; XCTAssertNotEqual(base, same)
         same = base; same.shuffle = false; XCTAssertNotEqual(base, same)
         same = base; same.repeatMode = .off; XCTAssertNotEqual(base, same)
