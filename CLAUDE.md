@@ -60,7 +60,13 @@ ViewModels receive `RestAPIService`, `YaleApiService`, and `URLCreator` via cons
 - **`YaleApiService`** — Yale lock API with Keychain-stored JWT tokens, auto-refresh logic.
 - **`URLCreator`** — Checks the current SSID against the configured home SSID to decide between internal URL (local LAN) and external URL (DuckDNS). Updates `RestAPIService.internalUrl`/`externalUrl` dynamically.
 
-Most real-time entity updates use WebSocket (`HAWebSocketService`) rather than REST polling.
+### State freshness
+
+There is no WebSocket layer (it was removed — the README's "uses WebSocket" claim is stale). All entity state is
+kept current by the `Navigator`'s continuous 5-second loop, which calls `reload()` on every ViewModel. ViewModels and
+entities conform to `Reloadable` (`Model/Reloadable.swift`); a `reload()` re-fetches state via `RestAPIService` (GET
+`/api/states/{entityId}`) and republishes. A few services that return a body (e.g. Music Assistant search) use a
+dedicated `return_response` request path rather than the fire-and-forget POST used for most service calls.
 
 ### Models
 
@@ -71,6 +77,27 @@ All entity IDs are declared in the `EntityId` enum; all HA domains in `Domain`; 
 ### Configuration
 
 Secrets are injected via xcconfig variables at build time (accessed as `Bundle.main.infoDictionary` values). `Github-Info.xcconfig` contains placeholder values safe to commit. Never commit `IntelliNest-Info.xcconfig`.
+
+### Adding a new screen / device
+
+A new device dashboard touches a fixed set of files in this order — follow an existing domain (e.g. `lights`,
+`roborock`) as the template:
+
+1. Add a `Destination` case with its Swedish `title` (`Navigation/Destination.swift`).
+2. Wire it into `Navigator` — a lazily-created `@MainActor ObservableObject` ViewModel, a `showXAction` closure, and
+   the `navigationDestination` switch — plus the parallel switch in `NavigatorHelpers`. Add the ViewModel to the
+   reload loop so it stays current.
+3. Add the new HA contract to the enums first: `EntityId`, `Domain`, `Action` (and `JSONKey` for new attribute keys).
+   Never use raw entity-id or service strings in feature code.
+4. Add an `EntityProtocol` model that decodes the entity's `attributes`.
+5. Build the ViewModel (constructor-injected `RestAPIService`/`URLCreator`, navigation via injected closures, a
+   `reload()` that refreshes state) and its View under `Views/<Domain>/`.
+6. Surface the entry point — typically a `NavigationButtonView` in `HomeView`'s button grid wired to the new
+   `showXAction` (which is threaded through `HomeViewModel`'s init and its PreviewProvider).
+
+The Xcode project uses **manual** `pbxproj` file references (not Xcode 16 file-system-synchronized groups), so new
+`.swift` files must be added to the `IntelliNest` target (and tests to `IntelliNestTests`) explicitly — via Xcode or
+a hand-edit of `project.pbxproj` — or they will not compile.
 
 ## Pre-commit: SwiftFormat & SwiftLint
 
