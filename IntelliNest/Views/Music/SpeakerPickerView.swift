@@ -21,9 +21,14 @@ struct SpeakerPickerView: View {
                     viewModel.selectSpeaker(speaker.entityId)
                 } label: {
                     HStack {
-                        Image(systemName: speaker.isPlaying ? "speaker.wave.2.fill" : "hifispeaker.fill")
+                        Image(systemName: "hifispeaker.fill")
                         Text(speaker.friendlyName)
                         Spacer()
+                        if speaker.isPlaying {
+                            Image(systemName: "speaker.wave.2.fill")
+                                .foregroundStyle(.green)
+                                .accessibilityLabel("Spelar nu")
+                        }
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 12)

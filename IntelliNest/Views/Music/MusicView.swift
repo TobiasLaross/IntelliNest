@@ -15,17 +15,23 @@ struct MusicView: View {
             MusicSearchBar(searchText: $viewModel.searchText,
                            onSubmit: { Task { await viewModel.search() } })
 
-            if let activeSpeaker = viewModel.activeSpeaker {
-                NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
-                SpeakerGroupingView(viewModel: viewModel)
-            } else {
-                SpeakerPickerView(viewModel: viewModel)
+            ScrollView {
+                VStack(spacing: 16) {
+                    if let activeSpeaker = viewModel.activeSpeaker {
+                        NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
+                        SpeakerGroupingView(viewModel: viewModel)
+                    } else {
+                        SpeakerPickerView(viewModel: viewModel)
+                    }
+                }
             }
-
-            MusicSearchResultsView(viewModel: viewModel)
+            .scrollDismissesKeyboard(.interactively)
         }
         .padding(.horizontal)
         .foregroundStyle(.white)
+        .sheet(isPresented: $viewModel.isShowingSearchResults) {
+            MusicSearchResultsView(viewModel: viewModel)
+        }
     }
 }
 

@@ -40,6 +40,14 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         state == "playing"
     }
 
+    /// The speaker that playback and queue commands must target. When this
+    /// speaker is synced into a group, Music Assistant only accepts transport
+    /// and play commands on the group leader (the first group member); a
+    /// follower rejects them. Falls back to this speaker when it is ungrouped.
+    var playbackTargetID: EntityId {
+        groupMembers.first ?? entityId
+    }
+
     var isUnavailable: Bool {
         state == "unavailable"
     }

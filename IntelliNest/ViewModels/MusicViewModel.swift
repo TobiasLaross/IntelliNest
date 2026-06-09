@@ -26,6 +26,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     @Published var searchSections: [MusicSearchSection] = []
     @Published var hasSearched = false
     @Published var isSearching = false
+    /// Drives the search-results sheet, which presents the grouped results in a
+    /// separate view with a tab per media-type category.
+    @Published var isShowingSearchResults = false
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
@@ -117,6 +120,7 @@ class MusicViewModel: ObservableObject, Reloadable {
             return
         }
 
+        isShowingSearchResults = true
         isSearching = true
         hasSearched = true
         do {
@@ -136,13 +140,23 @@ class MusicViewModel: ObservableObject, Reloadable {
 
     // MARK: - Playback
 
+    /// Playback and queue commands must go to the active speaker's group leader;
+    /// a synced follower rejects them. Returns the active speaker itself when it
+    /// is ungrouped. Volume stays per-speaker, so it is not redirected here.
+    private var playbackTargetID: EntityId? {
+        guard let activeSpeaker else {
+            return activeSpeakerID
+        }
+        return activeSpeaker.playbackTargetID
+    }
+
     func play(item: MusicSearchItem) async {
-        guard let activeSpeakerID else {
+        guard let activeSpeakerID, let targetID = playbackTargetID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return
         }
 
-        let success = await restAPIService.playMedia(on: activeSpeakerID,
+        let success = await restAPIService.playMedia(on: targetID,
                                                      mediaID: item.uri,
                                                      mediaType: item.mediaType)
         if success {
@@ -157,26 +171,26 @@ class MusicViewModel: ObservableObject, Reloadable {
     }
 
     func togglePlayPause() {
-        guard let activeSpeaker else {
+        guard let activeSpeaker, let targetID = playbackTargetID else {
             return
         }
         let action: Action = activeSpeaker.isPlaying ? .mediaPause : .mediaPlay
         speakers[activeSpeaker.entityId]?.state = activeSpeaker.isPlaying ? "paused" : "playing"
-        restAPIService.mediaTransport(entityID: activeSpeaker.entityId, action: action)
+        restAPIService.mediaTransport(entityID: targetID, action: action)
     }
 
     func nextTrack() {
-        guard let activeSpeakerID else {
+        guard let targetID = playbackTargetID else {
             return
         }
-        restAPIService.mediaTransport(entityID: activeSpeakerID, action: .mediaNextTrack)
+        restAPIService.mediaTransport(entityID: targetID, action: .mediaNextTrack)
     }
 
     func previousTrack() {
-        guard let activeSpeakerID else {
+        guard let targetID = playbackTargetID else {
             return
         }
-        restAPIService.mediaTransport(entityID: activeSpeakerID, action: .mediaPreviousTrack)
+        restAPIService.mediaTransport(entityID: targetID, action: .mediaPreviousTrack)
     }
 
     func setVolume(_ volume: Double) {
@@ -188,16 +202,16 @@ class MusicViewModel: ObservableObject, Reloadable {
     }
 
     func toggleShuffle() {
-        guard let activeSpeaker else {
+        guard let activeSpeaker, let targetID = playbackTargetID else {
             return
         }
         let newValue = !activeSpeaker.shuffle
         speakers[activeSpeaker.entityId]?.shuffle = newValue
-        restAPIService.setShuffle(entityID: activeSpeaker.entityId, shuffle: newValue)
+        restAPIService.setShuffle(entityID: targetID, shuffle: newValue)
     }
 
     func toggleRepeat() {
-        guard let activeSpeaker else {
+        guard let activeSpeaker, let targetID = playbackTargetID else {
             return
         }
         // Cycle off → all → one → off, matching the Sonos-style three-state control.
@@ -207,7 +221,7 @@ class MusicViewModel: ObservableObject, Reloadable {
         case .one: .off
         }
         speakers[activeSpeaker.entityId]?.repeatMode = newMode
-        restAPIService.setRepeat(entityID: activeSpeaker.entityId, repeatMode: newMode)
+        restAPIService.setRepeat(entityID: targetID, repeatMode: newMode)
     }
 
     // MARK: - Grouping
