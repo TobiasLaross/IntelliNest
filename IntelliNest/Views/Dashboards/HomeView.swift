@@ -93,12 +93,17 @@ private struct NavigationButtonsView: View {
             HStack(spacing: 15) {
                 NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), action: viewModel.showHeatersAction)
                 NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.2.fill"), action: viewModel.showLynkAction)
-            }
-            HStack(spacing: 15) {
                 NavigationButtonView(image: Image(imageName: .powerGrid),
                                      buttonImageWidth: 45,
                                      buttonImageHeight: 50,
                                      action: viewModel.showPowerGridAction)
+            }
+            HStack(spacing: 15) {
+                NavigationButtonView(buttonTitle: "Musik",
+                                     image: Image(systemName: "music.note"),
+                                     buttonImageWidth: 30,
+                                     buttonImageHeight: 35,
+                                     action: viewModel.showMusicAction)
 
                 NavigationButtonView(image: Image(systemName: "lightbulb.fill"),
                                      buttonImageWidth: 30,
@@ -117,13 +122,6 @@ private struct NavigationButtonsView: View {
                                      buttonImageWidth: 50,
                                      buttonImageHeight: 50,
                                      action: viewModel.showRoborockAction)
-            }
-            HStack(spacing: 15) {
-                NavigationButtonView(buttonTitle: "Musik",
-                                     image: Image(systemName: "music.note"),
-                                     buttonImageWidth: 30,
-                                     buttonImageHeight: 35,
-                                     action: viewModel.showMusicAction)
             }
         }
     }
