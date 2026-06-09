@@ -118,6 +118,13 @@ private struct NavigationButtonsView: View {
                                      buttonImageHeight: 50,
                                      action: viewModel.showRoborockAction)
             }
+            HStack(spacing: 15) {
+                NavigationButtonView(buttonTitle: "Musik",
+                                     image: Image(systemName: "music.note"),
+                                     buttonImageWidth: 30,
+                                     buttonImageHeight: 35,
+                                     action: viewModel.showMusicAction)
+            }
         }
     }
 }
@@ -251,6 +258,7 @@ struct Home_Previews: PreviewProvider {
                                       showRoborockAction: {},
                                       showPowerGridAction: {},
                                       showLightsAction: {},
+                                      showMusicAction: {},
                                       toolbarReloadAction: {})
 
         HomeView(viewModel: viewModel)

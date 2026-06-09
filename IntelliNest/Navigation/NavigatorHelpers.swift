@@ -24,6 +24,8 @@ extension Navigator {
                 showRoborockView()
             case .lights:
                 showLightsView()
+            case .music:
+                showMusicView()
             }
         }
         .backgroundModifier()
@@ -73,5 +75,9 @@ extension Navigator {
 
     func showLightsView() -> LightsView {
         LightsView(viewModel: lightsViewModel)
+    }
+
+    func showMusicView() -> MusicView {
+        MusicView(viewModel: musicViewModel)
     }
 }

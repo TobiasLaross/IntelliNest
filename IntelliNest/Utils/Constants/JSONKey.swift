@@ -48,4 +48,15 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case value
     case vin
     case watt
+    /* Music Assistant / media_player */
+    case configEntryID = "config_entry_id"
+    case name
+    case mediaType = "media_type"
+    case limit
+    case mediaID = "media_id"
+    case enqueue
+    case volumeLevel = "volume_level"
+    case shuffle
+    case repeatMode = "repeat"
+    case groupMembers = "group_members"
 }

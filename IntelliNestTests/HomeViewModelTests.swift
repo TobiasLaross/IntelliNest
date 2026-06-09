@@ -29,6 +29,7 @@ class HomeViewModelTests: XCTestCase {
             showRoborockAction: {},
             showPowerGridAction: {},
             showLightsAction: {},
+            showMusicAction: {},
             toolbarReloadAction: {}
         )
     }
