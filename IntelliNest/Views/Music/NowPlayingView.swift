@@ -125,14 +125,23 @@ struct VolumeSliderView: View {
     let volume: Double
     let onChange: DoubleClosure
 
+    private var percent: Int {
+        Int((volume * 100).rounded())
+    }
+
     var body: some View {
         HStack {
             Image(systemName: "speaker.fill")
                 .foregroundStyle(.white.opacity(0.7))
             Slider(value: Binding(get: { volume }, set: { onChange($0) }), in: 0 ... 1)
                 .accessibilityLabel("Volym")
-            Image(systemName: "speaker.wave.3.fill")
+                .accessibilityValue("\(percent) procent")
+            Text("\(percent)%")
+                .font(.caption)
+                .monospacedDigit()
                 .foregroundStyle(.white.opacity(0.7))
+                .frame(width: 40, alignment: .trailing)
+                .accessibilityHidden(true)
         }
     }
 }
