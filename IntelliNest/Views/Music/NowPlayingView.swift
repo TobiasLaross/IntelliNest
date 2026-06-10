@@ -206,13 +206,15 @@ private struct FillSlider: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let clamped = min(max(fraction, 0), 1)
-            let radius = min(geometry.size.width, geometry.size.height) / 2.5
+            let width = geometry.size.width
+            let height = geometry.size.height
+            let clamped = CGFloat(min(max(fraction, 0), 1))
+            let radius = min(width, height) / 2.5
             ZStack(alignment: axis == .horizontal ? .leading : .bottom) {
                 Rectangle().fill(trackColor)
                 Rectangle().fill(fillColor)
-                    .frame(width: axis == .horizontal ? geometry.size.width * clamped : nil,
-                           height: axis == .vertical ? geometry.size.height * clamped : nil)
+                    .frame(width: axis == .horizontal ? width * clamped : nil,
+                           height: axis == .vertical ? height * clamped : nil)
             }
             .clipShape(RoundedRectangle(cornerRadius: radius))
             .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.black.opacity(0.5), lineWidth: 1))
@@ -220,10 +222,10 @@ private struct FillSlider: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { value in
-                        let fraction: Double = axis == .horizontal
-                            ? value.location.x / geometry.size.width
-                            : 1 - value.location.y / geometry.size.height
-                        onChange(min(max(fraction, 0), 1))
+                        let position: CGFloat = axis == .horizontal
+                            ? value.location.x / width
+                            : CGFloat(1) - value.location.y / height
+                        onChange(Double(min(max(position, 0), 1)))
                     }
                     .onEnded { _ in onCommit() }
             )
