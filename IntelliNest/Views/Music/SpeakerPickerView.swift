@@ -38,7 +38,7 @@ struct SpeakerPickerView: View {
                     .accessibilityLabel("Välj \(speaker.friendlyName)")
 
                     VolumeSliderView(volume: speaker.volumeLevel,
-                                     onChange: { viewModel.setVolume($0, for: speaker.entityId) })
+                                     onCommit: { viewModel.setVolume($0, for: speaker.entityId) })
                         .accessibilityLabel("Volym \(speaker.friendlyName)")
                 }
                 .padding(.vertical, 10)
