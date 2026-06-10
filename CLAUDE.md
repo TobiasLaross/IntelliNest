@@ -10,7 +10,7 @@ xcodebuild test \
   -project IntelliNest.xcodeproj \
   -scheme "IntelliNest-github" \
   -testPlan "IntelliNest-github" \
-  -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
+  -destination "platform=iOS Simulator,name=iPhone 17,OS=latest" \
   -configuration "Github actions" \
   CODE_SIGNING_ALLOWED=NO | xcbeautify
 ```
@@ -20,7 +20,7 @@ xcodebuild test \
 xcodebuild test \
   -project IntelliNest.xcodeproj \
   -scheme "IntelliNest-github" \
-  -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
+  -destination "platform=iOS Simulator,name=iPhone 17,OS=latest" \
   -configuration "Github actions" \
   -only-testing:IntelliNestTests/HomeViewModelTests \
   CODE_SIGNING_ALLOWED=NO | xcbeautify
