@@ -50,7 +50,7 @@ struct NowPlayingView: View {
             TransportControlsView(speaker: speaker, viewModel: viewModel)
 
             VolumeSliderView(volume: speaker.volumeLevel,
-                             onChange: { viewModel.setVolume($0) })
+                             onCommit: { viewModel.setVolume($0) })
         }
         .padding()
         .background(Color.white.opacity(0.08))
@@ -121,27 +121,82 @@ private struct TransportControlsView: View {
     }
 }
 
+/// Volume control styled like the light-brightness slider (`VerticalSlider`):
+/// a custom fill bar that updates the label live while dragging and commits the
+/// new volume to Home Assistant only on release (no request spam mid-drag).
 struct VolumeSliderView: View {
     let volume: Double
-    let onChange: DoubleClosure
+    let onCommit: DoubleClosure
+
+    @State private var dragValue: Double?
+
+    private var displayed: Double {
+        dragValue ?? volume
+    }
 
     private var percent: Int {
-        Int((volume * 100).rounded())
+        Int((displayed * 100).rounded())
     }
 
     var body: some View {
         HStack {
             Image(systemName: "speaker.fill")
                 .foregroundStyle(.white.opacity(0.7))
-            Slider(value: Binding(get: { volume }, set: { onChange($0) }), in: 0 ... 1)
-                .accessibilityLabel("Volym")
-                .accessibilityValue("\(percent) procent")
+            HorizontalFillSlider(fraction: displayed,
+                                 onChange: { dragValue = $0 },
+                                 onCommit: {
+                                     if let dragValue {
+                                         onCommit(dragValue)
+                                     }
+                                     dragValue = nil
+                                 })
+                                 .frame(height: 26)
+                                 .accessibilityElement()
+                                 .accessibilityLabel("Volym")
+                                 .accessibilityValue("\(percent) procent")
+                                 .accessibilityAdjustableAction { direction in
+                                     let step = 0.05
+                                     let next = min(max(displayed + (direction == .increment ? step : -step), 0), 1)
+                                     onCommit(next)
+                                 }
             Text("\(percent)%")
                 .font(.caption)
                 .monospacedDigit()
                 .foregroundStyle(.white.opacity(0.7))
                 .frame(width: 40, alignment: .trailing)
                 .accessibilityHidden(true)
+        }
+    }
+}
+
+/// A horizontal fill slider mirroring `VerticalSlider`'s look (dark track, light
+/// fill, thin border). Tapping or dragging sets the value from the touch x; the
+/// change is reported live and committed on release.
+private struct HorizontalFillSlider: View {
+    let fraction: Double
+    let onChange: DoubleClosure
+    let onCommit: MainActorVoidClosure
+
+    private let trackColor = Color(white: 57.0 / 255).opacity(0.3)
+    private let fillColor = Color(white: 201.0 / 255)
+
+    var body: some View {
+        GeometryReader { geometry in
+            let clamped = min(max(fraction, 0), 1)
+            ZStack(alignment: .leading) {
+                Capsule().fill(trackColor)
+                Capsule().fill(fillColor)
+                    .frame(width: geometry.size.width * clamped)
+            }
+            .overlay(Capsule().stroke(.black.opacity(0.5), lineWidth: 1))
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        onChange(min(max(value.location.x / geometry.size.width, 0), 1))
+                    }
+                    .onEnded { _ in onCommit() }
+            )
         }
     }
 }
