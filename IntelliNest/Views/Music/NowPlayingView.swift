@@ -215,7 +215,7 @@ private struct FillSlider: View {
                            height: axis == .vertical ? geometry.size.height * clamped : nil)
             }
             .clipShape(RoundedRectangle(cornerRadius: radius))
-            .overlay(RoundedRectangle(cornerRadius: radius).stroke(.black.opacity(0.5), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.black.opacity(0.5), lineWidth: 1))
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 0)
