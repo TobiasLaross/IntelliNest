@@ -17,25 +17,34 @@ struct SpeakerPickerView: View {
             Text("Välj högtalare")
                 .font(.headline)
             ForEach(viewModel.availableSpeakers, id: \.entityId) { speaker in
-                Button {
-                    viewModel.selectSpeaker(speaker.entityId)
-                } label: {
-                    HStack {
-                        Image(systemName: "hifispeaker.fill")
-                        Text(speaker.friendlyName)
-                        Spacer()
-                        if speaker.isPlaying {
-                            Image(systemName: "speaker.wave.2.fill")
-                                .foregroundStyle(.green)
-                                .accessibilityLabel("Spelar nu")
+                VStack(spacing: 8) {
+                    Button {
+                        viewModel.selectSpeaker(speaker.entityId)
+                    } label: {
+                        HStack {
+                            Image(systemName: "hifispeaker.fill")
+                            Text(speaker.friendlyName)
+                            Spacer()
+                            if speaker.isPlaying {
+                                Image(systemName: "speaker.wave.2.fill")
+                                    .foregroundStyle(.green)
+                                    .accessibilityLabel("Spelar nu")
+                            }
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.5))
                         }
                     }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 12)
-                    .background(Color.white.opacity(0.08))
-                    .cornerRadius(10)
+                    .accessibilityLabel("Välj \(speaker.friendlyName)")
+
+                    VolumeSliderView(volume: speaker.volumeLevel,
+                                     onChange: { viewModel.setVolume($0, for: speaker.entityId) })
+                        .accessibilityLabel("Volym \(speaker.friendlyName)")
                 }
-                .accessibilityLabel("Välj \(speaker.friendlyName)")
+                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .background(Color.white.opacity(0.08))
+                .cornerRadius(10)
             }
         }
         .padding()

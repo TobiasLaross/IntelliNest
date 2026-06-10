@@ -333,6 +333,21 @@ class MusicViewModelTests: XCTestCase {
         await fulfillment(of: [expectation], timeout: 2.0)
     }
 
+    func testSetVolumeForSpecificSpeakerAdjustsThatSpeakerWithoutSelecting() async {
+        // No active speaker — volume can still be set on any speaker in place.
+        let expectation = XCTestExpectation(description: "POST volume_set")
+        URLProtocolStub.observerRequests { request in
+            if request.httpMethod == "POST", request.url?.path.contains("/volume_set") == true {
+                expectation.fulfill()
+            }
+        }
+        stubPostService(path: "/api/services/media_player/volume_set")
+        viewModel.setVolume(0.42, for: .mediaPlayerSpa)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.volumeLevel, 0.42)
+        XCTAssertNil(viewModel.activeSpeakerID)
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+
     // MARK: - Shuffle / Repeat
 
     func testToggleShuffle() async {

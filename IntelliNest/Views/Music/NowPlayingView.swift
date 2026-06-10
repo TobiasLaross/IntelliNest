@@ -13,6 +13,24 @@ struct NowPlayingView: View {
 
     var body: some View {
         VStack(spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "hifispeaker.fill")
+                    .foregroundStyle(.yellow)
+                Text(speaker.friendlyName)
+                    .font(.headline)
+                    .foregroundStyle(.yellow)
+                    .lineLimit(1)
+                Spacer()
+                Button {
+                    viewModel.activeSpeakerID = nil
+                } label: {
+                    Image(systemName: "hifispeaker.2.fill")
+                }
+                .accessibilityLabel("Byt högtalare")
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Vald högtalare: \(speaker.friendlyName)")
+
             HStack(spacing: 12) {
                 AlbumArtView(urlString: speaker.entityPicture, size: 64)
                 VStack(alignment: .leading, spacing: 2) {
@@ -25,17 +43,8 @@ struct NowPlayingView: View {
                             .foregroundStyle(.white.opacity(0.7))
                             .lineLimit(1)
                     }
-                    Text(speaker.friendlyName)
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.5))
                 }
                 Spacer()
-                Button {
-                    viewModel.activeSpeakerID = nil
-                } label: {
-                    Image(systemName: "hifispeaker.2.fill")
-                }
-                .accessibilityLabel("Byt högtalare")
             }
 
             TransportControlsView(speaker: speaker, viewModel: viewModel)
@@ -46,6 +55,10 @@ struct NowPlayingView: View {
         .padding()
         .background(Color.white.opacity(0.08))
         .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.yellow.opacity(0.7), lineWidth: 2)
+        )
     }
 }
 
@@ -108,7 +121,7 @@ private struct TransportControlsView: View {
     }
 }
 
-private struct VolumeSliderView: View {
+struct VolumeSliderView: View {
     let volume: Double
     let onChange: DoubleClosure
 

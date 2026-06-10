@@ -279,8 +279,15 @@ class MusicViewModel: ObservableObject, Reloadable {
         guard let activeSpeakerID else {
             return
         }
-        speakers[activeSpeakerID]?.volumeLevel = volume
-        restAPIService.setVolume(entityID: activeSpeakerID, volume: volume)
+        setVolume(volume, for: activeSpeakerID)
+    }
+
+    /// Sets the volume of a specific speaker. Volume is always per-speaker (never
+    /// redirected to a group leader), so any speaker in the list can be adjusted
+    /// in place.
+    func setVolume(_ volume: Double, for speakerID: EntityId) {
+        speakers[speakerID]?.volumeLevel = volume
+        restAPIService.setVolume(entityID: speakerID, volume: volume)
     }
 
     func toggleShuffle() {
