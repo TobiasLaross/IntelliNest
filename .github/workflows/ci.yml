@@ -49,11 +49,7 @@ jobs:
           # Runner images drop/rename device types (iPhone 16 -> 17 -> ...), and
           # xcodebuild sometimes fails to enumerate simulators by name; querying
           # simctl directly is more reliable and version-agnostic.
-          SIM_ID=$(xcrun simctl list devices available -j | python3 -c "import sys, json
-devices = json.load(sys.stdin)['devices']
-candidates = [device for runtime in sorted(devices) for device in devices[runtime] if device['name'].startswith('iPhone')]
-candidates.sort(key=lambda device: device['name'])
-print(candidates[-1]['udid'] if candidates else '')")
+          SIM_ID=$(xcrun simctl list devices available -j | python3 -c "import sys, json; ds = json.load(sys.stdin)['devices']; phones = sorted([d for r in ds for d in ds[r] if d['name'].startswith('iPhone')], key=lambda d: d['name']); print(phones[-1]['udid'] if phones else '')")
           if [ -z "$SIM_ID" ]; then
             echo "No iPhone simulator available on the runner:"
             xcrun simctl list devices available
