@@ -192,6 +192,22 @@ extension MusicViewModel {
         browsingLibraryPlaylist = nil
     }
 
+    // MARK: - Spotify login
+
+    /// Runs the Spotify login from the login prompt. On success, marks the session
+    /// authorized (hides the warning triangle) and loads the account's playlists
+    /// into the favourites section.
+    func connectSpotify() async {
+        do {
+            try await spotify.authorize()
+            isSpotifyAuthorized = true
+            await refreshSpotifyPlaylists()
+        } catch {
+            Log.error("Spotify login failed: \(error)")
+            setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")
+        }
+    }
+
     // MARK: - Spotify favourite
 
     /// Whether the playlist can be saved to Spotify, i.e. it is a Spotify-provider
@@ -236,6 +252,7 @@ extension MusicViewModel {
         if !spotify.isAuthorized {
             do {
                 try await spotify.authorize()
+                isSpotifyAuthorized = true
             } catch {
                 Log.error("Spotify authorization failed: \(error)")
                 setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")

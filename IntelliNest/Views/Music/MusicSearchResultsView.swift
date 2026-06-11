@@ -129,12 +129,9 @@ struct MusicPlaylistView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.loadSavedState(for: playlist) }
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text(playlist.name)
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-            }
+            // No principal title here on purpose — the full playlist name is shown
+            // large in the header below, so a cramped, truncated nav-bar copy adds
+            // nothing. Keep only the favourite star.
             ToolbarItem(placement: .topBarTrailing) {
                 if viewModel.isSpotifyPlaylist(playlist) {
                     favoriteButton

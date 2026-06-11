@@ -45,6 +45,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// URIs of playlists currently saved in the user's Spotify library, driving the
     /// star toggle in the playlist detail view. Populated on demand per playlist.
     @Published var savedPlaylistURIs: Set<String> = []
+    /// Whether the user is logged into Spotify. Drives the login warning triangle
+    /// and its prompt — shown only while logged out.
+    @Published var isSpotifyAuthorized = false
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
@@ -85,6 +88,7 @@ class MusicViewModel: ObservableObject, Reloadable {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
         self.spotify = spotify
+        isSpotifyAuthorized = spotify.isAuthorized
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
         for speakerID in Self.speakerIDs {
             initialSpeakers[speakerID] = MediaPlayerEntity(entityId: speakerID)
