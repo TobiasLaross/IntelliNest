@@ -267,17 +267,32 @@ extension MusicViewModel {
 
     // MARK: - Spotify favourite
 
-    /// Whether to show the favourite star for this playlist. Only true when logged
-    /// in (so the star never appears unless tapping it actually saves) and the
-    /// playlist resolves to a Spotify id — directly or via the account match.
-    /// Built-ins, non-account playlists, and the logged-out state get no star.
+    /// Whether to show the favourite star for this playlist: it resolves to a
+    /// Spotify id, directly or via the account match. The star shows even when
+    /// logged out for a directly-resolvable `spotify://` playlist (a search
+    /// result) — tapping it logs in first, then saves — so there's an affordance
+    /// instead of a blank toolbar. Built-ins and non-account `library://` items
+    /// still get no star (they only resolve via the logged-in account match).
     func isSpotifyPlaylist(_ playlist: MusicSearchItem) -> Bool {
-        isSpotifyAuthorized && spotifyPlaylistID(for: playlist) != nil
+        spotifyPlaylistID(for: playlist) != nil
     }
 
     /// Whether the playlist is currently marked saved (drives the filled star).
+    /// Resolved by Spotify id, not uri, so the same playlist reads identically
+    /// whether it came in as a `spotify://` favourite or a `library://` recent.
     func isSaved(_ playlist: MusicSearchItem) -> Bool {
-        savedPlaylistURIs.contains(playlist.uri)
+        guard let id = spotifyPlaylistID(for: playlist) else {
+            return false
+        }
+        return savedPlaylistIDs.contains(id)
+    }
+
+    /// The Spotify ids of every playlist currently in the account library (the
+    /// favourites section). Library membership — not Spotify's follow-contains
+    /// check, which returns false for playlists the account owns — is the source
+    /// of truth for whether a playlist is saved.
+    var libraryPlaylistIDs: Set<String> {
+        Set(favoritePlaylists.compactMap { spotifyPlaylistID(for: $0) })
     }
 
     /// Resolves the Spotify playlist id for a playlist. A `spotify://playlist/<id>`
@@ -308,11 +323,19 @@ extension MusicViewModel {
         name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
-    /// Reads the live Spotify saved-state when the playlist detail appears, so the
-    /// star reflects reality. Skipped (and silent) for non-Spotify playlists or
-    /// when the user hasn't logged in yet — the star only loads after first login.
+    /// Reads the saved-state when the playlist detail appears, so the star
+    /// reflects reality. Skipped (and silent) for non-Spotify playlists or when
+    /// the user hasn't logged in yet — the star only loads after first login. A
+    /// playlist already in the account library is saved by definition: Spotify's
+    /// follow-contains check returns false for playlists the account *owns*, so
+    /// trust library membership first and only query the API for playlists
+    /// outside the library (e.g. someone else's playlist opened from search).
     func loadSavedState(for playlist: MusicSearchItem) async {
         guard let playlistID = spotifyPlaylistID(for: playlist), spotify.isAuthorized else {
+            return
+        }
+        if libraryPlaylistIDs.contains(playlistID) {
+            savedPlaylistIDs.insert(playlistID)
             return
         }
         await setSaved(spotify.isPlaylistSaved(playlistID: playlistID), for: playlist)
@@ -352,10 +375,13 @@ extension MusicViewModel {
     }
 
     func setSaved(_ saved: Bool, for playlist: MusicSearchItem) {
+        guard let id = spotifyPlaylistID(for: playlist) else {
+            return
+        }
         if saved {
-            savedPlaylistURIs.insert(playlist.uri)
+            savedPlaylistIDs.insert(id)
         } else {
-            savedPlaylistURIs.remove(playlist.uri)
+            savedPlaylistIDs.remove(id)
         }
     }
 

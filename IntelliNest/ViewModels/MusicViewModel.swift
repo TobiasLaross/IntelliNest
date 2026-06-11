@@ -52,9 +52,11 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// A library playlist the user opened to browse from the main view (favourites
     /// or recents), presented in its own sheet. Nil when no browse sheet is shown.
     @Published var browsingLibraryPlaylist: MusicSearchItem?
-    /// URIs of playlists currently saved in the user's Spotify library, driving the
-    /// star toggle in the playlist detail view. Populated on demand per playlist.
-    @Published var savedPlaylistURIs: Set<String> = []
+    /// Spotify ids of playlists currently saved in the user's Spotify library,
+    /// driving the favourite star everywhere a playlist is shown. Keyed by
+    /// resolved Spotify id rather than uri so the same playlist reads the same
+    /// whether it arrived as a `spotify://` favourite or a `library://` recent.
+    @Published var savedPlaylistIDs: Set<String> = []
     /// Whether the user is logged into Spotify. Drives the login warning triangle
     /// and its prompt — shown only while logged out.
     @Published var isSpotifyAuthorized = false

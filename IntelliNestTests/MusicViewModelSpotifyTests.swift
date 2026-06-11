@@ -155,7 +155,7 @@ extension MusicViewModelTests {
         ["tobiasc91": [playlistItem(uri: "spotify://playlist/p1", name: "Träning")]]
     }
 
-    func testIsSpotifyPlaylistRequiresLoginAndResolvableUri() {
+    func testIsSpotifyPlaylistShowsStarForResolvableUriEvenLoggedOut() {
         let spotifyItem = spotifyPlaylist()
         let localItem = MusicSearchItem(uri: "library://playlist/3", name: "Lokal",
                                         mediaType: .playlist, imageURL: nil, artist: nil)
@@ -163,10 +163,13 @@ extension MusicViewModelTests {
         let loggedIn = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: true))
         XCTAssertTrue(loggedIn.isSpotifyPlaylist(spotifyItem))
         XCTAssertFalse(loggedIn.isSpotifyPlaylist(localItem))
-        // Logged out: no star at all, even on a Spotify playlist — tapping it
-        // couldn't save without logging in first.
+        // Logged out: a directly-resolvable Spotify playlist (a search result) still
+        // shows the star — tapping it logs in first, then saves — but an unmatched
+        // library item has no Spotify id to resolve (the account list is empty), so
+        // it stays starless.
         let loggedOut = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
-        XCTAssertFalse(loggedOut.isSpotifyPlaylist(spotifyItem))
+        XCTAssertTrue(loggedOut.isSpotifyPlaylist(spotifyItem))
+        XCTAssertFalse(loggedOut.isSpotifyPlaylist(localItem))
     }
 
     func testLibraryPlaylistResolvesToSpotifyByName() async {
@@ -254,7 +257,7 @@ extension MusicViewModelTests {
                                         mediaType: .playlist, imageURL: nil, artist: nil)
         await model.toggleSpotifySaved(localItem)
         XCTAssertEqual(stub.saveCallCount, 0)
-        XCTAssertTrue(model.savedPlaylistURIs.isEmpty)
+        XCTAssertTrue(model.savedPlaylistIDs.isEmpty)
     }
 
     func testSpotifyAccountPlaylistsLoadIntoFavoritesOnReload() async {
@@ -475,5 +478,39 @@ extension MusicViewModelTests {
         await model.refreshPersonalPlaylists()
         await model.loadLibrarySavedStates()
         XCTAssertFalse(model.isSaved(personal))
+    }
+
+    // A playlist the account *owns* isn't "followed", so Spotify's follow-contains
+    // check (`savedIDs` here) returns false for it. Library membership, not that
+    // check, must decide the star — otherwise the same owned playlist shows filled
+    // under Favoriter but hollow under Senast spelade.
+    func testOwnedFavouriteShowsSavedInBothFavouritesAndRecents() async {
+        let name = "Låtar som är ganska sköna och avslappnande"
+        let owned = MusicSearchItem(uri: "spotify://playlist/owned1", name: name,
+                                    mediaType: .playlist, imageURL: nil, artist: "huset")
+        // savedIDs empty → the follow-contains check would say "not saved".
+        let stub = StubSpotifyPlaylistService(savedIDs: [], accountPlaylistItems: [owned])
+        let model = makeViewModel(spotify: stub)
+        await model.refreshSpotifyPlaylists()
+        // The same playlist surfaces in Senast spelade as an opaque library:// item.
+        let recent = MusicSearchItem(uri: "library://playlist/42", name: name,
+                                     mediaType: .playlist, imageURL: nil, artist: nil)
+        model.recentlyPlayedPlaylists = [recent]
+        await model.loadLibrarySavedStates()
+        XCTAssertTrue(model.isSaved(owned))
+        XCTAssertTrue(model.isSaved(recent))
+    }
+
+    // Opening an owned favourite's detail must not un-mark it: the follow-contains
+    // check returns false, but library membership keeps the star filled (the popup
+    // no longer drops the playlist to non-favourite on dismiss).
+    func testOpeningOwnedFavouriteDetailKeepsItSaved() async {
+        let owned = MusicSearchItem(uri: "spotify://playlist/owned1", name: "Min egen lista",
+                                    mediaType: .playlist, imageURL: nil, artist: "huset")
+        let stub = StubSpotifyPlaylistService(savedIDs: [], accountPlaylistItems: [owned])
+        let model = makeViewModel(spotify: stub)
+        await model.refreshSpotifyPlaylists()
+        await model.loadSavedState(for: owned)
+        XCTAssertTrue(model.isSaved(owned))
     }
 }
