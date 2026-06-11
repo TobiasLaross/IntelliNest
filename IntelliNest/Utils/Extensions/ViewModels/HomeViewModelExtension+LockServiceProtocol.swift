@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 extension HomeViewModel: LockServiceProtocol {
     func toggleStateForSideDoor() {

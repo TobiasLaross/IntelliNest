@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 struct HeaterEntity: EntityProtocol {
     var entityId: EntityId

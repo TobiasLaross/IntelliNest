@@ -5,7 +5,6 @@
 //  Created by Tobias on 2022-06-20.
 //
 
-import ShipBookSDK
 import UIKit
 
 private enum CategoryIdentifier: String {
@@ -38,8 +37,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_: UIApplication,
                      didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Task {
-            ShipBook.start(appId: GlobalConstants.secretShipBookAppID,
-                           appKey: GlobalConstants.secretShipBookAppKey)
             UNUserNotificationCenter.current().delegate = self
             let action = UNNotificationAction(identifier: NotificationActionIdentifier.snoozeWashingMachine.rawValue,
                                               title: "Snooza Tvättmaskinen",

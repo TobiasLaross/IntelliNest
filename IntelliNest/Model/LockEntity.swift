@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 struct LockEntity: Lockable, EntityProtocol {
     var entityId: EntityId

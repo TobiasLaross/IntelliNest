@@ -7,7 +7,6 @@
 
 import Foundation
 import Security
-import ShipBookSDK
 
 @MainActor
 class YaleApiService: URLRequestBuilder {

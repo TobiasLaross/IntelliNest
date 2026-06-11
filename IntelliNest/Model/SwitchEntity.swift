@@ -5,7 +5,6 @@
 //  Created by Tobias on 2023-10-19.
 //
 
-import ShipBookSDK
 import SwiftUI
 
 struct SwitchEntity: EntityProtocol {

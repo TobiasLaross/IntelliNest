@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 import UserNotifications
 
 class NotificationService {

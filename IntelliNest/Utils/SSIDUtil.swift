@@ -8,7 +8,6 @@
 @preconcurrency import CoreLocation
 import Foundation
 import NetworkExtension
-import ShipBookSDK
 import SystemConfiguration.CaptiveNetwork
 
 struct SSIDUtil {

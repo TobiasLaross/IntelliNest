@@ -2,15 +2,6 @@
   "originHash" : "66d0e924887faeee4da8d3368133bc4c63f99389594ed32f1ce043232531e4e8",
   "pins" : [
     {
-      "identity" : "shipbooksdk-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ShipBook/ShipBookSDK-iOS.git",
-      "state" : {
-        "revision" : "20864a7f61064c541d73b5adaa781e5029e56bc7",
-        "version" : "1.1.20"
-      }
-    },
-    {
       "identity" : "starscream",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/daltoniam/Starscream",

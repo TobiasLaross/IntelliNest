@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 /// Playback, playlist browsing, and the favourite/recently-played library
 /// loaders, split out of `MusicViewModel` to keep that type focused on speaker

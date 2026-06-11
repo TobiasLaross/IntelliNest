@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 struct URLRequestParameters {
     var forceURLString: String?

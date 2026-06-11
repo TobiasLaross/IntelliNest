@@ -7,7 +7,6 @@
 
 import CoreLocation
 import Foundation
-import ShipBookSDK
 import UserNotifications
 
 class GeofenceManager: NSObject {

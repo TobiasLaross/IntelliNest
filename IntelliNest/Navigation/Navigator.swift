@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 import SwiftUI
 import WidgetKit
 

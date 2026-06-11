@@ -1,5 +1,4 @@
 import Foundation
-import ShipBookSDK
 
 @MainActor
 class ElectricityViewModel: ObservableObject, Reloadable {

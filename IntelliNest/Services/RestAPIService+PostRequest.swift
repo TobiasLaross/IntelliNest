@@ -1,5 +1,4 @@
 import Foundation
-import ShipBookSDK
 
 extension RestAPIService {
     func sendPostRequest(customPath: String? = nil, json: [JSONKey: Any]?, domain: Domain, action: Action) async {

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 extension UserDefaults {
     @MainActor

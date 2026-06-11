@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 class ServiceData: Encodable {}
 
