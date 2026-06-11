@@ -20,6 +20,7 @@ extension MusicViewModel {
     func loadLibraryPlaylistsIfNeeded() async {
         await loadRecentlyPlayedIfNeeded()
         await loadSpotifyPlaylistsIfNeeded()
+        await refreshPersonalPlaylists()
     }
 
     /// Loads the recently-played playlists from Music Assistant once.
@@ -59,6 +60,27 @@ extension MusicViewModel {
         favoritePlaylists = playlists
         hasLoadedSpotifyPlaylists = true
         editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()
+    }
+
+    /// Re-fetches each configured personal account's public playlists, reusing the
+    /// huset login, and rebuilds `personalPlaylistSections` in configured order.
+    /// Mirrors `refreshSpotifyPlaylists`: when logged out the sections are cleared,
+    /// and an account whose fetch returns nothing (empty profile or failed request)
+    /// is dropped so its section disappears — never shown as an empty header.
+    func refreshPersonalPlaylists() async {
+        guard spotify.isAuthorized else {
+            personalPlaylistSections = []
+            return
+        }
+        var sections: [PersonalPlaylistSection] = []
+        for account in personalAccounts {
+            let playlists = await spotify.userPlaylists(userID: account.userID)
+            guard playlists.isNotEmpty else {
+                continue
+            }
+            sections.append(PersonalPlaylistSection(account: account, playlists: playlists))
+        }
+        personalPlaylistSections = sections
     }
 
     /// Re-fetches the recently-played list after a playlist launch so the new
@@ -236,6 +258,7 @@ extension MusicViewModel {
             try await spotify.authorize()
             isSpotifyAuthorized = true
             await refreshSpotifyPlaylists()
+            await refreshPersonalPlaylists()
         } catch {
             Log.error("Spotify login failed: \(error)")
             setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")

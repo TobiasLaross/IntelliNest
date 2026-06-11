@@ -112,6 +112,57 @@ final class SpotifyApiServiceTests: XCTestCase {
         XCTAssertTrue(playlists.isEmpty)
     }
 
+    // MARK: - userPlaylists
+
+    func userPlaylistsURL(userID: String) -> URL {
+        spotifyURL(path: "/users/\(userID)/playlists", query: [URLQueryItem(name: "limit", value: "50")])
+    }
+
+    func testUserPlaylistsMapsOwnedAndFollowedItems() async {
+        // A public profile lists both owned playlists and ones it merely follows;
+        // there is no owner filtering, so both map through.
+        let json = """
+        {"items":[
+          {"id":"own1","name":"Träning","images":[{"url":"https://img/t.jpg"}],"owner":{"display_name":"tobiasc91"}},
+          {"id":"fol1","name":"Lugnt & skönt","images":[],"owner":{"display_name":"Spotify"}},
+          {"id":null,"name":"Trasig"}
+        ]}
+        """
+        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: json)
+        let playlists = await service.userPlaylists(userID: "tobiasc91")
+        XCTAssertEqual(playlists.map(\.name), ["Träning", "Lugnt & skönt"])
+        XCTAssertEqual(playlists.first?.uri, "spotify://playlist/own1")
+        XCTAssertEqual(playlists.first?.imageURL, "https://img/t.jpg")
+        XCTAssertEqual(playlists.last?.uri, "spotify://playlist/fol1")
+        XCTAssertTrue(playlists.allSatisfy { $0.mediaType == .playlist })
+    }
+
+    func testUserPlaylistsReturnsEmptyWhenNoPlaylists() async {
+        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: "{\"items\":[]}")
+        let playlists = await service.userPlaylists(userID: "tobiasc91")
+        XCTAssertTrue(playlists.isEmpty)
+    }
+
+    func testUserPlaylistsReturnsEmptyOnFailure() async {
+        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 404, json: "{}")
+        let playlists = await service.userPlaylists(userID: "tobiasc91")
+        XCTAssertTrue(playlists.isEmpty)
+    }
+
+    func testUserPlaylistsSendsBearerTokenToUserPath() async {
+        let expectation = XCTestExpectation(description: "GET user playlists with bearer token")
+        URLProtocolStub.observerRequests { request in
+            if request.httpMethod == "GET",
+               request.url?.path == "/v1/users/tobiasc91/playlists",
+               request.value(forHTTPHeaderField: "Authorization") == "Bearer stub-access-token" {
+                expectation.fulfill()
+            }
+        }
+        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: "{\"items\":[]}")
+        _ = await service.userPlaylists(userID: "tobiasc91")
+        await fulfillment(of: [expectation], timeout: 2.0)
+    }
+
     // MARK: - isPlaylistSaved
 
     func testIsPlaylistSavedReturnsTrueWhenFollowed() async {

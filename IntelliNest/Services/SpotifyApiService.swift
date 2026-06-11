@@ -7,6 +7,24 @@
 
 import Foundation
 
+/// A known personal Spotify account whose public playlists are surfaced in the
+/// music view as its own titled section. Baked into the app (no in-app management);
+/// add another account by appending to `SpotifyPersonalAccount.configured`.
+struct SpotifyPersonalAccount: Identifiable, Equatable {
+    /// The Spotify user id (the `/users/{id}` path component).
+    let userID: String
+    /// The Swedish section title shown above this account's playlists.
+    let title: String
+
+    var id: String { userID }
+
+    /// The ordered list of personal accounts. Sections render in this order.
+    /// Only Tobias is configured now; Sarah is appended here once her id is known.
+    static let configured: [SpotifyPersonalAccount] = [
+        SpotifyPersonalAccount(userID: "tobiasc91", title: "Mina spellistor")
+    ]
+}
+
 /// The Spotify playlist operations the music UI needs. Hidden behind a protocol
 /// so `MusicViewModel` can be tested with a stub and so the feature degrades
 /// cleanly when no Spotify client is configured.
@@ -21,6 +39,9 @@ protocol SpotifyPlaylistService {
     /// The Spotify ids of the playlists the user can edit (owned or collaborative).
     /// Used to gate the add-to-playlist picker and the remove-from-playlist action.
     func editablePlaylistIDs() async -> Set<String>
+    /// The public playlists on another Spotify user's profile (created + followed).
+    /// Reuses the signed-in account's token; only public playlists are visible.
+    func userPlaylists(userID: String) async -> [MusicSearchItem]
     /// Whether the playlist is currently in the user's Spotify library.
     func isPlaylistSaved(playlistID: String) async -> Bool
     /// Adds the playlist to the user's Spotify library. Returns success.
@@ -77,6 +98,25 @@ final class SpotifyApiService: SpotifyPlaylistService {
             return try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
         } catch {
             Log.error("Spotify accountPlaylists failed: \(error)")
+            return []
+        }
+    }
+
+    func userPlaylists(userID: String) async -> [MusicSearchItem] {
+        do {
+            // 50 is the API's per-page max. Matching accountPlaylists' single-page
+            // limit keeps this to one request; a personal profile rarely exceeds it
+            // and pagination is out of scope (see design.md).
+            let request = try await authorizedRequest(path: "/users/\(userID)/playlists",
+                                                      method: "GET",
+                                                      queryItems: [URLQueryItem(name: "limit", value: "50")])
+            let (data, response) = try await session.data(for: request)
+            guard isSuccess(response) else {
+                return []
+            }
+            return try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
+        } catch {
+            Log.error("Spotify userPlaylists(\(userID)) failed: \(error)")
             return []
         }
     }
@@ -324,6 +364,7 @@ struct DisabledSpotifyPlaylistService: SpotifyPlaylistService {
     func authorize() async throws {}
     func accountPlaylists() async -> [MusicSearchItem] { [] }
     func editablePlaylistIDs() async -> Set<String> { [] }
+    func userPlaylists(userID _: String) async -> [MusicSearchItem] { [] }
     func isPlaylistSaved(playlistID _: String) async -> Bool { false }
     func savePlaylist(playlistID _: String) async -> Bool { false }
     func removePlaylist(playlistID _: String) async -> Bool { false }
