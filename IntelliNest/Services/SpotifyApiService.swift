@@ -19,9 +19,9 @@ struct SpotifyPersonalAccount: Identifiable, Equatable {
     var id: String { userID }
 
     /// The ordered list of personal accounts. Sections render in this order.
-    /// Only Tobias is configured now; Sarah is appended here once her id is known.
     static let configured: [SpotifyPersonalAccount] = [
-        SpotifyPersonalAccount(userID: "tobiasc91", title: "Mina spellistor")
+        SpotifyPersonalAccount(userID: "tobiasc91", title: "Mina spellistor"),
+        SpotifyPersonalAccount(userID: "mbostroem", title: "Sarahs spellistor")
     ]
 }
 

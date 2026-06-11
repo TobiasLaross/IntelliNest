@@ -454,9 +454,9 @@ extension MusicViewModelTests {
         XCTAssertEqual(model.browsingLibraryPlaylist?.uri, playlist.uri)
     }
 
-    func testDefaultPersonalAccountsConfiguresTobiasOnly() {
-        XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.userID), ["tobiasc91"])
-        XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.title), ["Mina spellistor"])
+    func testDefaultPersonalAccountsConfiguresTobiasThenSarah() {
+        XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.userID), ["tobiasc91", "mbostroem"])
+        XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.title), ["Mina spellistor", "Sarahs spellistor"])
     }
 
     func testLoadLibrarySavedStatesResolvesPersonalSectionRows() async {
