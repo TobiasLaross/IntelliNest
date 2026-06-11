@@ -14,7 +14,6 @@ enum Destination: String {
     case lynk
     case corridorHeaterDetails
     case playroomHeaterDetails
-    case roborock
     case lights
     case music
 
@@ -32,8 +31,6 @@ enum Destination: String {
             "Korridoren"
         case .playroomHeaterDetails:
             "Lekrummet"
-        case .roborock:
-            "Roborock"
         case .lights:
             "Lampor"
         case .music:

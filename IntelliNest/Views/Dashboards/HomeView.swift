@@ -117,11 +117,6 @@ private struct NavigationButtonsView: View {
                             Text("Släck alla lampor")
                         }
                     }
-                NavigationButtonView(buttonTitle: "",
-                                     image: Image("roborocks7"),
-                                     buttonImageWidth: 50,
-                                     buttonImageHeight: 50,
-                                     action: viewModel.showRoborockAction)
             }
         }
     }
@@ -253,7 +248,6 @@ struct Home_Previews: PreviewProvider {
                                       urlCreator: PreviewProviderUtil.urlCreator,
                                       showHeatersAction: {},
                                       showLynkAction: {},
-                                      showRoborockAction: {},
                                       showPowerGridAction: {},
                                       showLightsAction: {},
                                       showMusicAction: {},

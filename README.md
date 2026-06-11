@@ -8,17 +8,17 @@ IntelliNest is a native iOS application that leverages the power of the popular 
 ## Code statistics
 | Indicators                          | Now  | Desired |
 |-------------------------------------|------|---------|
-| Total LOC                           | 14183 | N/A |
+| Total LOC                           | 15657 | N/A |
 | Swift file count                    | 167 | N/A |
-| Average LOC per file                | 85 | <100 |
+| Average LOC per file                | 93 | <100 |
 | TODO comment count                  | 0 | 0 |
 | FIX comment count                   | 0 | 0 |
-| unowned reference count             | 4 | 0 |
-| Commit count in main                | 131 | N/A |
-| Total deleted lines                 | 13391 | N/A |
-| Total added lines                   | 31040 | N/A |
+| unowned reference count             | 1 | 0 |
+| Commit count in main                | 141 | N/A |
+| Total deleted lines                 | 13876 | N/A |
+| Total added lines                   | 34206 | N/A |
 
-Last Updated: 2026-03-22
+Last Updated: 2026-06-10
 ## Supported features
 ### Rest API and Websocket support
 Most views now use WebSocket instead of REST API for improved real-time updates.
@@ -44,13 +44,6 @@ Climate handling and scheduling, refresh data, start/stop charging, lock/unlock 
  <div style="display: flex; justify-content: space-around;">
   <img src="Images/Car.PNG" alt="Car Image" width="120" height="250"/>
   <img src="Images/Car2.PNG" alt="Car Image" width="120" height="250"/>
- </div>
- 
-### Roborock
-Info since the trash was emptied, map view start/paus, dock, locate and send to bin. Also buttons for each room (organized by floor plan)
- <div style="display: flex; justify-content: space-around;">
-  <img src="Images/Vacuum.PNG" alt="Vacuum Image" width="120" height="250"/>
-  <img src="Images/Vacuum2.PNG" alt="Vacuum Image" width="120" height="250"/>
  </div>
  
 ### CCTV

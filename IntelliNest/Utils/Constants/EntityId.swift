@@ -126,16 +126,6 @@ enum EntityId: String, Decodable, CaseIterable {
     case resetCorridorHeaterTime = "input_datetime.reset_corridor_heater_time"
     case resetPlayroomHeaterTime = "input_datetime.reset_playroom_heater_time"
     case saveClimateState = "script.save_climate_state"
-    /* Roborock */
-    case roborock = "vacuum.bob"
-    case roborockBattery = "sensor.roborock_s7_battery"
-    case roborockAutomation = "automation.vacuum"
-    case roborockLastCleanArea = "sensor.bob_last_clean_area"
-    case roborockAreaWhenEmptied = "input_number.bob_clean_area_when_trash_emptied"
-    case roborockTotalCleaningArea = "sensor.roborock_s7_total_cleaning_area"
-    case roborockEmptiedAtDate = "input_datetime.bob_trash_last_emptied"
-    case roborockWaterShortage = "binary_sensor.bob_water_shortage"
-    case roborockMapImage = "image.bob_houseplan"
     /* Cameras */
     case cameraVince = "camera.vince_rtsp"
     case cameraFront = "camera.framsidan_frigate"

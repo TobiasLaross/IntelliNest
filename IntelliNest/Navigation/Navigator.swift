@@ -78,9 +78,6 @@ class Navigator: ObservableObject {
                                            showLynkAction: { [weak self] in
                                                self?.push(.lynk)
                                            },
-                                           showRoborockAction: { [weak self] in
-                                               self?.push(.roborock)
-                                           },
                                            showPowerGridAction: { [weak self] in
                                                self?.push(.electricity)
                                            },
@@ -101,7 +98,6 @@ class Navigator: ObservableObject {
                                                      }
                                                  })
     lazy var lynkViewModel = LynkViewModel(restAPIService: restAPIService)
-    lazy var roborockViewModel = RoborockViewModel(restAPIService: restAPIService)
     lazy var lightsViewModel = LightsViewModel(restAPIService: restAPIService)
     lazy var musicViewModel = MusicViewModel(restAPIService: restAPIService,
                                              setErrorBannerText: { [weak self] title, message in
@@ -155,8 +151,6 @@ class Navigator: ObservableObject {
             await lynkViewModel.reload()
         case .lights:
             await lightsViewModel.reload()
-        case .roborock:
-            await roborockViewModel.reload()
         case .music:
             await musicViewModel.reload()
         }
