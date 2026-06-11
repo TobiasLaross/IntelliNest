@@ -170,20 +170,30 @@ extension RestAPIService {
     /// failure; a failed pre-unjoin aborts before the join is attempted.
     @discardableResult
     func joinSpeakers(leaderID: EntityId, memberIDs: [EntityId], unjoinFirst: Bool = false, reloadTimes: Int = 3) async -> Bool {
+        // Track whether any state actually changed so a rejected op doesn't churn
+        // reloads, while a partial failure (a pre-unjoin succeeded, then the join
+        // failed) still refreshes the speaker that did leave its old group.
+        var didMutate = false
         if unjoinFirst {
             for memberID in memberIDs {
                 var unjoinJSON = [JSONKey: Any]()
                 unjoinJSON[.entityID] = memberID.rawValue
                 guard await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .unjoin, json: unjoinJSON) else {
+                    if didMutate {
+                        triggerRepeatReload(times: reloadTimes)
+                    }
                     return false
                 }
+                didMutate = true
             }
         }
         var json = [JSONKey: Any]()
         json[.entityID] = leaderID.rawValue
         json[.groupMembers] = memberIDs.map(\.rawValue)
         let success = await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .join, json: json)
-        triggerRepeatReload(times: reloadTimes)
+        if success || didMutate {
+            triggerRepeatReload(times: reloadTimes)
+        }
         return success
     }
 
@@ -194,7 +204,9 @@ extension RestAPIService {
         var json = [JSONKey: Any]()
         json[.entityID] = memberID.rawValue
         let success = await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .unjoin, json: json)
-        triggerRepeatReload(times: reloadTimes)
+        if success {
+            triggerRepeatReload(times: reloadTimes)
+        }
         return success
     }
 
