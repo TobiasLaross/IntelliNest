@@ -368,6 +368,7 @@ extension MusicViewModelTests {
         let stub = StubSpotifyPlaylistService(userPlaylistItems: tobiasTräning())
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         stubAllSpeakers(playing: .mediaPlayerKitchen)
+        XCTAssertTrue(model.personalPlaylistSections.isEmpty)
         await model.reload()
         XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor"])
     }
