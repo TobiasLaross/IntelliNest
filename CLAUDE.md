@@ -50,7 +50,6 @@ All ViewModels are `@MainActor ObservableObject` classes. Key ones:
 - `ElectricityViewModel` — power consumption, NordPool pricing, solar/grid data
 - `HeatersViewModel` — thermostat mode/fan/temperature
 - `LynkViewModel` — EV car climate and charging
-- `RoborockViewModel` — vacuum control and room targeting
 
 ViewModels receive `RestAPIService`, `YaleApiService`, and `URLCreator` via constructor injection. Navigation is decoupled via closure callbacks passed at init.
 
@@ -81,7 +80,7 @@ Secrets are injected via xcconfig variables at build time (accessed as `Bundle.m
 ### Adding a new screen / device
 
 A new device dashboard touches a fixed set of files in this order — follow an existing domain (e.g. `lights`,
-`roborock`) as the template:
+`heaters`) as the template:
 
 1. Add a `Destination` case with its Swedish `title` (`Navigation/Destination.swift`).
 2. Wire it into `Navigator` — a lazily-created `@MainActor ObservableObject` ViewModel, a `showXAction` closure, and

@@ -20,8 +20,6 @@ extension Navigator {
                 showHeaterDetailsView(heaterID: .heaterCorridor)
             case .playroomHeaterDetails:
                 showHeaterDetailsView(heaterID: .heaterPlayroom)
-            case .roborock:
-                showRoborockView()
             case .lights:
                 showLightsView()
             case .music:
@@ -67,10 +65,6 @@ extension Navigator {
         } else {
             DetailedHeaterView(viewModel: heatersViewModel, selectedHeater: .playroom)
         }
-    }
-
-    func showRoborockView() -> RoborockView {
-        RoborockView(viewModel: roborockViewModel)
     }
 
     func showLightsView() -> LightsView {

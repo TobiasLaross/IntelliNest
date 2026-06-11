@@ -27,7 +27,6 @@ enum Domain: String, Encodable {
     case sensor
     case binarySensor = "binary_sensor"
     case kiaUvo = "kia_uvo"
-    case vacuum
     case mediaPlayer = "media_player"
     case musicAssistant = "music_assistant"
     case unknown

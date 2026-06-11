@@ -26,7 +26,6 @@ class HomeViewModelTests: XCTestCase {
             urlCreator: urlCreator,
             showHeatersAction: {},
             showLynkAction: {},
-            showRoborockAction: {},
             showPowerGridAction: {},
             showLightsAction: {},
             showMusicAction: {},

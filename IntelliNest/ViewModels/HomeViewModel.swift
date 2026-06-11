@@ -65,7 +65,6 @@ class HomeViewModel: ObservableObject, Reloadable {
     var urlCreator: URLCreator
     let showHeatersAction: MainActorVoidClosure
     let showLynkAction: MainActorVoidClosure
-    let showRoborockAction: MainActorVoidClosure
     let showPowerGridAction: MainActorVoidClosure
     let showLightsAction: MainActorVoidClosure
     let showMusicAction: MainActorVoidClosure
@@ -76,7 +75,6 @@ class HomeViewModel: ObservableObject, Reloadable {
          urlCreator: URLCreator,
          showHeatersAction: @escaping MainActorVoidClosure,
          showLynkAction: @escaping MainActorVoidClosure,
-         showRoborockAction: @escaping MainActorVoidClosure,
          showPowerGridAction: @escaping MainActorVoidClosure,
          showLightsAction: @escaping MainActorVoidClosure,
          showMusicAction: @escaping MainActorVoidClosure,
@@ -86,7 +84,6 @@ class HomeViewModel: ObservableObject, Reloadable {
         self.urlCreator = urlCreator
         self.showHeatersAction = showHeatersAction
         self.showLynkAction = showLynkAction
-        self.showRoborockAction = showRoborockAction
         self.showPowerGridAction = showPowerGridAction
         self.showLightsAction = showLightsAction
         self.showMusicAction = showMusicAction
