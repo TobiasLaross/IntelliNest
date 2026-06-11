@@ -93,6 +93,7 @@ final class SpotifyApiService: SpotifyPlaylistService {
                                                       queryItems: [URLQueryItem(name: "limit", value: "50")])
             let (data, response) = try await session.data(for: request)
             guard isSuccess(response) else {
+                Log.error("Spotify accountPlaylists failed: \(httpFailureDescription(response, data))")
                 return []
             }
             return try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
@@ -112,9 +113,17 @@ final class SpotifyApiService: SpotifyPlaylistService {
                                                       queryItems: [URLQueryItem(name: "limit", value: "50")])
             let (data, response) = try await session.data(for: request)
             guard isSuccess(response) else {
+                Log.error("Spotify userPlaylists(\(userID)) failed: \(httpFailureDescription(response, data))")
                 return []
             }
-            return try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
+            let playlists = try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
+            if playlists.isEmpty {
+                // A configured personal account is expected to have public playlists;
+                // a 200-but-empty result is the anomaly to capture (distinguishes a
+                // genuine empty/filtered profile from an HTTP error logged above).
+                Log.warning("Spotify userPlaylists(\(userID)) returned 0 playlists (HTTP 200): \(bodySnippet(data))")
+            }
+            return playlists
         } catch {
             Log.error("Spotify userPlaylists(\(userID)) failed: \(error)")
             return []
@@ -290,6 +299,22 @@ final class SpotifyApiService: SpotifyPlaylistService {
 
     private func isSuccess(_ response: URLResponse) -> Bool {
         (response as? HTTPURLResponse).map { (200 ... 299).contains($0.statusCode) } ?? false
+    }
+
+    /// A compact "HTTP <code>: <body>" description for a failed response, used to
+    /// surface *why* a request was rejected. The body is Spotify's JSON error
+    /// envelope (e.g. `{"error":{"status":403,"message":"…"}}`); it's truncated so
+    /// a forwarded log line stays short. Callers swallow non-2xx responses and
+    /// return empty, so without this the failure would be invisible.
+    private func httpFailureDescription(_ response: URLResponse, _ data: Data) -> String {
+        let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+        let body = bodySnippet(data)
+        return body.isEmpty ? "HTTP \(status)" : "HTTP \(status): \(body)"
+    }
+
+    /// The leading slice of a response body, for diagnostic log lines.
+    private func bodySnippet(_ data: Data) -> String {
+        String(decoding: data.prefix(300), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
