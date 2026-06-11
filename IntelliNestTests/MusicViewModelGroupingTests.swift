@@ -220,39 +220,39 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.volumeLevel, 0.3)
     }
 
-    // MARK: - Favourite playlists
+    // MARK: - Recently-played playlists
 
-    private func favoritesURL() -> URL {
+    private func recentsURL() -> URL {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
         components.path = "/api/services/music_assistant/get_library"
         components.queryItems = [URLQueryItem(name: "return_response", value: "true")]
         return components.url!
     }
 
-    private func stubFavorites(json: String, statusCode: Int = 200) {
-        let url = favoritesURL()
+    private func stubRecents(json: String, statusCode: Int = 200) {
+        let url = recentsURL()
         let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: url, data: Data(json.utf8), response: response, error: nil)
     }
 
-    func testFavoriteAndRecentPlaylistsLoadOnReload() async {
+    func testRecentlyPlayedPlaylistsLoadOnReload() async {
         stubAllSpeakers(playing: .mediaPlayerKitchen)
-        // Both favourites and recents POST to get_library (filters live in the
-        // body, not the URL), so the same stub serves both.
-        stubFavorites(json: "{\"service_response\":{\"items\":[" +
+        stubRecents(json: "{\"service_response\":{\"items\":[" +
             "{\"uri\":\"spotify://playlist/1\",\"name\":\"Bastumusik\"}," +
             "{\"uri\":\"spotify://playlist/2\",\"name\":\"Träning\"}]}}")
         await viewModel.reload()
-        XCTAssertEqual(viewModel.favoritePlaylists.map(\.name), ["Bastumusik", "Träning"])
         XCTAssertEqual(viewModel.recentlyPlayedPlaylists.map(\.name), ["Bastumusik", "Träning"])
-        XCTAssertTrue(viewModel.favoritePlaylists.allSatisfy { $0.mediaType == .playlist })
+        XCTAssertTrue(viewModel.recentlyPlayedPlaylists.allSatisfy { $0.mediaType == .playlist })
+        // Favourites now come from the Spotify account, not Music Assistant, so the
+        // default (disabled, logged-out) Spotify service leaves them empty.
+        XCTAssertTrue(viewModel.favoritePlaylists.isEmpty)
     }
 
     func testPlayPlaylistRefreshesRecents() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         viewModel.isShowingSearchResults = true
         stubPlayMedia(statusCode: 200)
-        stubFavorites(json: "{\"service_response\":{\"items\":[" +
+        stubRecents(json: "{\"service_response\":{\"items\":[" +
             "{\"uri\":\"spotify://playlist/1\",\"name\":\"Bastumusik\"}]}}")
         let playlist = MusicSearchItem(uri: "spotify://playlist/1", name: "Bastumusik",
                                        mediaType: .playlist, imageURL: nil, artist: nil)

@@ -25,12 +25,6 @@ extension RestAPIService {
         return try decodeSearchResponse(from: data)
     }
 
-    /// Fetches the user's favourite playlists from the Music Assistant library
-    /// via `music_assistant.get_library`, sorted by name.
-    func getFavoritePlaylists(limit: Int = 20) async throws -> [MusicSearchItem] {
-        try await getLibraryPlaylists(favorite: true, orderBy: "name", limit: limit)
-    }
-
     /// Fetches the most recently played playlists from the Music Assistant
     /// library. Music Assistant tracks last-played, so `order_by:
     /// last_played_desc` returns them newest-first across every source (not just

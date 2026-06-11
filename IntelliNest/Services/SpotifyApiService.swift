@@ -7,15 +7,17 @@
 
 import Foundation
 
-/// The playlist favourite operations the music UI needs from Spotify. Hidden
-/// behind a protocol so `MusicViewModel` can be tested with a stub and so the
-/// feature degrades cleanly when no Spotify client is configured.
+/// The Spotify playlist operations the music UI needs. Hidden behind a protocol
+/// so `MusicViewModel` can be tested with a stub and so the feature degrades
+/// cleanly when no Spotify client is configured.
 @MainActor
-protocol SpotifyPlaylistFavoriting {
+protocol SpotifyPlaylistService {
     /// Whether the user has completed the Spotify login at least once.
     var isAuthorized: Bool { get }
     /// Runs the interactive Spotify login.
     func authorize() async throws
+    /// The playlists in the signed-in account's library (owned + followed).
+    func accountPlaylists() async -> [MusicSearchItem]
     /// Whether the playlist is currently in the user's Spotify library.
     func isPlaylistSaved(playlistID: String) async -> Bool
     /// Adds the playlist to the user's Spotify library. Returns success.
@@ -28,7 +30,7 @@ protocol SpotifyPlaylistFavoriting {
 /// signed-in user's library and to read the current saved state. Bearer tokens
 /// come from an injected `SpotifyTokenProviding`.
 @MainActor
-final class SpotifyApiService: SpotifyPlaylistFavoriting {
+final class SpotifyApiService: SpotifyPlaylistService {
     private let tokenProvider: SpotifyTokenProviding
     private let session: URLSession
     private let baseURL = "https://api.spotify.com/v1"
@@ -46,6 +48,24 @@ final class SpotifyApiService: SpotifyPlaylistFavoriting {
 
     func authorize() async throws {
         try await tokenProvider.authorize()
+    }
+
+    func accountPlaylists() async -> [MusicSearchItem] {
+        do {
+            // 50 is the API's per-page max; plenty for a personal library and keeps
+            // it to a single request (no pagination needed here).
+            let request = try await authorizedRequest(path: "/me/playlists",
+                                                      method: "GET",
+                                                      queryItems: [URLQueryItem(name: "limit", value: "50")])
+            let (data, response) = try await session.data(for: request)
+            guard isSuccess(response) else {
+                return []
+            }
+            return try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
+        } catch {
+            Log.error("Spotify accountPlaylists failed: \(error)")
+            return []
+        }
     }
 
     func isPlaylistSaved(playlistID: String) async -> Bool {
@@ -127,13 +147,55 @@ private struct SpotifyUser: Decodable {
     let id: String
 }
 
+/// Decodes the `GET /me/playlists` page, mapping each Spotify playlist to the
+/// app's `MusicSearchItem`. The Spotify `id` is rewritten into the `spotify://`
+/// uri form Music Assistant expects for playback.
+private struct SpotifyPlaylistPage: Decodable {
+    let items: [SpotifyPlaylistItem]
+
+    var playlists: [MusicSearchItem] {
+        items.compactMap(\.searchItem)
+    }
+}
+
+private struct SpotifyPlaylistItem: Decodable {
+    let id: String?
+    let name: String?
+    let images: [SpotifyImage]?
+    let owner: SpotifyOwner?
+
+    var searchItem: MusicSearchItem? {
+        guard let id, let name, name.isNotEmpty else {
+            return nil
+        }
+        return MusicSearchItem(uri: "spotify://playlist/\(id)",
+                               name: name,
+                               mediaType: .playlist,
+                               imageURL: images?.first?.url,
+                               artist: owner?.displayName)
+    }
+}
+
+private struct SpotifyImage: Decodable {
+    let url: String?
+}
+
+private struct SpotifyOwner: Decodable {
+    let displayName: String?
+
+    enum CodingKeys: String, CodingKey {
+        case displayName = "display_name"
+    }
+}
+
 /// Stand-in used when no Spotify client is configured (SwiftUI previews, tests
-/// that don't exercise favouriting). Reports unauthorized and no-ops every call,
-/// so the star simply never appears.
+/// that don't exercise Spotify). Reports unauthorized and no-ops every call, so
+/// the star never appears and the favourites section stays empty.
 @MainActor
-struct DisabledSpotifyFavoriting: SpotifyPlaylistFavoriting {
+struct DisabledSpotifyPlaylistService: SpotifyPlaylistService {
     var isAuthorized: Bool { false }
     func authorize() async throws {}
+    func accountPlaylists() async -> [MusicSearchItem] { [] }
     func isPlaylistSaved(playlistID _: String) async -> Bool { false }
     func savePlaylist(playlistID _: String) async -> Bool { false }
     func removePlaylist(playlistID _: String) async -> Bool { false }

@@ -84,6 +84,34 @@ final class SpotifyApiServiceTests: XCTestCase {
         spotifyURL(path: "/playlists/\(playlistID)/followers/contains", query: [URLQueryItem(name: "ids", value: userID)])
     }
 
+    // MARK: - accountPlaylists
+
+    func testAccountPlaylistsMapsItems() async {
+        let json = """
+        {"items":[
+          {"id":"abc123","name":"Morgon","images":[{"url":"https://img/a.jpg"}],"owner":{"display_name":"huset"}},
+          {"id":"def456","name":"Träning","images":[],"owner":{"display_name":"huset"}},
+          {"id":null,"name":"Trasig"}
+        ]}
+        """
+        stub(url: spotifyURL(path: "/me/playlists", query: [URLQueryItem(name: "limit", value: "50")]),
+             statusCode: 200, json: json)
+        let playlists = await service.accountPlaylists()
+        // The null-id item is dropped; the rest map to spotify:// uris.
+        XCTAssertEqual(playlists.map(\.name), ["Morgon", "Träning"])
+        XCTAssertEqual(playlists.first?.uri, "spotify://playlist/abc123")
+        XCTAssertEqual(playlists.first?.imageURL, "https://img/a.jpg")
+        XCTAssertEqual(playlists.first?.artist, "huset")
+        XCTAssertTrue(playlists.allSatisfy { $0.mediaType == .playlist })
+    }
+
+    func testAccountPlaylistsReturnsEmptyOnFailure() async {
+        stub(url: spotifyURL(path: "/me/playlists", query: [URLQueryItem(name: "limit", value: "50")]),
+             statusCode: 401, json: "{}")
+        let playlists = await service.accountPlaylists()
+        XCTAssertTrue(playlists.isEmpty)
+    }
+
     // MARK: - isPlaylistSaved
 
     func testIsPlaylistSavedReturnsTrueWhenFollowed() async {

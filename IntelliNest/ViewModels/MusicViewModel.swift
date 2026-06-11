@@ -50,6 +50,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     private var hasSelectedDefaultSpeaker = false
     /// Read/written by the library-playlist loader in `MusicViewModel+Playback`.
     var hasLoadedLibrary = false
+    /// Guards the one-time load of the Spotify account's playlists. Reset after a
+    /// favourite toggle so the favourites section reflects the change next reload.
+    var hasLoadedSpotifyPlaylists = false
     /// Increments on every search so a slow, older response can't overwrite the
     /// results of a newer query.
     private var searchRequestToken = 0
@@ -58,9 +61,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// methods extracted into `MusicViewModel+Playback` can reach them.
     let restAPIService: RestAPIService
     let setErrorBannerText: StringStringClosure
-    /// Saves/removes playlists in the user's Spotify library and reads saved state.
-    /// Defaults to a disabled no-op so previews and non-Spotify tests need no setup.
-    let spotify: SpotifyPlaylistFavoriting
+    /// Reads the account's playlists and saves/removes playlists in the user's
+    /// Spotify library. Defaults to a disabled no-op so previews and non-Spotify
+    /// tests need no setup.
+    let spotify: SpotifyPlaylistService
 
     /// Speakers that are reachable right now (anything not `unavailable`),
     /// in the fixed display order.
@@ -77,7 +81,7 @@ class MusicViewModel: ObservableObject, Reloadable {
 
     init(restAPIService: RestAPIService,
          setErrorBannerText: @escaping StringStringClosure = { _, _ in },
-         spotify: SpotifyPlaylistFavoriting = DisabledSpotifyFavoriting()) {
+         spotify: SpotifyPlaylistService = DisabledSpotifyPlaylistService()) {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
         self.spotify = spotify
