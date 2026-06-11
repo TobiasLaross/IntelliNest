@@ -213,7 +213,6 @@ When unsure which side of the 6a/6b line something is on, treat it as a defect a
 - **Revert the temporary render method** and the `import SwiftUI`/`UIKit` additions — never commit
   the render test or the PNGs. `git checkout -- IntelliNestTests/<Class>Tests.swift` and
   `rm -rf /tmp/intellinest-shots/<short-desc>` after delivering.
-- If the CodeStats build phase rewrote `README.md`, discard it (`git checkout -- README.md`).
 - After delivering, ask the user explicitly — "Does the empty state look right?", not "I'm done." In
   the same message say what UX review you ran: which 6a defects you found and fixed (with a re-shot
   image) and which 6b improvements you're suggesting vs. applied.
