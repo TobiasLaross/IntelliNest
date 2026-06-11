@@ -210,10 +210,12 @@ extension MusicViewModel {
 
     // MARK: - Spotify favourite
 
-    /// Whether the playlist can be saved to Spotify, i.e. it is a Spotify-provider
-    /// playlist. Local/other-provider playlists have no Spotify library to save to.
+    /// Whether to show the favourite star for this playlist. Only true when logged
+    /// in (so the star never appears unless tapping it actually saves) and the
+    /// playlist resolves to a Spotify id — directly or via the account match.
+    /// Built-ins, non-account playlists, and the logged-out state get no star.
     func isSpotifyPlaylist(_ playlist: MusicSearchItem) -> Bool {
-        spotifyPlaylistID(for: playlist) != nil
+        isSpotifyAuthorized && spotifyPlaylistID(for: playlist) != nil
     }
 
     /// Whether the playlist is currently marked saved (drives the filled star).
@@ -221,15 +223,32 @@ extension MusicViewModel {
         savedPlaylistURIs.contains(playlist.uri)
     }
 
-    /// Extracts the id from a `spotify://playlist/<id>` uri, or nil when the
-    /// playlist isn't a Spotify one.
+    /// Resolves the Spotify playlist id for a playlist. A `spotify://playlist/<id>`
+    /// uri gives it directly. Music Assistant library items instead use opaque
+    /// `library://playlist/<n>` uris with no Spotify id, so they're matched by name
+    /// against the logged-in account's playlists (Spotify is the source of truth,
+    /// and an MA Spotify-library playlist is by definition one of those). Returns
+    /// nil for non-Spotify playlists (MA built-ins, or anything not in the account).
     private func spotifyPlaylistID(for playlist: MusicSearchItem) -> String? {
+        if let id = directSpotifyPlaylistID(from: playlist.uri) {
+            return id
+        }
+        let name = normalizedName(playlist.name)
+        let match = favoritePlaylists.first { normalizedName($0.name) == name }
+        return match.flatMap { directSpotifyPlaylistID(from: $0.uri) }
+    }
+
+    private func directSpotifyPlaylistID(from uri: String) -> String? {
         let prefix = "spotify://playlist/"
-        guard playlist.uri.hasPrefix(prefix) else {
+        guard uri.hasPrefix(prefix) else {
             return nil
         }
-        let id = String(playlist.uri.dropFirst(prefix.count))
+        let id = String(uri.dropFirst(prefix.count))
         return id.isNotEmpty ? id : nil
+    }
+
+    private func normalizedName(_ name: String) -> String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
     /// Reads the live Spotify saved-state when the playlist detail appears, so the

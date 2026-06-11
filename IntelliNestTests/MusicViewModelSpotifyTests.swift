@@ -82,12 +82,47 @@ extension MusicViewModelTests {
                        spotify: spotify)
     }
 
-    func testIsSpotifyPlaylistDistinguishesProvider() {
+    func testIsSpotifyPlaylistRequiresLoginAndResolvableUri() {
         let spotifyItem = spotifyPlaylist()
         let localItem = MusicSearchItem(uri: "library://playlist/3", name: "Lokal",
                                         mediaType: .playlist, imageURL: nil, artist: nil)
-        XCTAssertTrue(viewModel.isSpotifyPlaylist(spotifyItem))
-        XCTAssertFalse(viewModel.isSpotifyPlaylist(localItem))
+        // Logged in: star shows for a Spotify uri, not for an unmatched library item.
+        let loggedIn = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: true))
+        XCTAssertTrue(loggedIn.isSpotifyPlaylist(spotifyItem))
+        XCTAssertFalse(loggedIn.isSpotifyPlaylist(localItem))
+        // Logged out: no star at all, even on a Spotify playlist — tapping it
+        // couldn't save without logging in first.
+        let loggedOut = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        XCTAssertFalse(loggedOut.isSpotifyPlaylist(spotifyItem))
+    }
+
+    func testLibraryPlaylistResolvesToSpotifyByName() async {
+        // The huset account has this playlist (with its real Spotify id); Music
+        // Assistant exposes the same playlist as an opaque library:// item.
+        let account = [MusicSearchItem(uri: "spotify://playlist/realid42",
+                                       name: "Barnlåtar 🐵 musik för barn",
+                                       mediaType: .playlist, imageURL: nil, artist: nil)]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: account)
+        let model = makeViewModel(spotify: stub)
+        await model.refreshSpotifyPlaylists()
+        let libraryItem = MusicSearchItem(uri: "library://playlist/12",
+                                          name: "Barnlåtar 🐵 musik för barn  ",
+                                          mediaType: .playlist, imageURL: nil, artist: nil)
+        XCTAssertTrue(model.isSpotifyPlaylist(libraryItem))
+        await model.toggleSpotifySaved(libraryItem)
+        // It resolved to a Spotify id, so the save went through.
+        XCTAssertEqual(stub.saveCallCount, 1)
+    }
+
+    func testLibraryBuiltinPlaylistHasNoStar() async {
+        let account = [MusicSearchItem(uri: "spotify://playlist/realid42", name: "Barnlåtar",
+                                       mediaType: .playlist, imageURL: nil, artist: nil)]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: account)
+        let model = makeViewModel(spotify: stub)
+        await model.refreshSpotifyPlaylists()
+        let builtin = MusicSearchItem(uri: "library://playlist/3", name: "Random Album (from library)",
+                                      mediaType: .playlist, imageURL: nil, artist: nil)
+        XCTAssertFalse(model.isSpotifyPlaylist(builtin))
     }
 
     func testLoadSavedStateReflectsLibrary() async {
