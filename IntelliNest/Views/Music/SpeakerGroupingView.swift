@@ -58,7 +58,7 @@ struct SpeakerGroupingView: View {
                     let grouped = viewModel.isGrouped(speaker.entityId)
                     VStack(spacing: 8) {
                         Button {
-                            viewModel.toggleGroupMember(speaker.entityId)
+                            Task { await viewModel.toggleGroupMember(speaker.entityId) }
                         } label: {
                             HStack {
                                 Image(systemName: grouped ? "checkmark.circle.fill" : "circle")
