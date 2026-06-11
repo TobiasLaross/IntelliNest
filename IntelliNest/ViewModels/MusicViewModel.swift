@@ -7,6 +7,16 @@
 
 import Foundation
 
+/// A personal account's section of public playlists, ready to render. Carries the
+/// account (for title + stable identity) and the playlists fetched for it.
+struct PersonalPlaylistSection: Identifiable, Equatable {
+    let account: SpotifyPersonalAccount
+    let playlists: [MusicSearchItem]
+
+    var id: String { account.id }
+    var title: String { account.title }
+}
+
 @MainActor
 class MusicViewModel: ObservableObject, Reloadable {
     /// The six controllable Music Assistant speakers, in display order.
@@ -68,6 +78,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Tracks the app enqueued this session, newest last. Used as the "Näst på
     /// tur" fallback when the live queue contents can't be read over the socket.
     @Published var sessionEnqueuedItems: [MusicQueueItem] = []
+    /// One section per configured personal account that currently has public
+    /// playlists, in configured order, rendered below "Favoriter". Accounts with
+    /// no playlists (empty/failed fetch, or logged out) are kept off the list.
+    @Published var personalPlaylistSections: [PersonalPlaylistSection] = []
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
@@ -92,6 +106,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Home Assistant exposes no REST service for). Defaults to a disabled no-op
     /// so previews and tests need no socket.
     let queueSocket: MusicAssistantQueueSocket
+    /// The personal accounts whose public playlists are surfaced as their own
+    /// sections. Injectable so tests can exercise multiple-account ordering and the
+    /// hide-when-empty rule without depending on the baked-in list.
+    let personalAccounts: [SpotifyPersonalAccount]
 
     /// Speakers that are reachable right now (anything not `unavailable`),
     /// in the fixed display order.
@@ -109,11 +127,13 @@ class MusicViewModel: ObservableObject, Reloadable {
     init(restAPIService: RestAPIService,
          setErrorBannerText: @escaping StringStringClosure = { _, _ in },
          spotify: SpotifyPlaylistService = DisabledSpotifyPlaylistService(),
-         queueSocket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket()) {
+         queueSocket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
+         personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured) {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
         self.spotify = spotify
         self.queueSocket = queueSocket
+        self.personalAccounts = personalAccounts
         isSpotifyAuthorized = spotify.isAuthorized
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
         for speakerID in Self.speakerIDs {

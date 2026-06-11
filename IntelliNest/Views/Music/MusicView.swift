@@ -32,6 +32,11 @@ struct MusicView: View {
                         LibraryPlaylistsSection(title: "Favoriter",
                                                 playlists: viewModel.favoritePlaylists,
                                                 viewModel: viewModel)
+                        ForEach(viewModel.personalPlaylistSections) { section in
+                            LibraryPlaylistsSection(title: section.title,
+                                                    playlists: section.playlists,
+                                                    viewModel: viewModel)
+                        }
                     } else {
                         SpeakerPickerView(viewModel: viewModel)
                     }
@@ -43,7 +48,10 @@ struct MusicView: View {
         .foregroundStyle(.white)
         // Spotify is the source of truth — refresh the account's playlists each
         // time the view appears rather than trusting the once-per-session cache.
-        .task { await viewModel.refreshSpotifyPlaylists() }
+        .task {
+            await viewModel.refreshSpotifyPlaylists()
+            await viewModel.refreshPersonalPlaylists()
+        }
         // Keep the library-row stars in sync as the favourite/recents lists load.
         .task(id: viewModel.librarySavedStateSignature) {
             await viewModel.loadLibrarySavedStates()

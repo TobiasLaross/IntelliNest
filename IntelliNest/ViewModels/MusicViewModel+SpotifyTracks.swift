@@ -83,17 +83,23 @@ extension MusicViewModel {
     /// Changes whenever the library lists change, so the view can reload the
     /// row stars' saved-state without polling.
     var librarySavedStateSignature: String {
-        (recentlyPlayedPlaylists.map(\.uri) + favoritePlaylists.map(\.uri)).joined(separator: "|")
+        (recentlyPlayedPlaylists.map(\.uri)
+            + favoritePlaylists.map(\.uri)
+            + personalPlaylistSections.flatMap { $0.playlists.map(\.uri) }).joined(separator: "|")
     }
 
     /// Populates the saved-state for the library rows. Favourites are in the
     /// Spotify library by definition, so they are marked saved without a call;
-    /// recently-played playlists are queried so their star reflects reality.
+    /// recently-played and personal-account playlists are queried so their star
+    /// reflects reality even when they are not also favourites.
     func loadLibrarySavedStates() async {
         for playlist in favoritePlaylists {
             setSaved(true, for: playlist)
         }
         for playlist in recentlyPlayedPlaylists {
+            await loadSavedState(for: playlist)
+        }
+        for playlist in personalPlaylistSections.flatMap(\.playlists) {
             await loadSavedState(for: playlist)
         }
     }
