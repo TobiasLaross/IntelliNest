@@ -54,6 +54,12 @@ enum GlobalConstants {
         Bundle.main.object(forInfoDictionaryKey: "SECRET_YALE_API_KEY") as? String ?? ""
     }
 
+    /// Spotify app Client ID (public — the app uses Authorization Code + PKCE, so
+    /// no client secret is stored). Injected from the xcconfig at build time.
+    static var secretSpotifyClientID: String {
+        Bundle.main.object(forInfoDictionaryKey: "SPOTIFY_CLIENT_ID") as? String ?? ""
+    }
+
     static let musicAssistantConfigEntryID = "01JZ57QTQPB79NSC7GJ2VQPA8V"
     static let baseInternalUrlString = "http://192.168.1.205:8123/"
     static let githubFakeUrlString = "https://192.218.223.123/"

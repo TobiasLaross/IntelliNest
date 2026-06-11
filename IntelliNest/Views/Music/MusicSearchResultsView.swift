@@ -127,12 +127,18 @@ struct MusicPlaylistView: View {
         .backgroundModifier()
         .foregroundStyle(.white)
         .navigationBarTitleDisplayMode(.inline)
+        .task { await viewModel.loadSavedState(for: playlist) }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text(playlist.name)
                     .font(.headline)
                     .foregroundStyle(.white)
                     .lineLimit(1)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                if viewModel.isSpotifyPlaylist(playlist) {
+                    favoriteButton
+                }
             }
         }
     }
@@ -144,19 +150,46 @@ struct MusicPlaylistView: View {
                 .font(.title3)
                 .bold()
                 .multilineTextAlignment(.center)
-            Button {
-                Task { await viewModel.playPlaylist(playlist) }
-            } label: {
-                Label("Spela", systemImage: "play.fill")
-                    .font(.headline)
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 28)
-                    .background(Color.white.opacity(0.15))
-                    .clipShape(Capsule())
+            HStack(spacing: 12) {
+                capsuleButton(title: "Spela", systemImage: "play.fill") {
+                    await viewModel.playPlaylist(playlist)
+                }
+                .accessibilityLabel("Spela spellistan \(playlist.name)")
+                capsuleButton(title: "Shuffle", systemImage: "shuffle") {
+                    await viewModel.playPlaylistShuffled(playlist)
+                }
+                .accessibilityLabel("Spela spellistan \(playlist.name) blandat")
             }
-            .accessibilityLabel("Spela spellistan \(playlist.name)")
         }
         .padding(.top, 12)
+    }
+
+    /// The Spotify favourite star. Filled and yellow when the playlist is saved,
+    /// outlined otherwise. Toggling it logs in to Spotify first if needed.
+    private var favoriteButton: some View {
+        let saved = viewModel.isSaved(playlist)
+        return Button {
+            Task { await viewModel.toggleSpotifySaved(playlist) }
+        } label: {
+            Image(systemName: saved ? "star.fill" : "star")
+                .foregroundStyle(saved ? .yellow : .white)
+        }
+        .accessibilityLabel(saved ? "Ta bort från Spotify-favoriter" : "Lägg till i Spotify-favoriter")
+    }
+
+    private func capsuleButton(title: String,
+                               systemImage: String,
+                               action: @escaping () async -> Void) -> some View {
+        Button {
+            Task { await action() }
+        } label: {
+            Label(title, systemImage: systemImage)
+                .font(.headline)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 24)
+                .background(Color.white.opacity(0.15))
+                .clipShape(Capsule())
+        }
     }
 
     @ViewBuilder private var trackList: some View {

@@ -27,6 +27,8 @@
 	<string>$(SECRET_YALE_API_KEY)</string>
 	<key>SECRET_YALE_API_URL</key>
 	<string>$(SECRET_YALE_API_URL)</string>
+	<key>SPOTIFY_CLIENT_ID</key>
+	<string>$(SPOTIFY_CLIENT_ID)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

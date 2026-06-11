@@ -68,6 +68,7 @@ class Navigator: ObservableObject {
                                                  self?.repeatReload(times: times)
                                              })
     lazy var yaleApiService = YaleApiService(hassAPIService: restAPIService)
+    lazy var spotifyApiService = SpotifyApiService(tokenProvider: SpotifyAuthService())
     lazy var homeViewModel = HomeViewModel(restAPIService: restAPIService,
                                            yaleApiService: yaleApiService,
                                            urlCreator: urlCreator,
@@ -101,7 +102,8 @@ class Navigator: ObservableObject {
     lazy var musicViewModel = MusicViewModel(restAPIService: restAPIService,
                                              setErrorBannerText: { [weak self] title, message in
                                                  self?.setErrorBannerText(title: title, message: message)
-                                             })
+                                             },
+                                             spotify: spotifyApiService)
 
     init() {
         WidgetCenter.shared.reloadAllTimelines()
