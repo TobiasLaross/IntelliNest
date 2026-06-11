@@ -63,4 +63,8 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case groupMembers = "group_members"
     case favorite
     case orderBy = "order_by"
+    /* system_log */
+    case message
+    case level
+    case logger
 }

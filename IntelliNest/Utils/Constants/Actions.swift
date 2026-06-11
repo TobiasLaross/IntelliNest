@@ -56,4 +56,6 @@ enum Action: String, Codable {
     case browseMedia = "browse_media"
     case getLibrary = "get_library"
     case getQueue = "get_queue"
+    /* system_log */
+    case create
 }

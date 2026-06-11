@@ -109,6 +109,14 @@ class Navigator: ObservableObject {
     init() {
         WidgetCenter.shared.reloadAllTimelines()
 
+        // Route the app's error/warning logs into Home Assistant's system log so they
+        // live alongside HA's own logs. Skipped under tests to avoid real network calls.
+        if NSClassFromString("XCTestCase") == nil {
+            Log.remoteReporter = { [weak self] level, message in
+                self?.restAPIService.reportToSystemLog(message: message, level: level)
+            }
+        }
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(registerAPNSToken(_:)),
                                                name: Notification.Name("UpdatedAPNSToken"),
