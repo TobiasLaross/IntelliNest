@@ -48,6 +48,26 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Whether the user is logged into Spotify. Drives the login warning triangle
     /// and its prompt — shown only while logged out.
     @Published var isSpotifyAuthorized = false
+    /// The playlist the current track is playing from, when playback was started
+    /// from a playlist within the app this session. Drives the now-playing card's
+    /// jump-to-playlist tap. Nil when the source is unknown (started elsewhere, a
+    /// single track played, or after relaunch), which hides the affordance.
+    @Published var nowPlayingSourcePlaylist: MusicSearchItem?
+    /// URIs of tracks currently in the user's Spotify Liked Songs, driving the
+    /// song favourite star wherever a track is shown. Loaded on demand per view.
+    @Published var savedSongURIs: Set<String> = []
+    /// Spotify ids of the account playlists the user can edit (owned or
+    /// collaborative). Gates the add-to-playlist picker and the remove action.
+    @Published var editablePlaylistSpotifyIDs: Set<String> = []
+    /// The queue shown on the Queue screen: the current track and the upcoming
+    /// tracks for the active speaker's group leader.
+    @Published var queue: MusicQueue = .empty
+    @Published var isLoadingQueue = false
+    /// Drives the Queue sheet presented from the now-playing area.
+    @Published var isShowingQueue = false
+    /// Tracks the app enqueued this session, newest last. Used as the "Näst på
+    /// tur" fallback when the live queue contents can't be read over the socket.
+    @Published var sessionEnqueuedItems: [MusicQueueItem] = []
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
@@ -68,6 +88,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Spotify library. Defaults to a disabled no-op so previews and non-Spotify
     /// tests need no setup.
     let spotify: SpotifyPlaylistService
+    /// Reads and edits the Music Assistant queue over its WebSocket (the commands
+    /// Home Assistant exposes no REST service for). Defaults to a disabled no-op
+    /// so previews and tests need no socket.
+    let queueSocket: MusicAssistantQueueSocket
 
     /// Speakers that are reachable right now (anything not `unavailable`),
     /// in the fixed display order.
@@ -84,10 +108,12 @@ class MusicViewModel: ObservableObject, Reloadable {
 
     init(restAPIService: RestAPIService,
          setErrorBannerText: @escaping StringStringClosure = { _, _ in },
-         spotify: SpotifyPlaylistService = DisabledSpotifyPlaylistService()) {
+         spotify: SpotifyPlaylistService = DisabledSpotifyPlaylistService(),
+         queueSocket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket()) {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
         self.spotify = spotify
+        self.queueSocket = queueSocket
         isSpotifyAuthorized = spotify.isAuthorized
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
         for speakerID in Self.speakerIDs {
@@ -123,6 +149,7 @@ class MusicViewModel: ObservableObject, Reloadable {
             self.dropActiveSpeakerIfUnavailable()
         }
         await loadLibraryPlaylistsIfNeeded()
+        await refreshQueueIfShowing()
     }
 
     /// On the first reload after the view appears, default the active speaker to

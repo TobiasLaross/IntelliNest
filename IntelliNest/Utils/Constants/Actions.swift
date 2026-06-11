@@ -55,4 +55,5 @@ enum Action: String, Codable {
     case unjoin
     case browseMedia = "browse_media"
     case getLibrary = "get_library"
+    case getQueue = "get_queue"
 }

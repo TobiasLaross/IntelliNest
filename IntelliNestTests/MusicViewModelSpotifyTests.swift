@@ -11,21 +11,31 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     var operationSucceeds: Bool
     var authorizeThrows: Bool
     var accountPlaylistItems: [MusicSearchItem]
+    var editableIDs: Set<String>
+    var savedSongTrackIDs: Set<String>
     private(set) var authorizeCallCount = 0
     private(set) var saveCallCount = 0
     private(set) var removeCallCount = 0
     private(set) var accountPlaylistsCallCount = 0
+    private(set) var saveSongCallCount = 0
+    private(set) var removeSongCallCount = 0
+    private(set) var addedTracks: [(playlistID: String, trackID: String)] = []
+    private(set) var removedTracks: [(playlistID: String, trackID: String)] = []
 
     init(authorized: Bool = true,
          savedIDs: Set<String> = [],
          operationSucceeds: Bool = true,
          authorizeThrows: Bool = false,
-         accountPlaylistItems: [MusicSearchItem] = []) {
+         accountPlaylistItems: [MusicSearchItem] = [],
+         editableIDs: Set<String> = [],
+         savedSongTrackIDs: Set<String> = []) {
         self.authorized = authorized
         self.savedIDs = savedIDs
         self.operationSucceeds = operationSucceeds
         self.authorizeThrows = authorizeThrows
         self.accountPlaylistItems = accountPlaylistItems
+        self.editableIDs = editableIDs
+        self.savedSongTrackIDs = savedSongTrackIDs
     }
 
     var isAuthorized: Bool { authorized }
@@ -41,6 +51,10 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     func accountPlaylists() async -> [MusicSearchItem] {
         accountPlaylistsCallCount += 1
         return accountPlaylistItems
+    }
+
+    func editablePlaylistIDs() async -> Set<String> {
+        editableIDs
     }
 
     func isPlaylistSaved(playlistID: String) async -> Bool {
@@ -59,6 +73,40 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
         removeCallCount += 1
         if operationSucceeds {
             savedIDs.remove(playlistID)
+        }
+        return operationSucceeds
+    }
+
+    func savedSongIDs(trackIDs: [String]) async -> Set<String> {
+        savedSongTrackIDs.intersection(trackIDs)
+    }
+
+    func saveSong(trackID: String) async -> Bool {
+        saveSongCallCount += 1
+        if operationSucceeds {
+            savedSongTrackIDs.insert(trackID)
+        }
+        return operationSucceeds
+    }
+
+    func removeSong(trackID: String) async -> Bool {
+        removeSongCallCount += 1
+        if operationSucceeds {
+            savedSongTrackIDs.remove(trackID)
+        }
+        return operationSucceeds
+    }
+
+    func addTrack(playlistID: String, trackID: String) async -> Bool {
+        if operationSucceeds {
+            addedTracks.append((playlistID, trackID))
+        }
+        return operationSucceeds
+    }
+
+    func removeTrack(playlistID: String, trackID: String) async -> Bool {
+        if operationSucceeds {
+            removedTracks.append((playlistID, trackID))
         }
         return operationSucceeds
     }

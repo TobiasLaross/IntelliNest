@@ -51,19 +51,28 @@
 		F62750B32A066B4500C1253F /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750B22A066B4500C1253F /* URLProtocolStub.swift */; };
 		EE0000010000000000000001 /* MediaPlayerEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000010000000000000001 /* MediaPlayerEntity.swift */; };
 		EE0000020000000000000002 /* MusicSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000020000000000000002 /* MusicSearchResult.swift */; };
+		FE0000000000000000000001 /* MusicQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000001 /* MusicQueue.swift */; };
 		EE0000030000000000000003 /* RestAPIService+Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000030000000000000003 /* RestAPIService+Music.swift */; };
 		EE0000130000000000000020 /* SpotifyAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000130000000000000020 /* SpotifyAuthService.swift */; };
 		EE0000140000000000000021 /* SpotifyApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000140000000000000021 /* SpotifyApiService.swift */; };
+		FE0000000000000000000002 /* MusicAssistantSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000002 /* MusicAssistantSocketService.swift */; };
 		EE0000150000000000000022 /* SpotifyApiServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000150000000000000022 /* SpotifyApiServiceTests.swift */; };
 		EE0000160000000000000023 /* MusicViewModelSpotifyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */; };
+		FE0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */; };
+		FE0000000000000000000008 /* MusicViewModelQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000008 /* MusicViewModelQueueTests.swift */; };
+		FE0000000000000000000007 /* MusicQueueModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000007 /* MusicQueueModelTests.swift */; };
 		EE0000040000000000000004 /* MusicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000040000000000000004 /* MusicViewModel.swift */; };
 		EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000400000000000000F1 /* MusicViewModel+Playback.swift */; };
+		FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000004 /* MusicViewModel+Queue.swift */; };
+		FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */; };
 		EE0000050000000000000005 /* MusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000050000000000000005 /* MusicView.swift */; };
 		EE0000060000000000000006 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000060000000000000006 /* NowPlayingView.swift */; };
 		EE0000070000000000000007 /* AlbumArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000070000000000000007 /* AlbumArtView.swift */; };
 		EE0000080000000000000008 /* SpeakerPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000080000000000000008 /* SpeakerPickerView.swift */; };
 		EE0000090000000000000009 /* SpeakerGroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000090000000000000009 /* SpeakerGroupingView.swift */; };
 		EE000010000000000000000A /* MusicSearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000010000000000000000A /* MusicSearchResultsView.swift */; };
+		FE0000000000000000000006 /* QueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000006 /* QueueView.swift */; };
+		FE0000000000000000000005 /* MusicTrackControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000005 /* MusicTrackControls.swift */; };
 		EE000011000000000000000B /* MusicViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000011000000000000000B /* MusicViewModelTests.swift */; };
 		EE00001100000000000000C1 /* MusicViewModelGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */; };
 		EE000012000000000000000C /* MusicModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000012000000000000000C /* MusicModelTests.swift */; };
@@ -270,19 +279,28 @@
 		F62CD2DF286D950A00462092 /* LightEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightEntity.swift; sourceTree = "<group>"; };
 		EF0000010000000000000001 /* MediaPlayerEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerEntity.swift; sourceTree = "<group>"; };
 		EF0000020000000000000002 /* MusicSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchResult.swift; sourceTree = "<group>"; };
+		FD0000000000000000000001 /* MusicQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicQueue.swift; sourceTree = "<group>"; };
 		EF0000030000000000000003 /* RestAPIService+Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RestAPIService+Music.swift"; sourceTree = "<group>"; };
 		EF0000130000000000000020 /* SpotifyAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyAuthService.swift; sourceTree = "<group>"; };
 		EF0000140000000000000021 /* SpotifyApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyApiService.swift; sourceTree = "<group>"; };
+		FD0000000000000000000002 /* MusicAssistantSocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicAssistantSocketService.swift; sourceTree = "<group>"; };
 		EF0000150000000000000022 /* SpotifyApiServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyApiServiceTests.swift; sourceTree = "<group>"; };
 		EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSpotifyTests.swift; sourceTree = "<group>"; };
+		FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSongFavoriteTests.swift; sourceTree = "<group>"; };
+		FD0000000000000000000008 /* MusicViewModelQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelQueueTests.swift; sourceTree = "<group>"; };
+		FD0000000000000000000007 /* MusicQueueModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicQueueModelTests.swift; sourceTree = "<group>"; };
 		EF0000040000000000000004 /* MusicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModel.swift; sourceTree = "<group>"; };
 		EF00000400000000000000F1 /* MusicViewModel+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Playback.swift"; sourceTree = "<group>"; };
+		FD0000000000000000000004 /* MusicViewModel+Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Queue.swift"; sourceTree = "<group>"; };
+		FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+SpotifyTracks.swift"; sourceTree = "<group>"; };
 		EF0000050000000000000005 /* MusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicView.swift; sourceTree = "<group>"; };
 		EF0000060000000000000006 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
 		EF0000070000000000000007 /* AlbumArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtView.swift; sourceTree = "<group>"; };
 		EF0000080000000000000008 /* SpeakerPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerPickerView.swift; sourceTree = "<group>"; };
 		EF0000090000000000000009 /* SpeakerGroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerGroupingView.swift; sourceTree = "<group>"; };
 		EF000010000000000000000A /* MusicSearchResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchResultsView.swift; sourceTree = "<group>"; };
+		FD0000000000000000000006 /* QueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueView.swift; sourceTree = "<group>"; };
+		FD0000000000000000000005 /* MusicTrackControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicTrackControls.swift; sourceTree = "<group>"; };
 		EF000011000000000000000B /* MusicViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelTests.swift; sourceTree = "<group>"; };
 		EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelGroupingTests.swift; sourceTree = "<group>"; };
 		EF000012000000000000000C /* MusicModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicModelTests.swift; sourceTree = "<group>"; };
@@ -481,6 +499,7 @@
 				B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */,
 				EF0000010000000000000001 /* MediaPlayerEntity.swift */,
 				EF0000020000000000000002 /* MusicSearchResult.swift */,
+				FD0000000000000000000001 /* MusicQueue.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -521,6 +540,7 @@
 				EF0000030000000000000003 /* RestAPIService+Music.swift */,
 				EF0000130000000000000020 /* SpotifyAuthService.swift */,
 				EF0000140000000000000021 /* SpotifyApiService.swift */,
+				FD0000000000000000000002 /* MusicAssistantSocketService.swift */,
 				F6FDBE2C2A1A2F970081BC3D /* URLRequestBuilder.swift */,
 				F60345CB27A93BD700212D04 /* URLCreator.swift */,
 				F64D2693283E8FAB0073A7BF /* NetworkTask.swift */,
@@ -568,6 +588,9 @@
 				EF000012000000000000000C /* MusicModelTests.swift */,
 				EF0000150000000000000022 /* SpotifyApiServiceTests.swift */,
 				EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */,
+				FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */,
+				FD0000000000000000000008 /* MusicViewModelQueueTests.swift */,
+				FD0000000000000000000007 /* MusicQueueModelTests.swift */,
 			);
 			path = IntelliNestTests;
 			sourceTree = "<group>";
@@ -598,6 +621,8 @@
 				D89BCA06BE3A45F2A8E3DAE4 /* LynkViewModelHelpers.swift */,
 				EF0000040000000000000004 /* MusicViewModel.swift */,
 				EF00000400000000000000F1 /* MusicViewModel+Playback.swift */,
+				FD0000000000000000000004 /* MusicViewModel+Queue.swift */,
+				FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -687,6 +712,8 @@
 				EF0000080000000000000008 /* SpeakerPickerView.swift */,
 				EF0000090000000000000009 /* SpeakerGroupingView.swift */,
 				EF000010000000000000000A /* MusicSearchResultsView.swift */,
+				FD0000000000000000000006 /* QueueView.swift */,
+				FD0000000000000000000005 /* MusicTrackControls.swift */,
 			);
 			path = Music;
 			sourceTree = "<group>";
@@ -1193,17 +1220,23 @@
 				F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */,
 				EE0000010000000000000001 /* MediaPlayerEntity.swift in Sources */,
 				EE0000020000000000000002 /* MusicSearchResult.swift in Sources */,
+				FE0000000000000000000001 /* MusicQueue.swift in Sources */,
 				EE0000030000000000000003 /* RestAPIService+Music.swift in Sources */,
 				EE0000130000000000000020 /* SpotifyAuthService.swift in Sources */,
 				EE0000140000000000000021 /* SpotifyApiService.swift in Sources */,
+				FE0000000000000000000002 /* MusicAssistantSocketService.swift in Sources */,
 				EE0000040000000000000004 /* MusicViewModel.swift in Sources */,
 				EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */,
+				FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */,
+				FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */,
 				EE0000050000000000000005 /* MusicView.swift in Sources */,
 				EE0000060000000000000006 /* NowPlayingView.swift in Sources */,
 				EE0000070000000000000007 /* AlbumArtView.swift in Sources */,
 				EE0000080000000000000008 /* SpeakerPickerView.swift in Sources */,
 				EE0000090000000000000009 /* SpeakerGroupingView.swift in Sources */,
 				EE000010000000000000000A /* MusicSearchResultsView.swift in Sources */,
+				FE0000000000000000000006 /* QueueView.swift in Sources */,
+				FE0000000000000000000005 /* MusicTrackControls.swift in Sources */,
 				CD215FD8D5AD91EE27DAAB00 /* FuelView.swift in Sources */,
 				3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */,
 				65450E96A215D8CB2443B2D6 /* INText.swift in Sources */,
@@ -1235,6 +1268,9 @@
 				EE000012000000000000000C /* MusicModelTests.swift in Sources */,
 				EE0000150000000000000022 /* SpotifyApiServiceTests.swift in Sources */,
 				EE0000160000000000000023 /* MusicViewModelSpotifyTests.swift in Sources */,
+				FE0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift in Sources */,
+				FE0000000000000000000008 /* MusicViewModelQueueTests.swift in Sources */,
+				FE0000000000000000000007 /* MusicQueueModelTests.swift in Sources */,
 			BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */,
 			BB0000007000000000000007 /* LockableTests.swift in Sources */,
 			AA0000001000000000000001 /* NordPoolEntityTests.swift in Sources */,

@@ -61,6 +61,21 @@ enum GlobalConstants {
     }
 
     static let musicAssistantConfigEntryID = "01JZ57QTQPB79NSC7GJ2VQPA8V"
+
+    /// Music Assistant server WebSocket URL, used only for the queue commands
+    /// Home Assistant exposes no REST service for: reading the full upcoming list
+    /// and removing a queue item. Defaults to the internal host on Music
+    /// Assistant's default port; override with the `MUSIC_ASSISTANT_WS_URL`
+    /// xcconfig key if the server runs elsewhere. Queue editing therefore works
+    /// on the home network only (the MA server is not exposed externally).
+    static var musicAssistantWebSocketURLString: String {
+        if let override = Bundle.main.object(forInfoDictionaryKey: "MUSIC_ASSISTANT_WS_URL") as? String,
+           override.isNotEmpty {
+            return override
+        }
+        return "ws://192.168.1.205:8095/ws"
+    }
+
     static let baseInternalUrlString = "http://192.168.1.205:8123/"
     static let githubFakeUrlString = "https://192.218.223.123/"
     static var shouldUseLocalSSID: Bool {

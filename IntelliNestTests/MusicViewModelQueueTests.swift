@@ -1,0 +1,163 @@
+@testable import IntelliNest
+import XCTest
+
+/// Records queue-socket calls so the view model's read/add/remove queue logic
+/// can be tested without the Music Assistant WebSocket.
+actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
+    var items: [MusicQueueItem]
+    var deleteSucceeds: Bool
+    private(set) var deletedItemIDs: [String] = []
+
+    init(items: [MusicQueueItem] = [], deleteSucceeds: Bool = true) {
+        self.items = items
+        self.deleteSucceeds = deleteSucceeds
+    }
+
+    func queueItems(queueID _: String) async -> [MusicQueueItem] { items }
+
+    func deleteItem(queueID _: String, itemID: String) async -> Bool {
+        deletedItemIDs.append(itemID)
+        return deleteSucceeds
+    }
+}
+
+@MainActor
+extension MusicViewModelTests {
+    func makeViewModel(socket: MusicAssistantQueueSocket) -> MusicViewModel {
+        makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false), socket: socket)
+    }
+
+    func makeViewModel(spotify: SpotifyPlaylistService, socket: MusicAssistantQueueSocket) -> MusicViewModel {
+        MusicViewModel(restAPIService: restAPIService,
+                       setErrorBannerText: { [weak self] title, _ in self?.bannerTitles.append(title) },
+                       spotify: spotify,
+                       queueSocket: socket)
+    }
+
+    func stubGetQueue(json: String, statusCode: Int = 200) {
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/music_assistant/get_queue"
+        components.queryItems = [URLQueryItem(name: "return_response", value: "true")]
+        let url = components.url!
+        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(json.utf8), response: response, error: nil)
+    }
+
+    private func queueItem(_ id: String, uri: String? = nil, title: String = "Song") -> MusicQueueItem {
+        MusicQueueItem(queueItemID: id, uri: uri, title: title, artist: nil, imageURL: nil)
+    }
+
+    private var getQueueJSON: String {
+        // queue_id present plus a current item; the socket supplies the full list.
+        #"{"service_response":{"queue_id":"kitchen","current_item":{"queue_item_id":"cur","media_item":{"name":"Now"}}}}"#
+    }
+
+    // MARK: - Load
+
+    func testLoadQueueSlicesUpcomingAfterCurrent() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        let socket = StubMusicAssistantQueueSocket(items: [
+            queueItem("cur", title: "Now"),
+            queueItem("next1", title: "Next One"),
+            queueItem("next2", title: "Next Two")
+        ])
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.loadQueue()
+        XCTAssertEqual(model.queue.queueID, "kitchen")
+        XCTAssertEqual(model.queue.currentItem?.queueItemID, "cur")
+        XCTAssertEqual(model.queue.upcomingItems.map(\.queueItemID), ["next1", "next2"])
+    }
+
+    func testLoadQueueFallsBackToSessionItemsWhenSocketEmpty() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        stubPlayMedia(statusCode: 200)
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket(items: []))
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/x", title: "Enqueued", artist: nil, imageURL: nil)
+        await model.loadQueue()
+        // Socket returns nothing, so the session-enqueued track is the fallback.
+        XCTAssertEqual(model.queue.upcomingItems.map(\.title), ["Enqueued"])
+    }
+
+    // MARK: - Add
+
+    func testAddToQueueAppendsOptimisticallyOnSuccess() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket())
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/x", title: "Enqueued", artist: "A", imageURL: nil)
+        XCTAssertEqual(model.sessionEnqueuedItems.map(\.title), ["Enqueued"])
+        XCTAssertEqual(model.queue.upcomingItems.map(\.title), ["Enqueued"])
+        XCTAssertTrue(bannerTitles.isEmpty)
+    }
+
+    func testAddToQueueBannersOnFailure() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 500)
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket())
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/x", title: "Enqueued", artist: nil, imageURL: nil)
+        XCTAssertTrue(model.sessionEnqueuedItems.isEmpty)
+        XCTAssertTrue(bannerTitles.contains("Kunde inte lägga till i kön"))
+    }
+
+    func testAddToQueueWithoutSpeakerBanners() async {
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket())
+        await model.addToQueue(uri: "spotify://track/x", title: "X", artist: nil, imageURL: nil)
+        XCTAssertTrue(bannerTitles.contains("Ingen högtalare vald"))
+    }
+
+    // MARK: - Remove
+
+    func testRemoveRealQueueItemCallsSocketAndDropsRow() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        let socket = StubMusicAssistantQueueSocket(items: [
+            queueItem("cur", title: "Now"),
+            queueItem("next1", title: "Next One")
+        ])
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.loadQueue()
+        let target = model.queue.upcomingItems[0]
+        await model.removeFromQueue(target)
+        XCTAssertTrue(model.queue.upcomingItems.isEmpty)
+        let deleted = await socket.deletedItemIDs
+        XCTAssertEqual(deleted, ["next1"])
+    }
+
+    func testRemoveRealQueueItemRevertsAndBannersOnFailure() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        let socket = StubMusicAssistantQueueSocket(items: [
+            queueItem("cur", title: "Now"),
+            queueItem("next1", title: "Next One")
+        ], deleteSucceeds: false)
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.loadQueue()
+        let target = model.queue.upcomingItems[0]
+        await model.removeFromQueue(target)
+        XCTAssertEqual(model.queue.upcomingItems.map(\.queueItemID), ["next1"])
+        XCTAssertTrue(bannerTitles.contains("Kunde inte ta bort från kön"))
+    }
+
+    func testRemoveSessionItemIsLocalOnlyNoSocketCall() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let socket = StubMusicAssistantQueueSocket(items: [])
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/x", title: "Enqueued", artist: nil, imageURL: nil)
+        let sessionItem = model.queue.upcomingItems[0]
+        await model.removeFromQueue(sessionItem)
+        XCTAssertTrue(model.queue.upcomingItems.isEmpty)
+        XCTAssertTrue(model.sessionEnqueuedItems.isEmpty)
+        let deleted = await socket.deletedItemIDs
+        XCTAssertTrue(deleted.isEmpty)
+    }
+}

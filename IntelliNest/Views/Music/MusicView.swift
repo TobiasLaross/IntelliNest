@@ -44,8 +44,15 @@ struct MusicView: View {
         // Spotify is the source of truth — refresh the account's playlists each
         // time the view appears rather than trusting the once-per-session cache.
         .task { await viewModel.refreshSpotifyPlaylists() }
+        // Keep the library-row stars in sync as the favourite/recents lists load.
+        .task(id: viewModel.librarySavedStateSignature) {
+            await viewModel.loadLibrarySavedStates()
+        }
         .sheet(isPresented: $viewModel.isShowingSearchResults) {
             MusicSearchResultsView(viewModel: viewModel)
+        }
+        .sheet(isPresented: $viewModel.isShowingQueue) {
+            QueueView(viewModel: viewModel)
         }
         .sheet(item: $viewModel.browsingLibraryPlaylist) { playlist in
             NavigationStack {
@@ -170,6 +177,7 @@ struct LibraryPlaylistsSection: View {
                     .font(.headline)
                 ForEach(playlists) { playlist in
                     LibraryPlaylistRow(
+                        viewModel: viewModel,
                         playlist: playlist,
                         onOpen: { Task { await viewModel.browseLibraryPlaylist(playlist) } }
                     )
@@ -183,30 +191,54 @@ struct LibraryPlaylistsSection: View {
     }
 }
 
-/// A single playlist row. The whole row navigates into the playlist detail
-/// (Spotify-style), where playback lives — so the trailing chevron honestly
-/// signals "tapping the row opens it". The detail's play button starts it.
+/// A single playlist row. Tapping the row opens the playlist detail
+/// (Spotify-style), where playback lives. Spotify-resolvable playlists also show
+/// a favourite star — filled for ones already in the library (the "Favoriter"
+/// rows are always filled; tapping un-favorites), empty and tappable-to-save for
+/// a recently-played playlist that isn't saved yet. Non-Spotify rows keep the
+/// plain chevron.
 private struct LibraryPlaylistRow: View {
+    @ObservedObject var viewModel: MusicViewModel
     let playlist: MusicSearchItem
     let onOpen: MainActorVoidClosure
 
     var body: some View {
-        Button(action: onOpen) {
-            HStack(spacing: 12) {
-                AlbumArtView(urlString: playlist.imageURL, size: 48)
-                Text(playlist.name)
-                    .font(.body)
-                    .lineLimit(1)
-                Spacer(minLength: 8)
+        HStack(spacing: 12) {
+            Button(action: onOpen) {
+                HStack(spacing: 12) {
+                    AlbumArtView(urlString: playlist.imageURL, size: 48)
+                    Text(playlist.name)
+                        .font(.body)
+                        .lineLimit(1)
+                    Spacer(minLength: 8)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(playlist.name)
+            .accessibilityHint("Öppna spellistan")
+
+            if viewModel.isSpotifyPlaylist(playlist) {
+                favoriteStar
+            } else {
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.4))
             }
-            .contentShape(Rectangle())
         }
         .foregroundStyle(.white)
-        .accessibilityLabel(playlist.name)
-        .accessibilityHint("Öppna spellistan")
+    }
+
+    private var favoriteStar: some View {
+        let saved = viewModel.isSaved(playlist)
+        return Button {
+            Task { await viewModel.toggleSpotifySaved(playlist) }
+        } label: {
+            Image(systemName: saved ? "star.fill" : "star")
+                .foregroundStyle(saved ? .yellow : .white.opacity(0.6))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(saved ? "Ta bort \(playlist.name) från Spotify-favoriter" : "Lägg till \(playlist.name) i Spotify-favoriter")
     }
 }
 
