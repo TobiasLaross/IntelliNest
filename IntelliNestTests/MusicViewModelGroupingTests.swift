@@ -15,7 +15,7 @@ extension MusicViewModelTests {
         }
         stubPostService(path: "/api/services/media_player/join")
         XCTAssertFalse(viewModel.isGrouped(.mediaPlayerKitchen))
-        viewModel.toggleGroupMember(.mediaPlayerKitchen)
+        await viewModel.toggleGroupMember(.mediaPlayerKitchen)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
 
@@ -40,15 +40,106 @@ extension MusicViewModelTests {
             }
         }
         stubPostService(path: "/api/services/media_player/unjoin")
-        viewModel.toggleGroupMember(.mediaPlayerKitchen)
+        await viewModel.toggleGroupMember(.mediaPlayerKitchen)
         await fulfillment(of: [expectation], timeout: 2.0)
     }
 
-    func testGroupingNoOpForActiveSpeakerItself() {
+    func testJoinUnjoinsSpeakerFromItsOldGroupFirst() async {
+        // Kitchen is the active, ungrouped leader. Spa and Matbord-ute are already
+        // synced together in their own group, so tapping Spa must unjoin it from
+        // that group before joining Kitchen — a bare join would silently no-op.
+        let spaGroup = [EntityId.mediaPlayerSpa.rawValue, EntityId.mediaPlayerOutdoorTable.rawValue]
+        stubSpeaker(.mediaPlayerKitchen,
+                    data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing", friendlyName: "Köket"))
+        stubSpeaker(.mediaPlayerSpa,
+                    data: speakerJSON(entityID: .mediaPlayerSpa, state: "idle", friendlyName: "Spa", groupMembers: spaGroup))
+        stubSpeaker(.mediaPlayerOutdoorTable,
+                    data: speakerJSON(entityID: .mediaPlayerOutdoorTable, state: "idle",
+                                      friendlyName: "Matbord-ute", groupMembers: spaGroup))
+        for entityID in [EntityId.mediaPlayerGuestRoom, .mediaPlayerPlayroom, .mediaPlayerLivingRoom] {
+            stubSpeaker(entityID, data: speakerJSON(entityID: entityID, state: "idle", friendlyName: entityID.rawValue))
+        }
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerSpa))
+
+        let orderLock = NSLock()
+        var requestOrder: [String] = []
+        URLProtocolStub.observerRequests { request in
+            guard request.httpMethod == "POST", let path = request.url?.path else {
+                return
+            }
+            if path.contains("/media_player/unjoin") {
+                orderLock.lock(); requestOrder.append("unjoin"); orderLock.unlock()
+            } else if path.contains("/media_player/join") {
+                orderLock.lock(); requestOrder.append("join"); orderLock.unlock()
+            }
+        }
+        stubPostService(path: "/api/services/media_player/unjoin")
+        stubPostService(path: "/api/services/media_player/join")
+
+        await viewModel.toggleGroupMember(.mediaPlayerSpa)
+        orderLock.lock(); let recordedOrder = requestOrder; orderLock.unlock()
+        XCTAssertEqual(recordedOrder, ["unjoin", "join"])
+    }
+
+    func testJoinDoesNotUnjoinAFreeSpeaker() async {
+        // Kitchen active, Spa ungrouped. Tapping Spa joins it directly — no unjoin.
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        await viewModel.reload()
+        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerSpa))
+
+        let orderLock = NSLock()
+        var requestOrder: [String] = []
+        URLProtocolStub.observerRequests { request in
+            guard request.httpMethod == "POST", let path = request.url?.path else {
+                return
+            }
+            if path.contains("/media_player/unjoin") {
+                orderLock.lock(); requestOrder.append("unjoin"); orderLock.unlock()
+            } else if path.contains("/media_player/join") {
+                orderLock.lock(); requestOrder.append("join"); orderLock.unlock()
+            }
+        }
+        stubPostService(path: "/api/services/media_player/unjoin")
+        stubPostService(path: "/api/services/media_player/join")
+
+        await viewModel.toggleGroupMember(.mediaPlayerSpa)
+        orderLock.lock(); let recordedOrder = requestOrder; orderLock.unlock()
+        XCTAssertEqual(recordedOrder, ["join"])
+    }
+
+    func testJoinFailureShowsBanner() async {
+        // Kitchen active, Spa ungrouped, but the join is rejected by Home Assistant.
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        await viewModel.reload()
+        stubPostService(path: "/api/services/media_player/join", statusCode: 500)
+        await viewModel.toggleGroupMember(.mediaPlayerSpa)
+        XCTAssertTrue(bannerTitles.contains("Kunde inte gruppera högtalare"))
+    }
+
+    func testUnjoinFailureShowsBanner() async {
+        // Living room leader with Kitchen grouped in; the unjoin is rejected.
+        stubSpeaker(.mediaPlayerLivingRoom,
+                    data: speakerJSON(entityID: .mediaPlayerLivingRoom,
+                                      state: "playing",
+                                      friendlyName: "Vardagsrummet",
+                                      groupMembers: [EntityId.mediaPlayerKitchen.rawValue]))
+        for entityID in MusicViewModel.speakerIDs where entityID != .mediaPlayerLivingRoom {
+            stubSpeaker(entityID, data: speakerJSON(entityID: entityID, state: "idle", friendlyName: entityID.rawValue))
+        }
+        await viewModel.reload()
+        XCTAssertTrue(viewModel.isGrouped(.mediaPlayerKitchen))
+        stubPostService(path: "/api/services/media_player/unjoin", statusCode: 500)
+        await viewModel.toggleGroupMember(.mediaPlayerKitchen)
+        XCTAssertTrue(bannerTitles.contains("Kunde inte dela upp högtalare"))
+    }
+
+    func testGroupingNoOpForActiveSpeakerItself() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         XCTAssertFalse(viewModel.isGrouped(.mediaPlayerKitchen))
         // Toggling the leader against itself must do nothing (no crash).
-        viewModel.toggleGroupMember(.mediaPlayerKitchen)
+        await viewModel.toggleGroupMember(.mediaPlayerKitchen)
     }
 
     // MARK: - Live updates

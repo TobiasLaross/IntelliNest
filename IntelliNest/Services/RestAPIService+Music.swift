@@ -162,25 +162,52 @@ extension RestAPIService {
                reloadTimes: reloadTimes)
     }
 
-    /// Adds `memberIDs` into the group led by `leaderID`.
-    func joinSpeakers(leaderID: EntityId, memberIDs: [EntityId], reloadTimes: Int = 3) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = leaderID.rawValue
-            json[.groupMembers] = memberIDs.map(\.rawValue)
-            await sendPostRequest(json: json, domain: .mediaPlayer, action: .join)
+    /// Adds `memberIDs` into the group led by `leaderID`. When `unjoinFirst` is
+    /// set, each member is unjoined from its current group before the join —
+    /// Music Assistant accepts a bare `join` on an already-synced player but
+    /// silently keeps it in its old group, so re-homing needs the unjoin first.
+    /// Returns whether the group change succeeded so the caller can surface a
+    /// failure; a failed pre-unjoin aborts before the join is attempted.
+    @discardableResult
+    func joinSpeakers(leaderID: EntityId, memberIDs: [EntityId], unjoinFirst: Bool = false, reloadTimes: Int = 3) async -> Bool {
+        // Track whether any state actually changed so a rejected op doesn't churn
+        // reloads, while a partial failure (a pre-unjoin succeeded, then the join
+        // failed) still refreshes the speaker that did leave its old group.
+        var didMutate = false
+        if unjoinFirst {
+            for memberID in memberIDs {
+                var unjoinJSON = [JSONKey: Any]()
+                unjoinJSON[.entityID] = memberID.rawValue
+                guard await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .unjoin, json: unjoinJSON) else {
+                    if didMutate {
+                        triggerRepeatReload(times: reloadTimes)
+                    }
+                    return false
+                }
+                didMutate = true
+            }
+        }
+        var json = [JSONKey: Any]()
+        json[.entityID] = leaderID.rawValue
+        json[.groupMembers] = memberIDs.map(\.rawValue)
+        let success = await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .join, json: json)
+        if success || didMutate {
             triggerRepeatReload(times: reloadTimes)
         }
+        return success
     }
 
-    /// Removes `memberID` from whatever group it is currently in.
-    func unjoinSpeaker(memberID: EntityId, reloadTimes: Int = 3) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = memberID.rawValue
-            await sendPostRequest(json: json, domain: .mediaPlayer, action: .unjoin)
+    /// Removes `memberID` from whatever group it is currently in. Returns whether
+    /// the unjoin succeeded so the caller can surface a failure.
+    @discardableResult
+    func unjoinSpeaker(memberID: EntityId, reloadTimes: Int = 3) async -> Bool {
+        var json = [JSONKey: Any]()
+        json[.entityID] = memberID.rawValue
+        let success = await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .unjoin, json: json)
+        if success {
             triggerRepeatReload(times: reloadTimes)
         }
+        return success
     }
 
     private func sendMusicPostExpectingSuccess(domain: Domain, action: Action, json: [JSONKey: Any]) async -> Bool {

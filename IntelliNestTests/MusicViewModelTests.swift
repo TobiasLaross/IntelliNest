@@ -385,11 +385,11 @@ extension MusicViewModelTests {
 
     // MARK: - Helpers
 
-    func stubPostService(path: String) {
+    func stubPostService(path: String, statusCode: Int = 200) {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
         components.path = path
         let url = components.url!
-        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
     }
 }

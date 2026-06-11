@@ -243,15 +243,32 @@ class MusicViewModel: ObservableObject, Reloadable {
     }
 
     /// Toggles `speakerID` into or out of the active speaker's group. The active
-    /// speaker stays the group leader (the `join` sync source).
-    func toggleGroupMember(_ speakerID: EntityId) {
+    /// speaker stays the group leader (the `join` sync source). Surfaces an error
+    /// banner when Home Assistant rejects the group change, so a failed sync no
+    /// longer looks like a silent no-op.
+    func toggleGroupMember(_ speakerID: EntityId) async {
         guard let activeSpeakerID, speakerID != activeSpeakerID else {
             return
         }
+        let speakerName = speakers[speakerID]?.friendlyName ?? speakerID.rawValue
         if isGrouped(speakerID) {
-            restAPIService.unjoinSpeaker(memberID: speakerID)
+            let success = await restAPIService.unjoinSpeaker(memberID: speakerID)
+            if !success {
+                setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
+            }
         } else {
-            restAPIService.joinSpeakers(leaderID: activeSpeakerID, memberIDs: [speakerID])
+            // A speaker already synced into a different group (e.g. Spa paired with
+            // Matbord-ute) can't be moved by a plain join, so unjoin it from its
+            // current group first. groupMembers > 1 means it is grouped with someone
+            // other than the active leader, since the grouped-with-leader case is the
+            // unjoin branch above.
+            let isInOtherGroup = (speakers[speakerID]?.groupMembers.count ?? 0) > 1
+            let success = await restAPIService.joinSpeakers(leaderID: activeSpeakerID,
+                                                            memberIDs: [speakerID],
+                                                            unjoinFirst: isInOtherGroup)
+            if !success {
+                setErrorBannerText("Kunde inte gruppera högtalare", "Det gick inte att lägga till \(speakerName) i gruppen")
+            }
         }
     }
 }
