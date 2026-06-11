@@ -1009,7 +1009,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --indent 4\n";
+			shellScript = "# Skip dev-only formatting on Xcode Cloud (read-only checkout, no reformat wanted).\nif [ \"$CI\" = \"TRUE\" ]; then\n  exit 0;\nfi\nif [[ $OTHER_SWIFT_FLAGS == *\"-D ED_SKIP_SWIFT_FORMAT\"* ]]; then\n  exit 0;\nfi\nBuildTools/SwiftFormat/swiftformat \"$SRCROOT\" --indent 4\n";
 		};
 		F66F061A27B16F1D00270E71 /* Swiftlint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1029,7 +1029,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\n\nif which swiftlint > /dev/null; then\n  swiftlint --config \"$SRCROOT/.swiftlint\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "# Skip dev-only linting on Xcode Cloud (SwiftLint is not installed there).\nif [ \"$CI\" = \"TRUE\" ]; then\n  exit 0;\nfi\nexport PATH=\"$PATH:/opt/homebrew/bin\"\n\nif which swiftlint > /dev/null; then\n  swiftlint --config \"$SRCROOT/.swiftlint\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		F6D0B5322AF3C15400E4373A /* CodeStats */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1048,7 +1048,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/zsh;
-			shellScript = "Scripts/generate_code_stats.zsh\n";
+			shellScript = "# Skip dev-only stats (rewrites README.md from full git history) on Xcode Cloud.\nif [ \"$CI\" = \"TRUE\" ]; then\n  exit 0;\nfi\nScripts/generate_code_stats.zsh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
