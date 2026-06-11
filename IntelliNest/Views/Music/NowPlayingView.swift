@@ -49,8 +49,12 @@ struct NowPlayingView: View {
 
             TransportControlsView(speaker: speaker, viewModel: viewModel)
 
-            VolumeSliderView(volume: speaker.volumeLevel,
-                             onCommit: { viewModel.setVolume($0) })
+            if viewModel.isGroupActive {
+                GroupVolumeView(viewModel: viewModel)
+            } else {
+                VolumeSliderView(volume: speaker.volumeLevel,
+                                 onCommit: { viewModel.setVolume($0) })
+            }
         }
         .padding()
         .background(Color.white.opacity(0.08))
@@ -117,6 +121,51 @@ private struct TransportControlsView: View {
         case .off: "Av"
         case .all: "Alla"
         case .one: "En"
+        }
+    }
+}
+
+/// The group-volume banner shown when the active speaker is synced with others.
+/// The top slider sets every grouped speaker at once; the chevron expands an
+/// individual volume slider per speaker so the balance can be fine-tuned.
+private struct GroupVolumeView: View {
+    @ObservedObject var viewModel: MusicViewModel
+    @State private var isExpanded = false
+
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 10) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() }
+                } label: {
+                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .frame(width: 16)
+                }
+                .accessibilityLabel(isExpanded ? "Dölj enskilda volymer" : "Visa enskilda volymer")
+
+                VolumeSliderView(volume: viewModel.groupVolume,
+                                 onCommit: { viewModel.setGroupVolume($0) })
+                    .accessibilityLabel("Gruppvolym")
+            }
+
+            if isExpanded {
+                VStack(spacing: 10) {
+                    ForEach(viewModel.groupedSpeakers, id: \.entityId) { speaker in
+                        HStack(spacing: 10) {
+                            Text(speaker.friendlyName)
+                                .font(.subheadline)
+                                .lineLimit(1)
+                                .frame(width: 88, alignment: .leading)
+                            VolumeSliderView(volume: speaker.volumeLevel,
+                                             onCommit: { viewModel.setVolume($0, for: speaker.entityId) })
+                                .accessibilityLabel("Volym \(speaker.friendlyName)")
+                        }
+                    }
+                }
+                .padding(.leading, 26)
+            }
         }
     }
 }

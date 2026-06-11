@@ -61,4 +61,6 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case shuffle
     case repeatMode = "repeat"
     case groupMembers = "group_members"
+    case favorite
+    case orderBy = "order_by"
 }

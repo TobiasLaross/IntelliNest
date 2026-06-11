@@ -26,6 +26,42 @@ extension RestAPIService {
         return try decodeSearchResponse(from: data)
     }
 
+    /// Fetches the user's favourite playlists from the Music Assistant library
+    /// via `music_assistant.get_library`, sorted by name.
+    func getFavoritePlaylists(limit: Int = 20) async throws -> [MusicSearchItem] {
+        try await getLibraryPlaylists(favorite: true, orderBy: "name", limit: limit)
+    }
+
+    /// Fetches the most recently played playlists from the Music Assistant
+    /// library. Music Assistant tracks last-played, so `order_by:
+    /// last_played_desc` returns them newest-first across every source (not just
+    /// plays started in this app). The favourite filter is left off so a played
+    /// non-favourite still shows up.
+    func getRecentlyPlayedPlaylists(limit: Int = 5) async throws -> [MusicSearchItem] {
+        try await getLibraryPlaylists(favorite: nil, orderBy: "last_played_desc", limit: limit)
+    }
+
+    /// Shared `get_library` call for playlists (`?return_response`). `favorite`
+    /// applies the favourite filter only when non-nil.
+    private func getLibraryPlaylists(favorite: Bool?, orderBy: String, limit: Int) async throws -> [MusicSearchItem] {
+        let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.getLibrary.rawValue)"
+        var json = [JSONKey: Any]()
+        json[.configEntryID] = GlobalConstants.musicAssistantConfigEntryID
+        json[.mediaType] = MusicMediaType.playlist.rawValue
+        if let favorite {
+            json[.favorite] = favorite
+        }
+        json[.orderBy] = orderBy
+        json[.limit] = limit
+
+        let data = try await postExpectingResponseData(path: path, json: json)
+        let decoder = JSONDecoder()
+        if let wrapper = try? decoder.decode(MusicLibraryServiceResponse.self, from: data) {
+            return wrapper.serviceResponse.playlists
+        }
+        return try decoder.decode(MusicLibraryResponse.self, from: data).playlists
+    }
+
     /// Browses a playlist's tracks via `media_player.browse_media`. The browse
     /// runs against `entityID` (any available speaker), but only reads the
     /// playlist contents — it does not change what that speaker is playing.
@@ -182,6 +218,15 @@ extension RestAPIService {
 /// Wrapper for the Home Assistant service-call response envelope.
 private struct MusicSearchServiceResponse: Decodable {
     let serviceResponse: MusicSearchResponse
+
+    enum CodingKeys: String, CodingKey {
+        case serviceResponse = "service_response"
+    }
+}
+
+/// Wrapper for the `get_library` service-call response envelope.
+private struct MusicLibraryServiceResponse: Decodable {
+    let serviceResponse: MusicLibraryResponse
 
     enum CodingKeys: String, CodingKey {
         case serviceResponse = "service_response"

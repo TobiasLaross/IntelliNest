@@ -20,6 +20,12 @@ struct MusicView: View {
                     if let activeSpeaker = viewModel.activeSpeaker {
                         NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
                         SpeakerGroupingView(viewModel: viewModel)
+                        LibraryPlaylistsSection(title: "Senast spelade",
+                                                playlists: viewModel.recentlyPlayedPlaylists,
+                                                viewModel: viewModel)
+                        LibraryPlaylistsSection(title: "Favoriter",
+                                                playlists: viewModel.favoritePlaylists,
+                                                viewModel: viewModel)
                     } else {
                         SpeakerPickerView(viewModel: viewModel)
                     }
@@ -32,10 +38,21 @@ struct MusicView: View {
         .sheet(isPresented: $viewModel.isShowingSearchResults) {
             MusicSearchResultsView(viewModel: viewModel)
         }
+        .sheet(item: $viewModel.browsingLibraryPlaylist) { playlist in
+            NavigationStack {
+                MusicPlaylistView(viewModel: viewModel, playlist: playlist)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Stäng") { viewModel.browsingLibraryPlaylist = nil }
+                                .foregroundStyle(.white)
+                        }
+                    }
+            }
+        }
     }
 }
 
-private struct MusicSearchBar: View {
+struct MusicSearchBar: View {
     @Binding var searchText: String
     let onSubmit: MainActorVoidClosure
 
@@ -52,6 +69,61 @@ private struct MusicSearchBar: View {
         .padding(10)
         .background(Color.white.opacity(0.12))
         .cornerRadius(12)
+    }
+}
+
+/// A titled card of library playlists (favourites or recently played) shown
+/// under the speaker grouping in place of the old per-speaker list. Renders
+/// nothing while the list is empty.
+struct LibraryPlaylistsSection: View {
+    let title: String
+    let playlists: [MusicSearchItem]
+    @ObservedObject var viewModel: MusicViewModel
+
+    var body: some View {
+        if playlists.isNotEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.headline)
+                ForEach(playlists) { playlist in
+                    LibraryPlaylistRow(
+                        playlist: playlist,
+                        onOpen: { Task { await viewModel.browseLibraryPlaylist(playlist) } }
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(Color.white.opacity(0.05))
+            .cornerRadius(16)
+        }
+    }
+}
+
+/// A single playlist row. The whole row navigates into the playlist detail
+/// (Spotify-style), where playback lives — so the trailing chevron honestly
+/// signals "tapping the row opens it". The detail's play button starts it.
+private struct LibraryPlaylistRow: View {
+    let playlist: MusicSearchItem
+    let onOpen: MainActorVoidClosure
+
+    var body: some View {
+        Button(action: onOpen) {
+            HStack(spacing: 12) {
+                AlbumArtView(urlString: playlist.imageURL, size: 48)
+                Text(playlist.name)
+                    .font(.body)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+            .contentShape(Rectangle())
+        }
+        .foregroundStyle(.white)
+        .accessibilityLabel(playlist.name)
+        .accessibilityHint("Öppna spellistan")
     }
 }
 

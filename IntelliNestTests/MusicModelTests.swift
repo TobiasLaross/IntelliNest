@@ -307,9 +307,11 @@ final class MusicModelTests: XCTestCase {
 
         XCTAssertFalse(success)
     }
+}
 
-    // MARK: - Playlist browse
+// MARK: - Playlist browse
 
+extension MusicModelTests {
     func testPlaylistBrowseResponseDecodesTracksAndDropsInvalid() throws {
         let json = """
         {"media_player.kitchen":{"title":"Sommar","media_class":"playlist","children":[

@@ -53,6 +53,7 @@
 		EE0000020000000000000002 /* MusicSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000020000000000000002 /* MusicSearchResult.swift */; };
 		EE0000030000000000000003 /* RestAPIService+Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000030000000000000003 /* RestAPIService+Music.swift */; };
 		EE0000040000000000000004 /* MusicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000040000000000000004 /* MusicViewModel.swift */; };
+		EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000400000000000000F1 /* MusicViewModel+Playback.swift */; };
 		EE0000050000000000000005 /* MusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000050000000000000005 /* MusicView.swift */; };
 		EE0000060000000000000006 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000060000000000000006 /* NowPlayingView.swift */; };
 		EE0000070000000000000007 /* AlbumArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000070000000000000007 /* AlbumArtView.swift */; };
@@ -60,6 +61,7 @@
 		EE0000090000000000000009 /* SpeakerGroupingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000090000000000000009 /* SpeakerGroupingView.swift */; };
 		EE000010000000000000000A /* MusicSearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000010000000000000000A /* MusicSearchResultsView.swift */; };
 		EE000011000000000000000B /* MusicViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000011000000000000000B /* MusicViewModelTests.swift */; };
+		EE00001100000000000000C1 /* MusicViewModelGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */; };
 		EE000012000000000000000C /* MusicModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000012000000000000000C /* MusicModelTests.swift */; };
 		F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2DF286D950A00462092 /* LightEntity.swift */; };
 		F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E228770D5500462092 /* LightsViewModel.swift */; };
@@ -268,6 +270,7 @@
 		EF0000020000000000000002 /* MusicSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchResult.swift; sourceTree = "<group>"; };
 		EF0000030000000000000003 /* RestAPIService+Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RestAPIService+Music.swift"; sourceTree = "<group>"; };
 		EF0000040000000000000004 /* MusicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModel.swift; sourceTree = "<group>"; };
+		EF00000400000000000000F1 /* MusicViewModel+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Playback.swift"; sourceTree = "<group>"; };
 		EF0000050000000000000005 /* MusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicView.swift; sourceTree = "<group>"; };
 		EF0000060000000000000006 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
 		EF0000070000000000000007 /* AlbumArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtView.swift; sourceTree = "<group>"; };
@@ -275,6 +278,7 @@
 		EF0000090000000000000009 /* SpeakerGroupingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerGroupingView.swift; sourceTree = "<group>"; };
 		EF000010000000000000000A /* MusicSearchResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchResultsView.swift; sourceTree = "<group>"; };
 		EF000011000000000000000B /* MusicViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelTests.swift; sourceTree = "<group>"; };
+		EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelGroupingTests.swift; sourceTree = "<group>"; };
 		EF000012000000000000000C /* MusicModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicModelTests.swift; sourceTree = "<group>"; };
 		F62CD2E228770D5500462092 /* LightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModel.swift; sourceTree = "<group>"; };
 		F62CD2E428770F3B00462092 /* RestAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestAPIService.swift; sourceTree = "<group>"; };
@@ -554,6 +558,7 @@
 			AA000000A00000000000000A /* StringExtensionTests.swift */,
 			AA000000C00000000000000C /* HeaterEntityTests.swift */,
 				EF000011000000000000000B /* MusicViewModelTests.swift */,
+				EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */,
 				EF000012000000000000000C /* MusicModelTests.swift */,
 			);
 			path = IntelliNestTests;
@@ -584,6 +589,7 @@
 				F685F8002B2B153C008E47AF /* ElectricityViewModel.swift */,
 				D89BCA06BE3A45F2A8E3DAE4 /* LynkViewModelHelpers.swift */,
 				EF0000040000000000000004 /* MusicViewModel.swift */,
+				EF00000400000000000000F1 /* MusicViewModel+Playback.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -1184,6 +1190,7 @@
 				EE0000020000000000000002 /* MusicSearchResult.swift in Sources */,
 				EE0000030000000000000003 /* RestAPIService+Music.swift in Sources */,
 				EE0000040000000000000004 /* MusicViewModel.swift in Sources */,
+				EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */,
 				EE0000050000000000000005 /* MusicView.swift in Sources */,
 				EE0000060000000000000006 /* NowPlayingView.swift in Sources */,
 				EE0000070000000000000007 /* AlbumArtView.swift in Sources */,
@@ -1217,6 +1224,7 @@
 			BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */,
 			DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */,
 				EE000011000000000000000B /* MusicViewModelTests.swift in Sources */,
+				EE00001100000000000000C1 /* MusicViewModelGroupingTests.swift in Sources */,
 				EE000012000000000000000C /* MusicModelTests.swift in Sources */,
 			BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */,
 			BB0000007000000000000007 /* LockableTests.swift in Sources */,
@@ -1395,7 +1403,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1404,7 +1412,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to handle geofence";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Need location access in order to handle geofence";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1436,7 +1444,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1445,7 +1453,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to handle geofence";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Need location access in order to handle geofence";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1476,7 +1484,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1501,7 +1509,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1527,7 +1535,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1560,7 +1568,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1592,7 +1600,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = IntelliWidget/IntelliWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1686,7 +1694,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "IntelliNest/Supporting Files/IntelliNest.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				DEVELOPMENT_ASSET_PATHS = "\"IntelliNest/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1695,7 +1703,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Need location access in order to handle geofence";
-				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "Need location access in order to handle geofence";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Need location access to get SSID";
 				INFOPLIST_KEY_NSSiriUsageDescription = "Used to avoid warnings";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1726,7 +1734,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 92;
+				CURRENT_PROJECT_VERSION = 93;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (

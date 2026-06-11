@@ -17,25 +17,27 @@ struct MusicSearchResultsView: View {
 
     var body: some View {
         NavigationStack {
-            content
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                .backgroundModifier()
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Text(viewModel.searchText)
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Stäng") { viewModel.closeSearchResults() }
-                            .foregroundStyle(.white)
-                    }
+            VStack(spacing: 16) {
+                // Keep an editable search bar in the sheet so a new query can be
+                // run without dismissing the results popup first.
+                MusicSearchBar(searchText: $viewModel.searchText,
+                               onSubmit: { Task { await viewModel.search() } })
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+                content
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .backgroundModifier()
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Stäng") { viewModel.closeSearchResults() }
+                        .foregroundStyle(.white)
                 }
-                .navigationDestination(item: $viewModel.openedPlaylist) { playlist in
-                    MusicPlaylistView(viewModel: viewModel, playlist: playlist)
-                }
+            }
+            .navigationDestination(item: $viewModel.openedPlaylist) { playlist in
+                MusicPlaylistView(viewModel: viewModel, playlist: playlist)
+            }
         }
     }
 
@@ -54,7 +56,6 @@ struct MusicSearchResultsView: View {
                 resultsList
             }
             .padding(.horizontal)
-            .padding(.top, 12)
         }
     }
 

@@ -40,21 +40,21 @@ class MusicViewModelTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func speakerURL(_ entityID: EntityId) -> URL {
+    func speakerURL(_ entityID: EntityId) -> URL {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
         components.path = "/api/states/\(entityID.rawValue)"
         return components.url!
     }
 
-    private func speakerJSON(entityID: EntityId,
-                             state: String,
-                             friendlyName: String,
-                             volume: Double = 0.3,
-                             title: String? = nil,
-                             artist: String? = nil,
-                             groupMembers: [String] = [],
-                             shuffle: Bool = false,
-                             repeatMode: String = "off") -> Data {
+    func speakerJSON(entityID: EntityId,
+                     state: String,
+                     friendlyName: String,
+                     volume: Double = 0.3,
+                     title: String? = nil,
+                     artist: String? = nil,
+                     groupMembers: [String] = [],
+                     shuffle: Bool = false,
+                     repeatMode: String = "off") -> Data {
         var attributes: [String: Any] = [
             "friendly_name": friendlyName,
             "volume_level": volume,
@@ -67,12 +67,12 @@ class MusicViewModelTests: XCTestCase {
         return makeEntityJSON(entityId: entityID.rawValue, state: state, attributes: attributes)
     }
 
-    private func stubSpeaker(_ entityID: EntityId, data: Data) {
+    func stubSpeaker(_ entityID: EntityId, data: Data) {
         let response = HTTPURLResponse(url: speakerURL(entityID), statusCode: 200, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: speakerURL(entityID), data: data, response: response, error: nil)
     }
 
-    private func stubAllSpeakers(playing: EntityId? = nil, unavailable: Set<EntityId> = []) {
+    func stubAllSpeakers(playing: EntityId? = nil, unavailable: Set<EntityId> = []) {
         for entityID in MusicViewModel.speakerIDs {
             let state: String = if unavailable.contains(entityID) {
                 "unavailable"
@@ -87,14 +87,14 @@ class MusicViewModelTests: XCTestCase {
         }
     }
 
-    private func searchURL() -> URL {
+    func searchURL() -> URL {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
         components.path = "/api/services/music_assistant/search"
         components.queryItems = [URLQueryItem(name: "return_response", value: "true")]
         return components.url!
     }
 
-    private func stubSearch(json: String, statusCode: Int = 200) {
+    func stubSearch(json: String, statusCode: Int = 200) {
         let url = searchURL()
         let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: url, data: Data(json.utf8), response: response, error: nil)
@@ -214,10 +214,15 @@ class MusicViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.hasNoResults)
         XCTAssertFalse(viewModel.isShowingSearchResults)
     }
+}
 
+// MARK: - Playback, transport & volume
+
+@MainActor
+extension MusicViewModelTests {
     // MARK: - Play
 
-    private func stubPlayMedia(statusCode: Int) {
+    func stubPlayMedia(statusCode: Int) {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
         components.path = "/api/services/music_assistant/play_media"
         let url = components.url!
@@ -380,177 +385,11 @@ class MusicViewModelTests: XCTestCase {
 
     // MARK: - Helpers
 
-    fileprivate func stubPostService(path: String) {
+    func stubPostService(path: String) {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
         components.path = path
         let url = components.url!
         let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
-    }
-}
-
-// MARK: - Grouping & live updates
-
-@MainActor
-extension MusicViewModelTests {
-    func testJoinAddsSpeakerToGroup() async {
-        viewModel.selectSpeaker(.mediaPlayerLivingRoom)
-        let expectation = XCTestExpectation(description: "POST join")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/media_player/join") == true {
-                expectation.fulfill()
-            }
-        }
-        stubPostService(path: "/api/services/media_player/join")
-        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerKitchen))
-        viewModel.toggleGroupMember(.mediaPlayerKitchen)
-        await fulfillment(of: [expectation], timeout: 2.0)
-    }
-
-    func testUnjoinRemovesSpeakerFromGroup() async {
-        // Living room is leader with Kitchen already grouped in.
-        stubSpeaker(.mediaPlayerLivingRoom,
-                    data: speakerJSON(entityID: .mediaPlayerLivingRoom,
-                                      state: "playing",
-                                      friendlyName: "Vardagsrummet",
-                                      groupMembers: [EntityId.mediaPlayerKitchen.rawValue]))
-        for entityID in MusicViewModel.speakerIDs where entityID != .mediaPlayerLivingRoom {
-            stubSpeaker(entityID, data: speakerJSON(entityID: entityID, state: "idle", friendlyName: entityID.rawValue))
-        }
-        await viewModel.reload()
-        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerLivingRoom)
-        XCTAssertTrue(viewModel.isGrouped(.mediaPlayerKitchen))
-
-        let expectation = XCTestExpectation(description: "POST unjoin")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/media_player/unjoin") == true {
-                expectation.fulfill()
-            }
-        }
-        stubPostService(path: "/api/services/media_player/unjoin")
-        viewModel.toggleGroupMember(.mediaPlayerKitchen)
-        await fulfillment(of: [expectation], timeout: 2.0)
-    }
-
-    func testGroupingNoOpForActiveSpeakerItself() {
-        viewModel.selectSpeaker(.mediaPlayerKitchen)
-        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerKitchen))
-        // Toggling the leader against itself must do nothing (no crash).
-        viewModel.toggleGroupMember(.mediaPlayerKitchen)
-    }
-
-    // MARK: - Live updates
-
-    func testReloadKeepsOtherSpeakersWhenOneFailsToDecode() async {
-        // Kitchen returns a body that cannot decode into MediaPlayerEntity, hitting
-        // reload()'s per-speaker catch; the other speakers must still load.
-        stubAllSpeakers(playing: .mediaPlayerLivingRoom)
-        let badResponse = HTTPURLResponse(url: speakerURL(.mediaPlayerKitchen),
-                                          statusCode: 200, httpVersion: nil, headerFields: nil)!
-        URLProtocolStub.setStub(for: speakerURL(.mediaPlayerKitchen),
-                                data: Data("not json".utf8), response: badResponse, error: nil)
-        await viewModel.reload()
-
-        // Kitchen keeps its initial loading entity; the playing speaker still resolves.
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "Loading")
-        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerLivingRoom)
-    }
-
-    func testReloadReflectsExternalChanges() async {
-        stubAllSpeakers(playing: .mediaPlayerKitchen)
-        await viewModel.reload()
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
-
-        // Someone changes volume + track elsewhere.
-        stubSpeaker(.mediaPlayerKitchen,
-                    data: speakerJSON(entityID: .mediaPlayerKitchen,
-                                      state: "playing",
-                                      friendlyName: "Kitchen",
-                                      volume: 0.9,
-                                      title: trackName,
-                                      artist: trackArtist))
-        await viewModel.reload()
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.volumeLevel, 0.9)
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, trackName)
-    }
-
-    // MARK: - Playlists
-
-    private var playlistItem: MusicSearchItem {
-        MusicSearchItem(uri: "spotify://playlist/p1", name: "Sommar", mediaType: .playlist, imageURL: nil, artist: nil)
-    }
-
-    private func browseURL() -> URL {
-        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
-        components.path = "/api/services/media_player/browse_media"
-        components.queryItems = [URLQueryItem(name: "return_response", value: "true")]
-        return components.url!
-    }
-
-    private func stubBrowse(json: String, statusCode: Int = 200) {
-        let url = browseURL()
-        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
-        URLProtocolStub.setStub(for: url, data: Data(json.utf8), response: response, error: nil)
-    }
-
-    func testOpenPlaylistDrillsInAndLoadsTracks() async {
-        viewModel.selectSpeaker(.mediaPlayerKitchen)
-        stubBrowse(json: "{\"service_response\":{\"media_player.kitchen\":{\"children\":" +
-            "[{\"title\":\"Song A\",\"media_content_id\":\"spotify://track/a\"}]}}}")
-        await viewModel.openPlaylist(playlistItem)
-        XCTAssertEqual(viewModel.openedPlaylist, playlistItem)
-        XCTAssertEqual(viewModel.playlistTracks.count, 1)
-        XCTAssertEqual(viewModel.playlistTracks.first?.uri, "spotify://track/a")
-        XCTAssertFalse(viewModel.isLoadingPlaylist)
-    }
-
-    func testOpenPlaylistFailureShowsBanner() async {
-        viewModel.selectSpeaker(.mediaPlayerKitchen)
-        stubBrowse(json: "boom", statusCode: 500)
-        await viewModel.openPlaylist(playlistItem)
-        XCTAssertTrue(viewModel.playlistTracks.isEmpty)
-        XCTAssertTrue(bannerTitles.contains("Kunde inte öppna spellistan"))
-        XCTAssertFalse(viewModel.isLoadingPlaylist)
-    }
-
-    func testPlayPlaylistStartsPlaybackAndClosesSheet() async {
-        viewModel.selectSpeaker(.mediaPlayerKitchen)
-        viewModel.isShowingSearchResults = true
-        viewModel.openedPlaylist = playlistItem
-        stubPlayMedia(statusCode: 200)
-        await viewModel.playPlaylist(playlistItem)
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
-        XCTAssertFalse(viewModel.isShowingSearchResults)
-        XCTAssertNil(viewModel.openedPlaylist)
-    }
-
-    func testPlayTrackInPlaylistPlaysTrackThenClosesSheet() async {
-        viewModel.selectSpeaker(.mediaPlayerKitchen)
-        viewModel.isShowingSearchResults = true
-        viewModel.openedPlaylist = playlistItem
-        stubPlayMedia(statusCode: 200)
-        let track = MusicPlaylistTrack(uri: "spotify://track/a", title: "Song A", imageURL: nil)
-        await viewModel.playTrackInPlaylist(track, from: playlistItem)
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, "Song A")
-        XCTAssertFalse(viewModel.isShowingSearchResults)
-        XCTAssertNil(viewModel.openedPlaylist)
-    }
-
-    func testCloseSearchResultsResetsState() {
-        viewModel.isShowingSearchResults = true
-        viewModel.openedPlaylist = playlistItem
-        viewModel.closeSearchResults()
-        XCTAssertFalse(viewModel.isShowingSearchResults)
-        XCTAssertNil(viewModel.openedPlaylist)
-    }
-
-    func testSearchClearsOpenedPlaylist() async {
-        viewModel.openedPlaylist = playlistItem
-        stubSearch(json: "{\"tracks\":[{\"uri\":\"spotify://track/a\",\"name\":\"Song A\"}]}")
-        viewModel.searchText = "song"
-        await viewModel.search()
-        XCTAssertNil(viewModel.openedPlaylist)
-        XCTAssertTrue(viewModel.isShowingSearchResults)
     }
 }
