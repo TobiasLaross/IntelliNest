@@ -62,34 +62,6 @@ enum GlobalConstants {
         Bundle.main.object(forInfoDictionaryKey: "SECRET_YALE_API_KEY") as? String ?? ""
     }
 
-    static var secretRTSPURLBackCamera: String {
-        if let rtspURL = Bundle.main.object(forInfoDictionaryKey: "SECRET_RTSP_STREAM_CAMERA_BACK") as? String {
-            return "rtsp://\(rtspURL)"
-        }
-        return ""
-    }
-
-    static var secretRTSPURLFrontCamera: String {
-        if let rtspURL = Bundle.main.object(forInfoDictionaryKey: "SECRET_RTSP_STREAM_CAMERA_FRONT") as? String {
-            return "rtsp://\(rtspURL)"
-        }
-        return ""
-    }
-
-    static var secretRTSPURLCarportkCamera: String {
-        if let rtspURL = Bundle.main.object(forInfoDictionaryKey: "SECRET_RTSP_STREAM_CAMERA_CARPORT") as? String {
-            return "rtsp://\(rtspURL)"
-        }
-        return ""
-    }
-
-    static var secretRTSPURLVinceCamera: String {
-        if let rtspURL = Bundle.main.object(forInfoDictionaryKey: "SECRET_RTSP_STREAM_CAMERA_VINCE") as? String {
-            return "rtsp://\(rtspURL)"
-        }
-        return ""
-    }
-
     static let musicAssistantConfigEntryID = "01JZ57QTQPB79NSC7GJ2VQPA8V"
     static let baseInternalUrlString = "http://192.168.1.205:8123/"
     static let githubFakeUrlString = "https://192.218.223.123/"
