@@ -39,12 +39,25 @@ extension MusicViewModel {
         guard spotify.isAuthorized, !hasLoadedSpotifyPlaylists else {
             return
         }
+        await refreshSpotifyPlaylists()
+    }
+
+    /// Re-fetches the Spotify account's playlists, bypassing the load latch.
+    /// Spotify is the source of truth for the library, so the favourites refresh
+    /// each time the music view appears in case the playlists changed elsewhere
+    /// (e.g. edited in the Spotify app or on another device). An empty result is
+    /// kept off the list rather than clearing it, since `accountPlaylists` also
+    /// returns empty on a failed/logged-out fetch.
+    func refreshSpotifyPlaylists() async {
+        guard spotify.isAuthorized else {
+            return
+        }
         let playlists = await spotify.accountPlaylists()
         guard playlists.isNotEmpty else {
             return
         }
-        hasLoadedSpotifyPlaylists = true
         favoritePlaylists = playlists
+        hasLoadedSpotifyPlaylists = true
     }
 
     /// Re-fetches the recently-played list after a playlist launch so the new
@@ -238,8 +251,7 @@ extension MusicViewModel {
         if success {
             // The account's playlist set just changed — refresh the favourites
             // section so it reflects the save/remove.
-            hasLoadedSpotifyPlaylists = false
-            await loadSpotifyPlaylistsIfNeeded()
+            await refreshSpotifyPlaylists()
         } else {
             setSaved(wasSaved, for: playlist)
             setErrorBannerText("Kunde inte uppdatera favorit", "Det gick inte att ändra favoritmarkeringen på Spotify")

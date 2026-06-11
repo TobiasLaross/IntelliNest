@@ -172,6 +172,32 @@ extension MusicViewModelTests {
         XCTAssertEqual(stub.accountPlaylistsCallCount, 0)
     }
 
+    func testRefreshSpotifyPlaylistsReflectsLatestLibrary() async {
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [
+            MusicSearchItem(uri: "spotify://playlist/a", name: "En", mediaType: .playlist, imageURL: nil, artist: nil)
+        ])
+        let model = makeViewModel(spotify: stub)
+        await model.refreshSpotifyPlaylists()
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["En"])
+        // The library changes on Spotify; a refresh reflects it (no stale cache),
+        // even though the list was already loaded once.
+        stub.accountPlaylistItems = [
+            MusicSearchItem(uri: "spotify://playlist/b", name: "Två", mediaType: .playlist, imageURL: nil, artist: nil)
+        ]
+        await model.refreshSpotifyPlaylists()
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Två"])
+    }
+
+    func testRefreshSpotifyPlaylistsSkippedWhenLoggedOut() async {
+        let item = MusicSearchItem(uri: "spotify://playlist/a", name: "En",
+                                   mediaType: .playlist, imageURL: nil, artist: nil)
+        let stub = StubSpotifyPlaylistService(authorized: false, accountPlaylistItems: [item])
+        let model = makeViewModel(spotify: stub)
+        await model.refreshSpotifyPlaylists()
+        XCTAssertTrue(model.favoritePlaylists.isEmpty)
+        XCTAssertEqual(stub.accountPlaylistsCallCount, 0)
+    }
+
     func testToggleRefreshesAccountPlaylists() async {
         let item = MusicSearchItem(uri: "spotify://playlist/x", name: "Ny",
                                    mediaType: .playlist, imageURL: nil, artist: nil)
