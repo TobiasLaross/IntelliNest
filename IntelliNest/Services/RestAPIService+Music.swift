@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 extension RestAPIService {
     /// Calls `music_assistant.search` with `?return_response` and decodes the

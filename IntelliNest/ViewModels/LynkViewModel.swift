@@ -1,5 +1,4 @@
 import Foundation
-import ShipBookSDK
 import SwiftUI
 
 @MainActor

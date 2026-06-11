@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 @MainActor
 class HeatersViewModel: ObservableObject, Reloadable {

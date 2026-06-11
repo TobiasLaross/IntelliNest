@@ -5,7 +5,6 @@
 //  Created by Tobias on 2023-05-02.
 //
 
-import ShipBookSDK
 import SwiftUI
 
 struct ToolBarConnectionStateView: View {

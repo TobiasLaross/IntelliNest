@@ -72,7 +72,6 @@
 		F63D1C6F2B0A605C004294D9 /* ServiceButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D1C6E2B0A605C004294D9 /* ServiceButtonView.swift */; };
 		F63D2B5C280E9EE000517746 /* LockEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63D2B5B280E9EE000517746 /* LockEntity.swift */; };
 		F63F1A722B615A8E006D8906 /* Coordinates.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A712B615A8E006D8906 /* Coordinates.swift */; };
-		F63F1A742B615D92006D8906 /* ShipBookSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F63F1A732B615D92006D8906 /* ShipBookSDK */; };
 		F63F1A762B615DCC006D8906 /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A752B615DCC006D8906 /* UserDefaultsExtension.swift */; };
 		F63F1A782B6255EF006D8906 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A772B6255EE006D8906 /* NotificationService.swift */; };
 		F63F1A7A2B625CAE006D8906 /* PreviewProvideUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = F63F1A792B625CAE006D8906 /* PreviewProvideUtil.swift */; };
@@ -166,7 +165,6 @@
 		F6D167CE27C1290300DCC155 /* NumberPickerScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6D167CD27C1290300DCC155 /* NumberPickerScrollView.swift */; };
 		F6DBA4D028E82D6A001BA1C0 /* TaskExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4CF28E82D6A001BA1C0 /* TaskExtension.swift */; };
 		F6DBA4D428F09C7F001BA1C0 /* Closures.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DBA4D328F09C7F001BA1C0 /* Closures.swift */; };
-		F6DE990929BD13B500B8AABB /* ShipBookSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F6DE990829BD13B500B8AABB /* ShipBookSDK */; };
 		F6DE990B29BD18FB00B8AABB /* LogExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE990A29BD18FB00B8AABB /* LogExtension.swift */; };
 		F6E10FEB2D3FEA410082E5CA /* LynkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E10FEA2D3FEA410082E5CA /* LynkView.swift */; };
 		F6EF35AF2A3A33BE00895250 /* DateTimePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6EF35AE2A3A33BE00895250 /* DateTimePickerView.swift */; };
@@ -414,7 +412,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F6DE990929BD13B500B8AABB /* ShipBookSDK in Frameworks */,
 				F669C7312A23D6DA00458165 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -432,7 +429,6 @@
 			files = (
 				F67D771B2B5130CA00F52EB0 /* SwiftUI.framework in Frameworks */,
 				F67D77192B5130CA00F52EB0 /* WidgetKit.framework in Frameworks */,
-				F63F1A742B615D92006D8906 /* ShipBookSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -878,7 +874,6 @@
 			);
 			name = IntelliNest;
 			packageProductDependencies = (
-				F6DE990829BD13B500B8AABB /* ShipBookSDK */,
 				F669C7302A23D6DA00458165 /* Starscream */,
 			);
 			productName = IntelliNest;
@@ -917,7 +912,6 @@
 			);
 			name = IntelliWidgetExtension;
 			packageProductDependencies = (
-				F63F1A732B615D92006D8906 /* ShipBookSDK */,
 			);
 			productName = IntelliWidgetExtension;
 			productReference = F67D77172B5130CA00F52EB0 /* IntelliWidgetExtension.appex */;
@@ -956,7 +950,6 @@
 			);
 			mainGroup = F67023EE27A177320070FFBB;
 			packageReferences = (
-				F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */,
 				F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */,
 			);
 			productRefGroup = F67023F827A177320070FFBB /* Products */;
@@ -1806,31 +1799,13 @@
 				minimumVersion = 4.0.6;
 			};
 		};
-		F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ShipBook/ShipBookSDK-iOS.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F63F1A732B615D92006D8906 /* ShipBookSDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
-			productName = ShipBookSDK;
-		};
 		F669C7302A23D6DA00458165 /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F669C72F2A23D6DA00458165 /* XCRemoteSwiftPackageReference "Starscream" */;
 			productName = Starscream;
-		};
-		F6DE990829BD13B500B8AABB /* ShipBookSDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F6DE990729BD13B500B8AABB /* XCRemoteSwiftPackageReference "ShipBookSDK-iOS" */;
-			productName = ShipBookSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

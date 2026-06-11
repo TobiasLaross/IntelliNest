@@ -1,5 +1,4 @@
 import Foundation
-import ShipBookSDK
 
 struct CallServiceRequest: Encodable {
     let type: String

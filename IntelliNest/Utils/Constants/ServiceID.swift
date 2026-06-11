@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ShipBookSDK
 
 enum ServiceID: String, Decodable, CaseIterable {
     case kiaForceUpdate = "kia_uvo.force_update"

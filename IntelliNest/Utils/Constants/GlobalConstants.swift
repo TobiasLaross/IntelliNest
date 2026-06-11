@@ -43,14 +43,6 @@ enum GlobalConstants {
         return Bundle.main.object(forInfoDictionaryKey: hassTokenKey) as? String ?? ""
     }
 
-    static var secretShipBookAppID: String {
-        Bundle.main.object(forInfoDictionaryKey: "SECRET_SHIP_BOOK_APP_ID") as? String ?? ""
-    }
-
-    static var secretShipBookAppKey: String {
-        Bundle.main.object(forInfoDictionaryKey: "SECRET_SHIP_BOOK_APP_KEY") as? String ?? ""
-    }
-
     static var secretYaleAPIURL: String {
         if let yaleAPIURL = Bundle.main.object(forInfoDictionaryKey: "SECRET_YALE_API_URL") as? String {
             return "https://\(yaleAPIURL)"
