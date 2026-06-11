@@ -192,4 +192,135 @@ class RestAPIServiceTests: XCTestCase {
 
         XCTAssertEqual(statusCode, 500)
     }
+
+    // MARK: - System log reporting
+
+    private func stubInternalSystemLogURL() -> URL {
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/system_log/create"
+        let url = components.url!
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
+        return url
+    }
+
+    func testReportToSystemLog_postsMessageLevelAndLoggerToSystemLogCreate() async {
+        _ = stubInternalSystemLogURL()
+
+        let requestObserved = expectation(description: "system_log.create POST observed")
+        var capturedPath: String?
+        var capturedBody: [String: Any]?
+        URLProtocolStub.observerRequests { request in
+            guard request.httpMethod == "POST" else { return }
+            capturedPath = request.url?.path
+            if let body = request.httpBodyStreamData() ?? request.httpBody,
+               let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any] {
+                capturedBody = json
+            }
+            requestObserved.fulfill()
+        }
+
+        restAPIService.reportToSystemLog(message: "Something broke", level: "error")
+
+        await fulfillment(of: [requestObserved], timeout: 2)
+        XCTAssertEqual(capturedPath, "/api/services/system_log/create")
+        XCTAssertEqual(capturedBody?["message"] as? String, "Something broke")
+        XCTAssertEqual(capturedBody?["level"] as? String, "error")
+        XCTAssertEqual(capturedBody?["logger"] as? String, "intellinest")
+    }
+
+    func testReportToSystemLog_fallsBackToExternalURLWhenLocalFails() async {
+        // Local URL has no stub — only external is reachable.
+        var components = URLComponents(string: GlobalConstants.baseExternalUrlString)!
+        components.path = "/api/services/system_log/create"
+        let externalURL = components.url!
+        let response = HTTPURLResponse(url: externalURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: externalURL, data: Data(), response: response, error: nil)
+
+        let externalObserved = expectation(description: "external system_log.create POST observed")
+        URLProtocolStub.observerRequests { request in
+            if request.httpMethod == "POST",
+               request.url?.absoluteString.contains(GlobalConstants.baseExternalUrlString) == true {
+                externalObserved.fulfill()
+            }
+        }
+
+        restAPIService.reportToSystemLog(message: "Fallback please", level: "warning")
+
+        await fulfillment(of: [externalObserved], timeout: 2)
+    }
+
+    // MARK: - Log → Home Assistant forwarding
+
+    /// Emitted from a single call site so repeated calls produce an identical formatted
+    /// line, which is what the dedupe cache keys on.
+    private func emitDuplicateError() {
+        Log.error("Recurring failure")
+    }
+
+    func testLogError_isForwardedToReporter() async {
+        Log.resetRemoteReporting()
+        defer { Log.resetRemoteReporting() }
+
+        let forwarded = expectation(description: "error forwarded")
+        var capturedLevel: String?
+        Log.remoteReporter = { level, _ in
+            capturedLevel = level
+            forwarded.fulfill()
+        }
+
+        Log.error("Boom")
+
+        await fulfillment(of: [forwarded], timeout: 2)
+        XCTAssertEqual(capturedLevel, "error")
+    }
+
+    func testLogInfo_isNotForwardedToReporter() async {
+        Log.resetRemoteReporting()
+        defer { Log.resetRemoteReporting() }
+
+        var forwardCount = 0
+        Log.remoteReporter = { _, _ in forwardCount += 1 }
+
+        Log.info("Just info")
+        // Let the @MainActor logging Task drain.
+        await Task.yield()
+        await Task.yield()
+
+        XCTAssertEqual(forwardCount, 0, "info-level logs must not be forwarded to Home Assistant")
+    }
+
+    func testLogError_duplicateWithinCooldownIsForwardedOnce() async {
+        Log.resetRemoteReporting()
+        defer { Log.resetRemoteReporting() }
+
+        var forwardCount = 0
+        Log.remoteReporter = { _, _ in forwardCount += 1 }
+
+        emitDuplicateError()
+        emitDuplicateError()
+        await Task.yield()
+        await Task.yield()
+
+        XCTAssertEqual(forwardCount, 1, "an identical log must only reach Home Assistant once per cooldown")
+    }
+}
+
+private extension URLRequest {
+    /// `URLProtocol` strips `httpBody` into a stream for POSTs, so read it back out.
+    func httpBodyStreamData() -> Data? {
+        guard let stream = httpBodyStream else { return nil }
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer { buffer.deallocate() }
+        while stream.hasBytesAvailable {
+            let read = stream.read(buffer, maxLength: bufferSize)
+            if read <= 0 { break }
+            data.append(buffer, count: read)
+        }
+        return data.isEmpty ? nil : data
+    }
 }

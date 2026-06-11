@@ -29,5 +29,6 @@ enum Domain: String, Encodable {
     case kiaUvo = "kia_uvo"
     case mediaPlayer = "media_player"
     case musicAssistant = "music_assistant"
+    case systemLog = "system_log"
     case unknown
 }
