@@ -13,25 +13,38 @@ import Foundation
 extension MusicViewModel {
     // MARK: - Library playlists
 
-    /// Loads the favourite and recently-played playlists on the first reload
-    /// after the view appears. Failures are logged but left silent — these are a
-    /// convenience shortcut, not core playback; a failed load retries next reload.
+    /// Loads the favourites (the Spotify account's playlists) and the
+    /// recently-played list (Music Assistant) on reload. Failures are logged but
+    /// left silent — these are a convenience shortcut, not core playback; a failed
+    /// load retries next reload.
     func loadLibraryPlaylistsIfNeeded() async {
-        guard !hasLoadedLibrary else {
-            return
-        }
-        let favorites = try? await restAPIService.getFavoritePlaylists()
-        let recents = try? await restAPIService.getRecentlyPlayedPlaylists()
-        guard favorites != nil || recents != nil else {
+        await loadRecentlyPlayedIfNeeded()
+        await loadSpotifyPlaylistsIfNeeded()
+    }
+
+    /// Loads the recently-played playlists from Music Assistant once.
+    private func loadRecentlyPlayedIfNeeded() async {
+        guard !hasLoadedLibrary, let recents = try? await restAPIService.getRecentlyPlayedPlaylists() else {
             return
         }
         hasLoadedLibrary = true
-        if let favorites {
-            favoritePlaylists = favorites
+        recentlyPlayedPlaylists = recents
+    }
+
+    /// Loads the huset Spotify account's playlists into the favourites section
+    /// once the user is logged in. Retries on each reload until it succeeds (so the
+    /// list appears the first reload after a login), then latches. An empty result
+    /// is treated as "not loaded yet" so a failed fetch doesn't latch on nothing.
+    func loadSpotifyPlaylistsIfNeeded() async {
+        guard spotify.isAuthorized, !hasLoadedSpotifyPlaylists else {
+            return
         }
-        if let recents {
-            recentlyPlayedPlaylists = recents
+        let playlists = await spotify.accountPlaylists()
+        guard playlists.isNotEmpty else {
+            return
         }
+        hasLoadedSpotifyPlaylists = true
+        favoritePlaylists = playlists
     }
 
     /// Re-fetches the recently-played list after a playlist launch so the new
@@ -222,7 +235,12 @@ extension MusicViewModel {
         let success = wasSaved
             ? await spotify.removePlaylist(playlistID: playlistID)
             : await spotify.savePlaylist(playlistID: playlistID)
-        if !success {
+        if success {
+            // The account's playlist set just changed — refresh the favourites
+            // section so it reflects the save/remove.
+            hasLoadedSpotifyPlaylists = false
+            await loadSpotifyPlaylistsIfNeeded()
+        } else {
             setSaved(wasSaved, for: playlist)
             setErrorBannerText("Kunde inte uppdatera favorit", "Det gick inte att ändra favoritmarkeringen på Spotify")
         }

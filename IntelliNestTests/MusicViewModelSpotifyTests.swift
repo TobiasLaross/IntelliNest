@@ -1,26 +1,31 @@
 @testable import IntelliNest
 import XCTest
 
-/// A favouriting stub that records calls and tracks saved ids in memory, so the
-/// view model's optimistic toggle/revert logic can be tested without Spotify.
+/// A Spotify stub that records calls and tracks saved ids in memory, so the view
+/// model's account-playlist load and optimistic toggle/revert logic can be tested
+/// without Spotify.
 @MainActor
-final class StubSpotifyFavoriting: SpotifyPlaylistFavoriting {
+final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     var authorized: Bool
     var savedIDs: Set<String>
     var operationSucceeds: Bool
     var authorizeThrows: Bool
+    var accountPlaylistItems: [MusicSearchItem]
     private(set) var authorizeCallCount = 0
     private(set) var saveCallCount = 0
     private(set) var removeCallCount = 0
+    private(set) var accountPlaylistsCallCount = 0
 
     init(authorized: Bool = true,
          savedIDs: Set<String> = [],
          operationSucceeds: Bool = true,
-         authorizeThrows: Bool = false) {
+         authorizeThrows: Bool = false,
+         accountPlaylistItems: [MusicSearchItem] = []) {
         self.authorized = authorized
         self.savedIDs = savedIDs
         self.operationSucceeds = operationSucceeds
         self.authorizeThrows = authorizeThrows
+        self.accountPlaylistItems = accountPlaylistItems
     }
 
     var isAuthorized: Bool { authorized }
@@ -31,6 +36,11 @@ final class StubSpotifyFavoriting: SpotifyPlaylistFavoriting {
             throw SpotifyAuthError.notAuthorized
         }
         authorized = true
+    }
+
+    func accountPlaylists() async -> [MusicSearchItem] {
+        accountPlaylistsCallCount += 1
+        return accountPlaylistItems
     }
 
     func isPlaylistSaved(playlistID: String) async -> Bool {
@@ -66,7 +76,7 @@ extension MusicViewModelTests {
                         name: "Lugnt & Skönt", mediaType: .playlist, imageURL: nil, artist: nil)
     }
 
-    func makeViewModel(spotify: SpotifyPlaylistFavoriting) -> MusicViewModel {
+    func makeViewModel(spotify: SpotifyPlaylistService) -> MusicViewModel {
         MusicViewModel(restAPIService: restAPIService,
                        setErrorBannerText: { [weak self] title, _ in self?.bannerTitles.append(title) },
                        spotify: spotify)
@@ -81,14 +91,14 @@ extension MusicViewModelTests {
     }
 
     func testLoadSavedStateReflectsLibrary() async {
-        let stub = StubSpotifyFavoriting(savedIDs: [spotifyPlaylistID])
+        let stub = StubSpotifyPlaylistService(savedIDs: [spotifyPlaylistID])
         let model = makeViewModel(spotify: stub)
         await model.loadSavedState(for: spotifyPlaylist())
         XCTAssertTrue(model.isSaved(spotifyPlaylist()))
     }
 
     func testToggleSavesWhenNotSaved() async {
-        let stub = StubSpotifyFavoriting()
+        let stub = StubSpotifyPlaylistService()
         let model = makeViewModel(spotify: stub)
         await model.toggleSpotifySaved(spotifyPlaylist())
         XCTAssertTrue(model.isSaved(spotifyPlaylist()))
@@ -96,7 +106,7 @@ extension MusicViewModelTests {
     }
 
     func testToggleRemovesWhenSaved() async {
-        let stub = StubSpotifyFavoriting(savedIDs: [spotifyPlaylistID])
+        let stub = StubSpotifyPlaylistService(savedIDs: [spotifyPlaylistID])
         let model = makeViewModel(spotify: stub)
         await model.loadSavedState(for: spotifyPlaylist())
         await model.toggleSpotifySaved(spotifyPlaylist())
@@ -105,7 +115,7 @@ extension MusicViewModelTests {
     }
 
     func testToggleFailureRevertsAndBanners() async {
-        let stub = StubSpotifyFavoriting(operationSucceeds: false)
+        let stub = StubSpotifyPlaylistService(operationSucceeds: false)
         let model = makeViewModel(spotify: stub)
         await model.toggleSpotifySaved(spotifyPlaylist())
         XCTAssertFalse(model.isSaved(spotifyPlaylist()))
@@ -113,7 +123,7 @@ extension MusicViewModelTests {
     }
 
     func testToggleLogsInWhenUnauthorized() async {
-        let stub = StubSpotifyFavoriting(authorized: false)
+        let stub = StubSpotifyPlaylistService(authorized: false)
         let model = makeViewModel(spotify: stub)
         await model.toggleSpotifySaved(spotifyPlaylist())
         XCTAssertEqual(stub.authorizeCallCount, 1)
@@ -121,7 +131,7 @@ extension MusicViewModelTests {
     }
 
     func testToggleAuthorizeFailureBanners() async {
-        let stub = StubSpotifyFavoriting(authorized: false, authorizeThrows: true)
+        let stub = StubSpotifyPlaylistService(authorized: false, authorizeThrows: true)
         let model = makeViewModel(spotify: stub)
         await model.toggleSpotifySaved(spotifyPlaylist())
         XCTAssertEqual(stub.saveCallCount, 0)
@@ -130,13 +140,46 @@ extension MusicViewModelTests {
     }
 
     func testToggleIgnoresNonSpotifyPlaylist() async {
-        let stub = StubSpotifyFavoriting()
+        let stub = StubSpotifyPlaylistService()
         let model = makeViewModel(spotify: stub)
         let localItem = MusicSearchItem(uri: "library://playlist/3", name: "Lokal",
                                         mediaType: .playlist, imageURL: nil, artist: nil)
         await model.toggleSpotifySaved(localItem)
         XCTAssertEqual(stub.saveCallCount, 0)
         XCTAssertTrue(model.savedPlaylistURIs.isEmpty)
+    }
+
+    func testSpotifyAccountPlaylistsLoadIntoFavoritesOnReload() async {
+        let accountPlaylists = [
+            MusicSearchItem(uri: "spotify://playlist/a", name: "Morgon", mediaType: .playlist, imageURL: nil, artist: "huset"),
+            MusicSearchItem(uri: "spotify://playlist/b", name: "Träning", mediaType: .playlist, imageURL: nil, artist: "huset")
+        ]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: accountPlaylists)
+        let model = makeViewModel(spotify: stub)
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        await model.reload()
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Morgon", "Träning"])
+    }
+
+    func testSpotifyAccountPlaylistsNotLoadedWhenUnauthorized() async {
+        let item = MusicSearchItem(uri: "spotify://playlist/a", name: "Morgon",
+                                   mediaType: .playlist, imageURL: nil, artist: nil)
+        let stub = StubSpotifyPlaylistService(authorized: false, accountPlaylistItems: [item])
+        let model = makeViewModel(spotify: stub)
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        await model.reload()
+        XCTAssertTrue(model.favoritePlaylists.isEmpty)
+        XCTAssertEqual(stub.accountPlaylistsCallCount, 0)
+    }
+
+    func testToggleRefreshesAccountPlaylists() async {
+        let item = MusicSearchItem(uri: "spotify://playlist/x", name: "Ny",
+                                   mediaType: .playlist, imageURL: nil, artist: nil)
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [item])
+        let model = makeViewModel(spotify: stub)
+        await model.toggleSpotifySaved(spotifyPlaylist())
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Ny"])
+        XCTAssertGreaterThanOrEqual(stub.accountPlaylistsCallCount, 1)
     }
 
     func testPlayPlaylistShuffledStartsPlaybackAndEnablesShuffle() async {
