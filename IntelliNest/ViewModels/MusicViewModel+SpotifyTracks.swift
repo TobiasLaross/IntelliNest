@@ -88,18 +88,15 @@ extension MusicViewModel {
             + personalPlaylistSections.flatMap { $0.playlists.map(\.uri) }).joined(separator: "|")
     }
 
-    /// Populates the saved-state for the library rows. Favourites are in the
-    /// Spotify library by definition, so they are marked saved without a call;
-    /// recently-played and personal-account playlists are queried so their star
-    /// reflects reality even when they are not also favourites.
+    /// Populates the saved-state for the library rows. The favourites section is
+    /// the account library, so every id in it is saved by definition — start from
+    /// that set (resetting so an un-favourited playlist still shown elsewhere drops
+    /// its star). Recently-played and personal-account playlists not already in the
+    /// library are then queried so their star reflects reality even when they are
+    /// not favourites.
     func loadLibrarySavedStates() async {
-        for playlist in favoritePlaylists {
-            setSaved(true, for: playlist)
-        }
-        for playlist in recentlyPlayedPlaylists {
-            await loadSavedState(for: playlist)
-        }
-        for playlist in personalPlaylistSections.flatMap(\.playlists) {
+        savedPlaylistIDs = libraryPlaylistIDs
+        for playlist in recentlyPlayedPlaylists + personalPlaylistSections.flatMap(\.playlists) {
             await loadSavedState(for: playlist)
         }
     }

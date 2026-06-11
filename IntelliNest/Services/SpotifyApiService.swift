@@ -301,16 +301,20 @@ private struct SpotifyUser: Decodable {
 /// app's `MusicSearchItem`. The Spotify `id` is rewritten into the `spotify://`
 /// uri form Music Assistant expects for playback.
 private struct SpotifyPlaylistPage: Decodable {
-    let items: [SpotifyPlaylistItem]
+    // Spotify occasionally returns `null` entries in a playlist page's `items`
+    // array (e.g. an unavailable playlist on a large public profile). Decoding the
+    // element as optional lets a `null` map to nil instead of throwing and losing
+    // the whole page — which would otherwise leave a populated profile empty.
+    let items: [SpotifyPlaylistItem?]
 
     var playlists: [MusicSearchItem] {
-        items.compactMap(\.searchItem)
+        items.compactMap { $0?.searchItem }
     }
 
     /// The ids of playlists the signed-in user may edit: ones they own, plus any
     /// collaborative playlist regardless of owner.
     func editableIDs(currentUserID: String) -> Set<String> {
-        Set(items.compactMap { $0.editableID(currentUserID: currentUserID) })
+        Set(items.compactMap { $0?.editableID(currentUserID: currentUserID) })
     }
 }
 

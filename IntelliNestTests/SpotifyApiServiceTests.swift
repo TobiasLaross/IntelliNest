@@ -137,6 +137,21 @@ final class SpotifyApiServiceTests: XCTestCase {
         XCTAssertTrue(playlists.allSatisfy { $0.mediaType == .playlist })
     }
 
+    func testUserPlaylistsToleratesNullArrayEntries() async {
+        // Spotify can return a bare `null` element in `items` for an unavailable
+        // playlist; it must be skipped, not throw away the whole (populated) page.
+        let json = """
+        {"items":[
+          null,
+          {"id":"own1","name":"Träning","images":[],"owner":{"display_name":"tobiasc91"}},
+          null
+        ]}
+        """
+        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: json)
+        let playlists = await service.userPlaylists(userID: "tobiasc91")
+        XCTAssertEqual(playlists.map(\.name), ["Träning"])
+    }
+
     func testUserPlaylistsReturnsEmptyWhenNoPlaylists() async {
         stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: "{\"items\":[]}")
         let playlists = await service.userPlaylists(userID: "tobiasc91")
