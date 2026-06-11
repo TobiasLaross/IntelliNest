@@ -42,6 +42,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// A library playlist the user opened to browse from the main view (favourites
     /// or recents), presented in its own sheet. Nil when no browse sheet is shown.
     @Published var browsingLibraryPlaylist: MusicSearchItem?
+    /// URIs of playlists currently saved in the user's Spotify library, driving the
+    /// star toggle in the playlist detail view. Populated on demand per playlist.
+    @Published var savedPlaylistURIs: Set<String> = []
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
@@ -55,6 +58,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// methods extracted into `MusicViewModel+Playback` can reach them.
     let restAPIService: RestAPIService
     let setErrorBannerText: StringStringClosure
+    /// Saves/removes playlists in the user's Spotify library and reads saved state.
+    /// Defaults to a disabled no-op so previews and non-Spotify tests need no setup.
+    let spotify: SpotifyPlaylistFavoriting
 
     /// Speakers that are reachable right now (anything not `unavailable`),
     /// in the fixed display order.
@@ -69,9 +75,12 @@ class MusicViewModel: ObservableObject, Reloadable {
         return speakers[activeSpeakerID]
     }
 
-    init(restAPIService: RestAPIService, setErrorBannerText: @escaping StringStringClosure = { _, _ in }) {
+    init(restAPIService: RestAPIService,
+         setErrorBannerText: @escaping StringStringClosure = { _, _ in },
+         spotify: SpotifyPlaylistFavoriting = DisabledSpotifyFavoriting()) {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
+        self.spotify = spotify
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
         for speakerID in Self.speakerIDs {
             initialSpeakers[speakerID] = MediaPlayerEntity(entityId: speakerID)

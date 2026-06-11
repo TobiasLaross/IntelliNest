@@ -130,6 +130,21 @@ extension MusicViewModel {
         }
     }
 
+    /// Plays the whole playlist with shuffle turned on. Starts playback first,
+    /// then enables shuffle on the group leader so the freshly-loaded queue is
+    /// shuffled rather than the previous one.
+    func playPlaylistShuffled(_ playlist: MusicSearchItem) async {
+        guard await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) else {
+            return
+        }
+        if let activeSpeaker, let targetID = playbackTargetID {
+            speakers[activeSpeaker.entityId]?.shuffle = true
+            restAPIService.setShuffle(entityID: targetID, shuffle: true)
+        }
+        closeSearchResults()
+        await refreshRecentlyPlayed()
+    }
+
     /// Plays the chosen track now, then queues the rest of the playlist after it,
     /// so the tapped song is followed by the playlist.
     func playTrackInPlaylist(_ track: MusicPlaylistTrack, from playlist: MusicSearchItem) async {
@@ -149,6 +164,76 @@ extension MusicViewModel {
         isShowingSearchResults = false
         openedPlaylist = nil
         browsingLibraryPlaylist = nil
+    }
+
+    // MARK: - Spotify favourite
+
+    /// Whether the playlist can be saved to Spotify, i.e. it is a Spotify-provider
+    /// playlist. Local/other-provider playlists have no Spotify library to save to.
+    func isSpotifyPlaylist(_ playlist: MusicSearchItem) -> Bool {
+        spotifyPlaylistID(for: playlist) != nil
+    }
+
+    /// Whether the playlist is currently marked saved (drives the filled star).
+    func isSaved(_ playlist: MusicSearchItem) -> Bool {
+        savedPlaylistURIs.contains(playlist.uri)
+    }
+
+    /// Extracts the id from a `spotify://playlist/<id>` uri, or nil when the
+    /// playlist isn't a Spotify one.
+    private func spotifyPlaylistID(for playlist: MusicSearchItem) -> String? {
+        let prefix = "spotify://playlist/"
+        guard playlist.uri.hasPrefix(prefix) else {
+            return nil
+        }
+        let id = String(playlist.uri.dropFirst(prefix.count))
+        return id.isNotEmpty ? id : nil
+    }
+
+    /// Reads the live Spotify saved-state when the playlist detail appears, so the
+    /// star reflects reality. Skipped (and silent) for non-Spotify playlists or
+    /// when the user hasn't logged in yet — the star only loads after first login.
+    func loadSavedState(for playlist: MusicSearchItem) async {
+        guard let playlistID = spotifyPlaylistID(for: playlist), spotify.isAuthorized else {
+            return
+        }
+        await setSaved(spotify.isPlaylistSaved(playlistID: playlistID), for: playlist)
+    }
+
+    /// Toggles whether the playlist is in the user's Spotify library. Triggers the
+    /// one-time Spotify login when needed, flips the star optimistically, then
+    /// reverts and shows a banner if the request fails.
+    func toggleSpotifySaved(_ playlist: MusicSearchItem) async {
+        guard let playlistID = spotifyPlaylistID(for: playlist) else {
+            return
+        }
+        if !spotify.isAuthorized {
+            do {
+                try await spotify.authorize()
+            } catch {
+                Log.error("Spotify authorization failed: \(error)")
+                setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")
+                return
+            }
+        }
+
+        let wasSaved = isSaved(playlist)
+        setSaved(!wasSaved, for: playlist)
+        let success = wasSaved
+            ? await spotify.removePlaylist(playlistID: playlistID)
+            : await spotify.savePlaylist(playlistID: playlistID)
+        if !success {
+            setSaved(wasSaved, for: playlist)
+            setErrorBannerText("Kunde inte uppdatera favorit", "Det gick inte att ändra favoritmarkeringen på Spotify")
+        }
+    }
+
+    private func setSaved(_ saved: Bool, for playlist: MusicSearchItem) {
+        if saved {
+            savedPlaylistURIs.insert(playlist.uri)
+        } else {
+            savedPlaylistURIs.remove(playlist.uri)
+        }
     }
 
     // MARK: - Transport & volume
