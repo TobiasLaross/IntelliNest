@@ -172,6 +172,30 @@ extension MusicViewModelTests {
         XCTAssertEqual(stub.accountPlaylistsCallCount, 0)
     }
 
+    func testIsSpotifyAuthorizedReflectsServiceAtInit() {
+        XCTAssertTrue(makeViewModel(spotify: StubSpotifyPlaylistService(authorized: true)).isSpotifyAuthorized)
+        XCTAssertFalse(makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false)).isSpotifyAuthorized)
+    }
+
+    func testConnectSpotifyLogsInAndLoadsPlaylists() async {
+        let item = MusicSearchItem(uri: "spotify://playlist/a", name: "Morgon",
+                                   mediaType: .playlist, imageURL: nil, artist: nil)
+        let stub = StubSpotifyPlaylistService(authorized: false, accountPlaylistItems: [item])
+        let model = makeViewModel(spotify: stub)
+        await model.connectSpotify()
+        XCTAssertTrue(model.isSpotifyAuthorized)
+        XCTAssertEqual(stub.authorizeCallCount, 1)
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Morgon"])
+    }
+
+    func testConnectSpotifyFailureBannersAndStaysLoggedOut() async {
+        let stub = StubSpotifyPlaylistService(authorized: false, authorizeThrows: true)
+        let model = makeViewModel(spotify: stub)
+        await model.connectSpotify()
+        XCTAssertFalse(model.isSpotifyAuthorized)
+        XCTAssertTrue(bannerTitles.contains("Spotify-inloggning misslyckades"))
+    }
+
     func testRefreshSpotifyPlaylistsReflectsLatestLibrary() async {
         let stub = StubSpotifyPlaylistService(accountPlaylistItems: [
             MusicSearchItem(uri: "spotify://playlist/a", name: "En", mediaType: .playlist, imageURL: nil, artist: nil)

@@ -9,11 +9,17 @@ import SwiftUI
 
 struct MusicView: View {
     @ObservedObject var viewModel: MusicViewModel
+    @State private var isShowingSpotifyLogin = false
 
     var body: some View {
         VStack(spacing: 16) {
-            MusicSearchBar(searchText: $viewModel.searchText,
-                           onSubmit: { Task { await viewModel.search() } })
+            HStack(spacing: 8) {
+                MusicSearchBar(searchText: $viewModel.searchText,
+                               onSubmit: { Task { await viewModel.search() } })
+                if !viewModel.isSpotifyAuthorized {
+                    spotifyLoginTriangle
+                }
+            }
 
             ScrollView {
                 VStack(spacing: 16) {
@@ -50,6 +56,80 @@ struct MusicView: View {
                                 .foregroundStyle(.white)
                         }
                     }
+            }
+        }
+        .sheet(isPresented: $isShowingSpotifyLogin) {
+            SpotifyLoginPromptView(viewModel: viewModel)
+        }
+    }
+
+    /// A discrete warning triangle shown next to the search bar while logged out
+    /// of Spotify. Tapping opens the dismissable login prompt.
+    private var spotifyLoginTriangle: some View {
+        Button {
+            isShowingSpotifyLogin = true
+        } label: {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.title3)
+                .foregroundStyle(.yellow)
+                .frame(width: 36, height: 36)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel("Anslut Spotify")
+    }
+}
+
+/// A dismissable modal that explains why Spotify is needed and starts the login.
+/// Dismissable by swipe, the drag indicator, or "Senare"; logging in successfully
+/// also dismisses it.
+private struct SpotifyLoginPromptView: View {
+    @ObservedObject var viewModel: MusicViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var isLoggingIn = false
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.largeTitle)
+                .foregroundStyle(.yellow)
+            Text("Anslut Spotify")
+                .font(.title2.bold())
+            Text("Logga in på Spotify för att se dina spellistor under Favoriter och spara favoriter.")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.white.opacity(0.8))
+            Button(action: logIn) {
+                HStack(spacing: 8) {
+                    if isLoggingIn {
+                        ProgressView().tint(.black)
+                    }
+                    Text("Logga in på Spotify")
+                }
+                .font(.headline)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity)
+                .background(Color.white)
+                .foregroundStyle(.black)
+                .clipShape(Capsule())
+            }
+            .disabled(isLoggingIn)
+            Button("Senare") { dismiss() }
+                .foregroundStyle(.white.opacity(0.7))
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .backgroundModifier()
+        .foregroundStyle(.white)
+        .presentationDetents([.height(320)])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func logIn() {
+        Task {
+            isLoggingIn = true
+            await viewModel.connectSpotify()
+            isLoggingIn = false
+            if viewModel.isSpotifyAuthorized {
+                dismiss()
             }
         }
     }
