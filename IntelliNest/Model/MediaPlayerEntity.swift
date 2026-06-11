@@ -44,8 +44,16 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
     /// speaker is synced into a group, Music Assistant only accepts transport
     /// and play commands on the group leader (the first group member); a
     /// follower rejects them. Falls back to this speaker when it is ungrouped.
+    ///
+    /// A well-formed Music Assistant group always lists this speaker among its
+    /// members. If `group_members` doesn't include it (a stale or malformed
+    /// list), play on this speaker rather than redirecting to a leader it isn't
+    /// actually grouped with — otherwise the music starts on the wrong speaker.
     var playbackTargetID: EntityId {
-        groupMembers.first ?? entityId
+        guard groupMembers.contains(entityId), let leader = groupMembers.first else {
+            return entityId
+        }
+        return leader
     }
 
     var isUnavailable: Bool {

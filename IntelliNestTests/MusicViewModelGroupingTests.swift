@@ -227,6 +227,35 @@ extension MusicViewModelTests {
         XCTAssertNil(viewModel.openedPlaylist)
     }
 
+    func testPlayRefreshesGroupStateSoStaleLeaderIsNotTargeted() async {
+        // Per the last reload, Matbord-ute is grouped under Kitchen as leader, so
+        // its stale playback target is Kitchen.
+        let staleGroup = [EntityId.mediaPlayerKitchen.rawValue, EntityId.mediaPlayerOutdoorTable.rawValue]
+        stubSpeaker(.mediaPlayerOutdoorTable,
+                    data: speakerJSON(entityID: .mediaPlayerOutdoorTable, state: "playing",
+                                      friendlyName: "Matbord-ute", groupMembers: staleGroup))
+        for entityID in MusicViewModel.speakerIDs where entityID != .mediaPlayerOutdoorTable {
+            stubSpeaker(entityID, data: speakerJSON(entityID: entityID, state: "idle", friendlyName: entityID.rawValue))
+        }
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerOutdoorTable)
+        XCTAssertEqual(viewModel.activeSpeaker?.playbackTargetID, .mediaPlayerKitchen)
+
+        // The speakers were ungrouped since that reload; the fresh state is solo.
+        stubSpeaker(.mediaPlayerOutdoorTable,
+                    data: speakerJSON(entityID: .mediaPlayerOutdoorTable, state: "idle",
+                                      friendlyName: "Matbord-ute", groupMembers: []))
+        stubPlayMedia(statusCode: 200)
+        let item = MusicSearchItem(uri: "spotify://track/x", name: "Song A",
+                                   mediaType: .track, imageURL: nil, artist: nil)
+        await viewModel.play(item: item)
+
+        // Playback refreshed the active speaker first, so routing now lands on
+        // Matbord-ute itself rather than the stale Kitchen leader.
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerOutdoorTable]?.groupMembers, [])
+        XCTAssertEqual(viewModel.activeSpeaker?.playbackTargetID, .mediaPlayerOutdoorTable)
+    }
+
     func testPlayTrackInPlaylistPlaysTrackThenClosesSheet() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         viewModel.isShowingSearchResults = true
