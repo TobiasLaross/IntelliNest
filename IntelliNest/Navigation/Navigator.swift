@@ -103,7 +103,8 @@ class Navigator: ObservableObject {
                                              setErrorBannerText: { [weak self] title, message in
                                                  self?.setErrorBannerText(title: title, message: message)
                                              },
-                                             spotify: spotifyApiService)
+                                             spotify: spotifyApiService,
+                                             queueSocket: MusicAssistantSocketService())
 
     init() {
         WidgetCenter.shared.reloadAllTimelines()

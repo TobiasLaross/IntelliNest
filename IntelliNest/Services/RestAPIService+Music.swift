@@ -73,6 +73,20 @@ extension RestAPIService {
         return try decoder.decode(MusicPlaylistBrowseResponse.self, from: data).tracks
     }
 
+    /// Reads the active queue for `entityID` via `music_assistant.get_queue`
+    /// (`?return_response`). Returns the queue id (needed to target the WebSocket
+    /// delete command) and the current item ("Spelas nu"). The upcoming list is
+    /// fetched separately over the Music Assistant WebSocket, since `get_queue`
+    /// only carries the current/next item, not the full list.
+    func getQueue(on entityID: EntityId) async throws -> (queueID: String?, currentItem: MusicQueueItem?) {
+        let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.getQueue.rawValue)"
+        var json = [JSONKey: Any]()
+        json[.entityID] = entityID.rawValue
+
+        let data = try await postExpectingResponseData(path: path, json: json)
+        return MusicGetQueueParser.parse(data)
+    }
+
     /// POSTs a service call with `?return_response` and returns the response
     /// body, retrying against the external URL when the internal one fails.
     /// Used by the music services that read data back (search, browse).

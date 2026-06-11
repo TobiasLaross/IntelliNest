@@ -22,29 +22,26 @@ struct NowPlayingView: View {
                     .lineLimit(1)
                 Spacer()
                 Button {
+                    Task { await viewModel.openQueue() }
+                } label: {
+                    Image(systemName: "list.bullet")
+                }
+                .accessibilityLabel("Visa kö")
+                Button {
                     viewModel.activeSpeakerID = nil
                 } label: {
                     Image(systemName: "hifispeaker.2.fill")
                 }
                 .accessibilityLabel("Byt högtalare")
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Vald högtalare: \(speaker.friendlyName)")
 
             HStack(spacing: 12) {
-                AlbumArtView(urlString: speaker.entityPicture, size: 64)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(speaker.mediaTitle ?? "Inget spelas")
-                        .font(.headline)
-                        .lineLimit(1)
-                    if let artist = speaker.mediaArtist {
-                        Text(artist)
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.7))
-                            .lineLimit(1)
-                    }
+                nowPlayingMetadata
+                Spacer(minLength: 8)
+                if let uri = speaker.mediaContentID, viewModel.canFavoriteSong(uri: uri) {
+                    SongFavoriteButton(viewModel: viewModel, uri: uri)
+                        .font(.title3)
                 }
-                Spacer()
             }
 
             TransportControlsView(speaker: speaker, viewModel: viewModel)
@@ -63,6 +60,52 @@ struct NowPlayingView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.yellow.opacity(0.7), lineWidth: 2)
         )
+        // Keep the now-playing Liked-Songs heart in sync with the live track.
+        .task(id: speaker.mediaContentID) {
+            await viewModel.loadSavedSongStates(uris: [speaker.mediaContentID].compactMap { $0 })
+        }
+    }
+
+    /// The album art and track metadata. Tapping it opens the playlist the track
+    /// is playing from, when that source is known; otherwise it is inert (no
+    /// dead-end). The transport and volume controls below stay separate, so the
+    /// jump tap never swallows a play/pause or volume change.
+    @ViewBuilder private var nowPlayingMetadata: some View {
+        if viewModel.nowPlayingSourcePlaylist != nil {
+            Button {
+                Task { await viewModel.openNowPlayingPlaylist() }
+            } label: {
+                metadataLabel
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Öppna spellistan som spelas")
+        } else {
+            metadataLabel
+        }
+    }
+
+    private var metadataLabel: some View {
+        HStack(spacing: 12) {
+            AlbumArtView(urlString: speaker.entityPicture, size: 64)
+            VStack(alignment: .leading, spacing: 2) {
+                if let source = viewModel.nowPlayingSourcePlaylist {
+                    Text("Spelas från \(source.name)")
+                        .font(.caption2)
+                        .foregroundStyle(.yellow.opacity(0.8))
+                        .lineLimit(1)
+                }
+                Text(speaker.mediaTitle ?? "Inget spelas")
+                    .font(.headline)
+                    .lineLimit(1)
+                if let artist = speaker.mediaArtist {
+                    Text(artist)
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.7))
+                        .lineLimit(1)
+                }
+            }
+        }
+        .contentShape(Rectangle())
     }
 }
 

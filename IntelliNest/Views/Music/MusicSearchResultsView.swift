@@ -75,11 +75,11 @@ struct MusicSearchResultsView: View {
                     ForEach(section.items) { item in
                         if item.mediaType == .playlist {
                             // A playlist opens its track list instead of playing.
-                            MusicResultRow(item: item, trailingSystemImage: "chevron.right") {
+                            MusicResultRow(viewModel: viewModel, item: item, trailingSystemImage: "chevron.right") {
                                 Task { await viewModel.openPlaylist(item) }
                             }
                         } else {
-                            MusicResultRow(item: item) {
+                            MusicResultRow(viewModel: viewModel, item: item) {
                                 Task { await viewModel.play(item: item) }
                             }
                         }
@@ -204,36 +204,85 @@ struct MusicPlaylistView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 8) {
                     ForEach(viewModel.playlistTracks) { track in
-                        Button {
-                            Task { await viewModel.playTrackInPlaylist(track, from: playlist) }
-                        } label: {
-                            HStack(spacing: 12) {
-                                AlbumArtView(urlString: track.imageURL, size: 44)
-                                Text(track.title)
-                                    .font(.body)
-                                    .lineLimit(1)
-                                Spacer()
-                                Image(systemName: "play.fill")
-                                    .foregroundStyle(.white.opacity(0.6))
-                            }
-                            .padding(.vertical, 4)
-                        }
-                        .foregroundStyle(.white)
-                        .accessibilityLabel("Spela \(track.title)")
+                        trackRow(track)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            // Reflect each track's Liked-Songs state when the list loads.
+            .task(id: viewModel.playlistTracks.map(\.uri).joined(separator: "|")) {
+                await viewModel.loadSavedSongStates(uris: viewModel.playlistTracks.map(\.uri))
+            }
+        }
+    }
+
+    /// A playlist track row: tapping plays it (then the rest of the playlist),
+    /// the trailing heart toggles Liked Songs, and a long-press exposes add to
+    /// queue / add to playlist / remove from this playlist.
+    private func trackRow(_ track: MusicPlaylistTrack) -> some View {
+        // Only an editable playlist offers "remove from this playlist".
+        var removeAction: MainActorVoidClosure?
+        if viewModel.canEditPlaylist(playlist) {
+            removeAction = { Task { await viewModel.removeTrack(track, fromPlaylist: playlist) } }
+        }
+        return HStack(spacing: 12) {
+            Button {
+                Task { await viewModel.playTrackInPlaylist(track, from: playlist) }
+            } label: {
+                HStack(spacing: 12) {
+                    AlbumArtView(urlString: track.imageURL, size: 44)
+                    Text(track.title)
+                        .font(.body)
+                        .lineLimit(1)
+                    Spacer(minLength: 8)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Spela \(track.title)")
+
+            if viewModel.canFavoriteSong(uri: track.uri) {
+                SongFavoriteButton(viewModel: viewModel, uri: track.uri)
+            } else {
+                Image(systemName: "play.fill")
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+        }
+        .padding(.vertical, 4)
+        .foregroundStyle(.white)
+        .contextMenu {
+            TrackActionButtons(viewModel: viewModel,
+                               uri: track.uri,
+                               title: track.title,
+                               imageURL: track.imageURL,
+                               onRemoveFromPlaylist: removeAction)
         }
     }
 }
 
 private struct MusicResultRow: View {
+    @ObservedObject var viewModel: MusicViewModel
     let item: MusicSearchItem
     var trailingSystemImage = "play.fill"
     let onTap: MainActorVoidClosure
 
     var body: some View {
+        // A track also offers add-to-queue / add-to-playlist via long-press; the
+        // other result types (album, artist, playlist) have no track actions.
+        if item.mediaType == .track {
+            rowButton.contextMenu {
+                TrackActionButtons(viewModel: viewModel,
+                                   uri: item.uri,
+                                   title: item.name,
+                                   artist: item.artist,
+                                   imageURL: item.imageURL)
+            }
+        } else {
+            rowButton
+        }
+    }
+
+    private var rowButton: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 AlbumArtView(urlString: item.imageURL, size: 44)

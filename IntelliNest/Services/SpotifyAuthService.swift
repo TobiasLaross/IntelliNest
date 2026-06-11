@@ -42,9 +42,12 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
     /// Must exactly match a Redirect URI registered in the Spotify app dashboard.
     private let redirectURI = "intellinest://spotify-callback"
     private let callbackScheme = "intellinest"
-    /// `playlist-read-private` to read follow state, the two `modify` scopes to
-    /// add/remove a playlist from the user's library.
-    private let scopes = "playlist-read-private playlist-modify-public playlist-modify-private"
+    /// `playlist-read-private` to read follow state, the two playlist `modify`
+    /// scopes to add/remove a playlist from the user's library and to edit a
+    /// playlist's tracks, and the two `user-library` scopes to read and toggle
+    /// Liked Songs.
+    private let scopes = "playlist-read-private playlist-modify-public playlist-modify-private "
+        + "user-library-read user-library-modify"
     private let authorizeEndpoint = "https://accounts.spotify.com/authorize"
     private let tokenEndpoint = "https://accounts.spotify.com/api/token"
 

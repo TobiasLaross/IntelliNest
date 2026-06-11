@@ -58,6 +58,7 @@ extension MusicViewModel {
         }
         favoritePlaylists = playlists
         hasLoadedSpotifyPlaylists = true
+        editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()
     }
 
     /// Re-fetches the recently-played list after a playlist launch so the new
@@ -90,6 +91,9 @@ extension MusicViewModel {
 
     func play(item: MusicSearchItem) async {
         if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist) {
+            // A single search result isn't played from a playlist, so the
+            // now-playing card has no playlist to jump to.
+            nowPlayingSourcePlaylist = nil
             closeSearchResults()
         }
     }
@@ -133,7 +137,7 @@ extension MusicViewModel {
 
     /// Loads a playlist's tracks into `playlistTracks`, toggling the loading
     /// flag. Shared by the search-sheet drill-in and the main-view browse sheet.
-    private func loadPlaylistTracks(_ playlist: MusicSearchItem) async {
+    func loadPlaylistTracks(_ playlist: MusicSearchItem) async {
         playlistTracks = []
         isLoadingPlaylist = true
         let browseSpeaker = activeSpeakerID ?? availableSpeakers.first?.entityId
@@ -151,6 +155,7 @@ extension MusicViewModel {
     /// Plays the whole playlist from the start on the active speaker.
     func playPlaylist(_ playlist: MusicSearchItem) async {
         if await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) {
+            nowPlayingSourcePlaylist = playlist
             closeSearchResults()
             await refreshRecentlyPlayed()
         }
@@ -163,6 +168,7 @@ extension MusicViewModel {
         guard await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) else {
             return
         }
+        nowPlayingSourcePlaylist = playlist
         if let activeSpeaker, let targetID = playbackTargetID {
             speakers[activeSpeaker.entityId]?.shuffle = true
             restAPIService.setShuffle(entityID: targetID, shuffle: true)
@@ -177,11 +183,21 @@ extension MusicViewModel {
         guard await startPlayback(uri: track.uri, mediaType: .track, title: track.title, artist: nil) else {
             return
         }
+        nowPlayingSourcePlaylist = playlist
         if let targetID = playbackTargetID {
             await restAPIService.playMedia(on: targetID, mediaID: playlist.uri, mediaType: .playlist, enqueue: "add")
         }
         closeSearchResults()
         await refreshRecentlyPlayed()
+    }
+
+    /// Opens the playlist the current track is playing from, reusing the main
+    /// view's browse sheet. No-op when the source playlist is unknown.
+    func openNowPlayingPlaylist() async {
+        guard let playlist = nowPlayingSourcePlaylist else {
+            return
+        }
+        await browseLibraryPlaylist(playlist)
     }
 
     /// Dismisses any playlist presentation: the search-results sheet, its
@@ -229,7 +245,7 @@ extension MusicViewModel {
     /// against the logged-in account's playlists (Spotify is the source of truth,
     /// and an MA Spotify-library playlist is by definition one of those). Returns
     /// nil for non-Spotify playlists (MA built-ins, or anything not in the account).
-    private func spotifyPlaylistID(for playlist: MusicSearchItem) -> String? {
+    func spotifyPlaylistID(for playlist: MusicSearchItem) -> String? {
         if let id = directSpotifyPlaylistID(from: playlist.uri) {
             return id
         }
@@ -294,7 +310,7 @@ extension MusicViewModel {
         }
     }
 
-    private func setSaved(_ saved: Bool, for playlist: MusicSearchItem) {
+    func setSaved(_ saved: Bool, for playlist: MusicSearchItem) {
         if saved {
             savedPlaylistURIs.insert(playlist.uri)
         } else {
