@@ -110,9 +110,12 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
                 }
             }
             webAuth.presentationContextProvider = self
-            // Spotify keeps the account signed in across logins, which is what we
-            // want here — re-auth shouldn't force a fresh username/password every time.
-            webAuth.prefersEphemeralWebBrowserSession = false
+            // Use a fresh (cookieless) session so login never silently binds to
+            // whatever Spotify account Safari happens to be signed into. The house
+            // account ("huset") differs from personal logins, so the account must
+            // be a deliberate choice at sign-in. Re-auth is rare — only when the
+            // stored refresh token is gone — since day-to-day calls use that token.
+            webAuth.prefersEphemeralWebBrowserSession = true
             webAuthSession = webAuth
             if !webAuth.start() {
                 continuation.resume(throwing: SpotifyAuthError.invalidCallback)
