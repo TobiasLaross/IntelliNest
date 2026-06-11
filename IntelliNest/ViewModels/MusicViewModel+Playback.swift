@@ -88,6 +88,15 @@ extension MusicViewModel {
         return activeSpeaker.playbackTargetID
     }
 
+    /// Re-fetches the active speaker's state so playback routing reads its
+    /// current group membership rather than a value up to one reload cycle
+    /// stale. A failed fetch leaves the existing state in place.
+    private func refreshActiveSpeaker(_ speakerID: EntityId) async {
+        if let fresh = try? await restAPIService.reload(entityId: speakerID, entityType: MediaPlayerEntity.self) {
+            speakers[speakerID] = fresh
+        }
+    }
+
     func play(item: MusicSearchItem) async {
         if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist) {
             closeSearchResults()
@@ -103,7 +112,16 @@ extension MusicViewModel {
                                title: String?,
                                artist: String?,
                                enqueue: String = "replace") async -> Bool {
-        guard let activeSpeakerID, let targetID = playbackTargetID else {
+        guard let activeSpeakerID else {
+            setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
+            return false
+        }
+        // Group membership can change between the 5-second reloads (e.g. the
+        // speaker was just ungrouped). Refresh the active speaker before routing
+        // so playback isn't sent to a stale group leader it's no longer synced
+        // with — which would start the music on the wrong speaker.
+        await refreshActiveSpeaker(activeSpeakerID)
+        guard let targetID = playbackTargetID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return false
         }

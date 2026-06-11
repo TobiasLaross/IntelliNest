@@ -125,6 +125,13 @@ final class MusicModelTests: XCTestCase {
         var leader = MediaPlayerEntity(entityId: .mediaPlayerGuestRoom)
         leader.groupMembers = [.mediaPlayerGuestRoom, .mediaPlayerPlayroom]
         XCTAssertEqual(leader.playbackTargetID, .mediaPlayerGuestRoom)
+
+        // A group_members list that doesn't include this speaker is stale or
+        // malformed; playback must stay on this speaker rather than redirect to
+        // a leader it isn't grouped with.
+        var stale = MediaPlayerEntity(entityId: .mediaPlayerOutdoorTable)
+        stale.groupMembers = [.mediaPlayerKitchen]
+        XCTAssertEqual(stale.playbackTargetID, .mediaPlayerOutdoorTable)
     }
 
     func testMediaPlayerSetNextUpdateTimeMovesIntoFuture() {
