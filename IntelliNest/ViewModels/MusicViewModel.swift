@@ -34,15 +34,28 @@ class MusicViewModel: ObservableObject, Reloadable {
     @Published var openedPlaylist: MusicSearchItem?
     @Published var playlistTracks: [MusicPlaylistTrack] = []
     @Published var isLoadingPlaylist = false
+    /// The user's favourite Spotify playlists, shown for quick launch in place of
+    /// the speaker list. Loaded on the first reload.
+    @Published var favoritePlaylists: [MusicSearchItem] = []
+    /// The most recently played playlists (Music Assistant `last_played` order),
+    /// shown above the favourites. Refreshed whenever a playlist is launched.
+    @Published var recentlyPlayedPlaylists: [MusicSearchItem] = []
+    /// A library playlist the user opened to browse from the main view (favourites
+    /// or recents), presented in its own sheet. Nil when no browse sheet is shown.
+    @Published var browsingLibraryPlaylist: MusicSearchItem?
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
+    /// Read/written by the library-playlist loader in `MusicViewModel+Playback`.
+    var hasLoadedLibrary = false
     /// Increments on every search so a slow, older response can't overwrite the
     /// results of a newer query.
     private var searchRequestToken = 0
 
-    private let restAPIService: RestAPIService
-    private let setErrorBannerText: StringStringClosure
+    /// Injected dependencies — internal (not private) so the playback/playlist
+    /// methods extracted into `MusicViewModel+Playback` can reach them.
+    let restAPIService: RestAPIService
+    let setErrorBannerText: StringStringClosure
 
     /// Speakers that are reachable right now (anything not `unavailable`),
     /// in the fixed display order.
@@ -93,6 +106,7 @@ class MusicViewModel: ObservableObject, Reloadable {
             self.selectDefaultSpeakerIfNeeded()
             self.dropActiveSpeakerIfUnavailable()
         }
+        await loadLibraryPlaylistsIfNeeded()
     }
 
     /// On the first reload after the view appears, default the active speaker to
@@ -161,156 +175,45 @@ class MusicViewModel: ObservableObject, Reloadable {
         hasSearched && !isSearching && searchSections.isEmpty
     }
 
-    // MARK: - Playback
+    // MARK: - Group volume
 
-    /// Playback and queue commands must go to the active speaker's group leader;
-    /// a synced follower rejects them. Returns the active speaker itself when it
-    /// is ungrouped. Volume stays per-speaker, so it is not redirected here.
-    private var playbackTargetID: EntityId? {
+    /// The speakers currently synced with the active speaker (leader plus any
+    /// followers), in the fixed display order. When the active speaker is
+    /// ungrouped this is just the active speaker on its own.
+    var groupedSpeakers: [MediaPlayerEntity] {
         guard let activeSpeaker else {
-            return activeSpeakerID
+            return []
         }
-        return activeSpeaker.playbackTargetID
+        let memberIDs = activeSpeaker.groupMembers
+        guard memberIDs.count > 1 else {
+            return [activeSpeaker]
+        }
+        return Self.speakerIDs.filter { memberIDs.contains($0) }.compactMap { speakers[$0] }
     }
 
-    func play(item: MusicSearchItem) async {
-        if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist) {
-            closeSearchResults()
-        }
+    /// Whether the active speaker is synced with at least one other speaker, so
+    /// the volume control should act on the whole group.
+    var isGroupActive: Bool {
+        groupedSpeakers.count > 1
     }
 
-    /// Starts (or enqueues) playback of a media item on the active speaker's
-    /// group leader. Returns whether the request succeeded so callers can chain
-    /// follow-up actions and avoid showing a false playing state.
-    @discardableResult
-    private func startPlayback(uri: String,
-                               mediaType: MusicMediaType,
-                               title: String?,
-                               artist: String?,
-                               enqueue: String = "replace") async -> Bool {
-        guard let activeSpeakerID, let targetID = playbackTargetID else {
-            setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
-            return false
+    /// The single value shown on the group-volume banner: the average volume
+    /// across every grouped speaker.
+    var groupVolume: Double {
+        let grouped = groupedSpeakers
+        guard grouped.isNotEmpty else {
+            return 0
         }
-
-        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType, enqueue: enqueue)
-        if success {
-            // Optimistically reflect what we just started; a reload confirms it.
-            speakers[activeSpeakerID]?.state = "playing"
-            speakers[activeSpeakerID]?.mediaTitle = title
-            speakers[activeSpeakerID]?.mediaArtist = artist
-            restAPIService.triggerRepeatReload(times: 3)
-        } else {
-            setErrorBannerText("Kunde inte spela", "Det gick inte att starta uppspelningen")
-        }
-        return success
+        let total = grouped.reduce(0.0) { $0 + $1.volumeLevel }
+        return total / Double(grouped.count)
     }
 
-    // MARK: - Playlists
-
-    /// Opens a playlist for browsing instead of playing it: records the opened
-    /// playlist (which drills the sheet into the detail view) and loads its
-    /// tracks. Browsing reads the playlist contents and never changes playback.
-    func openPlaylist(_ playlist: MusicSearchItem) async {
-        openedPlaylist = playlist
-        playlistTracks = []
-        isLoadingPlaylist = true
-        let browseSpeaker = activeSpeakerID ?? availableSpeakers.first?.entityId
-        if let browseSpeaker {
-            do {
-                playlistTracks = try await restAPIService.browsePlaylistTracks(playlistURI: playlist.uri, on: browseSpeaker)
-            } catch {
-                Log.error("Failed to browse playlist: \(error)")
-                setErrorBannerText("Kunde inte öppna spellistan", "Det gick inte att hämta låtarna")
-            }
+    /// Sets every grouped speaker to the same absolute volume. Individual
+    /// speakers can still be rebalanced afterwards via their own sliders.
+    func setGroupVolume(_ volume: Double) {
+        for speaker in groupedSpeakers {
+            setVolume(volume, for: speaker.entityId)
         }
-        isLoadingPlaylist = false
-    }
-
-    /// Plays the whole playlist from the start on the active speaker.
-    func playPlaylist(_ playlist: MusicSearchItem) async {
-        if await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) {
-            closeSearchResults()
-        }
-    }
-
-    /// Plays the chosen track now, then queues the rest of the playlist after it,
-    /// so the tapped song is followed by the playlist.
-    func playTrackInPlaylist(_ track: MusicPlaylistTrack, from playlist: MusicSearchItem) async {
-        guard await startPlayback(uri: track.uri, mediaType: .track, title: track.title, artist: nil) else {
-            return
-        }
-        if let targetID = playbackTargetID {
-            await restAPIService.playMedia(on: targetID, mediaID: playlist.uri, mediaType: .playlist, enqueue: "add")
-        }
-        closeSearchResults()
-    }
-
-    /// Dismisses the search-results sheet and clears any opened playlist.
-    func closeSearchResults() {
-        isShowingSearchResults = false
-        openedPlaylist = nil
-    }
-
-    func togglePlayPause() {
-        guard let activeSpeaker, let targetID = playbackTargetID else {
-            return
-        }
-        let action: Action = activeSpeaker.isPlaying ? .mediaPause : .mediaPlay
-        speakers[activeSpeaker.entityId]?.state = activeSpeaker.isPlaying ? "paused" : "playing"
-        restAPIService.mediaTransport(entityID: targetID, action: action)
-    }
-
-    func nextTrack() {
-        guard let targetID = playbackTargetID else {
-            return
-        }
-        restAPIService.mediaTransport(entityID: targetID, action: .mediaNextTrack)
-    }
-
-    func previousTrack() {
-        guard let targetID = playbackTargetID else {
-            return
-        }
-        restAPIService.mediaTransport(entityID: targetID, action: .mediaPreviousTrack)
-    }
-
-    func setVolume(_ volume: Double) {
-        guard let activeSpeakerID else {
-            return
-        }
-        setVolume(volume, for: activeSpeakerID)
-    }
-
-    /// Sets the volume of a specific speaker. Volume is always per-speaker (never
-    /// redirected to a group leader), so any speaker in the list can be adjusted
-    /// in place.
-    func setVolume(_ volume: Double, for speakerID: EntityId) {
-        speakers[speakerID]?.volumeLevel = volume
-        restAPIService.setVolume(entityID: speakerID, volume: volume)
-    }
-
-    func toggleShuffle() {
-        guard let activeSpeaker, let targetID = playbackTargetID else {
-            return
-        }
-        let newValue = !activeSpeaker.shuffle
-        speakers[activeSpeaker.entityId]?.shuffle = newValue
-        restAPIService.setShuffle(entityID: targetID, shuffle: newValue)
-    }
-
-    func toggleRepeat() {
-        guard let activeSpeaker, let targetID = playbackTargetID else {
-            return
-        }
-        // Cycle off → all → one → off, matching the Sonos-style three-state control.
-        let newMode: MediaRepeatMode = switch activeSpeaker.repeatMode {
-        case .off: .all
-        case .all: .one
-        case .one: .off
-        }
-        speakers[activeSpeaker.entityId]?.repeatMode = newMode
-        restAPIService.setRepeat(entityID: targetID, repeatMode: newMode)
     }
 
     // MARK: - Grouping

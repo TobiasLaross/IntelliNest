@@ -143,85 +143,6 @@ class RestAPIService: URLRequestBuilder {
 
     // MARK: Post requests
 
-    func update(entityID: EntityId, domain: Domain, action: Action, reloadTimes: Int = 1) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = entityID.rawValue
-            await sendPostRequest(json: json, domain: domain, action: action)
-            repeatReloadAction(reloadTimes)
-        }
-    }
-
-    func update(lightIDs: [EntityId], action: Action, brightness: Int, reloadTimes: Int = 1) {
-        Task {
-            await withTaskGroup(of: Void.self) { group in
-                for lightID in lightIDs {
-                    group.addTask {
-                        var json = [JSONKey: Any]()
-                        json[.entityID] = lightID.rawValue
-                        if action == .turnOn && brightness > 0 {
-                            json[.brightness] = brightness
-                        }
-
-                        await self.sendPostRequest(json: json, domain: .light, action: action)
-                    }
-                }
-            }
-
-            repeatReloadAction(reloadTimes)
-        }
-    }
-
-    func update(dateEntityID: EntityId, date: Date, reloadTimes: Int = 1) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = dateEntityID.rawValue
-            json[.dateTime] = date
-            await sendPostRequest(json: json, domain: .inputDateTime, action: .setDateTime)
-            repeatReloadAction(reloadTimes)
-        }
-    }
-
-    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: String, reloadTimes: Int = 1) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = entityID.rawValue
-            json[dataKey] = dataValue
-            await sendPostRequest(json: json, domain: domain, action: action)
-            repeatReloadAction(reloadTimes)
-        }
-    }
-
-    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Int, reloadTimes: Int = 1) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = entityID.rawValue
-            json[dataKey] = dataValue
-            await sendPostRequest(json: json, domain: domain, action: action)
-            repeatReloadAction(reloadTimes)
-        }
-    }
-
-    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double, reloadTimes: Int = 1) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = entityID.rawValue
-            json[dataKey] = dataValue
-            await sendPostRequest(json: json, domain: domain, action: action)
-            repeatReloadAction(reloadTimes)
-        }
-    }
-
-    func update(numberEntityID: EntityId, number: Double, reloadTimes: Int = 1) {
-        Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = numberEntityID.rawValue
-            json[.value] = number
-            await sendPostRequest(json: json, domain: .inputNumber, action: .setValue)
-            repeatReloadAction(reloadTimes)
-        }
-    }
-
     func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil, reloadTimes: Int = 2) {
         Task {
             if let action = serviceID.toAction {
@@ -343,6 +264,89 @@ class RestAPIService: URLRequestBuilder {
         let capturedJSON = json
         Task {
             await sendPostRequest(customPath: path, json: capturedJSON, domain: .apnsToken, action: .register)
+        }
+    }
+}
+
+// MARK: - Entity update overloads
+
+extension RestAPIService {
+    func update(entityID: EntityId, domain: Domain, action: Action, reloadTimes: Int = 1) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
+        }
+    }
+
+    func update(lightIDs: [EntityId], action: Action, brightness: Int, reloadTimes: Int = 1) {
+        Task {
+            await withTaskGroup(of: Void.self) { group in
+                for lightID in lightIDs {
+                    group.addTask {
+                        var json = [JSONKey: Any]()
+                        json[.entityID] = lightID.rawValue
+                        if action == .turnOn && brightness > 0 {
+                            json[.brightness] = brightness
+                        }
+
+                        await self.sendPostRequest(json: json, domain: .light, action: action)
+                    }
+                }
+            }
+
+            repeatReloadAction(reloadTimes)
+        }
+    }
+
+    func update(dateEntityID: EntityId, date: Date, reloadTimes: Int = 1) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = dateEntityID.rawValue
+            json[.dateTime] = date
+            await sendPostRequest(json: json, domain: .inputDateTime, action: .setDateTime)
+            repeatReloadAction(reloadTimes)
+        }
+    }
+
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: String, reloadTimes: Int = 1) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
+            json[dataKey] = dataValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
+        }
+    }
+
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Int, reloadTimes: Int = 1) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
+            json[dataKey] = dataValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
+        }
+    }
+
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double, reloadTimes: Int = 1) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = entityID.rawValue
+            json[dataKey] = dataValue
+            await sendPostRequest(json: json, domain: domain, action: action)
+            repeatReloadAction(reloadTimes)
+        }
+    }
+
+    func update(numberEntityID: EntityId, number: Double, reloadTimes: Int = 1) {
+        Task {
+            var json = [JSONKey: Any]()
+            json[.entityID] = numberEntityID.rawValue
+            json[.value] = number
+            await sendPostRequest(json: json, domain: .inputNumber, action: .setValue)
+            repeatReloadAction(reloadTimes)
         }
     }
 }
