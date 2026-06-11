@@ -454,4 +454,25 @@ extension MusicViewModelTests {
         XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.userID), ["tobiasc91"])
         XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.title), ["Mina spellistor"])
     }
+
+    func testLoadLibrarySavedStatesResolvesPersonalSectionRows() async {
+        // A personal playlist saved in the huset library but not a favourite must
+        // still get its row star resolved, so it isn't shown empty until detail open.
+        let personal = playlistItem(uri: "spotify://playlist/p1", name: "Träning")
+        let stub = StubSpotifyPlaylistService(savedIDs: ["p1"], userPlaylistItems: ["tobiasc91": [personal]])
+        let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
+        await model.refreshPersonalPlaylists()
+        XCTAssertTrue(model.librarySavedStateSignature.contains("spotify://playlist/p1"))
+        await model.loadLibrarySavedStates()
+        XCTAssertTrue(model.isSaved(personal))
+    }
+
+    func testLoadLibrarySavedStatesLeavesUnsavedPersonalRowUnmarked() async {
+        let personal = playlistItem(uri: "spotify://playlist/p9", name: "Inte sparad")
+        let stub = StubSpotifyPlaylistService(savedIDs: [], userPlaylistItems: ["tobiasc91": [personal]])
+        let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
+        await model.refreshPersonalPlaylists()
+        await model.loadLibrarySavedStates()
+        XCTAssertFalse(model.isSaved(personal))
+    }
 }
