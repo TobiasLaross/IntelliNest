@@ -4,21 +4,6 @@
 <img align="right" src="Images/Icon.png" alt="App icon" width="200" height="200"/>
 IntelliNest is a native iOS application that leverages the power of the popular open-source home automation platform, Home Assistant, to control various smart home devices. It aims to replace the web-based Home Assitant app. The application is written in Swift/SwiftUI. I hope that this repo will help you create your own native iOS app, I think the easiest approach is to familiarise yourself with this repo and then remove the views/viewmodels and start building your own based on the same architecture as this app.
 
-
-## Code statistics
-| Indicators                          | Now  | Desired |
-|-------------------------------------|------|---------|
-| Total LOC                           | 18594 | N/A |
-| Swift file count                    | 182 | N/A |
-| Average LOC per file                | 102 | <100 |
-| TODO comment count                  | 0 | 0 |
-| FIX comment count                   | 0 | 0 |
-| unowned reference count             | 1 | 0 |
-| Commit count in main                | 154 | N/A |
-| Total deleted lines                 | 15865 | N/A |
-| Total added lines                   | 36606 | N/A |
-
-Last Updated: 2026-06-11
 ## Supported features
 ### Rest API and Websocket support
 Most views now use WebSocket instead of REST API for improved real-time updates.
@@ -89,12 +74,3 @@ A thank you to [@alexEkdahl](https://github.com/alexEkdahl) for suggesting the n
 
 ## Licensing
 IntelliNest is licensed under the terms of the MIT license. This license grants permission for the software to be used, copied, modified, merged, published, distributed, sublicensed, and/or sold.
-| Indicators                          | Now  | Desired |
-|-------------------------------------|------|---------|
-| Total LOC                           | 9015 | N/A |
-| Swift file count                    | 131 | N/A |
-| Average LOC per file                | 68 | <100 |
-| TODO comment count                  | 0 | 0 |
-| FIX comment count                   | 0 | 0 |
-| Optional force unwrap (!) count     | 3 | 0 |
-| unowned reference count             | 0 | 0 |
