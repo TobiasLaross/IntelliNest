@@ -113,7 +113,7 @@ final class MusicModelTests: XCTestCase {
 
     func testPlaybackTargetIDResolvesGroupLeader() {
         // Ungrouped speaker targets itself.
-        var solo = MediaPlayerEntity(entityId: .mediaPlayerSpa)
+        let solo = MediaPlayerEntity(entityId: .mediaPlayerSpa)
         XCTAssertEqual(solo.playbackTargetID, .mediaPlayerSpa)
 
         // A synced follower routes playback to the group leader (the first member).
