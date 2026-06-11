@@ -35,6 +35,9 @@ struct MusicView: View {
         }
         .padding(.horizontal)
         .foregroundStyle(.white)
+        // Spotify is the source of truth — refresh the account's playlists each
+        // time the view appears rather than trusting the once-per-session cache.
+        .task { await viewModel.refreshSpotifyPlaylists() }
         .sheet(isPresented: $viewModel.isShowingSearchResults) {
             MusicSearchResultsView(viewModel: viewModel)
         }
