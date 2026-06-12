@@ -86,96 +86,59 @@ final class SpotifyApiServiceTests: XCTestCase {
 
     // MARK: - accountPlaylists
 
-    func testAccountPlaylistsMapsItems() async {
+    func mePlaylistsURL(offset: Int) -> URL {
+        spotifyURL(path: "/me/playlists", query: [URLQueryItem(name: "limit", value: "50"),
+                                                  URLQueryItem(name: "offset", value: "\(offset)")])
+    }
+
+    func testAccountPlaylistsMapsItemsWithOwnerID() async {
         let json = """
         {"items":[
-          {"id":"abc123","name":"Morgon","images":[{"url":"https://img/a.jpg"}],"owner":{"display_name":"huset"}},
-          {"id":"def456","name":"Träning","images":[],"owner":{"display_name":"huset"}},
+          {"id":"abc123","name":"Morgon","images":[{"url":"https://img/a.jpg"}],"owner":{"id":"huset","display_name":"huset"}},
+          {"id":"def456","name":"Träning","images":[],"owner":{"id":"tobiasc91","display_name":"Tobias"}},
           {"id":null,"name":"Trasig"}
         ]}
         """
-        stub(url: spotifyURL(path: "/me/playlists", query: [URLQueryItem(name: "limit", value: "50")]),
-             statusCode: 200, json: json)
+        stub(url: mePlaylistsURL(offset: 0), statusCode: 200, json: json)
         let playlists = await service.accountPlaylists()
-        // The null-id item is dropped; the rest map to spotify:// uris.
+        // The null-id item is dropped; the rest map to spotify:// uris with ownerID.
         XCTAssertEqual(playlists.map(\.name), ["Morgon", "Träning"])
         XCTAssertEqual(playlists.first?.uri, "spotify://playlist/abc123")
         XCTAssertEqual(playlists.first?.imageURL, "https://img/a.jpg")
-        XCTAssertEqual(playlists.first?.artist, "huset")
+        XCTAssertEqual(playlists.first?.ownerID, "huset")
+        XCTAssertEqual(playlists.last?.ownerID, "tobiasc91")
         XCTAssertTrue(playlists.allSatisfy { $0.mediaType == .playlist })
     }
 
-    func testAccountPlaylistsReturnsEmptyOnFailure() async {
-        stub(url: spotifyURL(path: "/me/playlists", query: [URLQueryItem(name: "limit", value: "50")]),
-             statusCode: 401, json: "{}")
-        let playlists = await service.accountPlaylists()
-        XCTAssertTrue(playlists.isEmpty)
-    }
-
-    // MARK: - userPlaylists
-
-    func userPlaylistsURL(userID: String) -> URL {
-        spotifyURL(path: "/users/\(userID)/playlists", query: [URLQueryItem(name: "limit", value: "50")])
-    }
-
-    func testUserPlaylistsMapsOwnedAndFollowedItems() async {
-        // A public profile lists both owned playlists and ones it merely follows;
-        // there is no owner filtering, so both map through.
-        let json = """
-        {"items":[
-          {"id":"own1","name":"Träning","images":[{"url":"https://img/t.jpg"}],"owner":{"display_name":"tobiasc91"}},
-          {"id":"fol1","name":"Lugnt & skönt","images":[],"owner":{"display_name":"Spotify"}},
-          {"id":null,"name":"Trasig"}
-        ]}
-        """
-        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: json)
-        let playlists = await service.userPlaylists(userID: "tobiasc91")
-        XCTAssertEqual(playlists.map(\.name), ["Träning", "Lugnt & skönt"])
-        XCTAssertEqual(playlists.first?.uri, "spotify://playlist/own1")
-        XCTAssertEqual(playlists.first?.imageURL, "https://img/t.jpg")
-        XCTAssertEqual(playlists.last?.uri, "spotify://playlist/fol1")
-        XCTAssertTrue(playlists.allSatisfy { $0.mediaType == .playlist })
-    }
-
-    func testUserPlaylistsToleratesNullArrayEntries() async {
+    func testAccountPlaylistsToleratesNullArrayEntries() async {
         // Spotify can return a bare `null` element in `items` for an unavailable
         // playlist; it must be skipped, not throw away the whole (populated) page.
         let json = """
-        {"items":[
-          null,
-          {"id":"own1","name":"Träning","images":[],"owner":{"display_name":"tobiasc91"}},
-          null
-        ]}
+        {"items":[null,{"id":"own1","name":"Träning","owner":{"id":"tobiasc91"}},null]}
         """
-        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: json)
-        let playlists = await service.userPlaylists(userID: "tobiasc91")
+        stub(url: mePlaylistsURL(offset: 0), statusCode: 200, json: json)
+        let playlists = await service.accountPlaylists()
         XCTAssertEqual(playlists.map(\.name), ["Träning"])
     }
 
-    func testUserPlaylistsReturnsEmptyWhenNoPlaylists() async {
-        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: "{\"items\":[]}")
-        let playlists = await service.userPlaylists(userID: "tobiasc91")
-        XCTAssertTrue(playlists.isEmpty)
+    func testAccountPlaylistsPaginatesPastFiftyUntilShortPage() async {
+        // A full 50-item page triggers a second fetch at offset 50; the short page
+        // there ends paging, so the whole library is returned, not just the first 50.
+        let firstPage = (0 ..< 50).map { index in
+            "{\"id\":\"p\(index)\",\"name\":\"P\(index)\",\"owner\":{\"id\":\"huset\"}}"
+        }.joined(separator: ",")
+        stub(url: mePlaylistsURL(offset: 0), statusCode: 200, json: "{\"items\":[\(firstPage)]}")
+        stub(url: mePlaylistsURL(offset: 50), statusCode: 200,
+             json: "{\"items\":[{\"id\":\"p50\",\"name\":\"P50\",\"owner\":{\"id\":\"huset\"}}]}")
+        let playlists = await service.accountPlaylists()
+        XCTAssertEqual(playlists.count, 51)
+        XCTAssertEqual(playlists.last?.name, "P50")
     }
 
-    func testUserPlaylistsReturnsEmptyOnFailure() async {
-        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 404, json: "{}")
-        let playlists = await service.userPlaylists(userID: "tobiasc91")
+    func testAccountPlaylistsReturnsEmptyOnFailure() async {
+        stub(url: mePlaylistsURL(offset: 0), statusCode: 401, json: "{}")
+        let playlists = await service.accountPlaylists()
         XCTAssertTrue(playlists.isEmpty)
-    }
-
-    func testUserPlaylistsSendsBearerTokenToUserPath() async {
-        let expectation = XCTestExpectation(description: "GET user playlists with bearer token")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "GET",
-               request.url?.path == "/v1/users/tobiasc91/playlists",
-               request.value(forHTTPHeaderField: "Authorization") == "Bearer stub-access-token" {
-                expectation.fulfill()
-            }
-        }
-        stub(url: userPlaylistsURL(userID: "tobiasc91"), statusCode: 200, json: "{\"items\":[]}")
-        _ = await service.userPlaylists(userID: "tobiasc91")
-        await fulfillment(of: [expectation], timeout: 2.0)
     }
 
     // MARK: - isPlaylistSaved

@@ -20,7 +20,6 @@ extension MusicViewModel {
     func loadLibraryPlaylistsIfNeeded() async {
         await loadRecentlyPlayedIfNeeded()
         await loadSpotifyPlaylistsIfNeeded()
-        await refreshPersonalPlaylists()
     }
 
     /// Loads the recently-played playlists from Music Assistant once.
@@ -49,38 +48,36 @@ extension MusicViewModel {
     /// (e.g. edited in the Spotify app or on another device). An empty result is
     /// kept off the list rather than clearing it, since `accountPlaylists` also
     /// returns empty on a failed/logged-out fetch.
+    /// Re-fetches the huset account's library (`/me/playlists`, all pages) and splits
+    /// it: playlists owned by a configured personal account become that person's
+    /// section, everything else stays in Favoriter — so nothing shows twice. Spotify
+    /// blocks reading another user's playlists for this dev-mode app (403), so the
+    /// personal sections are sourced from the playlists the huset account follows,
+    /// matched by `ownerID`. An account that owns none of the followed playlists is
+    /// dropped (no empty header). When logged out the personal sections are cleared;
+    /// favourites are left as-is, since an empty fetch shouldn't blank a loaded list.
     func refreshSpotifyPlaylists() async {
         guard spotify.isAuthorized else {
+            personalPlaylistSections = []
             return
         }
         let playlists = await spotify.accountPlaylists()
         guard playlists.isNotEmpty else {
             return
         }
-        favoritePlaylists = playlists
+        let personalAccountIDs = Set(personalAccounts.map(\.userID))
+        favoritePlaylists = playlists.filter { playlist in
+            guard let ownerID = playlist.ownerID else {
+                return true
+            }
+            return !personalAccountIDs.contains(ownerID)
+        }
+        personalPlaylistSections = personalAccounts.compactMap { account in
+            let owned = playlists.filter { $0.ownerID == account.userID }
+            return owned.isEmpty ? nil : PersonalPlaylistSection(account: account, playlists: owned)
+        }
         hasLoadedSpotifyPlaylists = true
         editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()
-    }
-
-    /// Re-fetches each configured personal account's public playlists, reusing the
-    /// huset login, and rebuilds `personalPlaylistSections` in configured order.
-    /// Mirrors `refreshSpotifyPlaylists`: when logged out the sections are cleared,
-    /// and an account whose fetch returns nothing (empty profile or failed request)
-    /// is dropped so its section disappears — never shown as an empty header.
-    func refreshPersonalPlaylists() async {
-        guard spotify.isAuthorized else {
-            personalPlaylistSections = []
-            return
-        }
-        var sections: [PersonalPlaylistSection] = []
-        for account in personalAccounts {
-            let playlists = await spotify.userPlaylists(userID: account.userID)
-            guard playlists.isNotEmpty else {
-                continue
-            }
-            sections.append(PersonalPlaylistSection(account: account, playlists: playlists))
-        }
-        personalPlaylistSections = sections
     }
 
     /// Re-fetches the recently-played list after a playlist launch so the new
@@ -258,7 +255,6 @@ extension MusicViewModel {
             try await spotify.authorize()
             isSpotifyAuthorized = true
             await refreshSpotifyPlaylists()
-            await refreshPersonalPlaylists()
         } catch {
             Log.error("Spotify login failed: \(error)")
             setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")

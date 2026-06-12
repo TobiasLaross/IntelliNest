@@ -50,7 +50,6 @@ struct MusicView: View {
         // time the view appears rather than trusting the once-per-session cache.
         .task {
             await viewModel.refreshSpotifyPlaylists()
-            await viewModel.refreshPersonalPlaylists()
         }
         // Keep the library-row stars in sync as the favourite/recents lists load.
         .task(id: viewModel.librarySavedStateSignature) {
