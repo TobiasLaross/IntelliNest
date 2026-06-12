@@ -70,16 +70,16 @@ extension MusicViewModelTests {
                 return
             }
             if path.contains("/media_player/unjoin") {
-                orderLock.lock(); requestOrder.append("unjoin"); orderLock.unlock()
+                orderLock.withLock { requestOrder.append("unjoin") }
             } else if path.contains("/media_player/join") {
-                orderLock.lock(); requestOrder.append("join"); orderLock.unlock()
+                orderLock.withLock { requestOrder.append("join") }
             }
         }
         stubPostService(path: "/api/services/media_player/unjoin")
         stubPostService(path: "/api/services/media_player/join")
 
         await viewModel.toggleGroupMember(.mediaPlayerSpa)
-        orderLock.lock(); let recordedOrder = requestOrder; orderLock.unlock()
+        let recordedOrder = orderLock.withLock { requestOrder }
         XCTAssertEqual(recordedOrder, ["unjoin", "join"])
     }
 
@@ -96,16 +96,16 @@ extension MusicViewModelTests {
                 return
             }
             if path.contains("/media_player/unjoin") {
-                orderLock.lock(); requestOrder.append("unjoin"); orderLock.unlock()
+                orderLock.withLock { requestOrder.append("unjoin") }
             } else if path.contains("/media_player/join") {
-                orderLock.lock(); requestOrder.append("join"); orderLock.unlock()
+                orderLock.withLock { requestOrder.append("join") }
             }
         }
         stubPostService(path: "/api/services/media_player/unjoin")
         stubPostService(path: "/api/services/media_player/join")
 
         await viewModel.toggleGroupMember(.mediaPlayerSpa)
-        orderLock.lock(); let recordedOrder = requestOrder; orderLock.unlock()
+        let recordedOrder = orderLock.withLock { requestOrder }
         XCTAssertEqual(recordedOrder, ["join"])
     }
 
