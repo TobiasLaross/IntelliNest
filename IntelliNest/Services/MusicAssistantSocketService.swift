@@ -122,7 +122,10 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
     /// can't be serialized.
     private static func frameJSON(command: String, messageID: String, args: [String: Any]) -> String? {
         let payload: [String: Any] = ["command": command, "message_id": messageID, "args": args]
-        guard let data = try? JSONSerialization.data(withJSONObject: payload) else {
+        // `JSONSerialization.data(withJSONObject:)` raises an uncatchable Obj-C
+        // exception on an invalid object, so validate before serializing.
+        guard JSONSerialization.isValidJSONObject(payload),
+              let data = try? JSONSerialization.data(withJSONObject: payload) else {
             return nil
         }
         return String(data: data, encoding: .utf8)
@@ -144,10 +147,18 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
                   let replyID = replyMessageID(object), replyID == messageID else {
                 continue
             }
-            guard object["error_code"] == nil, let result = object["result"] else {
+            guard object["error_code"] == nil else {
                 return nil
             }
-            return try? JSONSerialization.data(withJSONObject: result)
+            // A successful command may return a non-container `result` — favourites
+            // add/remove reply with `null`. `JSONSerialization.data(withJSONObject:)`
+            // only accepts a top-level array/dictionary and raises an Obj-C exception
+            // (which `try?` can't catch) on a scalar/null, so only serialize a valid
+            // container; otherwise signal success with empty Data.
+            guard let result = object["result"], JSONSerialization.isValidJSONObject(result) else {
+                return Data()
+            }
+            return (try? JSONSerialization.data(withJSONObject: result)) ?? Data()
         }
         return nil
     }
