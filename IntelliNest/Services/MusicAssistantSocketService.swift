@@ -26,13 +26,16 @@ protocol MusicAssistantQueueSocket: Sendable {
 /// carry no matching id; those are skipped while waiting for the reply.
 final class MusicAssistantSocketService: MusicAssistantQueueSocket {
     private let urlString: String
+    private let token: String
     private let session: URLSession
     private let timeout: TimeInterval
 
     init(urlString: String = GlobalConstants.musicAssistantWebSocketURLString,
+         token: String = GlobalConstants.musicAssistantToken,
          session: URLSession = .shared,
          timeout: TimeInterval = 5) {
         self.urlString = urlString
+        self.token = token
         self.session = session
         self.timeout = timeout
     }
@@ -55,33 +58,57 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
 
     // MARK: - WebSocket plumbing
 
-    /// Opens a socket, sends one command, and returns the `result` payload of the
-    /// reply with the matching `message_id`. Returns nil on any error, timeout, or
-    /// error reply, so callers degrade gracefully.
+    /// Opens a socket, authenticates, sends one command, and returns the `result`
+    /// payload of the reply with the matching `message_id`. Returns nil on any
+    /// error, timeout, or error reply, so callers degrade gracefully.
     private func send(command: String, args: [String: Any]) async -> Data? {
-        guard let url = URL(string: urlString) else {
+        // Serialize both frames up front so the `@Sendable` timeout closure captures
+        // only the resulting JSON strings, never the non-Sendable `args` dictionary.
+        guard let url = URL(string: urlString),
+              let authJSON = Self.frameJSON(command: "auth", messageID: "auth", args: ["token": token]),
+              let commandJSON = Self.frameJSON(command: command, messageID: "1", args: args) else {
             return nil
         }
         let task = session.webSocketTask(with: url)
         task.resume()
         defer { task.cancel(with: .normalClosure, reason: nil) }
 
-        let messageID = "1"
-        let payload: [String: Any] = ["command": command, "message_id": messageID, "args": args]
-        guard let data = try? JSONSerialization.data(withJSONObject: payload),
-              let json = String(data: data, encoding: .utf8) else {
-            return nil
-        }
-
         do {
             return try await withTimeout(timeout) {
-                try await task.send(.string(json))
-                return try await Self.awaitReply(on: task, messageID: messageID)
+                // MA 2.9+ rejects every command until the connection is authenticated,
+                // so send the `auth` frame and await its ack before the real command.
+                guard try await Self.authenticate(on: task, authJSON: authJSON) else {
+                    Log.error("Music Assistant socket auth failed for command \(command)")
+                    return nil
+                }
+                try await task.send(.string(commandJSON))
+                return try await Self.awaitReply(on: task, messageID: "1")
             }
         } catch {
             Log.error("Music Assistant socket command \(command) failed: \(error)")
             return nil
         }
+    }
+
+    /// Sends the pre-serialized `auth` frame and returns whether the server acked
+    /// with `authenticated: true`.
+    private static func authenticate(on task: URLSessionWebSocketTask, authJSON: String) async throws -> Bool {
+        try await task.send(.string(authJSON))
+        guard let result = try await awaitReply(on: task, messageID: "auth"),
+              let object = try? JSONSerialization.jsonObject(with: result) as? [String: Any] else {
+            return false
+        }
+        return object["authenticated"] as? Bool == true
+    }
+
+    /// Encodes a `{command, message_id, args}` frame to a JSON string, or nil if it
+    /// can't be serialized.
+    private static func frameJSON(command: String, messageID: String, args: [String: Any]) -> String? {
+        let payload: [String: Any] = ["command": command, "message_id": messageID, "args": args]
+        guard let data = try? JSONSerialization.data(withJSONObject: payload) else {
+            return nil
+        }
+        return String(data: data, encoding: .utf8)
     }
 
     /// Reads frames until one carries the matching `message_id`, returning its

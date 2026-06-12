@@ -62,6 +62,13 @@ enum GlobalConstants {
 
     static let musicAssistantConfigEntryID = "01JZ57QTQPB79NSC7GJ2VQPA8V"
 
+    /// Music Assistant long-lived access token. MA 2.9+ requires authenticating the
+    /// WebSocket before any command, so the socket sends an `auth` frame with this
+    /// token first. Injected from the `MUSIC_ASSISTANT` xcconfig key at build time.
+    static var musicAssistantToken: String {
+        Bundle.main.object(forInfoDictionaryKey: "MUSIC_ASSISTANT") as? String ?? ""
+    }
+
     /// Music Assistant server WebSocket URL, used only for the queue commands
     /// Home Assistant exposes no REST service for: reading the full upcoming list
     /// and removing a queue item. Override with the `MUSIC_ASSISTANT_WS_URL`

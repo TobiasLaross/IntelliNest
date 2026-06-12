@@ -29,6 +29,8 @@
 	<string>$(SECRET_YALE_API_URL)</string>
 	<key>SPOTIFY_CLIENT_ID</key>
 	<string>$(SPOTIFY_CLIENT_ID)</string>
+	<key>MUSIC_ASSISTANT</key>
+	<string>$(MUSIC_ASSISTANT)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
