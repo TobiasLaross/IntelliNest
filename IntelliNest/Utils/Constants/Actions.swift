@@ -57,5 +57,5 @@ enum Action: String, Codable {
     case getLibrary = "get_library"
     case getQueue = "get_queue"
     /* system_log */
-    case create
+    case write
 }
