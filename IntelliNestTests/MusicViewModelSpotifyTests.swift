@@ -125,11 +125,13 @@ extension MusicViewModelTests {
     }
 
     func makeViewModel(spotify: SpotifyPlaylistService,
+                       socket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
                        personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
                        currentUser: @escaping @MainActor () -> User = { .tobias }) -> MusicViewModel {
         MusicViewModel(restAPIService: restAPIService,
                        setErrorBannerText: { [weak self] title, _ in self?.bannerTitles.append(title) },
                        spotify: spotify,
+                       queueSocket: socket,
                        personalAccounts: personalAccounts,
                        currentUser: currentUser)
     }
@@ -149,109 +151,51 @@ extension MusicViewModelTests {
         [playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")]
     }
 
-    func testIsSpotifyPlaylistShowsStarForResolvableUriEvenLoggedOut() {
-        let spotifyItem = spotifyPlaylist()
-        let localItem = MusicSearchItem(uri: "library://playlist/3", name: "Lokal",
-                                        mediaType: .playlist, imageURL: nil, artist: nil)
-        // Logged in: star shows for a Spotify uri, not for an unmatched library item.
-        let loggedIn = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: true))
-        XCTAssertTrue(loggedIn.isSpotifyPlaylist(spotifyItem))
-        XCTAssertFalse(loggedIn.isSpotifyPlaylist(localItem))
-        // Logged out: a directly-resolvable Spotify playlist (a search result) still
-        // shows the star — tapping it logs in first, then saves — but an unmatched
-        // library item has no Spotify id to resolve (the account list is empty), so
-        // it stays starless.
-        let loggedOut = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
-        XCTAssertTrue(loggedOut.isSpotifyPlaylist(spotifyItem))
-        XCTAssertFalse(loggedOut.isSpotifyPlaylist(localItem))
+    func testCanFavoriteShownForPlaylistsOnly() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService())
+        XCTAssertTrue(model.canFavoritePlaylist(spotifyPlaylist()))
+        let track = MusicSearchItem(uri: "spotify://track/1", name: "Song", mediaType: .track, imageURL: nil, artist: nil)
+        XCTAssertFalse(model.canFavoritePlaylist(track))
     }
 
-    func testLibraryPlaylistResolvesToSpotifyByName() async {
-        // The huset account has this playlist (with its real Spotify id); Music
-        // Assistant exposes the same playlist as an opaque library:// item.
-        let account = [MusicSearchItem(uri: "spotify://playlist/realid42",
-                                       name: "Barnlåtar 🐵 musik för barn",
-                                       mediaType: .playlist, imageURL: nil, artist: nil)]
-        let stub = StubSpotifyPlaylistService(accountPlaylistItems: account)
-        let model = makeViewModel(spotify: stub)
-        await model.refreshSpotifyPlaylists()
-        let libraryItem = MusicSearchItem(uri: "library://playlist/12",
-                                          name: "Barnlåtar 🐵 musik för barn  ",
-                                          mediaType: .playlist, imageURL: nil, artist: nil)
-        XCTAssertTrue(model.isSpotifyPlaylist(libraryItem))
-        await model.toggleSpotifySaved(libraryItem)
-        // It resolved to a Spotify id, so the save went through.
-        XCTAssertEqual(stub.saveCallCount, 1)
+    func testIsSavedMatchesMusicAssistantFavouriteByName() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService())
+        model.maFavorites = [playlistItem(uri: "library://playlist/1", name: "Träning")]
+        // Matched by normalized name across the spotify:// / library:// uri spaces.
+        XCTAssertTrue(model.isSaved(playlistItem(uri: "spotify://playlist/x", name: "  träning ")))
+        XCTAssertFalse(model.isSaved(playlistItem(uri: "spotify://playlist/y", name: "Annan")))
     }
 
-    func testLibraryBuiltinPlaylistHasNoStar() async {
-        let account = [MusicSearchItem(uri: "spotify://playlist/realid42", name: "Barnlåtar",
-                                       mediaType: .playlist, imageURL: nil, artist: nil)]
-        let stub = StubSpotifyPlaylistService(accountPlaylistItems: account)
-        let model = makeViewModel(spotify: stub)
-        await model.refreshSpotifyPlaylists()
-        let builtin = MusicSearchItem(uri: "library://playlist/3", name: "Random Album (from library)",
-                                      mediaType: .playlist, imageURL: nil, artist: nil)
-        XCTAssertFalse(model.isSpotifyPlaylist(builtin))
+    func testToggleFavoriteAddsViaSocket() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(), socket: socket)
+        let playlist = spotifyPlaylist()
+        await model.toggleFavorite(playlist)
+        let added = await socket.addedFavoriteURIs
+        XCTAssertEqual(added, [playlist.uri])
+        XCTAssertTrue(model.isSaved(playlist)) // optimistic
     }
 
-    func testLoadSavedStateReflectsLibrary() async {
-        let stub = StubSpotifyPlaylistService(savedIDs: [spotifyPlaylistID])
-        let model = makeViewModel(spotify: stub)
-        await model.loadSavedState(for: spotifyPlaylist())
-        XCTAssertTrue(model.isSaved(spotifyPlaylist()))
+    func testToggleFavoriteRemovesViaSocketUsingLibraryID() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(), socket: socket)
+        let playlist = playlistItem(uri: "spotify://playlist/x", name: "Lugnt")
+        // It's favourited in MA as a library:// item with the same name.
+        model.maFavorites = [playlistItem(uri: "library://playlist/42", name: "Lugnt")]
+        XCTAssertTrue(model.isSaved(playlist))
+        await model.toggleFavorite(playlist)
+        let removed = await socket.removedFavorites
+        XCTAssertEqual(removed, ["playlist:42"])
+        XCTAssertFalse(model.isSaved(playlist)) // optimistic
     }
 
-    func testToggleSavesWhenNotSaved() async {
-        let stub = StubSpotifyPlaylistService()
-        let model = makeViewModel(spotify: stub)
-        await model.toggleSpotifySaved(spotifyPlaylist())
-        XCTAssertTrue(model.isSaved(spotifyPlaylist()))
-        XCTAssertEqual(stub.saveCallCount, 1)
-    }
-
-    func testToggleRemovesWhenSaved() async {
-        let stub = StubSpotifyPlaylistService(savedIDs: [spotifyPlaylistID])
-        let model = makeViewModel(spotify: stub)
-        await model.loadSavedState(for: spotifyPlaylist())
-        await model.toggleSpotifySaved(spotifyPlaylist())
-        XCTAssertFalse(model.isSaved(spotifyPlaylist()))
-        XCTAssertEqual(stub.removeCallCount, 1)
-    }
-
-    func testToggleFailureRevertsAndBanners() async {
-        let stub = StubSpotifyPlaylistService(operationSucceeds: false)
-        let model = makeViewModel(spotify: stub)
-        await model.toggleSpotifySaved(spotifyPlaylist())
-        XCTAssertFalse(model.isSaved(spotifyPlaylist()))
+    func testToggleFavoriteFailureRevertsAndBanners() async {
+        let socket = StubMusicAssistantQueueSocket(favoriteSucceeds: false)
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(), socket: socket)
+        let playlist = spotifyPlaylist()
+        await model.toggleFavorite(playlist)
+        XCTAssertFalse(model.isSaved(playlist)) // reverted
         XCTAssertTrue(bannerTitles.contains("Kunde inte uppdatera favorit"))
-    }
-
-    func testToggleLogsInWhenUnauthorized() async {
-        let stub = StubSpotifyPlaylistService(authorized: false)
-        let model = makeViewModel(spotify: stub)
-        await model.toggleSpotifySaved(spotifyPlaylist())
-        XCTAssertEqual(stub.authorizeCallCount, 1)
-        XCTAssertTrue(model.isSaved(spotifyPlaylist()))
-    }
-
-    func testToggleAuthorizeFailureBanners() async {
-        let stub = StubSpotifyPlaylistService(authorized: false, authorizeThrows: true)
-        let model = makeViewModel(spotify: stub)
-        await model.toggleSpotifySaved(spotifyPlaylist())
-        XCTAssertEqual(stub.saveCallCount, 0)
-        XCTAssertFalse(model.isSaved(spotifyPlaylist()))
-        XCTAssertTrue(bannerTitles.contains("Spotify-inloggning misslyckades"))
-    }
-
-    func testToggleIgnoresNonSpotifyPlaylist() async {
-        let stub = StubSpotifyPlaylistService()
-        let model = makeViewModel(spotify: stub)
-        let localItem = MusicSearchItem(uri: "library://playlist/3", name: "Lokal",
-                                        mediaType: .playlist, imageURL: nil, artist: nil)
-        await model.toggleSpotifySaved(localItem)
-        XCTAssertEqual(stub.saveCallCount, 0)
-        XCTAssertTrue(model.savedPlaylistIDs.isEmpty)
     }
 
     func testSpotifyAccountPlaylistsLoadIntoFavoritesOnReload() async {
@@ -327,12 +271,13 @@ extension MusicViewModelTests {
         XCTAssertEqual(stub.accountPlaylistsCallCount, 0)
     }
 
-    func testToggleRefreshesAccountPlaylists() async {
+    func testToggleRefreshesListing() async {
         let item = MusicSearchItem(uri: "spotify://playlist/x", name: "Ny",
                                    mediaType: .playlist, imageURL: nil, artist: nil)
         let stub = StubSpotifyPlaylistService(accountPlaylistItems: [item])
-        let model = makeViewModel(spotify: stub)
-        await model.toggleSpotifySaved(spotifyPlaylist())
+        let model = makeViewModel(spotify: stub, socket: StubMusicAssistantQueueSocket())
+        // A successful favourite refreshes the listing (which 2-way sync may change).
+        await model.toggleFavorite(spotifyPlaylist())
         XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Ny"])
         XCTAssertGreaterThanOrEqual(stub.accountPlaylistsCallCount, 1)
     }
@@ -476,60 +421,5 @@ extension MusicViewModelTests {
         await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor", "Tobias spellistor"])
         XCTAssertEqual(model.personalPlaylistSections.first?.account.userID, "sarahtest42")
-    }
-
-    func testLoadLibrarySavedStatesResolvesPersonalSectionRows() async {
-        // A personal playlist saved in the huset library but not a favourite must
-        // still get its row star resolved, so it isn't shown empty until detail open.
-        let personal = playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")
-        let stub = StubSpotifyPlaylistService(savedIDs: ["p1"], accountPlaylistItems: [personal])
-        let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshSpotifyPlaylists()
-        XCTAssertTrue(model.librarySavedStateSignature.contains("spotify://playlist/p1"))
-        await model.loadLibrarySavedStates()
-        XCTAssertTrue(model.isSaved(personal))
-    }
-
-    func testLoadLibrarySavedStatesLeavesUnsavedPersonalRowUnmarked() async {
-        let personal = playlistItem(uri: "spotify://playlist/p9", name: "Inte sparad", ownerID: "tobiasc91")
-        let stub = StubSpotifyPlaylistService(savedIDs: [], accountPlaylistItems: [personal])
-        let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshSpotifyPlaylists()
-        await model.loadLibrarySavedStates()
-        XCTAssertFalse(model.isSaved(personal))
-    }
-
-    // A playlist the account *owns* isn't "followed", so Spotify's follow-contains
-    // check (`savedIDs` here) returns false for it. Library membership, not that
-    // check, must decide the star — otherwise the same owned playlist shows filled
-    // under Favoriter but hollow under Senast spelade.
-    func testOwnedFavouriteShowsSavedInBothFavouritesAndRecents() async {
-        let name = "Låtar som är ganska sköna och avslappnande"
-        let owned = MusicSearchItem(uri: "spotify://playlist/owned1", name: name,
-                                    mediaType: .playlist, imageURL: nil, artist: "huset")
-        // savedIDs empty → the follow-contains check would say "not saved".
-        let stub = StubSpotifyPlaylistService(savedIDs: [], accountPlaylistItems: [owned])
-        let model = makeViewModel(spotify: stub)
-        await model.refreshSpotifyPlaylists()
-        // The same playlist surfaces in Senast spelade as an opaque library:// item.
-        let recent = MusicSearchItem(uri: "library://playlist/42", name: name,
-                                     mediaType: .playlist, imageURL: nil, artist: nil)
-        model.recentlyPlayedPlaylists = [recent]
-        await model.loadLibrarySavedStates()
-        XCTAssertTrue(model.isSaved(owned))
-        XCTAssertTrue(model.isSaved(recent))
-    }
-
-    // Opening an owned favourite's detail must not un-mark it: the follow-contains
-    // check returns false, but library membership keeps the star filled (the popup
-    // no longer drops the playlist to non-favourite on dismiss).
-    func testOpeningOwnedFavouriteDetailKeepsItSaved() async {
-        let owned = MusicSearchItem(uri: "spotify://playlist/owned1", name: "Min egen lista",
-                                    mediaType: .playlist, imageURL: nil, artist: "huset")
-        let stub = StubSpotifyPlaylistService(savedIDs: [], accountPlaylistItems: [owned])
-        let model = makeViewModel(spotify: stub)
-        await model.refreshSpotifyPlaylists()
-        await model.loadSavedState(for: owned)
-        XCTAssertTrue(model.isSaved(owned))
     }
 }

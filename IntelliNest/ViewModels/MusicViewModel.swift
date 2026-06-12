@@ -53,11 +53,11 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// A library playlist the user opened to browse from the main view (favourites
     /// or recents), presented in its own sheet. Nil when no browse sheet is shown.
     @Published var browsingLibraryPlaylist: MusicSearchItem?
-    /// Spotify ids of playlists currently saved in the user's Spotify library,
-    /// driving the favourite star everywhere a playlist is shown. Keyed by
-    /// resolved Spotify id rather than uri so the same playlist reads the same
-    /// whether it arrived as a `spotify://` favourite or a `library://` recent.
-    @Published var savedPlaylistIDs: Set<String> = []
+    /// The playlists favourited in Music Assistant (`library://playlist/<id>`
+    /// items). Drives the favourite-star fill (matched by name) and carries the
+    /// library id needed to unfavourite over the socket. With MA's Spotify 2-way
+    /// sync on, this mirrors what the huset account follows on Spotify.
+    @Published var maFavorites: [MusicSearchItem] = []
     /// Whether the user is logged into Spotify. Drives the login warning triangle
     /// and its prompt — shown only while logged out.
     @Published var isSpotifyAuthorized = false

@@ -263,49 +263,36 @@ extension MusicViewModel {
         do {
             try await spotify.authorize()
             isSpotifyAuthorized = true
-            await refreshSpotifyPlaylists()
+            await refreshFavorites()
         } catch {
             Log.error("Spotify login failed: \(error)")
             setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")
         }
     }
 
-    // MARK: - Spotify favourite
+    // MARK: - Favourites (Music Assistant)
 
-    /// Whether to show the favourite star for this playlist: it resolves to a
-    /// Spotify id, directly or via the account match. The star shows even when
-    /// logged out for a directly-resolvable `spotify://` playlist (a search
-    /// result) — tapping it logs in first, then saves — so there's an affordance
-    /// instead of a blank toolbar. Built-ins and non-account `library://` items
-    /// still get no star (they only resolve via the logged-in account match).
-    func isSpotifyPlaylist(_ playlist: MusicSearchItem) -> Bool {
-        spotifyPlaylistID(for: playlist) != nil
+    /// Whether to show the favourite star: any playlist can be favourited in MA
+    /// (and MA's Spotify 2-way sync mirrors it to the follow). Spotify writes are
+    /// blocked for this dev-mode app, so the star goes through MA, not Spotify.
+    func canFavoritePlaylist(_ playlist: MusicSearchItem) -> Bool {
+        playlist.mediaType == .playlist
     }
 
-    /// Whether the playlist is currently marked saved (drives the filled star).
-    /// Resolved by Spotify id, not uri, so the same playlist reads identically
-    /// whether it came in as a `spotify://` favourite or a `library://` recent.
+    /// Whether the playlist is currently favourited in Music Assistant. MA
+    /// favourites are `library://` items while the listing is `spotify://`, so
+    /// they are matched by normalized name.
     func isSaved(_ playlist: MusicSearchItem) -> Bool {
-        guard let id = spotifyPlaylistID(for: playlist) else {
-            return false
-        }
-        return savedPlaylistIDs.contains(id)
+        maFavoriteNames.contains(normalizedName(playlist.name))
     }
 
-    /// The Spotify ids of every playlist currently in the account library (the
-    /// favourites section). Library membership — not Spotify's follow-contains
-    /// check, which returns false for playlists the account owns — is the source
-    /// of truth for whether a playlist is saved.
-    var libraryPlaylistIDs: Set<String> {
-        Set(favoritePlaylists.compactMap { spotifyPlaylistID(for: $0) })
+    var maFavoriteNames: Set<String> {
+        Set(maFavorites.map { normalizedName($0.name) })
     }
 
-    /// Resolves the Spotify playlist id for a playlist. A `spotify://playlist/<id>`
-    /// uri gives it directly. Music Assistant library items instead use opaque
-    /// `library://playlist/<n>` uris with no Spotify id, so they're matched by name
-    /// against the logged-in account's playlists (Spotify is the source of truth,
-    /// and an MA Spotify-library playlist is by definition one of those). Returns
-    /// nil for non-Spotify playlists (MA built-ins, or anything not in the account).
+    /// Resolves the Spotify playlist id for a playlist (used by the add-to-playlist
+    /// feature). A `spotify://playlist/<id>` uri gives it directly; a `library://`
+    /// item is matched by name against the account's playlists.
     func spotifyPlaylistID(for playlist: MusicSearchItem) -> String? {
         if let id = directSpotifyPlaylistID(from: playlist.uri) {
             return id
@@ -328,66 +315,82 @@ extension MusicViewModel {
         name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
-    /// Reads the saved-state when the playlist detail appears, so the star
-    /// reflects reality. Skipped (and silent) for non-Spotify playlists or when
-    /// the user hasn't logged in yet — the star only loads after first login. A
-    /// playlist already in the account library is saved by definition: Spotify's
-    /// follow-contains check returns false for playlists the account *owns*, so
-    /// trust library membership first and only query the API for playlists
-    /// outside the library (e.g. someone else's playlist opened from search).
-    func loadSavedState(for playlist: MusicSearchItem) async {
-        guard let playlistID = spotifyPlaylistID(for: playlist), spotify.isAuthorized else {
-            return
+    /// The Music Assistant library id from a `library://playlist/<id>` uri, needed
+    /// to unfavourite over the socket.
+    private func libraryPlaylistID(from uri: String) -> String? {
+        let prefix = "library://playlist/"
+        guard uri.hasPrefix(prefix) else {
+            return nil
         }
-        if libraryPlaylistIDs.contains(playlistID) {
-            savedPlaylistIDs.insert(playlistID)
-            return
-        }
-        await setSaved(spotify.isPlaylistSaved(playlistID: playlistID), for: playlist)
+        let id = String(uri.dropFirst(prefix.count))
+        return id.isNotEmpty ? id : nil
     }
 
-    /// Toggles whether the playlist is in the user's Spotify library. Triggers the
-    /// one-time Spotify login when needed, flips the star optimistically, then
-    /// reverts and shows a banner if the request fails.
-    func toggleSpotifySaved(_ playlist: MusicSearchItem) async {
-        guard let playlistID = spotifyPlaylistID(for: playlist) else {
-            return
+    /// Ensures the MA favourites are loaded so the star reflects reality when a
+    /// playlist detail opens straight from a search result.
+    func loadSavedState(for _: MusicSearchItem) async {
+        if maFavorites.isEmpty {
+            await refreshFavorites()
         }
-        if !spotify.isAuthorized {
-            do {
-                try await spotify.authorize()
-                isSpotifyAuthorized = true
-            } catch {
-                Log.error("Spotify authorization failed: \(error)")
-                setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")
-                return
-            }
-        }
+    }
 
+    /// Toggles the playlist's Music Assistant favourite. MA's Spotify 2-way sync
+    /// then follows/unfollows it on Spotify, and the next listing reload reflects
+    /// it. Flips the star optimistically; reverts and banners on failure.
+    func toggleFavorite(_ playlist: MusicSearchItem) async {
         let wasSaved = isSaved(playlist)
-        setSaved(!wasSaved, for: playlist)
-        let success = wasSaved
-            ? await spotify.removePlaylist(playlistID: playlistID)
-            : await spotify.savePlaylist(playlistID: playlistID)
-        if success {
-            // The account's playlist set just changed — refresh the favourites
-            // section so it reflects the save/remove.
-            await refreshSpotifyPlaylists()
+        // Capture the unfavourite target's library id before the optimistic flip
+        // removes it from `maFavorites`.
+        let removalID = wasSaved ? maLibraryID(matching: playlist) : nil
+        setFavoriteOptimistically(!wasSaved, playlist: playlist)
+        let success: Bool = if wasSaved {
+            if let removalID {
+                await queueSocket.removeFavorite(mediaType: "playlist", libraryItemID: removalID)
+            } else {
+                false
+            }
         } else {
-            setSaved(wasSaved, for: playlist)
-            setErrorBannerText("Kunde inte uppdatera favorit", "Det gick inte att ändra favoritmarkeringen på Spotify")
+            await queueSocket.addFavorite(uri: playlist.uri)
+        }
+        if success {
+            await refreshFavorites()
+        } else {
+            setFavoriteOptimistically(wasSaved, playlist: playlist)
+            setErrorBannerText("Kunde inte uppdatera favorit", "Det gick inte att ändra favoritmarkeringen")
         }
     }
 
-    func setSaved(_ saved: Bool, for playlist: MusicSearchItem) {
-        guard let id = spotifyPlaylistID(for: playlist) else {
-            return
+    /// The MA library id for the favourite matching `playlist` by name, or nil if
+    /// no matching favourite is loaded.
+    private func maLibraryID(matching playlist: MusicSearchItem) -> String? {
+        let name = normalizedName(playlist.name)
+        guard let item = maFavorites.first(where: { normalizedName($0.name) == name }) else {
+            return nil
         }
-        if saved {
-            savedPlaylistIDs.insert(id)
+        return libraryPlaylistID(from: item.uri)
+    }
+
+    /// Optimistically flips the favourite-name membership so the star updates
+    /// before the socket round-trip completes.
+    private func setFavoriteOptimistically(_ favorite: Bool, playlist: MusicSearchItem) {
+        let name = normalizedName(playlist.name)
+        if favorite {
+            if !maFavorites.contains(where: { normalizedName($0.name) == name }) {
+                maFavorites.append(playlist)
+            }
         } else {
-            savedPlaylistIDs.remove(id)
+            maFavorites.removeAll { normalizedName($0.name) == name }
         }
+    }
+
+    /// Re-fetches the MA favourites (drives the star state and the unfavourite id
+    /// lookup), then the Spotify listing so the per-owner sections reflect any
+    /// follow change the 2-way sync propagated.
+    func refreshFavorites() async {
+        if let favorites = try? await restAPIService.getFavoritePlaylists() {
+            maFavorites = favorites
+        }
+        await refreshSpotifyPlaylists()
     }
 
     // MARK: - Transport & volume
