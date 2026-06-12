@@ -72,9 +72,18 @@ extension MusicViewModel {
             }
             return !personalAccountIDs.contains(ownerID)
         }
-        personalPlaylistSections = personalAccounts.compactMap { account in
+        // Show the viewer's own section first; the rest keep configured order. The
+        // viewer's own is titled "Mina spellistor", everyone else's by their name.
+        let viewer = currentUser()
+        let orderedAccounts = personalAccounts.filter { $0.user == viewer }
+            + personalAccounts.filter { $0.user != viewer }
+        personalPlaylistSections = orderedAccounts.compactMap { account in
             let owned = playlists.filter { $0.ownerID == account.userID }
-            return owned.isEmpty ? nil : PersonalPlaylistSection(account: account, playlists: owned)
+            guard owned.isNotEmpty else {
+                return nil
+            }
+            let title = account.user == viewer ? "Mina spellistor" : account.user.playlistSectionTitle
+            return PersonalPlaylistSection(account: account, title: title, playlists: owned)
         }
         hasLoadedSpotifyPlaylists = true
         editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()

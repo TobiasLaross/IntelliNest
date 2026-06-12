@@ -18,6 +18,14 @@ enum User: String, CaseIterable {
             "Unknown User"
         }
     }
+
+    /// The music-view section heading for this person's playlists from another
+    /// viewer's perspective, e.g. "Sarahs spellistor". Swedish genitive: names
+    /// already ending in s/x/z take no extra "s" ("Tobias spellistor").
+    var playlistSectionTitle: String {
+        let genitive = "sxzSXZ".contains(name.last ?? " ") ? "" : "s"
+        return "\(name)\(genitive) spellistor"
+    }
 }
 
 struct UserManager {

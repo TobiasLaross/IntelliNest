@@ -11,17 +11,20 @@ import Foundation
 /// music view as its own titled section. Baked into the app (no in-app management);
 /// add another account by appending to `SpotifyPersonalAccount.configured`.
 struct SpotifyPersonalAccount: Identifiable, Equatable {
-    /// The Spotify user id (the `/users/{id}` path component).
+    /// The Spotify user id that owns these playlists in the huset library.
     let userID: String
-    /// The Swedish section title shown above this account's playlists.
-    let title: String
+    /// The app user this account belongs to — drives the per-viewer section title
+    /// ("Mina spellistor" for the logged-in user, the person's name for everyone
+    /// else) and ordering (the viewer's own section is shown first).
+    let user: User
 
     var id: String { userID }
 
-    /// The ordered list of personal accounts. Sections render in this order.
+    /// The configured personal accounts. The viewer's own is surfaced first at
+    /// render time; this is just the known set.
     static let configured: [SpotifyPersonalAccount] = [
-        SpotifyPersonalAccount(userID: "tobiasc91", title: "Mina spellistor"),
-        SpotifyPersonalAccount(userID: "mbostroem", title: "Sarahs spellistor")
+        SpotifyPersonalAccount(userID: "tobiasc91", user: .tobias),
+        SpotifyPersonalAccount(userID: "mbostroem", user: .sarah)
     ]
 }
 
