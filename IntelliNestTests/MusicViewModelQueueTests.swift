@@ -6,11 +6,15 @@ import XCTest
 actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     var items: [MusicQueueItem]
     var deleteSucceeds: Bool
+    var favoriteSucceeds: Bool
     private(set) var deletedItemIDs: [String] = []
+    private(set) var addedFavoriteURIs: [String] = []
+    private(set) var removedFavorites: [String] = []
 
-    init(items: [MusicQueueItem] = [], deleteSucceeds: Bool = true) {
+    init(items: [MusicQueueItem] = [], deleteSucceeds: Bool = true, favoriteSucceeds: Bool = true) {
         self.items = items
         self.deleteSucceeds = deleteSucceeds
+        self.favoriteSucceeds = favoriteSucceeds
     }
 
     func queueItems(queueID _: String) async -> [MusicQueueItem] { items }
@@ -18,6 +22,16 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     func deleteItem(queueID _: String, itemID: String) async -> Bool {
         deletedItemIDs.append(itemID)
         return deleteSucceeds
+    }
+
+    func addFavorite(uri: String) async -> Bool {
+        addedFavoriteURIs.append(uri)
+        return favoriteSucceeds
+    }
+
+    func removeFavorite(mediaType: String, libraryItemID: String) async -> Bool {
+        removedFavorites.append("\(mediaType):\(libraryItemID)")
+        return favoriteSucceeds
     }
 }
 

@@ -133,7 +133,7 @@ struct MusicPlaylistView: View {
             // large in the header below, so a cramped, truncated nav-bar copy adds
             // nothing. Keep only the favourite star.
             ToolbarItem(placement: .topBarTrailing) {
-                if viewModel.isSpotifyPlaylist(playlist) {
+                if viewModel.canFavoritePlaylist(playlist) {
                     favoriteButton
                 }
             }
@@ -161,17 +161,18 @@ struct MusicPlaylistView: View {
         .padding(.top, 12)
     }
 
-    /// The Spotify favourite star. Filled and yellow when the playlist is saved,
-    /// outlined otherwise. Toggling it logs in to Spotify first if needed.
+    /// The favourite star. Filled and yellow when favourited in Music Assistant,
+    /// outlined otherwise. Toggling it adds/removes the MA favourite (which 2-way
+    /// syncs to the Spotify follow).
     private var favoriteButton: some View {
         let saved = viewModel.isSaved(playlist)
         return Button {
-            Task { await viewModel.toggleSpotifySaved(playlist) }
+            Task { await viewModel.toggleFavorite(playlist) }
         } label: {
             Image(systemName: saved ? "star.fill" : "star")
                 .foregroundStyle(saved ? .yellow : .white)
         }
-        .accessibilityLabel(saved ? "Ta bort från Spotify-favoriter" : "Lägg till i Spotify-favoriter")
+        .accessibilityLabel(saved ? "Ta bort från favoriter" : "Lägg till i favoriter")
     }
 
     private func capsuleButton(title: String,

@@ -46,14 +46,10 @@ struct MusicView: View {
         }
         .padding(.horizontal)
         .foregroundStyle(.white)
-        // Spotify is the source of truth — refresh the account's playlists each
-        // time the view appears rather than trusting the once-per-session cache.
+        // Refresh the MA favourites (star state) and the Spotify listing each time
+        // the view appears rather than trusting the once-per-session cache.
         .task {
-            await viewModel.refreshSpotifyPlaylists()
-        }
-        // Keep the library-row stars in sync as the favourite/recents lists load.
-        .task(id: viewModel.librarySavedStateSignature) {
-            await viewModel.loadLibrarySavedStates()
+            await viewModel.refreshFavorites()
         }
         .sheet(isPresented: $viewModel.isShowingSearchResults) {
             MusicSearchResultsView(viewModel: viewModel)
@@ -225,7 +221,7 @@ private struct LibraryPlaylistRow: View {
             .accessibilityLabel(playlist.name)
             .accessibilityHint("Öppna spellistan")
 
-            if viewModel.isSpotifyPlaylist(playlist) {
+            if viewModel.canFavoritePlaylist(playlist) {
                 favoriteStar
             } else {
                 Image(systemName: "chevron.right")
@@ -239,13 +235,13 @@ private struct LibraryPlaylistRow: View {
     private var favoriteStar: some View {
         let saved = viewModel.isSaved(playlist)
         return Button {
-            Task { await viewModel.toggleSpotifySaved(playlist) }
+            Task { await viewModel.toggleFavorite(playlist) }
         } label: {
             Image(systemName: saved ? "star.fill" : "star")
                 .foregroundStyle(saved ? .yellow : .white.opacity(0.6))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(saved ? "Ta bort \(playlist.name) från Spotify-favoriter" : "Lägg till \(playlist.name) i Spotify-favoriter")
+        .accessibilityLabel(saved ? "Ta bort \(playlist.name) från favoriter" : "Lägg till \(playlist.name) i favoriter")
     }
 }
 

@@ -34,6 +34,13 @@ extension RestAPIService {
         try await getLibraryPlaylists(favorite: nil, orderBy: "last_played_desc", limit: limit)
     }
 
+    /// Fetches the favourited playlists from the Music Assistant library. These are
+    /// `library://playlist/<id>` items whose `<id>` is the library id needed to
+    /// unfavourite over the socket. Drives the favourite-star state.
+    func getFavoritePlaylists(limit: Int = 100) async throws -> [MusicSearchItem] {
+        try await getLibraryPlaylists(favorite: true, orderBy: "sort_name", limit: limit)
+    }
+
     /// Shared `get_library` call for playlists (`?return_response`). `favorite`
     /// applies the favourite filter only when non-nil.
     private func getLibraryPlaylists(favorite: Bool?, orderBy: String, limit: Int) async throws -> [MusicSearchItem] {
