@@ -353,7 +353,7 @@ extension RestAPIService {
 // MARK: - Remote logging
 
 extension RestAPIService {
-    /// Forwards a log line to Home Assistant's system log (`system_log.create`) so the
+    /// Forwards a log line to Home Assistant's system log (`system_log.write`) so the
     /// app's errors and warnings show up next to HA's own logs. Failures here are
     /// swallowed on purpose: this runs from `Log.error`/`Log.warning`, so logging a
     /// failure — or showing the error banner — would recurse or spam the user.
@@ -364,7 +364,7 @@ extension RestAPIService {
             .logger: "intellinest"
         ]
         guard let jsonData = createJSONData(json: json) else { return }
-        let path = "/api/services/\(Domain.systemLog.rawValue)/\(Action.create.rawValue)"
+        let path = "/api/services/\(Domain.systemLog.rawValue)/\(Action.write.rawValue)"
         Task {
             await sendSystemLogRequest(path: path, jsonData: jsonData, forceExternalURL: false)
         }

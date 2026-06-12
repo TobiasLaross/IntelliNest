@@ -197,17 +197,17 @@ class RestAPIServiceTests: XCTestCase {
 
     private func stubInternalSystemLogURL() -> URL {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
-        components.path = "/api/services/system_log/create"
+        components.path = "/api/services/system_log/write"
         let url = components.url!
         let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
         return url
     }
 
-    func testReportToSystemLog_postsMessageLevelAndLoggerToSystemLogCreate() async {
+    func testReportToSystemLog_postsMessageLevelAndLoggerToSystemLogWrite() async {
         _ = stubInternalSystemLogURL()
 
-        let requestObserved = expectation(description: "system_log.create POST observed")
+        let requestObserved = expectation(description: "system_log.write POST observed")
         var capturedPath: String?
         var capturedBody: [String: Any]?
         URLProtocolStub.observerRequests { request in
@@ -223,7 +223,7 @@ class RestAPIServiceTests: XCTestCase {
         restAPIService.reportToSystemLog(message: "Something broke", level: "error")
 
         await fulfillment(of: [requestObserved], timeout: 2)
-        XCTAssertEqual(capturedPath, "/api/services/system_log/create")
+        XCTAssertEqual(capturedPath, "/api/services/system_log/write")
         XCTAssertEqual(capturedBody?["message"] as? String, "Something broke")
         XCTAssertEqual(capturedBody?["level"] as? String, "error")
         XCTAssertEqual(capturedBody?["logger"] as? String, "intellinest")
@@ -232,12 +232,12 @@ class RestAPIServiceTests: XCTestCase {
     func testReportToSystemLog_fallsBackToExternalURLWhenLocalFails() async {
         // Local URL has no stub — only external is reachable.
         var components = URLComponents(string: GlobalConstants.baseExternalUrlString)!
-        components.path = "/api/services/system_log/create"
+        components.path = "/api/services/system_log/write"
         let externalURL = components.url!
         let response = HTTPURLResponse(url: externalURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: externalURL, data: Data(), response: response, error: nil)
 
-        let externalObserved = expectation(description: "external system_log.create POST observed")
+        let externalObserved = expectation(description: "external system_log.write POST observed")
         URLProtocolStub.observerRequests { request in
             if request.httpMethod == "POST",
                request.url?.absoluteString.contains(GlobalConstants.baseExternalUrlString) == true {

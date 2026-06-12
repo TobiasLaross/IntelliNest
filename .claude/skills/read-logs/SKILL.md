@@ -12,7 +12,7 @@ allowed-tools: Bash, Read
 IntelliNest logs to two places. The app writes every `Log.info/error/warning/debug/verbose` call
 (`IntelliNest/Utils/Extensions/LogExtension.swift`) to Apple's unified logging system. Since the
 "Added error logs to Home Assistant" change, every **error** and **warning** is *also* forwarded to
-Home Assistant's system log via `system_log.create`, tagged with logger `intellinest`. So the app's
+Home Assistant's system log via `system_log.write`, tagged with logger `intellinest`. So the app's
 own log is the full firehose; Home Assistant holds errors + warnings in one place alongside HA's
 own logs.
 
