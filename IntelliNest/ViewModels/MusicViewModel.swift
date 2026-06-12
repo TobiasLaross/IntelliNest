@@ -7,14 +7,15 @@
 
 import Foundation
 
-/// A personal account's section of public playlists, ready to render. Carries the
-/// account (for title + stable identity) and the playlists fetched for it.
+/// A personal account's section of playlists, ready to render. The `title` is
+/// resolved per viewer ("Mina spellistor" for the logged-in user, the person's
+/// name otherwise), so it's stored rather than derived from the account.
 struct PersonalPlaylistSection: Identifiable, Equatable {
     let account: SpotifyPersonalAccount
+    let title: String
     let playlists: [MusicSearchItem]
 
     var id: String { account.id }
-    var title: String { account.title }
 }
 
 @MainActor
@@ -112,6 +113,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// sections. Injectable so tests can exercise multiple-account ordering and the
     /// hide-when-empty rule without depending on the baked-in list.
     let personalAccounts: [SpotifyPersonalAccount]
+    /// The logged-in app user, read when building the personal sections so the
+    /// viewer's own playlists are shown first and titled "Mina spellistor".
+    /// Injected as a closure so tests don't depend on shared `UserDefaults`.
+    let currentUser: @MainActor () -> User
 
     /// Speakers that are reachable right now (anything not `unavailable`),
     /// in the fixed display order.
@@ -130,12 +135,14 @@ class MusicViewModel: ObservableObject, Reloadable {
          setErrorBannerText: @escaping StringStringClosure = { _, _ in },
          spotify: SpotifyPlaylistService = DisabledSpotifyPlaylistService(),
          queueSocket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
-         personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured) {
+         personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
+         currentUser: @escaping @MainActor () -> User = { UserManager.currentUser }) {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
         self.spotify = spotify
         self.queueSocket = queueSocket
         self.personalAccounts = personalAccounts
+        self.currentUser = currentUser
         isSpotifyAuthorized = spotify.isAuthorized
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
         for speakerID in Self.speakerIDs {

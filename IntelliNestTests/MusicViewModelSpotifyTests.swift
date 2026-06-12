@@ -125,16 +125,18 @@ extension MusicViewModelTests {
     }
 
     func makeViewModel(spotify: SpotifyPlaylistService,
-                       personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured) -> MusicViewModel {
+                       personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
+                       currentUser: @escaping @MainActor () -> User = { .tobias }) -> MusicViewModel {
         MusicViewModel(restAPIService: restAPIService,
                        setErrorBannerText: { [weak self] title, _ in self?.bannerTitles.append(title) },
                        spotify: spotify,
-                       personalAccounts: personalAccounts)
+                       personalAccounts: personalAccounts,
+                       currentUser: currentUser)
     }
 
-    // Fixed personal-account ids/titles — grep-searchable, no random data.
-    var tobiasAccount: SpotifyPersonalAccount { SpotifyPersonalAccount(userID: "tobiasc91", title: "Mina spellistor") }
-    var sarahAccount: SpotifyPersonalAccount { SpotifyPersonalAccount(userID: "sarahtest42", title: "Sarahs spellistor") }
+    // Fixed personal-account ids — grep-searchable, no random data.
+    var tobiasAccount: SpotifyPersonalAccount { SpotifyPersonalAccount(userID: "tobiasc91", user: .tobias) }
+    var sarahAccount: SpotifyPersonalAccount { SpotifyPersonalAccount(userID: "sarahtest42", user: .sarah) }
 
     func playlistItem(uri: String, name: String, ownerID: String? = nil) -> MusicSearchItem {
         MusicSearchItem(uri: uri, name: name, mediaType: .playlist, imageURL: nil, artist: nil, ownerID: ownerID)
@@ -461,7 +463,19 @@ extension MusicViewModelTests {
 
     func testDefaultPersonalAccountsConfiguresTobiasThenSarah() {
         XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.userID), ["tobiasc91", "mbostroem"])
-        XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.title), ["Mina spellistor", "Sarahs spellistor"])
+        XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.user), [.tobias, .sarah])
+    }
+
+    func testViewerOwnSectionIsFirstAndTitledMina() async {
+        let library = [playlistItem(uri: "spotify://playlist/p1", name: "Tobias lista", ownerID: "tobiasc91"),
+                       playlistItem(uri: "spotify://playlist/p2", name: "Sarahs lista", ownerID: "sarahtest42")]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: library)
+        // Sarah is the viewer → her section is first and titled "Mina spellistor",
+        // Tobias's drops below, titled by his name.
+        let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount, sarahAccount], currentUser: { .sarah })
+        await model.refreshSpotifyPlaylists()
+        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor", "Tobias spellistor"])
+        XCTAssertEqual(model.personalPlaylistSections.first?.account.userID, "sarahtest42")
     }
 
     func testLoadLibrarySavedStatesResolvesPersonalSectionRows() async {
