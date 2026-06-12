@@ -13,8 +13,6 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     var accountPlaylistItems: [MusicSearchItem]
     var editableIDs: Set<String>
     var savedSongTrackIDs: Set<String>
-    /// Public playlists keyed by Spotify user id, returned from `userPlaylists`.
-    var userPlaylistItems: [String: [MusicSearchItem]]
     private(set) var authorizeCallCount = 0
     private(set) var saveCallCount = 0
     private(set) var removeCallCount = 0
@@ -23,7 +21,6 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     private(set) var removeSongCallCount = 0
     private(set) var addedTracks: [(playlistID: String, trackID: String)] = []
     private(set) var removedTracks: [(playlistID: String, trackID: String)] = []
-    private(set) var userPlaylistsCalls: [String] = []
 
     init(authorized: Bool = true,
          savedIDs: Set<String> = [],
@@ -31,8 +28,7 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
          authorizeThrows: Bool = false,
          accountPlaylistItems: [MusicSearchItem] = [],
          editableIDs: Set<String> = [],
-         savedSongTrackIDs: Set<String> = [],
-         userPlaylistItems: [String: [MusicSearchItem]] = [:]) {
+         savedSongTrackIDs: Set<String> = []) {
         self.authorized = authorized
         self.savedIDs = savedIDs
         self.operationSucceeds = operationSucceeds
@@ -40,7 +36,6 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
         self.accountPlaylistItems = accountPlaylistItems
         self.editableIDs = editableIDs
         self.savedSongTrackIDs = savedSongTrackIDs
-        self.userPlaylistItems = userPlaylistItems
     }
 
     var isAuthorized: Bool { authorized }
@@ -60,11 +55,6 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
 
     func editablePlaylistIDs() async -> Set<String> {
         editableIDs
-    }
-
-    func userPlaylists(userID: String) async -> [MusicSearchItem] {
-        userPlaylistsCalls.append(userID)
-        return userPlaylistItems[userID] ?? []
     }
 
     func isPlaylistSaved(playlistID: String) async -> Bool {
@@ -146,13 +136,15 @@ extension MusicViewModelTests {
     var tobiasAccount: SpotifyPersonalAccount { SpotifyPersonalAccount(userID: "tobiasc91", title: "Mina spellistor") }
     var sarahAccount: SpotifyPersonalAccount { SpotifyPersonalAccount(userID: "sarahtest42", title: "Sarahs spellistor") }
 
-    func playlistItem(uri: String, name: String) -> MusicSearchItem {
-        MusicSearchItem(uri: uri, name: name, mediaType: .playlist, imageURL: nil, artist: nil)
+    func playlistItem(uri: String, name: String, ownerID: String? = nil) -> MusicSearchItem {
+        MusicSearchItem(uri: uri, name: name, mediaType: .playlist, imageURL: nil, artist: nil, ownerID: ownerID)
     }
 
-    /// A "Träning" playlist keyed under Tobias's user id — the common single-account fixture.
-    func tobiasTräning() -> [String: [MusicSearchItem]] {
-        ["tobiasc91": [playlistItem(uri: "spotify://playlist/p1", name: "Träning")]]
+    /// The huset library containing a single "Träning" playlist owned by Tobias —
+    /// the common single-account fixture. Personal sections are sourced from the
+    /// account library filtered by `ownerID`.
+    func tobiasLibrary() -> [MusicSearchItem] {
+        [playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")]
     }
 
     func testIsSpotifyPlaylistShowsStarForResolvableUriEvenLoggedOut() {
@@ -356,19 +348,32 @@ extension MusicViewModelTests {
     // MARK: - Personal account playlist sections
 
     func testPersonalSectionAppearsWhenLoggedInWithPlaylists() async {
-        let playlists = [playlistItem(uri: "spotify://playlist/p1", name: "Träning"),
-                         playlistItem(uri: "spotify://playlist/p2", name: "Lugnt & skönt")]
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: ["tobiasc91": playlists])
+        // Personal sections are sourced from the huset library, matched by ownerID.
+        let library = [playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91"),
+                       playlistItem(uri: "spotify://playlist/p2", name: "Lugnt & skönt", ownerID: "tobiasc91")]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: library)
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.count, 1)
         XCTAssertEqual(model.personalPlaylistSections.first?.title, "Mina spellistor")
         // Order is preserved exactly as returned — no client-side re-sorting.
         XCTAssertEqual(model.personalPlaylistSections.first?.playlists.map(\.name), ["Träning", "Lugnt & skönt"])
     }
 
+    func testPersonalOwnedPlaylistsExcludedFromFavourites() async {
+        // A huset-owned playlist stays in Favoriter; a personal-account-owned one
+        // moves to that person's section so it never shows in both.
+        let library = [playlistItem(uri: "spotify://playlist/h1", name: "Husets", ownerID: "huset"),
+                       playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: library)
+        let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
+        await model.refreshSpotifyPlaylists()
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Husets"])
+        XCTAssertEqual(model.personalPlaylistSections.first?.playlists.map(\.name), ["Träning"])
+    }
+
     func testPersonalSectionLoadsViaReload() async {
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: tobiasTräning())
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: tobiasLibrary())
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         stubAllSpeakers(playing: .mediaPlayerKitchen)
         XCTAssertTrue(model.personalPlaylistSections.isEmpty)
@@ -376,79 +381,79 @@ extension MusicViewModelTests {
         XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor"])
     }
 
-    func testPersonalSectionHiddenWhenAccountHasNoPlaylists() async {
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: ["tobiasc91": []])
+    func testPersonalSectionHiddenWhenAccountOwnsNoLibraryPlaylists() async {
+        // The library has playlists, but none owned by Tobias → no Mina section.
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [
+            playlistItem(uri: "spotify://playlist/h1", name: "Husets", ownerID: "huset")
+        ])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertTrue(model.personalPlaylistSections.isEmpty)
-        // The fetch was still attempted (empty result, not skipped).
-        XCTAssertEqual(stub.userPlaylistsCalls, ["tobiasc91"])
     }
 
     func testPersonalSectionHiddenWhenLoggedOut() async {
-        let stub = StubSpotifyPlaylistService(authorized: false, userPlaylistItems: tobiasTräning())
+        let stub = StubSpotifyPlaylistService(authorized: false, accountPlaylistItems: tobiasLibrary())
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertTrue(model.personalPlaylistSections.isEmpty)
-        XCTAssertTrue(stub.userPlaylistsCalls.isEmpty)
+        XCTAssertEqual(stub.accountPlaylistsCallCount, 0)
     }
 
     func testPersonalSectionsClearedWhenSessionBecomesLoggedOut() async {
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: tobiasTräning())
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: tobiasLibrary())
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.count, 1)
         // The session is lost; a refresh now clears the sections so they disappear.
         stub.authorized = false
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertTrue(model.personalPlaylistSections.isEmpty)
     }
 
     func testMultipleAccountsEachGetASectionInConfiguredOrder() async {
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: [
-            "tobiasc91": [playlistItem(uri: "spotify://playlist/p1", name: "Träning")],
-            "sarahtest42": [playlistItem(uri: "spotify://playlist/p2", name: "Sarahs mix")]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [
+            playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91"),
+            playlistItem(uri: "spotify://playlist/p2", name: "Sarahs mix", ownerID: "sarahtest42")
         ])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount, sarahAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor", "Sarahs spellistor"])
     }
 
     func testEmptyAccountDroppedWhileOthersRemain() async {
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: [
-            "tobiasc91": [],
-            "sarahtest42": [playlistItem(uri: "spotify://playlist/p2", name: "Sarahs mix")]
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [
+            playlistItem(uri: "spotify://playlist/p2", name: "Sarahs mix", ownerID: "sarahtest42")
         ])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount, sarahAccount])
-        await model.refreshPersonalPlaylists()
-        // Tobias has nothing → dropped; only Sarah's section shows.
+        await model.refreshSpotifyPlaylists()
+        // Tobias owns nothing in the library → dropped; only Sarah's section shows.
         XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Sarahs spellistor"])
     }
 
     func testPersonalSectionRefreshReflectsLatestPlaylists() async {
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: tobiasTräning())
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: tobiasLibrary())
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.first?.playlists.map(\.name), ["Träning"])
         // Renamed/changed on Spotify; a refresh reflects it with no stale cache.
-        stub.userPlaylistItems = ["tobiasc91": [playlistItem(uri: "spotify://playlist/p3", name: "Ny spellista")]]
-        await model.refreshPersonalPlaylists()
+        stub.accountPlaylistItems = [playlistItem(uri: "spotify://playlist/p3", name: "Ny spellista", ownerID: "tobiasc91")]
+        await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.first?.playlists.map(\.name), ["Ny spellista"])
     }
 
     func testConnectSpotifyLoadsPersonalSections() async {
-        let stub = StubSpotifyPlaylistService(authorized: false, userPlaylistItems: tobiasTräning())
+        let stub = StubSpotifyPlaylistService(authorized: false, accountPlaylistItems: tobiasLibrary())
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         await model.connectSpotify()
         XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor"])
     }
 
     func testTappingPersonalPlaylistRoutesThroughBrowseFlow() async {
-        let playlist = playlistItem(uri: "spotify://playlist/p1", name: "Träning")
-        let stub = StubSpotifyPlaylistService(userPlaylistItems: ["tobiasc91": [playlist]])
+        let playlist = playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [playlist])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         model.selectSpeaker(.mediaPlayerKitchen)
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         // Tapping a personal playlist uses the same browse flow as a favourite.
         await model.browseLibraryPlaylist(model.personalPlaylistSections.first!.playlists.first!)
         XCTAssertEqual(model.browsingLibraryPlaylist?.uri, playlist.uri)
@@ -462,20 +467,20 @@ extension MusicViewModelTests {
     func testLoadLibrarySavedStatesResolvesPersonalSectionRows() async {
         // A personal playlist saved in the huset library but not a favourite must
         // still get its row star resolved, so it isn't shown empty until detail open.
-        let personal = playlistItem(uri: "spotify://playlist/p1", name: "Träning")
-        let stub = StubSpotifyPlaylistService(savedIDs: ["p1"], userPlaylistItems: ["tobiasc91": [personal]])
+        let personal = playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")
+        let stub = StubSpotifyPlaylistService(savedIDs: ["p1"], accountPlaylistItems: [personal])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         XCTAssertTrue(model.librarySavedStateSignature.contains("spotify://playlist/p1"))
         await model.loadLibrarySavedStates()
         XCTAssertTrue(model.isSaved(personal))
     }
 
     func testLoadLibrarySavedStatesLeavesUnsavedPersonalRowUnmarked() async {
-        let personal = playlistItem(uri: "spotify://playlist/p9", name: "Inte sparad")
-        let stub = StubSpotifyPlaylistService(savedIDs: [], userPlaylistItems: ["tobiasc91": [personal]])
+        let personal = playlistItem(uri: "spotify://playlist/p9", name: "Inte sparad", ownerID: "tobiasc91")
+        let stub = StubSpotifyPlaylistService(savedIDs: [], accountPlaylistItems: [personal])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
-        await model.refreshPersonalPlaylists()
+        await model.refreshSpotifyPlaylists()
         await model.loadLibrarySavedStates()
         XCTAssertFalse(model.isSaved(personal))
     }

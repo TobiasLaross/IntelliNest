@@ -34,14 +34,13 @@ protocol SpotifyPlaylistService {
     var isAuthorized: Bool { get }
     /// Runs the interactive Spotify login.
     func authorize() async throws
-    /// The playlists in the signed-in account's library (owned + followed).
+    /// The playlists in the signed-in account's library (owned + followed), across
+    /// all pages. Each item carries its `ownerID` so the library can be split into
+    /// per-person sections.
     func accountPlaylists() async -> [MusicSearchItem]
     /// The Spotify ids of the playlists the user can edit (owned or collaborative).
     /// Used to gate the add-to-playlist picker and the remove-from-playlist action.
     func editablePlaylistIDs() async -> Set<String>
-    /// The public playlists on another Spotify user's profile (created + followed).
-    /// Reuses the signed-in account's token; only public playlists are visible.
-    func userPlaylists(userID: String) async -> [MusicSearchItem]
     /// Whether the playlist is currently in the user's Spotify library.
     func isPlaylistSaved(playlistID: String) async -> Bool
     /// Adds the playlist to the user's Spotify library. Returns success.
@@ -85,49 +84,42 @@ final class SpotifyApiService: SpotifyPlaylistService {
     }
 
     func accountPlaylists() async -> [MusicSearchItem] {
-        do {
-            // 50 is the API's per-page max; plenty for a personal library and keeps
-            // it to a single request (no pagination needed here).
-            let request = try await authorizedRequest(path: "/me/playlists",
-                                                      method: "GET",
-                                                      queryItems: [URLQueryItem(name: "limit", value: "50")])
-            let (data, response) = try await session.data(for: request)
-            guard isSuccess(response) else {
-                Log.error("Spotify accountPlaylists failed: \(httpFailureDescription(response, data))")
-                return []
-            }
-            return try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
-        } catch {
-            Log.error("Spotify accountPlaylists failed: \(error)")
-            return []
-        }
+        await fetchAllLibraryPlaylistItems().compactMap(\.searchItem)
     }
 
-    func userPlaylists(userID: String) async -> [MusicSearchItem] {
-        do {
-            // 50 is the API's per-page max. Matching accountPlaylists' single-page
-            // limit keeps this to one request; a personal profile rarely exceeds it
-            // and pagination is out of scope (see design.md).
-            let request = try await authorizedRequest(path: "/users/\(userID)/playlists",
-                                                      method: "GET",
-                                                      queryItems: [URLQueryItem(name: "limit", value: "50")])
-            let (data, response) = try await session.data(for: request)
-            guard isSuccess(response) else {
-                Log.error("Spotify userPlaylists(\(userID)) failed: \(httpFailureDescription(response, data))")
-                return []
+    /// Fetches every page of the signed-in account's `/me/playlists`. Spotify caps a
+    /// page at 50, so we walk the `offset` until a short page ends it — the huset
+    /// library plus the followed personal-account playlists easily exceeds 50, and a
+    /// single page would silently truncate them. `maxPages` guards against an
+    /// unbounded loop. A page fetch that fails stops paging and returns what we have.
+    private func fetchAllLibraryPlaylistItems() async -> [SpotifyPlaylistItem] {
+        let pageSize = 50
+        let maxPages = 10
+        var items: [SpotifyPlaylistItem] = []
+        for page in 0 ..< maxPages {
+            do {
+                let request = try await authorizedRequest(
+                    path: "/me/playlists",
+                    method: "GET",
+                    queryItems: [URLQueryItem(name: "limit", value: "\(pageSize)"),
+                                 URLQueryItem(name: "offset", value: "\(page * pageSize)")]
+                )
+                let (data, response) = try await session.data(for: request)
+                guard isSuccess(response) else {
+                    Log.error("Spotify accountPlaylists failed: \(httpFailureDescription(response, data))")
+                    break
+                }
+                let decoded = try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data)
+                items.append(contentsOf: decoded.items.compactMap { $0 })
+                if decoded.items.count < pageSize {
+                    break
+                }
+            } catch {
+                Log.error("Spotify accountPlaylists failed: \(error)")
+                break
             }
-            let playlists = try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data).playlists
-            if playlists.isEmpty {
-                // A configured personal account is expected to have public playlists;
-                // a 200-but-empty result is the anomaly to capture (distinguishes a
-                // genuine empty/filtered profile from an HTTP error logged above).
-                Log.warning("Spotify userPlaylists(\(userID)) returned 0 playlists (HTTP 200): \(bodySnippet(data))")
-            }
-            return playlists
-        } catch {
-            Log.error("Spotify userPlaylists(\(userID)) failed: \(error)")
-            return []
         }
+        return items
     }
 
     func isPlaylistSaved(playlistID: String) async -> Bool {
@@ -157,21 +149,10 @@ final class SpotifyApiService: SpotifyPlaylistService {
     }
 
     func editablePlaylistIDs() async -> Set<String> {
-        do {
-            let userID = try await currentUserID()
-            let request = try await authorizedRequest(path: "/me/playlists",
-                                                      method: "GET",
-                                                      queryItems: [URLQueryItem(name: "limit", value: "50")])
-            let (data, response) = try await session.data(for: request)
-            guard isSuccess(response) else {
-                return []
-            }
-            let page = try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data)
-            return page.editableIDs(currentUserID: userID)
-        } catch {
-            Log.error("Spotify editablePlaylistIDs failed: \(error)")
+        guard let userID = try? await currentUserID() else {
             return []
         }
+        return await Set(fetchAllLibraryPlaylistItems().compactMap { $0.editableID(currentUserID: userID) })
     }
 
     // MARK: - Liked Songs
@@ -332,10 +313,6 @@ private struct SpotifyPlaylistPage: Decodable {
     // the whole page — which would otherwise leave a populated profile empty.
     let items: [SpotifyPlaylistItem?]
 
-    var playlists: [MusicSearchItem] {
-        items.compactMap { $0?.searchItem }
-    }
-
     /// The ids of playlists the signed-in user may edit: ones they own, plus any
     /// collaborative playlist regardless of owner.
     func editableIDs(currentUserID: String) -> Set<String> {
@@ -358,7 +335,8 @@ private struct SpotifyPlaylistItem: Decodable {
                                name: name,
                                mediaType: .playlist,
                                imageURL: images?.first?.url,
-                               artist: owner?.displayName)
+                               artist: owner?.displayName,
+                               ownerID: owner?.id)
     }
 
     func editableID(currentUserID: String) -> String? {
@@ -393,7 +371,6 @@ struct DisabledSpotifyPlaylistService: SpotifyPlaylistService {
     func authorize() async throws {}
     func accountPlaylists() async -> [MusicSearchItem] { [] }
     func editablePlaylistIDs() async -> Set<String> { [] }
-    func userPlaylists(userID _: String) async -> [MusicSearchItem] { [] }
     func isPlaylistSaved(playlistID _: String) async -> Bool { false }
     func savePlaylist(playlistID _: String) async -> Bool { false }
     func removePlaylist(playlistID _: String) async -> Bool { false }

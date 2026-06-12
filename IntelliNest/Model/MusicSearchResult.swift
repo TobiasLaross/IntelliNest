@@ -37,6 +37,24 @@ struct MusicSearchItem: Identifiable, Equatable, Hashable {
     let mediaType: MusicMediaType
     let imageURL: String?
     let artist: String?
+    /// The Spotify user id of the playlist's owner, when known (set for account
+    /// library playlists). Used to split the huset library into per-person
+    /// sections; nil for search results and non-playlist items.
+    let ownerID: String?
+
+    init(uri: String,
+         name: String,
+         mediaType: MusicMediaType,
+         imageURL: String?,
+         artist: String?,
+         ownerID: String? = nil) {
+        self.uri = uri
+        self.name = name
+        self.mediaType = mediaType
+        self.imageURL = imageURL
+        self.artist = artist
+        self.ownerID = ownerID
+    }
 
     var id: String { uri }
 }
