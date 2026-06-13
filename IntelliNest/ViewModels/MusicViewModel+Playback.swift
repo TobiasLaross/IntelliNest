@@ -385,12 +385,54 @@ extension MusicViewModel {
 
     /// Re-fetches the MA favourites (drives the star state and the unfavourite id
     /// lookup), then the Spotify listing so the per-owner sections reflect any
-    /// follow change the 2-way sync propagated.
+    /// follow change the 2-way sync propagated, then stars any Spotify-library
+    /// playlist that isn't already an MA favourite.
     func refreshFavorites() async {
+        var maFavoritesLoaded = false
         if let favorites = try? await restAPIService.getFavoritePlaylists() {
             maFavorites = favorites
+            maFavoritesLoaded = true
         }
         await refreshSpotifyPlaylists()
+        // Only sync once both sides are actually loaded — otherwise an empty MA
+        // fetch would make every Spotify playlist look unfavourited and re-add it.
+        if maFavoritesLoaded {
+            await syncSpotifyLibraryToMAFavorites()
+        }
+    }
+
+    /// Auto-favourites in Music Assistant every playlist in the huset Spotify
+    /// library that isn't already an MA favourite, so a playlist saved on Spotify
+    /// shows a filled star without a manual tap. MA's own 2-way sync is meant to
+    /// keep these aligned but doesn't always; this closes the gap. One-way and
+    /// additive — it never removes a favourite, so a deliberate unstar isn't undone
+    /// — and runs once per session so it can't fight a manual toggle. Best-effort:
+    /// per-item failures are ignored.
+    func syncSpotifyLibraryToMAFavorites() async {
+        guard spotify.isAuthorized, !hasSyncedSpotifyFavorites else {
+            return
+        }
+        let libraryPlaylists = favoritePlaylists + personalPlaylistSections.flatMap(\.playlists)
+        guard libraryPlaylists.isNotEmpty else {
+            // Spotify side not loaded yet — leave the latch open so a later refresh
+            // retries once the library is available.
+            return
+        }
+        hasSyncedSpotifyFavorites = true
+        let alreadyFavorited = maFavoriteNames
+        let toFavorite = libraryPlaylists.filter { !alreadyFavorited.contains(normalizedName($0.name)) }
+        guard toFavorite.isNotEmpty else {
+            return
+        }
+        var didAddAny = false
+        for playlist in toFavorite {
+            let added = await queueSocket.addFavorite(uri: playlist.uri)
+            didAddAny = didAddAny || added
+        }
+        // Reload the favourites so the freshly-starred playlists fill their stars.
+        if didAddAny, let favorites = try? await restAPIService.getFavoritePlaylists() {
+            maFavorites = favorites
+        }
     }
 
     // MARK: - Transport & volume

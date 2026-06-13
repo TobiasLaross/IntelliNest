@@ -93,6 +93,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Guards the one-time load of the Spotify account's playlists. Reset after a
     /// favourite toggle so the favourites section reflects the change next reload.
     var hasLoadedSpotifyPlaylists = false
+    /// Guards the one-time Spotify-library → MA-favourite sync so it runs once per
+    /// session and can't re-add a playlist the user just unstarred.
+    var hasSyncedSpotifyFavorites = false
     /// Increments on every search so a slow, older response can't overwrite the
     /// results of a newer query.
     private var searchRequestToken = 0
