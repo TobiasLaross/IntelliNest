@@ -374,7 +374,9 @@ class MusicViewModel: ObservableObject, Reloadable {
         let speakerName = activeSpeaker.friendlyName
         let success = await restAPIService.unjoinSpeaker(memberID: activeSpeakerID)
         if success {
-            self.activeSpeakerID = newActiveID
+            // Route through selectSpeaker so the promoted speaker is also persisted
+            // as the last-used one, like any other manual selection.
+            selectSpeaker(newActiveID)
         } else {
             setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
         }

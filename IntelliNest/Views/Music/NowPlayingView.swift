@@ -200,7 +200,7 @@ private struct GroupVolumeView: View {
                             HStack(spacing: 6) {
                                 Text(speaker.friendlyName)
                                     .font(.subheadline)
-                                    .lineLimit(1)
+                                    .fixedSize(horizontal: false, vertical: true)
                                 // The group leader (the active speaker) is the sync
                                 // source the others follow — flag it as primary.
                                 if speaker.entityId == viewModel.activeSpeakerID {
