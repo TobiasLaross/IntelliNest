@@ -98,10 +98,16 @@ private struct SpeakerGroupingRow: View {
 
     var body: some View {
         HStack(spacing: 6) {
+            // The whole row toggles membership, so this is just a status mark —
+            // a plain checkmark when grouped, empty (but space-reserved so names
+            // stay aligned) otherwise. Not a control of its own.
             Button(action: toggle) {
-                HStack(spacing: 6) {
-                    Image(systemName: grouped ? "checkmark.circle.fill" : "circle")
-                        .foregroundStyle(grouped ? .yellow : .white.opacity(0.6))
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.yellow)
+                        .opacity(grouped ? 1 : 0)
+                        .frame(width: 18)
                     Text(speaker.friendlyName)
                     if isPrimary {
                         Text("Primär")
@@ -114,14 +120,13 @@ private struct SpeakerGroupingRow: View {
                             .foregroundStyle(.green)
                             .accessibilityLabel("Spelar nu")
                     }
+                    Spacer(minLength: 8)
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityLabel(toggleAccessibilityLabel)
             .accessibilityValue(grouped ? "Grupperad" : "Inte grupperad")
-
-            Spacer(minLength: 8)
 
             // Only a grouped follower can be promoted — the primary is already it,
             // and an ungrouped speaker has no group to lead.
@@ -139,7 +144,8 @@ private struct SpeakerGroupingRow: View {
             }
         }
         .padding(.vertical, 12)
-        .padding(.horizontal, 12)
+        .padding(.leading, 12)
+        .padding(.trailing, grouped && !isPrimary ? 4 : 12)
         .background(grouped ? Color.yellow.opacity(0.12) : Color.white.opacity(0.06))
         .cornerRadius(10)
     }
