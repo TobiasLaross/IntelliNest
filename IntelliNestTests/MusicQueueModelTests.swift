@@ -43,6 +43,28 @@ final class MusicQueueModelTests: XCTestCase {
         XCTAssertNil(result.currentItem)
     }
 
+    func testGetQueueParsesCurrentItemWithStringImage() {
+        // `get_queue` serializes `media_item.image` as a bare URL string (not the
+        // object the socket sends). A strict object decode threw and lost the whole
+        // queue, leaving queue_id nil and the upcoming list silently empty.
+        let json = """
+        {"service_response":{"media_player.kitchen":{"queue_id":"kitchen","current_item":{"queue_item_id":"item-1",
+        "media_item":{"uri":"spotify://track/abc","name":"Det sista jag behöver","artists":[{"name":"Darin"}],
+        "image":"https://i.scdn.co/image/cover.jpg"}}}}}
+        """
+        let result = MusicGetQueueParser.parse(Data(json.utf8))
+        XCTAssertEqual(result.queueID, "kitchen")
+        XCTAssertEqual(result.currentItem?.title, "Det sista jag behöver")
+        XCTAssertEqual(result.currentItem?.imageURL, "https://i.scdn.co/image/cover.jpg")
+    }
+
+    func testQueueItemDecodesObjectImageFromSocket() {
+        // The socket sends `image` as an object with a `path`; both shapes resolve.
+        let json = #"{"queue_item_id":"i1","image":{"path":"https://i.scdn.co/image/sock.jpg"},"media_item":{"name":"X"}}"#
+        let dto = try? JSONDecoder().decode(MusicQueueItemDTO.self, from: Data(json.utf8))
+        XCTAssertEqual(dto?.queueItem?.imageURL, "https://i.scdn.co/image/sock.jpg")
+    }
+
     func testQueueItemDropsNonHttpImage() {
         let json = """
         {"queue_item_id":"i1","media_item":{"uri":"spotify://track/x","name":"X",

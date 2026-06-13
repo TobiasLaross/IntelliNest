@@ -67,8 +67,27 @@ struct MusicQueueItemDTO: Decodable {
     /// A Music Assistant image reference. Only a remotely-reachable `path` (an
     /// absolute URL) is usable directly; local provider images would need the MA
     /// image proxy, so those are dropped to nil rather than shown broken.
+    ///
+    /// The two transports disagree on the shape: the `player_queues/items` socket
+    /// sends an object (`{"path": "https://…"}`), while `get_queue` serializes a
+    /// `media_item.image` as a bare URL string. Decode both, otherwise a
+    /// string-shaped image throws and takes the whole `get_queue` decode with it —
+    /// which left `queue_id` nil and the "Näst på tur" list silently empty.
     struct ImageDTO: Decodable {
         let path: String?
+
+        init(from decoder: Decoder) throws {
+            if let single = try? decoder.singleValueContainer(), let url = try? single.decode(String.self) {
+                path = url
+                return
+            }
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            path = try container.decodeIfPresent(String.self, forKey: .path)
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case path
+        }
 
         var usableURL: String? {
             guard let path, path.hasPrefix("http") else {
