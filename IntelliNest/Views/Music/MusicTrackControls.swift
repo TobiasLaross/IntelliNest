@@ -27,10 +27,10 @@ struct SongFavoriteButton: View {
     }
 }
 
-/// The track context-menu actions: add to the play queue, add to one of the
-/// user's editable playlists, and (in an editable playlist) remove from it. Each
-/// action is shown only when it can function. Designed to live inside a
-/// `.contextMenu { … }`.
+/// The track context-menu actions: play next or add to the end of the play
+/// queue, add to one of the user's editable playlists, and (in an editable
+/// playlist) remove from it. Each action is shown only when it can function.
+/// Designed to live inside a `.contextMenu { … }`.
 struct TrackActionButtons: View {
     @ObservedObject var viewModel: MusicViewModel
     let uri: String
@@ -42,9 +42,15 @@ struct TrackActionButtons: View {
 
     var body: some View {
         Button {
-            Task { await viewModel.addToQueue(uri: uri, title: title, artist: artist, imageURL: imageURL) }
+            Task { await viewModel.addToQueue(uri: uri, title: title, artist: artist, imageURL: imageURL, placement: .next) }
         } label: {
-            Label("Lägg till i kö", systemImage: "text.line.last.and.arrowtriangle.forward")
+            Label("Spela härnäst", systemImage: "text.line.first.and.arrowtriangle.forward")
+        }
+
+        Button {
+            Task { await viewModel.addToQueue(uri: uri, title: title, artist: artist, imageURL: imageURL, placement: .last) }
+        } label: {
+            Label("Lägg till sist i kö", systemImage: "text.line.last.and.arrowtriangle.forward")
         }
 
         if viewModel.canAddTrackToPlaylist(uri: uri) {

@@ -7,6 +7,21 @@
 
 import Foundation
 
+/// Where a newly-added track lands in the queue, mapped to Music Assistant's
+/// `enqueue` modes: `.next` plays it right after the current track, `.last`
+/// appends it to the end.
+enum QueuePlacement {
+    case next
+    case last
+
+    var enqueueMode: String {
+        switch self {
+        case .next: "next"
+        case .last: "add"
+        }
+    }
+}
+
 /// The play queue for the active speaker's group leader. Reads run over two
 /// transports: `music_assistant.get_queue` (REST) for the queue id and the
 /// current track, and the Music Assistant WebSocket for the full upcoming list
@@ -46,28 +61,32 @@ extension MusicViewModel {
 
         let queueID: String?
         let restCurrent: MusicQueueItem?
+        let restNext: MusicQueueItem?
         do {
-            (queueID, restCurrent) = try await restAPIService.getQueue(on: targetID)
+            (queueID, restCurrent, restNext) = try await restAPIService.getQueue(on: targetID)
         } catch {
             Log.error("Failed to read queue: \(error)")
-            (queueID, restCurrent) = (nil, nil)
+            (queueID, restCurrent, restNext) = (nil, nil, nil)
         }
 
         let currentItem = restCurrent ?? currentItemFromSpeaker()
-        let upcoming = await upcomingItems(queueID: queueID, currentItem: currentItem)
+        let upcoming = await upcomingItems(queueID: queueID, currentItem: currentItem, nextItem: restNext)
         queue = MusicQueue(queueID: queueID, currentItem: currentItem, upcomingItems: upcoming)
     }
 
     /// The upcoming tracks: the socket's full ordered list sliced to whatever
-    /// follows the current item, or the session-enqueued fallback when the socket
-    /// returns nothing (server unreachable, e.g. away from home).
-    private func upcomingItems(queueID: String?, currentItem: MusicQueueItem?) async -> [MusicQueueItem] {
+    /// follows the current item, falling back to the REST-supplied next item plus
+    /// anything enqueued this session when the socket returns nothing (the socket
+    /// is LAN-only, so it's unreachable away from home).
+    private func upcomingItems(queueID: String?,
+                               currentItem: MusicQueueItem?,
+                               nextItem: MusicQueueItem?) async -> [MusicQueueItem] {
         guard let queueID else {
-            return sessionEnqueuedItems
+            return offlineUpcoming(nextItem: nextItem)
         }
         let items = await queueSocket.queueItems(queueID: queueID)
         guard items.isNotEmpty else {
-            return sessionEnqueuedItems
+            return offlineUpcoming(nextItem: nextItem)
         }
         guard let currentItem,
               let currentIndex = items.firstIndex(where: { $0.queueItemID == currentItem.queueItemID }) else {
@@ -76,6 +95,17 @@ extension MusicViewModel {
             return items.filter { $0.uri == nil || $0.uri != currentItem?.uri }
         }
         return Array(items[(currentIndex + 1)...])
+    }
+
+    /// The "Näst på tur" list when the socket can't supply the full queue: at least
+    /// the immediate next track (from `get_queue` over REST, which works remotely),
+    /// then anything enqueued this session, never showing the next track twice.
+    private func offlineUpcoming(nextItem: MusicQueueItem?) -> [MusicQueueItem] {
+        guard let nextItem else {
+            return sessionEnqueuedItems
+        }
+        let rest = sessionEnqueuedItems.filter { $0.uri == nil || $0.uri != nextItem.uri }
+        return [nextItem] + rest
     }
 
     /// Builds a "Spelas nu" item from the speaker's now-playing metadata, used
@@ -93,22 +123,25 @@ extension MusicViewModel {
 
     // MARK: - Add
 
-    func addToQueue(_ track: MusicPlaylistTrack) async {
-        await addToQueue(uri: track.uri, title: track.title, artist: nil, imageURL: track.imageURL)
+    func addToQueue(_ track: MusicPlaylistTrack, placement: QueuePlacement = .last) async {
+        await addToQueue(uri: track.uri, title: track.title, artist: nil, imageURL: track.imageURL, placement: placement)
     }
 
-    func addToQueue(_ item: MusicSearchItem) async {
-        await addToQueue(uri: item.uri, title: item.name, artist: item.artist, imageURL: item.imageURL)
+    func addToQueue(_ item: MusicSearchItem, placement: QueuePlacement = .last) async {
+        await addToQueue(uri: item.uri, title: item.name, artist: item.artist, imageURL: item.imageURL, placement: placement)
     }
 
-    /// Appends a track to the active speaker's queue. Optimistically adds it to
-    /// "Näst på tur" and the session fallback; banners on failure.
-    func addToQueue(uri: String, title: String, artist: String?, imageURL: String?) async {
+    /// Adds a track to the active speaker's queue, either right after the current
+    /// track (`.next`) or at the end (`.last`). Optimistically inserts it into
+    /// "Näst på tur" and the session fallback; banners on failure. This goes over
+    /// REST (`play_media`), so it works away from home too — unlike reading the
+    /// full upcoming list, which needs the LAN-only socket.
+    func addToQueue(uri: String, title: String, artist: String?, imageURL: String?, placement: QueuePlacement = .last) async {
         guard let targetID = queueTargetID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du lägger till i kön")
             return
         }
-        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: .track, enqueue: "add")
+        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: .track, enqueue: placement.enqueueMode)
         guard success else {
             setErrorBannerText("Kunde inte lägga till i kön", "Det gick inte att lägga till låten i kön")
             return
@@ -121,10 +154,18 @@ extension MusicViewModel {
                                          title: title,
                                          artist: artist,
                                          imageURL: imageURL)
-        sessionEnqueuedItems.append(sessionItem)
-        queue = MusicQueue(queueID: queue.queueID,
-                           currentItem: queue.currentItem,
-                           upcomingItems: queue.upcomingItems + [sessionItem])
+        switch placement {
+        case .next:
+            sessionEnqueuedItems.insert(sessionItem, at: 0)
+            queue = MusicQueue(queueID: queue.queueID,
+                               currentItem: queue.currentItem,
+                               upcomingItems: [sessionItem] + queue.upcomingItems)
+        case .last:
+            sessionEnqueuedItems.append(sessionItem)
+            queue = MusicQueue(queueID: queue.queueID,
+                               currentItem: queue.currentItem,
+                               upcomingItems: queue.upcomingItems + [sessionItem])
+        }
     }
 
     // MARK: - Remove

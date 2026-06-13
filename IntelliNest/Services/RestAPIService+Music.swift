@@ -82,10 +82,11 @@ extension RestAPIService {
 
     /// Reads the active queue for `entityID` via `music_assistant.get_queue`
     /// (`?return_response`). Returns the queue id (needed to target the WebSocket
-    /// delete command) and the current item ("Spelas nu"). The upcoming list is
-    /// fetched separately over the Music Assistant WebSocket, since `get_queue`
-    /// only carries the current/next item, not the full list.
-    func getQueue(on entityID: EntityId) async throws -> (queueID: String?, currentItem: MusicQueueItem?) {
+    /// delete command), the current item ("Spelas nu"), and the immediate next
+    /// item. The full upcoming list is fetched separately over the Music Assistant
+    /// WebSocket, since `get_queue` only carries the current/next item; the next
+    /// item backs "Näst på tur" over REST when that socket is unreachable.
+    func getQueue(on entityID: EntityId) async throws -> (queueID: String?, currentItem: MusicQueueItem?, nextItem: MusicQueueItem?) {
         let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.getQueue.rawValue)"
         var json = [JSONKey: Any]()
         json[.entityID] = entityID.rawValue

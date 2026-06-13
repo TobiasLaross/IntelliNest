@@ -96,7 +96,35 @@ extension MusicViewModelTests {
         XCTAssertEqual(model.queue.upcomingItems.map(\.title), ["Enqueued"])
     }
 
+    func testLoadQueueShowsNextItemWhenSocketEmpty() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        // The socket is LAN-only; away from home it returns nothing. get_queue still
+        // carries next_item over REST, so the up-next list shows at least that.
+        let json = """
+        {"service_response":{"queue_id":"kitchen","current_item":{"queue_item_id":"cur","media_item":{"name":"Now"}},
+        "next_item":{"queue_item_id":"nxt","media_item":{"name":"Up Next"}}}}
+        """
+        stubGetQueue(json: json)
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket(items: []))
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.loadQueue()
+        XCTAssertEqual(model.queue.upcomingItems.map(\.queueItemID), ["nxt"])
+        XCTAssertEqual(model.queue.upcomingItems.map(\.title), ["Up Next"])
+    }
+
     // MARK: - Add
+
+    func testAddToQueueNextInsertsAtFront() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket())
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/a", title: "Last", artist: nil, imageURL: nil, placement: .last)
+        await model.addToQueue(uri: "spotify://track/b", title: "Next", artist: nil, imageURL: nil, placement: .next)
+        // .next jumps to the front of both the visible list and the session fallback.
+        XCTAssertEqual(model.queue.upcomingItems.map(\.title), ["Next", "Last"])
+        XCTAssertEqual(model.sessionEnqueuedItems.map(\.title), ["Next", "Last"])
+    }
 
     func testAddToQueueAppendsOptimisticallyOnSuccess() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
