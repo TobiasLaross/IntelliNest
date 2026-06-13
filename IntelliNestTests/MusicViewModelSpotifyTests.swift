@@ -198,6 +198,44 @@ extension MusicViewModelTests {
         XCTAssertTrue(bannerTitles.contains("Kunde inte uppdatera favorit"))
     }
 
+    func testSyncStarsUnfavoritedSpotifyLibraryInMA() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(), socket: socket)
+        model.favoritePlaylists = [
+            playlistItem(uri: "spotify://playlist/a", name: "Svensk sommar"),
+            playlistItem(uri: "spotify://playlist/b", name: "Sommarklassiker")
+        ]
+        // Sommarklassiker is already an MA favourite; only Svensk sommar needs syncing.
+        model.maFavorites = [playlistItem(uri: "library://playlist/9", name: "Sommarklassiker")]
+        await model.syncSpotifyLibraryToMAFavorites()
+        let added = await socket.addedFavoriteURIs
+        XCTAssertEqual(added, ["spotify://playlist/a"])
+        XCTAssertTrue(model.hasSyncedSpotifyFavorites)
+    }
+
+    func testSyncRunsOncePerSession() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(), socket: socket)
+        model.favoritePlaylists = [playlistItem(uri: "spotify://playlist/a", name: "Svensk sommar")]
+        await model.syncSpotifyLibraryToMAFavorites()
+        // A second run (e.g. after the user unstarred it) must not re-add anything.
+        model.favoritePlaylists = [playlistItem(uri: "spotify://playlist/c", name: "Ny lista")]
+        await model.syncSpotifyLibraryToMAFavorites()
+        let added = await socket.addedFavoriteURIs
+        XCTAssertEqual(added, ["spotify://playlist/a"])
+    }
+
+    func testSyncSkippedWhenLoggedOut() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false), socket: socket)
+        model.favoritePlaylists = [playlistItem(uri: "spotify://playlist/a", name: "Svensk sommar")]
+        await model.syncSpotifyLibraryToMAFavorites()
+        let added = await socket.addedFavoriteURIs
+        XCTAssertTrue(added.isEmpty)
+        // Latch stays open so it can run once the user logs in.
+        XCTAssertFalse(model.hasSyncedSpotifyFavorites)
+    }
+
     func testSpotifyAccountPlaylistsLoadIntoFavoritesOnReload() async {
         let accountPlaylists = [
             MusicSearchItem(uri: "spotify://playlist/a", name: "Morgon", mediaType: .playlist, imageURL: nil, artist: "huset"),
