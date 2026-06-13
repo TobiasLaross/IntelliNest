@@ -340,7 +340,7 @@ extension MusicViewModelTests {
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.count, 1)
-        XCTAssertEqual(model.personalPlaylistSections.first?.title, "Mina spellistor")
+        XCTAssertEqual(model.personalPlaylistSections.first?.title, "Tobias spellistor")
         // Order is preserved exactly as returned — no client-side re-sorting.
         XCTAssertEqual(model.personalPlaylistSections.first?.playlists.map(\.name), ["Träning", "Lugnt & skönt"])
     }
@@ -363,11 +363,11 @@ extension MusicViewModelTests {
         stubAllSpeakers(playing: .mediaPlayerKitchen)
         XCTAssertTrue(model.personalPlaylistSections.isEmpty)
         await model.reload()
-        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor"])
+        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Tobias spellistor"])
     }
 
     func testPersonalSectionHiddenWhenAccountOwnsNoLibraryPlaylists() async {
-        // The library has playlists, but none owned by Tobias → no Mina section.
+        // The library has playlists, but none owned by Tobias → no Tobias section.
         let stub = StubSpotifyPlaylistService(accountPlaylistItems: [
             playlistItem(uri: "spotify://playlist/h1", name: "Husets", ownerID: "huset")
         ])
@@ -402,7 +402,7 @@ extension MusicViewModelTests {
         ])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount, sarahAccount])
         await model.refreshSpotifyPlaylists()
-        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor", "Sarahs spellistor"])
+        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Tobias spellistor", "Sarahs spellistor"])
     }
 
     func testEmptyAccountDroppedWhileOthersRemain() async {
@@ -430,7 +430,7 @@ extension MusicViewModelTests {
         let stub = StubSpotifyPlaylistService(authorized: false, accountPlaylistItems: tobiasLibrary())
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         await model.connectSpotify()
-        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor"])
+        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Tobias spellistor"])
     }
 
     func testTappingPersonalPlaylistRoutesThroughBrowseFlow() async {
@@ -449,15 +449,15 @@ extension MusicViewModelTests {
         XCTAssertEqual(SpotifyPersonalAccount.configured.map(\.user), [.tobias, .sarah])
     }
 
-    func testViewerOwnSectionIsFirstAndTitledMina() async {
+    func testViewerOwnSectionIsFirstAndTitledByName() async {
         let library = [playlistItem(uri: "spotify://playlist/p1", name: "Tobias lista", ownerID: "tobiasc91"),
                        playlistItem(uri: "spotify://playlist/p2", name: "Sarahs lista", ownerID: "sarahtest42")]
         let stub = StubSpotifyPlaylistService(accountPlaylistItems: library)
-        // Sarah is the viewer → her section is first and titled "Mina spellistor",
-        // Tobias's drops below, titled by his name.
+        // Sarah is the viewer → her section is first, titled by her own name;
+        // Tobias's drops below, also titled by his name.
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount, sarahAccount], currentUser: { .sarah })
         await model.refreshSpotifyPlaylists()
-        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Mina spellistor", "Tobias spellistor"])
+        XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Sarahs spellistor", "Tobias spellistor"])
         XCTAssertEqual(model.personalPlaylistSections.first?.account.userID, "sarahtest42")
     }
 }
