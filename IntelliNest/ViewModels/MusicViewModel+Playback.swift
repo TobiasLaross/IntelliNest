@@ -72,8 +72,8 @@ extension MusicViewModel {
             }
             return !personalAccountIDs.contains(ownerID)
         }
-        // Show the viewer's own section first; the rest keep configured order. The
-        // viewer's own is titled "Mina spellistor", everyone else's by their name.
+        // Show the viewer's own section first; the rest keep configured order.
+        // Every section is titled by its owner's name (e.g. "Tobias spellistor").
         let viewer = currentUser()
         let orderedAccounts = personalAccounts.filter { $0.user == viewer }
             + personalAccounts.filter { $0.user != viewer }
@@ -82,8 +82,7 @@ extension MusicViewModel {
             guard owned.isNotEmpty else {
                 return nil
             }
-            let title = account.user == viewer ? "Mina spellistor" : account.user.playlistSectionTitle
-            return PersonalPlaylistSection(account: account, title: title, playlists: owned)
+            return PersonalPlaylistSection(account: account, title: account.user.playlistSectionTitle, playlists: owned)
         }
         hasLoadedSpotifyPlaylists = true
         editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()

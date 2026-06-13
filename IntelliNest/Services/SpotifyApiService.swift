@@ -13,9 +13,9 @@ import Foundation
 struct SpotifyPersonalAccount: Identifiable, Equatable {
     /// The Spotify user id that owns these playlists in the huset library.
     let userID: String
-    /// The app user this account belongs to — drives the per-viewer section title
-    /// ("Mina spellistor" for the logged-in user, the person's name for everyone
-    /// else) and ordering (the viewer's own section is shown first).
+    /// The app user this account belongs to — drives the section title (the
+    /// owner's name, e.g. "Tobias spellistor") and ordering (the viewer's own
+    /// section is shown first).
     let user: User
 
     var id: String { userID }
