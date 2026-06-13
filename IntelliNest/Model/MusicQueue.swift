@@ -120,29 +120,33 @@ struct MusicQueueItemDTO: Decodable {
 struct MusicQueueDTO: Decodable {
     let queueID: String?
     let currentItem: MusicQueueItemDTO?
+    let nextItem: MusicQueueItemDTO?
 
     private enum CodingKeys: String, CodingKey {
         case queueID = "queue_id"
         case currentItem = "current_item"
+        case nextItem = "next_item"
     }
 }
 
 enum MusicGetQueueParser {
     /// Parses the `music_assistant.get_queue` `return_response` body into the
-    /// queue id and current item. Home Assistant wraps service results under
-    /// `service_response`, and the queue then sits either directly under it or
-    /// keyed by the entity id (as `browse_media` does). Both shapes are handled,
+    /// queue id, current item, and next item. Home Assistant wraps service results
+    /// under `service_response`, and the queue then sits either directly under it
+    /// or keyed by the entity id (as `browse_media` does). Both shapes are handled,
     /// and a body in any unexpected shape yields an empty queue rather than
     /// throwing — the Queue screen falls back to session state when this is empty.
-    static func parse(_ data: Data) -> (queueID: String?, currentItem: MusicQueueItem?) {
+    /// `next_item` works over REST, so it backs the "Näst på tur" list away from
+    /// home when the LAN-only socket can't supply the full list.
+    static func parse(_ data: Data) -> (queueID: String?, currentItem: MusicQueueItem?, nextItem: MusicQueueItem?) {
         let decoder = JSONDecoder()
         for candidate in candidateObjects(in: data) {
             guard let dto = try? decoder.decode(MusicQueueDTO.self, from: candidate), dto.queueID != nil else {
                 continue
             }
-            return (dto.queueID, dto.currentItem?.queueItem)
+            return (dto.queueID, dto.currentItem?.queueItem, dto.nextItem?.queueItem)
         }
-        return (nil, nil)
+        return (nil, nil, nil)
     }
 
     /// Returns every JSON object worth trying to decode as a queue: the body

@@ -43,6 +43,22 @@ final class MusicQueueModelTests: XCTestCase {
         XCTAssertNil(result.currentItem)
     }
 
+    func testGetQueueParsesNextItem() {
+        let json = """
+        {"service_response":{"queue_id":"kitchen","current_item":{"queue_item_id":"cur","media_item":{"name":"Now"}},
+        "next_item":{"queue_item_id":"nxt","media_item":{"name":"Up Next","artists":[{"name":"Band"}]}}}}
+        """
+        let result = MusicGetQueueParser.parse(Data(json.utf8))
+        XCTAssertEqual(result.nextItem?.queueItemID, "nxt")
+        XCTAssertEqual(result.nextItem?.title, "Up Next")
+        XCTAssertEqual(result.nextItem?.artist, "Band")
+    }
+
+    func testQueuePlacementMapsToEnqueueMode() {
+        XCTAssertEqual(QueuePlacement.next.enqueueMode, "next")
+        XCTAssertEqual(QueuePlacement.last.enqueueMode, "add")
+    }
+
     func testGetQueueParsesCurrentItemWithStringImage() {
         // `get_queue` serializes `media_item.image` as a bare URL string (not the
         // object the socket sends). A strict object decode threw and lost the whole
