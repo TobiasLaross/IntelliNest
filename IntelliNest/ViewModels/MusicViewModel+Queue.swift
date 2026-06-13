@@ -59,19 +59,17 @@ extension MusicViewModel {
         isLoadingQueue = true
         defer { isLoadingQueue = false }
 
-        let queueID: String?
-        let restCurrent: MusicQueueItem?
-        let restNext: MusicQueueItem?
+        let state: MusicQueueState
         do {
-            (queueID, restCurrent, restNext) = try await restAPIService.getQueue(on: targetID)
+            state = try await restAPIService.getQueue(on: targetID)
         } catch {
             Log.error("Failed to read queue: \(error)")
-            (queueID, restCurrent, restNext) = (nil, nil, nil)
+            state = .empty
         }
 
-        let currentItem = restCurrent ?? currentItemFromSpeaker()
-        let upcoming = await upcomingItems(queueID: queueID, currentItem: currentItem, nextItem: restNext)
-        queue = MusicQueue(queueID: queueID, currentItem: currentItem, upcomingItems: upcoming)
+        let currentItem = state.currentItem ?? currentItemFromSpeaker()
+        let upcoming = await upcomingItems(queueID: state.queueID, currentItem: currentItem, nextItem: state.nextItem)
+        queue = MusicQueue(queueID: state.queueID, currentItem: currentItem, upcomingItems: upcoming)
     }
 
     /// The upcoming tracks: the socket's full ordered list sliced to whatever

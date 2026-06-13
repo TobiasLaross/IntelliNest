@@ -107,12 +107,15 @@ Run both tools on changed Swift files before every commit, matching what Xcode d
 BuildTools/SwiftFormat/swiftformat . --indent 4
 ```
 
-**SwiftLint** (Homebrew install, same config as the Xcode build phase):
+**SwiftLint** (Homebrew install, same config and `--strict` as the Xcode build phase and CI):
 ```bash
-swiftlint --config .swiftlint
+swiftlint --strict --config .swiftlint
 ```
 
-Fix all SwiftLint errors before committing. Warnings are acceptable but errors are not. The config (`.swiftlint`) sets a warning threshold at 140 chars and an error threshold at 160 chars per line.
+SwiftLint runs with `--strict` in both the Xcode build phase and CI, so **every warning is treated as an
+error** and fails the build. Fix all violations before committing — there is no acceptable-warning tier.
+The config (`.swiftlint`) sets a line-length warning at 140 chars and error at 160; `file_length` uses the
+default 400-line limit, so split files that grow past it rather than letting the warning ride.
 
 ## Screenshots for UI changes
 

@@ -298,7 +298,8 @@ final class SpotifyApiService: SpotifyPlaylistService {
 
     /// The leading slice of a response body, for diagnostic log lines.
     private func bodySnippet(_ data: Data) -> String {
-        String(decoding: data.prefix(300), as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        let text = String(bytes: data.prefix(300), encoding: .utf8) ?? ""
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 

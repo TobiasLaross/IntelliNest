@@ -40,7 +40,7 @@ jobs:
           fi
 
       - name: SwiftLint
-        run: swiftlint --config .swiftlint
+        run: swiftlint --strict --config .swiftlint
 
       - name: Build and Test
         run: |
