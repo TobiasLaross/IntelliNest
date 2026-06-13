@@ -31,8 +31,19 @@ struct SpeakerGroupingView: View {
         otherSpeakers.filter { viewModel.isGrouped($0.entityId) }.map(\.friendlyName)
     }
 
+    /// The active (primary) speaker's name, sourced the same way as the other
+    /// rows so the summary reads consistently.
+    private var activeSpeakerName: String? {
+        viewModel.availableSpeakers.first { $0.entityId == viewModel.activeSpeakerID }?.friendlyName
+    }
+
+    /// The collapsed summary lists the whole playback group, active speaker first
+    /// (e.g. "Kitchen, Gästrummet, Lekrummet"), or notes that nothing is grouped.
     private var summary: String {
-        groupedNames.isEmpty ? "Inga grupperade" : groupedNames.joined(separator: ", ")
+        guard !groupedNames.isEmpty else {
+            return "Inga grupperade"
+        }
+        return ([activeSpeakerName].compactMap { $0 } + groupedNames).joined(separator: ", ")
     }
 
     var body: some View {
