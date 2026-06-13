@@ -17,6 +17,14 @@ struct SpeakerGroupingView: View {
         viewModel.availableSpeakers.filter { $0.entityId != viewModel.activeSpeakerID }
     }
 
+    /// The rows to show: every available speaker, but the active (primary) one is
+    /// only listed while it's grouped with others — so it can be removed, which
+    /// promotes another speaker to primary. Alone, removing it would be a no-op,
+    /// so it stays out of the list.
+    private var listedSpeakers: [MediaPlayerEntity] {
+        viewModel.availableSpeakers.filter { $0.entityId != viewModel.activeSpeakerID || viewModel.isGroupActive }
+    }
+
     /// Names of the speakers grouped with the active one, used for the collapsed
     /// summary line.
     private var groupedNames: [String] {
@@ -54,41 +62,95 @@ struct SpeakerGroupingView: View {
             .accessibilityValue(isExpanded ? "Expanderad" : "Hopfälld. \(summary)")
 
             if isExpanded {
-                ForEach(otherSpeakers, id: \.entityId) { speaker in
-                    let grouped = viewModel.isGrouped(speaker.entityId)
-                    VStack(spacing: 8) {
-                        Button {
-                            Task { await viewModel.toggleGroupMember(speaker.entityId) }
-                        } label: {
-                            HStack {
-                                Image(systemName: grouped ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(grouped ? .yellow : .white.opacity(0.6))
-                                Text(speaker.friendlyName)
-                                if speaker.isPlaying {
-                                    Image(systemName: "speaker.wave.2.fill")
-                                        .font(.caption)
-                                        .foregroundStyle(.green)
-                                        .accessibilityLabel("Spelar nu")
-                                }
-                                Spacer()
-                            }
-                        }
-                        .accessibilityLabel("\(grouped ? "Ta bort" : "Lägg till") \(speaker.friendlyName) i gruppen")
-                        .accessibilityValue(grouped ? "Grupperad" : "Inte grupperad")
-
-                        VolumeSliderView(volume: speaker.volumeLevel,
-                                         onCommit: { viewModel.setVolume($0, for: speaker.entityId) })
-                            .accessibilityLabel("Volym \(speaker.friendlyName)")
-                    }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 12)
-                    .background(grouped ? Color.yellow.opacity(0.12) : Color.white.opacity(0.06))
-                    .cornerRadius(10)
+                ForEach(listedSpeakers, id: \.entityId) { speaker in
+                    SpeakerGroupingRow(viewModel: viewModel,
+                                       speaker: speaker,
+                                       isPrimary: speaker.entityId == viewModel.activeSpeakerID)
                 }
             }
         }
         .padding()
         .background(Color.white.opacity(0.05))
         .cornerRadius(16)
+    }
+}
+
+/// A single grouping row. The leading toggle adds/removes the speaker (removing
+/// the primary promotes the next grouped speaker). A grouped follower also gets a
+/// trailing crown to promote it to primary. Volume lives in the group-volume
+/// control on the now-playing card above, so the row carries no slider.
+private struct SpeakerGroupingRow: View {
+    @ObservedObject var viewModel: MusicViewModel
+    let speaker: MediaPlayerEntity
+    let isPrimary: Bool
+
+    // The primary is always part of its own group; followers reflect membership.
+    private var grouped: Bool {
+        isPrimary || viewModel.isGrouped(speaker.entityId)
+    }
+
+    private var toggleAccessibilityLabel: String {
+        if isPrimary {
+            return "Ta bort \(speaker.friendlyName) som primär högtalare ur gruppen"
+        }
+        return "\(grouped ? "Ta bort" : "Lägg till") \(speaker.friendlyName) i gruppen"
+    }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Button(action: toggle) {
+                HStack(spacing: 6) {
+                    Image(systemName: grouped ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(grouped ? .yellow : .white.opacity(0.6))
+                    Text(speaker.friendlyName)
+                    if isPrimary {
+                        Text("Primär")
+                            .font(.caption2)
+                            .foregroundStyle(.yellow.opacity(0.8))
+                    }
+                    if speaker.isPlaying {
+                        Image(systemName: "speaker.wave.2.fill")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                            .accessibilityLabel("Spelar nu")
+                    }
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(toggleAccessibilityLabel)
+            .accessibilityValue(grouped ? "Grupperad" : "Inte grupperad")
+
+            Spacer(minLength: 8)
+
+            // Only a grouped follower can be promoted — the primary is already it,
+            // and an ungrouped speaker has no group to lead.
+            if grouped, !isPrimary {
+                Button {
+                    viewModel.makePrimary(speaker.entityId)
+                } label: {
+                    Image(systemName: "crown")
+                        .foregroundStyle(.white.opacity(0.85))
+                        .frame(width: 40, height: 40)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Gör \(speaker.friendlyName) till primär högtalare")
+            }
+        }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 12)
+        .background(grouped ? Color.yellow.opacity(0.12) : Color.white.opacity(0.06))
+        .cornerRadius(10)
+    }
+
+    private func toggle() {
+        Task {
+            if isPrimary {
+                await viewModel.removeActiveSpeakerFromGroup()
+            } else {
+                await viewModel.toggleGroupMember(speaker.entityId)
+            }
+        }
     }
 }

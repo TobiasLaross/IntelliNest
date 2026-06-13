@@ -16,4 +16,5 @@ enum StorageKeys: String {
     case webhookID
     case yaleAccessToken
     case spotifyTokens
+    case lastMusicSpeaker
 }

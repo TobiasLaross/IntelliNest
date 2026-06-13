@@ -194,13 +194,22 @@ private struct GroupVolumeView: View {
             }
 
             if isExpanded {
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     ForEach(viewModel.groupedSpeakers, id: \.entityId) { speaker in
-                        HStack(spacing: 10) {
-                            Text(speaker.friendlyName)
-                                .font(.subheadline)
-                                .lineLimit(1)
-                                .frame(width: 88, alignment: .leading)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(spacing: 6) {
+                                Text(speaker.friendlyName)
+                                    .font(.subheadline)
+                                    .lineLimit(1)
+                                // The group leader (the active speaker) is the sync
+                                // source the others follow — flag it as primary.
+                                if speaker.entityId == viewModel.activeSpeakerID {
+                                    Text("Primär")
+                                        .font(.caption2)
+                                        .foregroundStyle(.yellow.opacity(0.8))
+                                }
+                                Spacer(minLength: 0)
+                            }
                             VolumeSliderView(volume: speaker.volumeLevel,
                                              onCommit: { viewModel.setVolume($0, for: speaker.entityId) })
                                 .accessibilityLabel("Volym \(speaker.friendlyName)")

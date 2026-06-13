@@ -7,6 +7,9 @@ class MusicViewModelTests: XCTestCase {
     var restAPIService: RestAPIService!
     var urlCreator: URLCreator!
     var bannerTitles: [String] = []
+    /// In-memory backing for the last-used-speaker persistence so tests stay
+    /// deterministic instead of touching shared `UserDefaults`.
+    var storedLastSpeaker: EntityId?
 
     // Fixed, grep-searchable literals — no random data.
     let trackURI = "spotify://track/3SjXx3rbNGk8nCho8YEoz5"
@@ -15,6 +18,7 @@ class MusicViewModelTests: XCTestCase {
 
     override func setUp() async throws {
         bannerTitles = []
+        storedLastSpeaker = nil
         URLProtocolStub.startInterceptingRequests()
         let stubbedSession = URLProtocolStub.createStubbedURLSession()
         urlCreator = URLCreator(session: stubbedSession)
@@ -28,7 +32,9 @@ class MusicViewModelTests: XCTestCase {
         viewModel = MusicViewModel(restAPIService: restAPIService,
                                    setErrorBannerText: { [weak self] title, _ in
                                        self?.bannerTitles.append(title)
-                                   })
+                                   },
+                                   loadLastSpeaker: { [weak self] in self?.storedLastSpeaker },
+                                   saveLastSpeaker: { [weak self] in self?.storedLastSpeaker = $0 })
     }
 
     override func tearDown() async throws {
@@ -133,6 +139,32 @@ class MusicViewModelTests: XCTestCase {
         viewModel.selectSpeaker(.mediaPlayerSpa)
         await viewModel.reload()
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerSpa)
+    }
+
+    func testSelectSpeakerPersistsLastUsed() {
+        viewModel.selectSpeaker(.mediaPlayerSpa)
+        XCTAssertEqual(storedLastSpeaker, .mediaPlayerSpa)
+    }
+
+    func testDefaultActiveSpeaker_picksLastUsedWhenNothingPlaying() async {
+        storedLastSpeaker = .mediaPlayerGuestRoom
+        stubAllSpeakers(playing: nil)
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerGuestRoom)
+    }
+
+    func testDefaultActiveSpeaker_playingWinsOverLastUsed() async {
+        storedLastSpeaker = .mediaPlayerGuestRoom
+        stubAllSpeakers(playing: .mediaPlayerLivingRoom)
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerLivingRoom)
+    }
+
+    func testDefaultActiveSpeaker_ignoresUnavailableLastUsed() async {
+        storedLastSpeaker = .mediaPlayerSpa
+        stubAllSpeakers(playing: nil, unavailable: [.mediaPlayerSpa])
+        await viewModel.reload()
+        XCTAssertNil(viewModel.activeSpeakerID)
     }
 
     // MARK: - Unavailable speaker filtering
