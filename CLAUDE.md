@@ -114,6 +114,23 @@ swiftlint --config .swiftlint
 
 Fix all SwiftLint errors before committing. Warnings are acceptable but errors are not. The config (`.swiftlint`) sets a warning threshold at 140 chars and an error threshold at 160 chars per line.
 
+## Screenshots for UI changes
+
+Any change that affects what a user sees on screen — a new view or sheet, a restyle, a layout or
+spacing tweak, a Swedish copy change, an empty/error/loading state, a list row, a dashboard button —
+must be verified with screenshots, not just a green build. The type-checker can't see padding,
+ordering, truncation, contrast, or theme regressions.
+
+Use the `ui-screenshots` skill: it renders the real SwiftUI views to PNG with sample data via
+`ImageRenderer` (no Home Assistant needed), with an optional live-simulator path that uses real HA
+data when local secrets exist. Capture one screenshot per distinct state worth verifying (collapsed
+vs. expanded, empty vs. populated, success vs. error, long text).
+
+Send screenshots **in flight, proactively** via `SendUserFile` (status: `proactive`) the moment a
+meaningful state is reachable — don't wait until the end; a short caption is enough. After PRs are
+open, ask explicitly whether the screenshots look right ("Looks good?", not "I'm done."). This does
+not apply to service-layer-only, test-only, refactor, or doc changes with no visible result.
+
 ## Commit Messages
 
 Based on the project history, follow this style:
