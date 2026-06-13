@@ -117,6 +117,11 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// viewer's own playlists are shown first and titled "Mina spellistor".
     /// Injected as a closure so tests don't depend on shared `UserDefaults`.
     let currentUser: @MainActor () -> User
+    /// Reads/writes the last speaker the user controlled, so it can be
+    /// pre-selected when the music view next opens. Injected as closures so tests
+    /// don't depend on shared `UserDefaults`.
+    let loadLastSpeaker: @MainActor () -> EntityId?
+    let saveLastSpeaker: @MainActor (EntityId) -> Void
 
     /// Speakers that are reachable right now (anything not `unavailable`),
     /// in the fixed display order.
@@ -136,13 +141,21 @@ class MusicViewModel: ObservableObject, Reloadable {
          spotify: SpotifyPlaylistService = DisabledSpotifyPlaylistService(),
          queueSocket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
          personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
-         currentUser: @escaping @MainActor () -> User = { UserManager.currentUser }) {
+         currentUser: @escaping @MainActor () -> User = { UserManager.currentUser },
+         loadLastSpeaker: @escaping @MainActor () -> EntityId? = {
+             UserDefaults.shared.string(forKey: StorageKeys.lastMusicSpeaker.rawValue).flatMap { EntityId(rawValue: $0) }
+         },
+         saveLastSpeaker: @escaping @MainActor (EntityId) -> Void = {
+             UserDefaults.shared.set($0.rawValue, forKey: StorageKeys.lastMusicSpeaker.rawValue)
+         }) {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
         self.spotify = spotify
         self.queueSocket = queueSocket
         self.personalAccounts = personalAccounts
         self.currentUser = currentUser
+        self.loadLastSpeaker = loadLastSpeaker
+        self.saveLastSpeaker = saveLastSpeaker
         isSpotifyAuthorized = spotify.isAuthorized
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
         for speakerID in Self.speakerIDs {
@@ -182,8 +195,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     }
 
     /// On the first reload after the view appears, default the active speaker to
-    /// whatever is currently playing. If nothing is playing, leave it unselected
-    /// so the picker is shown. Runs only once so it never overrides a manual pick.
+    /// whatever is currently playing, falling back to the last speaker the user
+    /// controlled (if it's reachable). If neither applies, leave it unselected so
+    /// the picker is shown. Runs only once so it never overrides a manual pick.
     private func selectDefaultSpeakerIfNeeded() {
         guard !hasSelectedDefaultSpeaker else {
             return
@@ -191,6 +205,9 @@ class MusicViewModel: ObservableObject, Reloadable {
         hasSelectedDefaultSpeaker = true
         if let playing = availableSpeakers.first(where: { $0.isPlaying }) {
             activeSpeakerID = playing.entityId
+        } else if let lastUsed = loadLastSpeaker(),
+                  availableSpeakers.contains(where: { $0.entityId == lastUsed }) {
+            activeSpeakerID = lastUsed
         }
     }
 
@@ -202,6 +219,7 @@ class MusicViewModel: ObservableObject, Reloadable {
 
     func selectSpeaker(_ entityID: EntityId) {
         activeSpeakerID = entityID
+        saveLastSpeaker(entityID)
     }
 
     // MARK: - Search
@@ -325,6 +343,42 @@ class MusicViewModel: ObservableObject, Reloadable {
             if !success {
                 setErrorBannerText("Kunde inte gruppera högtalare", "Det gick inte att lägga till \(speakerName) i gruppen")
             }
+        }
+    }
+
+    /// Promotes a grouped speaker to primary — the one shown and controlled as the
+    /// group's main speaker. Playback still routes through the live Music Assistant
+    /// group leader (`playbackTargetID`), so switching the primary never interrupts
+    /// what's playing. No-op for a speaker that isn't grouped with the active one.
+    func makePrimary(_ speakerID: EntityId) {
+        guard speakerID != activeSpeakerID, isGrouped(speakerID) else {
+            return
+        }
+        selectSpeaker(speakerID)
+    }
+
+    /// Removes the active (primary) speaker from its group and promotes the next
+    /// grouped speaker to active, so playback control follows the speakers that
+    /// keep playing. Music Assistant re-elects the real group leader on its own;
+    /// the new `activeSpeakerID` only needs to be a remaining member, since
+    /// playback commands are routed through the live group leader. No-op when the
+    /// active speaker isn't grouped with anyone.
+    func removeActiveSpeakerFromGroup() async {
+        guard let activeSpeakerID, let activeSpeaker else {
+            return
+        }
+        let remaining = Self.speakerIDs.filter { activeSpeaker.groupMembers.contains($0) && $0 != activeSpeakerID }
+        guard let newActiveID = remaining.first else {
+            return
+        }
+        let speakerName = activeSpeaker.friendlyName
+        let success = await restAPIService.unjoinSpeaker(memberID: activeSpeakerID)
+        if success {
+            // Route through selectSpeaker so the promoted speaker is also persisted
+            // as the last-used one, like any other manual selection.
+            selectSpeaker(newActiveID)
+        } else {
+            setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
         }
     }
 }

@@ -142,6 +142,57 @@ extension MusicViewModelTests {
         await viewModel.toggleGroupMember(.mediaPlayerKitchen)
     }
 
+    func testRemoveActiveSpeakerFromGroupPromotesNextSpeaker() async {
+        // Kitchen leads a group with Playroom and Matbord-ute.
+        await reloadGroupedKitchenLeader()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+
+        let expectation = XCTestExpectation(description: "POST unjoin")
+        URLProtocolStub.observerRequests { request in
+            if request.httpMethod == "POST", request.url?.path.contains("/media_player/unjoin") == true {
+                expectation.fulfill()
+            }
+        }
+        stubPostService(path: "/api/services/media_player/unjoin")
+        await viewModel.removeActiveSpeakerFromGroup()
+        await fulfillment(of: [expectation], timeout: 2.0)
+        // The next remaining member in display order takes over as active.
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerPlayroom)
+    }
+
+    func testMakePrimaryPromotesGroupedSpeaker() async {
+        await reloadGroupedKitchenLeader()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+        XCTAssertTrue(viewModel.isGrouped(.mediaPlayerPlayroom))
+        viewModel.makePrimary(.mediaPlayerPlayroom)
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerPlayroom)
+    }
+
+    func testMakePrimaryIgnoresUngroupedSpeaker() async {
+        await reloadGroupedKitchenLeader()
+        // Spa isn't in the group, so it can't be made primary.
+        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerSpa))
+        viewModel.makePrimary(.mediaPlayerSpa)
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+    }
+
+    func testRemoveActiveSpeakerNoOpWhenUngrouped() async {
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        await viewModel.reload()
+        XCTAssertFalse(viewModel.isGroupActive)
+        // Nothing to promote — the active speaker stays put.
+        await viewModel.removeActiveSpeakerFromGroup()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+    }
+
+    func testRemoveActiveSpeakerFailureKeepsPrimaryAndBanners() async {
+        await reloadGroupedKitchenLeader()
+        stubPostService(path: "/api/services/media_player/unjoin", statusCode: 500)
+        await viewModel.removeActiveSpeakerFromGroup()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+        XCTAssertTrue(bannerTitles.contains("Kunde inte dela upp högtalare"))
+    }
+
     // MARK: - Live updates
 
     func testReloadKeepsOtherSpeakersWhenOneFailsToDecode() async {
