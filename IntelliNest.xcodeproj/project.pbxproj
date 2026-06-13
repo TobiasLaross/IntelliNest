@@ -60,10 +60,14 @@
 		EE0000160000000000000023 /* MusicViewModelSpotifyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */; };
 		FE0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */; };
 		FE0000000000000000000008 /* MusicViewModelQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000008 /* MusicViewModelQueueTests.swift */; };
+		FE0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift */; };
+		FE0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift */; };
+		FE0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift */; };
 		FE0000000000000000000007 /* MusicQueueModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000007 /* MusicQueueModelTests.swift */; };
 		EE0000040000000000000004 /* MusicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000040000000000000004 /* MusicViewModel.swift */; };
 		EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000400000000000000F1 /* MusicViewModel+Playback.swift */; };
 		FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000004 /* MusicViewModel+Queue.swift */; };
+		FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */; };
 		FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */; };
 		EE0000050000000000000005 /* MusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000050000000000000005 /* MusicView.swift */; };
 		EE0000060000000000000006 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000060000000000000006 /* NowPlayingView.swift */; };
@@ -288,10 +292,14 @@
 		EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSpotifyTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSongFavoriteTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000008 /* MusicViewModelQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelQueueTests.swift; sourceTree = "<group>"; };
+		FD0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelPlaybackTests.swift; sourceTree = "<group>"; };
+		FD0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelPersonalSectionsTests.swift; sourceTree = "<group>"; };
+		FD0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelGroupVolumeTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000007 /* MusicQueueModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicQueueModelTests.swift; sourceTree = "<group>"; };
 		EF0000040000000000000004 /* MusicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModel.swift; sourceTree = "<group>"; };
 		EF00000400000000000000F1 /* MusicViewModel+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Playback.swift"; sourceTree = "<group>"; };
 		FD0000000000000000000004 /* MusicViewModel+Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Queue.swift"; sourceTree = "<group>"; };
+		FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Favourites.swift"; sourceTree = "<group>"; };
 		FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+SpotifyTracks.swift"; sourceTree = "<group>"; };
 		EF0000050000000000000005 /* MusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicView.swift; sourceTree = "<group>"; };
 		EF0000060000000000000006 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
@@ -590,6 +598,9 @@
 				EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */,
 				FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */,
 				FD0000000000000000000008 /* MusicViewModelQueueTests.swift */,
+				FD0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift */,
+				FD0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift */,
+				FD0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift */,
 				FD0000000000000000000007 /* MusicQueueModelTests.swift */,
 			);
 			path = IntelliNestTests;
@@ -622,6 +633,7 @@
 				EF0000040000000000000004 /* MusicViewModel.swift */,
 				EF00000400000000000000F1 /* MusicViewModel+Playback.swift */,
 				FD0000000000000000000004 /* MusicViewModel+Queue.swift */,
+				FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */,
 				FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */,
 			);
 			path = ViewModels;
@@ -1067,7 +1079,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Skip dev-only linting on Xcode Cloud (SwiftLint is not installed there).\nif [ \"$CI\" = \"TRUE\" ]; then\n  exit 0;\nfi\nexport PATH=\"$PATH:/opt/homebrew/bin\"\n\nif which swiftlint > /dev/null; then\n  swiftlint --config \"$SRCROOT/.swiftlint\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "# Skip dev-only linting on Xcode Cloud (SwiftLint is not installed there).\nif [ \"$CI\" = \"TRUE\" ]; then\n  exit 0;\nfi\nexport PATH=\"$PATH:/opt/homebrew/bin\"\n\nif which swiftlint > /dev/null; then\n  swiftlint --strict --config \"$SRCROOT/.swiftlint\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1208,6 +1220,7 @@
 				EE0000040000000000000004 /* MusicViewModel.swift in Sources */,
 				EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */,
 				FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */,
+				FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */,
 				FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */,
 				EE0000050000000000000005 /* MusicView.swift in Sources */,
 				EE0000060000000000000006 /* NowPlayingView.swift in Sources */,
@@ -1250,6 +1263,9 @@
 				EE0000160000000000000023 /* MusicViewModelSpotifyTests.swift in Sources */,
 				FE0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift in Sources */,
 				FE0000000000000000000008 /* MusicViewModelQueueTests.swift in Sources */,
+				FE0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift in Sources */,
+				FE0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift in Sources */,
+				FE0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift in Sources */,
 				FE0000000000000000000007 /* MusicQueueModelTests.swift in Sources */,
 			BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */,
 			BB0000007000000000000007 /* LockableTests.swift in Sources */,

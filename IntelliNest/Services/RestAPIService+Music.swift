@@ -86,7 +86,7 @@ extension RestAPIService {
     /// item. The full upcoming list is fetched separately over the Music Assistant
     /// WebSocket, since `get_queue` only carries the current/next item; the next
     /// item backs "Näst på tur" over REST when that socket is unreachable.
-    func getQueue(on entityID: EntityId) async throws -> (queueID: String?, currentItem: MusicQueueItem?, nextItem: MusicQueueItem?) {
+    func getQueue(on entityID: EntityId) async throws -> MusicQueueState {
         let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.getQueue.rawValue)"
         var json = [JSONKey: Any]()
         json[.entityID] = entityID.rawValue

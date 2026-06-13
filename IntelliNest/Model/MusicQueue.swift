@@ -129,24 +129,35 @@ struct MusicQueueDTO: Decodable {
     }
 }
 
+/// What `get_queue` yields for the Queue screen: the queue id (needed to target
+/// the WebSocket delete command), the current item ("Spelas nu"), and the
+/// immediate next item. `next_item` works over REST, so it backs "Näst på tur"
+/// away from home when the LAN-only socket can't supply the full list.
+struct MusicQueueState {
+    let queueID: String?
+    let currentItem: MusicQueueItem?
+    let nextItem: MusicQueueItem?
+
+    static let empty = MusicQueueState(queueID: nil, currentItem: nil, nextItem: nil)
+}
+
 enum MusicGetQueueParser {
-    /// Parses the `music_assistant.get_queue` `return_response` body into the
-    /// queue id, current item, and next item. Home Assistant wraps service results
-    /// under `service_response`, and the queue then sits either directly under it
-    /// or keyed by the entity id (as `browse_media` does). Both shapes are handled,
-    /// and a body in any unexpected shape yields an empty queue rather than
-    /// throwing — the Queue screen falls back to session state when this is empty.
-    /// `next_item` works over REST, so it backs the "Näst på tur" list away from
-    /// home when the LAN-only socket can't supply the full list.
-    static func parse(_ data: Data) -> (queueID: String?, currentItem: MusicQueueItem?, nextItem: MusicQueueItem?) {
+    /// Parses the `music_assistant.get_queue` `return_response` body. Home Assistant
+    /// wraps service results under `service_response`, and the queue then sits
+    /// either directly under it or keyed by the entity id (as `browse_media` does).
+    /// Both shapes are handled, and a body in any unexpected shape yields an empty
+    /// state rather than throwing — the Queue screen falls back to session state.
+    static func parse(_ data: Data) -> MusicQueueState {
         let decoder = JSONDecoder()
         for candidate in candidateObjects(in: data) {
             guard let dto = try? decoder.decode(MusicQueueDTO.self, from: candidate), dto.queueID != nil else {
                 continue
             }
-            return (dto.queueID, dto.currentItem?.queueItem, dto.nextItem?.queueItem)
+            return MusicQueueState(queueID: dto.queueID,
+                                   currentItem: dto.currentItem?.queueItem,
+                                   nextItem: dto.nextItem?.queueItem)
         }
-        return (nil, nil, nil)
+        return .empty
     }
 
     /// Returns every JSON object worth trying to decode as a queue: the body
