@@ -265,6 +265,32 @@ extension MusicViewModelTests {
         XCTAssertFalse(model.manualQueueItemIDs.contains(manualTrack.id))
     }
 
+    func testRemovingReconciledManualTrackPrunesSessionRow() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        stubPlayMedia(statusCode: 200)
+        let socket = StubMusicAssistantQueueSocket(items: [])
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/m1", title: "Mine", artist: nil, imageURL: nil)
+        // The server now reports the manual add as a real queue item; a reload
+        // reconciles the synthetic session id to that server id.
+        await socket.setItems([
+            queueItem("cur", title: "Now"),
+            queueItem("real-m1", uri: "spotify://track/m1", title: "Mine")
+        ])
+        await model.loadQueue()
+        let reconciled = model.queue.manualUpcoming[0]
+        XCTAssertEqual(reconciled.queueItemID, "real-m1")
+        // Removing the reconciled (real-id) item must also prune the stale session
+        // row, which still carries the synthetic id, so it can't haunt the fallback.
+        await model.removeFromQueue(reconciled)
+        XCTAssertTrue(model.queue.manualUpcoming.isEmpty)
+        XCTAssertTrue(model.sessionEnqueuedItems.isEmpty)
+        let deleted = await socket.deletedItemIDs
+        XCTAssertEqual(deleted, ["real-m1"])
+    }
+
     func testRemoveSessionItemIsLocalOnlyNoSocketCall() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         stubPlayMedia(statusCode: 200)

@@ -153,6 +153,12 @@ extension MusicViewModel {
     func clearManualQueueTracking() {
         manualQueueItemIDs = []
         sessionEnqueuedItems = []
+        // Also drop the grouping on the already-published queue, so nothing shows
+        // under "I kö" in the window before the next loadQueue() rebuilds it.
+        queue = MusicQueue(queueID: queue.queueID,
+                           currentItem: queue.currentItem,
+                           upcomingItems: queue.upcomingItems,
+                           manualItemIDs: [])
     }
 
     // MARK: - Add
@@ -183,11 +189,12 @@ extension MusicViewModel {
         // A session-local id: these fallback rows have no server queue-item id,
         // so they are removed locally only. A queue reload replaces them with the
         // real items once the socket can read the live queue.
-        let sessionItem = MusicQueueItem(queueItemID: "session-\(uri)-\(sessionEnqueuedItems.count)",
+        let sessionItem = MusicQueueItem(queueItemID: "session-\(sessionEnqueueSequence)-\(uri)",
                                          uri: uri,
                                          title: title,
                                          artist: artist,
                                          imageURL: imageURL)
+        sessionEnqueueSequence += 1
         // The user added this by hand, so it belongs in "I kö" — track its id now;
         // reconciliation swaps the synthetic id for the real one on the next load.
         manualQueueItemIDs.insert(sessionItem.id)
@@ -224,7 +231,7 @@ extension MusicViewModel {
                            currentItem: queue.currentItem,
                            upcomingItems: previousUpcoming.filter { $0.id != item.id },
                            manualItemIDs: manualQueueItemIDs)
-        sessionEnqueuedItems.removeAll { $0.id == item.id }
+        removeSessionRow(matching: item)
 
         guard let queueID = queue.queueID, !isSessionOnly else {
             return
@@ -238,6 +245,18 @@ extension MusicViewModel {
                                manualItemIDs: manualQueueItemIDs)
             sessionEnqueuedItems = previousSession
             setErrorBannerText("Kunde inte ta bort från kön", "Det gick inte att ta bort låten från kön")
+        }
+    }
+
+    /// Drops the session-fallback row backing a removed item. Matches on the
+    /// synthetic id first; once an add has been reconciled, the live item carries
+    /// the real server id instead, so fall back to removing one row with the same
+    /// uri — otherwise the stale placeholder would linger in the offline fallback.
+    private func removeSessionRow(matching item: MusicQueueItem) {
+        if let index = sessionEnqueuedItems.firstIndex(where: { $0.id == item.id }) {
+            sessionEnqueuedItems.remove(at: index)
+        } else if let uri = item.uri, let index = sessionEnqueuedItems.firstIndex(where: { $0.uri == uri }) {
+            sessionEnqueuedItems.remove(at: index)
         }
     }
 }

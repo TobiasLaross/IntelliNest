@@ -89,6 +89,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// only — like `nowPlayingSourcePlaylist`, the grouping resets after a relaunch
     /// rather than risk mislabelling playlist tracks from stale persisted state.
     var manualQueueItemIDs: Set<String> = []
+    /// Monotonic sequence for synthetic session-item ids. Never decreases, so a
+    /// remove-then-re-add of the same track can't reuse an id still in the list
+    /// (a plain count would collide).
+    var sessionEnqueueSequence = 0
     /// One section per configured personal account that currently has public
     /// playlists, in configured order, rendered below "Favoriter". Accounts with
     /// no playlists (empty/failed fetch, or logged out) are kept off the list.
