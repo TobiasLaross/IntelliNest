@@ -22,6 +22,14 @@ enum QueuePlacement {
     }
 }
 
+/// One of the two reorderable upcoming groups on the Queue screen. Drag-reorder
+/// is confined within a single group (the displayed groups split by origin, not
+/// by play order, so dragging across them has no backend meaning).
+enum QueueSection {
+    case manual
+    case context
+}
+
 /// The play queue for the active speaker's group leader. Reads run over two
 /// transports: `music_assistant.get_queue` (REST) for the queue id and the
 /// current track, and the Music Assistant WebSocket for the full upcoming list
@@ -258,5 +266,92 @@ extension MusicViewModel {
         } else if let uri = item.uri, let index = sessionEnqueuedItems.firstIndex(where: { $0.uri == uri }) {
             sessionEnqueuedItems.remove(at: index)
         }
+    }
+
+    // MARK: - Reorder
+
+    /// Reorders a track within one upcoming group in response to a drag. The drag
+    /// is group-local (SwiftUI confines `onMove` to one section), so the new order
+    /// is mapped back onto the real flat queue: the group's items keep the same
+    /// slots, reassigned in the dragged order, and the moved item is shifted that
+    /// many positions on the server via `move_item`. Optimistic; reverts + banners
+    /// on socket failure. A session-only row (no server id, or offline) is reordered
+    /// locally only, since there is no live queue to move it in.
+    func moveUpcoming(_ section: QueueSection, fromOffsets: IndexSet, toOffset: Int) async {
+        let groupItems = upcomingItems(in: section)
+        guard let sourceIndex = fromOffsets.first, groupItems.indices.contains(sourceIndex) else {
+            return
+        }
+        let reorderedGroup = Self.applyingMove(to: groupItems, fromOffsets: fromOffsets, toOffset: toOffset)
+        let movedItem = groupItems[sourceIndex]
+        guard let destinationIndex = reorderedGroup.firstIndex(where: { $0.id == movedItem.id }),
+              destinationIndex != sourceIndex else {
+            return
+        }
+
+        // The real-queue indices this group occupies, ascending; slot k holds
+        // group item k, so the move stays inside the group's own positions.
+        let slots = queue.upcomingItems.indices.filter { isInSection(section, item: queue.upcomingItems[$0]) }
+        guard slots.count == groupItems.count else {
+            return
+        }
+        let positionShift = slots[destinationIndex] - slots[sourceIndex]
+
+        // Reordering doesn't change which tracks are manual, so preserve the
+        // queue's existing grouping rather than re-deriving it.
+        let manualIDs = queue.manualItemIDs
+        let previousUpcoming = queue.upcomingItems
+        var newUpcoming = queue.upcomingItems
+        for (offset, slot) in slots.enumerated() {
+            newUpcoming[slot] = reorderedGroup[offset]
+        }
+        queue = MusicQueue(queueID: queue.queueID,
+                           currentItem: queue.currentItem,
+                           upcomingItems: newUpcoming,
+                           manualItemIDs: manualIDs)
+
+        let isSessionOnly = sessionEnqueuedItems.contains { $0.id == movedItem.id }
+        guard let queueID = queue.queueID, !isSessionOnly else {
+            return
+        }
+        let success = await queueSocket.moveItem(queueID: queueID, itemID: movedItem.queueItemID, positions: positionShift)
+        if !success {
+            queue = MusicQueue(queueID: queue.queueID,
+                               currentItem: queue.currentItem,
+                               upcomingItems: previousUpcoming,
+                               manualItemIDs: manualIDs)
+            setErrorBannerText("Kunde inte flytta låten", "Det gick inte att ändra ordningen i kön")
+        }
+    }
+
+    private func upcomingItems(in section: QueueSection) -> [MusicQueueItem] {
+        switch section {
+        case .manual: queue.manualUpcoming
+        case .context: queue.contextUpcoming
+        }
+    }
+
+    private func isInSection(_ section: QueueSection, item: MusicQueueItem) -> Bool {
+        // Use the published queue's grouping (the same source as manualUpcoming /
+        // contextUpcoming) so the slots line up with what's on screen.
+        let isManual = queue.manualItemIDs.contains(item.id)
+        return section == .manual ? isManual : !isManual
+    }
+
+    /// Replicates SwiftUI's `move(fromOffsets:toOffset:)` without importing
+    /// SwiftUI into the view model: removes the moved elements, then inserts them
+    /// at the destination adjusted for the elements removed ahead of it.
+    private static func applyingMove(to items: [MusicQueueItem],
+                                     fromOffsets: IndexSet,
+                                     toOffset: Int) -> [MusicQueueItem] {
+        let sources = fromOffsets.sorted()
+        let moving = sources.map { items[$0] }
+        var result = items
+        for index in sources.reversed() {
+            result.remove(at: index)
+        }
+        let insertionIndex = toOffset - sources.filter { $0 < toOffset }.count
+        result.insert(contentsOf: moving, at: insertionIndex)
+        return result
     }
 }

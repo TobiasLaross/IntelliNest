@@ -89,14 +89,14 @@ struct QueueView: View {
             } else {
                 if !manual.isEmpty {
                     Section {
-                        upcomingRows(manual)
+                        upcomingRows(manual, section: .manual)
                     } header: {
                         sectionHeader("I kö")
                     }
                 }
                 if !context.isEmpty {
                     Section {
-                        upcomingRows(context)
+                        upcomingRows(context, section: .context)
                     } header: {
                         sectionHeader(contextHeaderTitle)
                     }
@@ -116,9 +116,9 @@ struct QueueView: View {
         return "Näst på tur"
     }
 
-    @ViewBuilder private func upcomingRows(_ items: [MusicQueueItem]) -> some View {
+    @ViewBuilder private func upcomingRows(_ items: [MusicQueueItem], section: QueueSection) -> some View {
         ForEach(items) { item in
-            QueueRow(viewModel: viewModel, item: item)
+            QueueRow(viewModel: viewModel, item: item, showsDragHandle: true)
                 .listRowBackground(Color.clear)
                 .swipeActions(edge: .trailing) {
                     Button(role: .destructive) {
@@ -127,6 +127,10 @@ struct QueueView: View {
                         Label("Ta bort", systemImage: "trash")
                     }
                 }
+        }
+        // Long-press a row to drag it within its group; reorders the live queue.
+        .onMove { fromOffsets, toOffset in
+            Task { await viewModel.moveUpcoming(section, fromOffsets: fromOffsets, toOffset: toOffset) }
         }
     }
 
@@ -137,11 +141,13 @@ struct QueueView: View {
     }
 }
 
-/// One queue row: album art, title, artist, and the Liked-Songs heart for
-/// Spotify tracks.
+/// One queue row: album art, title, artist, the Liked-Songs heart for Spotify
+/// tracks, and — for reorderable upcoming rows — a trailing drag handle hinting
+/// that the row can be long-pressed and dragged within its group.
 private struct QueueRow: View {
     @ObservedObject var viewModel: MusicViewModel
     let item: MusicQueueItem
+    var showsDragHandle = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -160,6 +166,12 @@ private struct QueueRow: View {
             Spacer()
             if let uri = item.uri, viewModel.canFavoriteSong(uri: uri) {
                 SongFavoriteButton(viewModel: viewModel, uri: uri)
+            }
+            if showsDragHandle {
+                Image(systemName: "line.3.horizontal")
+                    .font(.body)
+                    .foregroundStyle(.white.opacity(0.4))
+                    .accessibilityLabel("Dra för att ändra ordning")
             }
         }
         .listRowBackground(Color.clear)
