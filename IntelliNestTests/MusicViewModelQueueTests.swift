@@ -382,6 +382,9 @@ extension MusicViewModelTests {
         await model.addToQueue(uri: "spotify://track/b", title: "B", artist: nil, imageURL: nil, placement: .last)
         await model.moveUpcoming(.manual, fromOffsets: IndexSet(integer: 0), toOffset: 2)
         XCTAssertEqual(model.queue.manualUpcoming.map(\.title), ["B", "A"])
+        // The session fallback must follow the new order too, so an offline reload
+        // (which rebuilds from it) doesn't undo the drag.
+        XCTAssertEqual(model.sessionEnqueuedItems.map(\.title), ["B", "A"])
         let moves = await socket.movedItems
         XCTAssertTrue(moves.isEmpty)
     }

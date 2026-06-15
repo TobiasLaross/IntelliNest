@@ -301,6 +301,7 @@ extension MusicViewModel {
         // queue's existing grouping rather than re-deriving it.
         let manualIDs = queue.manualItemIDs
         let previousUpcoming = queue.upcomingItems
+        let previousSession = sessionEnqueuedItems
         var newUpcoming = queue.upcomingItems
         for (offset, slot) in slots.enumerated() {
             newUpcoming[slot] = reorderedGroup[offset]
@@ -309,8 +310,11 @@ extension MusicViewModel {
                            currentItem: queue.currentItem,
                            upcomingItems: newUpcoming,
                            manualItemIDs: manualIDs)
+        // Keep the session fallback in the same order, so an offline reload (which
+        // rebuilds the upcoming list from it) doesn't undo the drag.
+        reorderSessionItems(toMatch: newUpcoming)
 
-        let isSessionOnly = sessionEnqueuedItems.contains { $0.id == movedItem.id }
+        let isSessionOnly = previousSession.contains { $0.id == movedItem.id }
         guard let queueID = queue.queueID, !isSessionOnly else {
             return
         }
@@ -320,8 +324,20 @@ extension MusicViewModel {
                                currentItem: queue.currentItem,
                                upcomingItems: previousUpcoming,
                                manualItemIDs: manualIDs)
+            sessionEnqueuedItems = previousSession
             setErrorBannerText("Kunde inte flytta låten", "Det gick inte att ändra ordningen i kön")
         }
+    }
+
+    /// Re-sorts the session-fallback rows to match their order in the reordered
+    /// upcoming list, leaving any session rows not currently visible (e.g. while
+    /// the live socket queue is shown) at the end in their existing order.
+    private func reorderSessionItems(toMatch upcoming: [MusicQueueItem]) {
+        let sessionIDs = Set(sessionEnqueuedItems.map(\.id))
+        let visible = upcoming.filter { sessionIDs.contains($0.id) }
+        let visibleIDs = Set(visible.map(\.id))
+        let hidden = sessionEnqueuedItems.filter { !visibleIDs.contains($0.id) }
+        sessionEnqueuedItems = visible + hidden
     }
 
     private func upcomingItems(in section: QueueSection) -> [MusicQueueItem] {
