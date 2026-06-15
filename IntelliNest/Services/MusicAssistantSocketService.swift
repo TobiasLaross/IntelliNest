@@ -17,6 +17,10 @@ protocol MusicAssistantQueueSocket: Sendable {
     func queueItems(queueID: String) async -> [MusicQueueItem]
     /// Removes the item from the queue. Returns whether the command succeeded.
     func deleteItem(queueID: String, itemID: String) async -> Bool
+    /// Moves the item `positions` slots within the queue: a positive value moves
+    /// it later (towards the end), a negative value earlier. Returns whether the
+    /// command succeeded.
+    func moveItem(queueID: String, itemID: String, positions: Int) async -> Bool
     /// Adds the media item (by uri, e.g. `spotify://playlist/<id>`) to the Music
     /// Assistant library favourites. With MA's Spotify 2-way sync on, this also
     /// follows the playlist on Spotify. Returns whether the command succeeded.
@@ -62,6 +66,11 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
     func deleteItem(queueID: String, itemID: String) async -> Bool {
         await send(command: "player_queues/delete_item",
                    args: ["queue_id": queueID, "item_id_or_index": itemID]) != nil
+    }
+
+    func moveItem(queueID: String, itemID: String, positions: Int) async -> Bool {
+        await send(command: "player_queues/move_item",
+                   args: ["queue_id": queueID, "queue_item_id": itemID, "pos_shift": positions]) != nil
     }
 
     func addFavorite(uri: String) async -> Bool {
@@ -201,6 +210,7 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
 struct DisabledMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     func queueItems(queueID _: String) async -> [MusicQueueItem] { [] }
     func deleteItem(queueID _: String, itemID _: String) async -> Bool { false }
+    func moveItem(queueID _: String, itemID _: String, positions _: Int) async -> Bool { false }
     func addFavorite(uri _: String) async -> Bool { false }
     func removeFavorite(mediaType _: String, libraryItemID _: String) async -> Bool { false }
 }

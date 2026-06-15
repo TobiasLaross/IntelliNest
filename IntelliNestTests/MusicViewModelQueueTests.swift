@@ -7,14 +7,17 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     var items: [MusicQueueItem]
     var deleteSucceeds: Bool
     var favoriteSucceeds: Bool
+    var moveSucceeds: Bool
     private(set) var deletedItemIDs: [String] = []
+    private(set) var movedItems: [(itemID: String, positions: Int)] = []
     private(set) var addedFavoriteURIs: [String] = []
     private(set) var removedFavorites: [String] = []
 
-    init(items: [MusicQueueItem] = [], deleteSucceeds: Bool = true, favoriteSucceeds: Bool = true) {
+    init(items: [MusicQueueItem] = [], deleteSucceeds: Bool = true, favoriteSucceeds: Bool = true, moveSucceeds: Bool = true) {
         self.items = items
         self.deleteSucceeds = deleteSucceeds
         self.favoriteSucceeds = favoriteSucceeds
+        self.moveSucceeds = moveSucceeds
     }
 
     func queueItems(queueID _: String) async -> [MusicQueueItem] { items }
@@ -28,6 +31,11 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     func deleteItem(queueID _: String, itemID: String) async -> Bool {
         deletedItemIDs.append(itemID)
         return deleteSucceeds
+    }
+
+    func moveItem(queueID _: String, itemID: String, positions: Int) async -> Bool {
+        movedItems.append((itemID, positions))
+        return moveSucceeds
     }
 
     func addFavorite(uri: String) async -> Bool {
@@ -304,5 +312,80 @@ extension MusicViewModelTests {
         XCTAssertTrue(model.sessionEnqueuedItems.isEmpty)
         let deleted = await socket.deletedItemIDs
         XCTAssertTrue(deleted.isEmpty)
+    }
+
+    // MARK: - Reorder
+
+    /// Builds a queue with three manual tracks ahead of two context tracks.
+    private func groupedQueue() -> MusicQueue {
+        MusicQueue(queueID: "kitchen",
+                   currentItem: queueItem("cur", title: "Now"),
+                   upcomingItems: [
+                       queueItem("m1", uri: "spotify://track/m1", title: "Mine One"),
+                       queueItem("m2", uri: "spotify://track/m2", title: "Mine Two"),
+                       queueItem("m3", uri: "spotify://track/m3", title: "Mine Three"),
+                       queueItem("c1", uri: "spotify://track/c1", title: "Context One"),
+                       queueItem("c2", uri: "spotify://track/c2", title: "Context Two")
+                   ],
+                   manualItemIDs: ["m1", "m2", "m3"])
+    }
+
+    func testMoveManualWithinGroupReordersAndShiftsServer() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        model.queue = groupedQueue()
+        // Drag the first manual track to the end of the manual group.
+        await model.moveUpcoming(.manual, fromOffsets: IndexSet(integer: 0), toOffset: 3)
+        XCTAssertEqual(model.queue.manualUpcoming.map(\.queueItemID), ["m2", "m3", "m1"])
+        // Context untouched; the real flat order keeps it after the manual slots.
+        XCTAssertEqual(model.queue.contextUpcoming.map(\.queueItemID), ["c1", "c2"])
+        let moves = await socket.movedItems
+        XCTAssertEqual(moves.map(\.itemID), ["m1"])
+        XCTAssertEqual(moves.first?.positions, 2)
+    }
+
+    func testMoveContextWithinGroupShiftsUpwardWithNegativePosition() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        model.queue = groupedQueue()
+        // Drag the second context track above the first.
+        await model.moveUpcoming(.context, fromOffsets: IndexSet(integer: 1), toOffset: 0)
+        XCTAssertEqual(model.queue.contextUpcoming.map(\.queueItemID), ["c2", "c1"])
+        XCTAssertEqual(model.queue.manualUpcoming.map(\.queueItemID), ["m1", "m2", "m3"])
+        let moves = await socket.movedItems
+        XCTAssertEqual(moves.map(\.itemID), ["c2"])
+        // c2 is one slot earlier than c1, so it shifts up by one.
+        XCTAssertEqual(moves.first?.positions, -1)
+    }
+
+    func testMoveFailureRevertsOrderAndBanners() async {
+        let socket = StubMusicAssistantQueueSocket(moveSucceeds: false)
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        model.queue = groupedQueue()
+        await model.moveUpcoming(.manual, fromOffsets: IndexSet(integer: 0), toOffset: 3)
+        // Reverts to the original order on a failed socket move.
+        XCTAssertEqual(model.queue.manualUpcoming.map(\.queueItemID), ["m1", "m2", "m3"])
+        XCTAssertTrue(bannerTitles.contains("Kunde inte flytta låten"))
+    }
+
+    func testMoveSessionOnlyItemIsLocalOnlyNoSocketCall() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        // Two session-only adds (no live queue id), so a reorder is local only.
+        await model.addToQueue(uri: "spotify://track/a", title: "A", artist: nil, imageURL: nil, placement: .last)
+        await model.addToQueue(uri: "spotify://track/b", title: "B", artist: nil, imageURL: nil, placement: .last)
+        await model.moveUpcoming(.manual, fromOffsets: IndexSet(integer: 0), toOffset: 2)
+        XCTAssertEqual(model.queue.manualUpcoming.map(\.title), ["B", "A"])
+        // The session fallback must follow the new order too, so an offline reload
+        // (which rebuilds from it) doesn't undo the drag.
+        XCTAssertEqual(model.sessionEnqueuedItems.map(\.title), ["B", "A"])
+        let moves = await socket.movedItems
+        XCTAssertTrue(moves.isEmpty)
     }
 }
