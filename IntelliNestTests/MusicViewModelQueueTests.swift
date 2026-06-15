@@ -19,6 +19,12 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
 
     func queueItems(queueID _: String) async -> [MusicQueueItem] { items }
 
+    /// Replaces the items a later `queueItems` read returns, so a test can model
+    /// the live queue changing between two `loadQueue` calls.
+    func setItems(_ newItems: [MusicQueueItem]) {
+        items = newItems
+    }
+
     func deleteItem(queueID _: String, itemID: String) async -> Bool {
         deletedItemIDs.append(itemID)
         return deleteSucceeds
@@ -186,6 +192,103 @@ extension MusicViewModelTests {
         await model.removeFromQueue(target)
         XCTAssertEqual(model.queue.upcomingItems.map(\.queueItemID), ["next1"])
         XCTAssertTrue(bannerTitles.contains("Kunde inte ta bort från kön"))
+    }
+
+    // MARK: - Grouping (I kö vs. playlist context)
+
+    func testManualAddGroupsSeparatelyFromContext() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        stubPlayMedia(statusCode: 200)
+        let socket = StubMusicAssistantQueueSocket(items: [
+            queueItem("cur", title: "Now"),
+            queueItem("ctx1", uri: "spotify://track/c1", title: "Context One"),
+            queueItem("ctx2", uri: "spotify://track/c2", title: "Context Two")
+        ])
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.loadQueue()
+        await model.addToQueue(uri: "spotify://track/m1", title: "Mine", artist: nil, imageURL: nil, placement: .last)
+        // The hand-added track lands in "I kö"; the playlist tracks stay in context.
+        XCTAssertEqual(model.queue.manualUpcoming.map(\.title), ["Mine"])
+        XCTAssertEqual(model.queue.contextUpcoming.map(\.title), ["Context One", "Context Two"])
+    }
+
+    func testReconcileMapsSessionAddToRealQueueItemByURI() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        stubPlayMedia(statusCode: 200)
+        let socket = StubMusicAssistantQueueSocket(items: [
+            queueItem("cur", title: "Now"),
+            queueItem("ctx1", uri: "spotify://track/c1", title: "Context One")
+        ])
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.loadQueue()
+        await model.addToQueue(uri: "spotify://track/m1", title: "Mine", artist: nil, imageURL: nil, placement: .last)
+        // The server now reports the manual add as a real queue item with a server id.
+        await socket.setItems([
+            queueItem("cur", title: "Now"),
+            queueItem("ctx1", uri: "spotify://track/c1", title: "Context One"),
+            queueItem("real-m1", uri: "spotify://track/m1", title: "Mine")
+        ])
+        await model.loadQueue()
+        // The synthetic session id is swapped for the real one, so "I kö" still
+        // points at the user's track and the playlist track stays in context.
+        XCTAssertEqual(model.queue.manualUpcoming.map(\.queueItemID), ["real-m1"])
+        XCTAssertEqual(model.queue.contextUpcoming.map(\.queueItemID), ["ctx1"])
+    }
+
+    func testStartingNewPlaybackClearsManualGrouping() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket())
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/m1", title: "Mine", artist: nil, imageURL: nil)
+        XCTAssertFalse(model.manualQueueItemIDs.isEmpty)
+        // Playing something new replaces the queue, so the manual grouping is dropped.
+        let playlist = MusicSearchItem(uri: "spotify://playlist/p", name: "P", mediaType: .playlist, imageURL: nil, artist: nil)
+        await model.play(item: playlist)
+        XCTAssertTrue(model.manualQueueItemIDs.isEmpty)
+        XCTAssertTrue(model.sessionEnqueuedItems.isEmpty)
+    }
+
+    func testRemovingManualTrackDropsItFromGroup() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let model = makeViewModel(socket: StubMusicAssistantQueueSocket())
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/m1", title: "Mine", artist: nil, imageURL: nil)
+        let manualTrack = model.queue.manualUpcoming[0]
+        await model.removeFromQueue(manualTrack)
+        XCTAssertTrue(model.queue.manualUpcoming.isEmpty)
+        XCTAssertFalse(model.manualQueueItemIDs.contains(manualTrack.id))
+    }
+
+    func testRemovingReconciledManualTrackPrunesSessionRow() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubGetQueue(json: getQueueJSON)
+        stubPlayMedia(statusCode: 200)
+        let socket = StubMusicAssistantQueueSocket(items: [])
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        await model.addToQueue(uri: "spotify://track/m1", title: "Mine", artist: nil, imageURL: nil)
+        // The server now reports the manual add as a real queue item; a reload
+        // reconciles the synthetic session id to that server id.
+        await socket.setItems([
+            queueItem("cur", title: "Now"),
+            queueItem("real-m1", uri: "spotify://track/m1", title: "Mine")
+        ])
+        await model.loadQueue()
+        let reconciled = model.queue.manualUpcoming[0]
+        XCTAssertEqual(reconciled.queueItemID, "real-m1")
+        // Removing the reconciled (real-id) item must also prune the stale session
+        // row, which still carries the synthetic id, so it can't haunt the fallback.
+        await model.removeFromQueue(reconciled)
+        XCTAssertTrue(model.queue.manualUpcoming.isEmpty)
+        XCTAssertTrue(model.sessionEnqueuedItems.isEmpty)
+        let deleted = await socket.deletedItemIDs
+        XCTAssertEqual(deleted, ["real-m1"])
     }
 
     func testRemoveSessionItemIsLocalOnlyNoSocketCall() async {

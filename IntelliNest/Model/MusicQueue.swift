@@ -21,13 +21,31 @@ struct MusicQueueItem: Identifiable, Equatable {
 }
 
 /// The state the Queue screen renders: the queue's id (needed for the delete
-/// command), the track playing now, and the upcoming tracks.
+/// command), the track playing now, and the upcoming tracks. The upcoming tracks
+/// are split into the user's own queue ("I kö") and the playing context ("Nästa
+/// från: …"), the way Spotify separates the two.
 struct MusicQueue: Equatable {
     let queueID: String?
     let currentItem: MusicQueueItem?
     let upcomingItems: [MusicQueueItem]
+    /// Queue-item ids of upcoming tracks the user enqueued by hand (play next /
+    /// add to queue). Music Assistant's queue is flat and tags items with no
+    /// origin, so the app tracks this itself to group the user queue apart from
+    /// the playlist/album context. See `MusicViewModel.manualQueueItemIDs`.
+    let manualItemIDs: Set<String>
 
-    static let empty = MusicQueue(queueID: nil, currentItem: nil, upcomingItems: [])
+    static let empty = MusicQueue(queueID: nil, currentItem: nil, upcomingItems: [], manualItemIDs: [])
+
+    /// Upcoming tracks the user added by hand, in queue order ("I kö").
+    var manualUpcoming: [MusicQueueItem] {
+        upcomingItems.filter { manualItemIDs.contains($0.id) }
+    }
+
+    /// Upcoming tracks coming from the playing context — the rest of the playlist
+    /// or album ("Nästa från: …").
+    var contextUpcoming: [MusicQueueItem] {
+        upcomingItems.filter { !manualItemIDs.contains($0.id) }
+    }
 }
 
 /// Decodes a Music Assistant `QueueItem`, as returned both by the Home Assistant
