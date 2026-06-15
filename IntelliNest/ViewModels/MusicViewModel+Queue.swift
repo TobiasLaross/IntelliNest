@@ -69,7 +69,10 @@ extension MusicViewModel {
 
         let currentItem = state.currentItem ?? currentItemFromSpeaker()
         let upcoming = await upcomingItems(queueID: state.queueID, currentItem: currentItem, nextItem: state.nextItem)
-        queue = MusicQueue(queueID: state.queueID, currentItem: currentItem, upcomingItems: upcoming)
+        queue = MusicQueue(queueID: state.queueID,
+                           currentItem: currentItem,
+                           upcomingItems: upcoming,
+                           manualItemIDs: manualQueueItemIDs)
     }
 
     /// The upcoming tracks: the socket's full ordered list sliced to whatever
@@ -86,13 +89,38 @@ extension MusicViewModel {
         guard items.isNotEmpty else {
             return offlineUpcoming(nextItem: nextItem)
         }
-        guard let currentItem,
-              let currentIndex = items.firstIndex(where: { $0.queueItemID == currentItem.queueItemID }) else {
+        let upcoming: [MusicQueueItem] = if let currentItem,
+                                            let currentIndex = items.firstIndex(where: { $0.queueItemID == currentItem.queueItemID }) {
+            Array(items[(currentIndex + 1)...])
+        } else {
             // Current track not located in the list — show the whole list rather
             // than nothing, minus any entry that is the current track by uri.
-            return items.filter { $0.uri == nil || $0.uri != currentItem?.uri }
+            items.filter { $0.uri == nil || $0.uri != currentItem?.uri }
         }
-        return Array(items[(currentIndex + 1)...])
+        reconcileManualIDs(against: upcoming)
+        return upcoming
+    }
+
+    /// Re-anchors the manual-queue id set to the live queue. Music Assistant gives
+    /// queued items no origin marker, so the synthetic session ids vanish once the
+    /// socket returns real server items. This keeps the real ids already known to
+    /// be manual (that still exist), then claims one live item per session-enqueued
+    /// uri not yet represented — matching by uri, each session add consuming one
+    /// row. Ids no longer in the queue (removed, or wiped by a new playlist) drop
+    /// out, so "I kö" keeps pointing at the right rows.
+    private func reconcileManualIDs(against upcoming: [MusicQueueItem]) {
+        let upcomingIDs = Set(upcoming.map(\.id))
+        var reconciled = manualQueueItemIDs.intersection(upcomingIDs)
+        var unclaimed = upcoming.filter { !reconciled.contains($0.id) }
+        for sessionItem in sessionEnqueuedItems {
+            guard let uri = sessionItem.uri,
+                  let matchIndex = unclaimed.firstIndex(where: { $0.uri == uri }) else {
+                continue
+            }
+            reconciled.insert(unclaimed[matchIndex].id)
+            unclaimed.remove(at: matchIndex)
+        }
+        manualQueueItemIDs = reconciled
     }
 
     /// The "Näst på tur" list when the socket can't supply the full queue: at least
@@ -117,6 +145,14 @@ extension MusicViewModel {
                               title: title,
                               artist: speaker.mediaArtist,
                               imageURL: speaker.entityPicture)
+    }
+
+    /// Forgets the manual-queue tracking (the "I kö" grouping and its session
+    /// fallback). Called when the queue is replaced wholesale, since the previous
+    /// manual adds are gone from the server queue.
+    func clearManualQueueTracking() {
+        manualQueueItemIDs = []
+        sessionEnqueuedItems = []
     }
 
     // MARK: - Add
@@ -152,17 +188,22 @@ extension MusicViewModel {
                                          title: title,
                                          artist: artist,
                                          imageURL: imageURL)
+        // The user added this by hand, so it belongs in "I kö" — track its id now;
+        // reconciliation swaps the synthetic id for the real one on the next load.
+        manualQueueItemIDs.insert(sessionItem.id)
         switch placement {
         case .next:
             sessionEnqueuedItems.insert(sessionItem, at: 0)
             queue = MusicQueue(queueID: queue.queueID,
                                currentItem: queue.currentItem,
-                               upcomingItems: [sessionItem] + queue.upcomingItems)
+                               upcomingItems: [sessionItem] + queue.upcomingItems,
+                               manualItemIDs: manualQueueItemIDs)
         case .last:
             sessionEnqueuedItems.append(sessionItem)
             queue = MusicQueue(queueID: queue.queueID,
                                currentItem: queue.currentItem,
-                               upcomingItems: queue.upcomingItems + [sessionItem])
+                               upcomingItems: queue.upcomingItems + [sessionItem],
+                               manualItemIDs: manualQueueItemIDs)
         }
     }
 
@@ -175,11 +216,14 @@ extension MusicViewModel {
     func removeFromQueue(_ item: MusicQueueItem) async {
         let previousUpcoming = queue.upcomingItems
         let previousSession = sessionEnqueuedItems
+        let previousManualIDs = manualQueueItemIDs
         let isSessionOnly = previousSession.contains { $0.id == item.id }
 
+        manualQueueItemIDs.remove(item.id)
         queue = MusicQueue(queueID: queue.queueID,
                            currentItem: queue.currentItem,
-                           upcomingItems: previousUpcoming.filter { $0.id != item.id })
+                           upcomingItems: previousUpcoming.filter { $0.id != item.id },
+                           manualItemIDs: manualQueueItemIDs)
         sessionEnqueuedItems.removeAll { $0.id == item.id }
 
         guard let queueID = queue.queueID, !isSessionOnly else {
@@ -187,7 +231,11 @@ extension MusicViewModel {
         }
         let success = await queueSocket.deleteItem(queueID: queueID, itemID: item.queueItemID)
         if !success {
-            queue = MusicQueue(queueID: queue.queueID, currentItem: queue.currentItem, upcomingItems: previousUpcoming)
+            manualQueueItemIDs = previousManualIDs
+            queue = MusicQueue(queueID: queue.queueID,
+                               currentItem: queue.currentItem,
+                               upcomingItems: previousUpcoming,
+                               manualItemIDs: manualQueueItemIDs)
             sessionEnqueuedItems = previousSession
             setErrorBannerText("Kunde inte ta bort från kön", "Det gick inte att ta bort låten från kön")
         }

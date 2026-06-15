@@ -81,6 +81,14 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Tracks the app enqueued this session, newest last. Used as the "Näst på
     /// tur" fallback when the live queue contents can't be read over the socket.
     @Published var sessionEnqueuedItems: [MusicQueueItem] = []
+    /// Queue-item ids of tracks the user enqueued by hand (play next / add to
+    /// queue): synthetic session ids before the live queue is read, real server
+    /// ids after reconciliation. Drives the "I kö" grouping on the Queue screen.
+    /// Music Assistant's queue carries no origin marker, so the app tracks this
+    /// itself. Reconciled against the live queue on each load. Tracked per session
+    /// only — like `nowPlayingSourcePlaylist`, the grouping resets after a relaunch
+    /// rather than risk mislabelling playlist tracks from stale persisted state.
+    var manualQueueItemIDs: Set<String> = []
     /// One section per configured personal account that currently has public
     /// playlists, in configured order, rendered below "Favoriter". Accounts with
     /// no playlists (empty/failed fetch, or logged out) are kept off the list.

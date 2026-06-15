@@ -163,6 +163,12 @@ extension MusicViewModel {
             speakers[activeSpeakerID]?.state = "playing"
             speakers[activeSpeakerID]?.mediaTitle = title
             speakers[activeSpeakerID]?.mediaArtist = artist
+            // A "replace" wipes the server queue, so the manual "I kö" tracking from
+            // the previous context no longer applies — clear it so leftover ids can't
+            // mislabel the new playlist's tracks.
+            if enqueue == "replace" {
+                clearManualQueueTracking()
+            }
             restAPIService.triggerRepeatReload(times: 3)
         } else {
             setErrorBannerText("Kunde inte spela", "Det gick inte att starta uppspelningen")

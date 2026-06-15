@@ -73,30 +73,61 @@ struct QueueView: View {
                 sectionHeader("Spelas nu")
             }
 
-            Section {
-                if viewModel.queue.upcomingItems.isEmpty {
+            // The user's own additions ("I kö") and the playing context ("Nästa
+            // från: …") are shown as separate groups, the way Spotify splits them.
+            let manual = viewModel.queue.manualUpcoming
+            let context = viewModel.queue.contextUpcoming
+
+            if manual.isEmpty, context.isEmpty {
+                Section {
                     Text("Inga kommande låtar")
                         .foregroundStyle(.white.opacity(0.6))
                         .listRowBackground(Color.clear)
-                } else {
-                    ForEach(viewModel.queue.upcomingItems) { item in
-                        QueueRow(viewModel: viewModel, item: item)
-                            .listRowBackground(Color.clear)
-                            .swipeActions(edge: .trailing) {
-                                Button(role: .destructive) {
-                                    Task { await viewModel.removeFromQueue(item) }
-                                } label: {
-                                    Label("Ta bort", systemImage: "trash")
-                                }
-                            }
+                } header: {
+                    sectionHeader("Näst på tur")
+                }
+            } else {
+                if !manual.isEmpty {
+                    Section {
+                        upcomingRows(manual)
+                    } header: {
+                        sectionHeader("I kö")
                     }
                 }
-            } header: {
-                sectionHeader("Näst på tur")
+                if !context.isEmpty {
+                    Section {
+                        upcomingRows(context)
+                    } header: {
+                        sectionHeader(contextHeaderTitle)
+                    }
+                }
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
+    }
+
+    /// The header for the context group: names the source playlist when playback
+    /// was started from one this session, otherwise the generic "Näst på tur".
+    private var contextHeaderTitle: String {
+        if let name = viewModel.nowPlayingSourcePlaylist?.name {
+            return "Nästa från: \(name)"
+        }
+        return "Näst på tur"
+    }
+
+    @ViewBuilder private func upcomingRows(_ items: [MusicQueueItem]) -> some View {
+        ForEach(items) { item in
+            QueueRow(viewModel: viewModel, item: item)
+                .listRowBackground(Color.clear)
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        Task { await viewModel.removeFromQueue(item) }
+                    } label: {
+                        Label("Ta bort", systemImage: "trash")
+                    }
+                }
+        }
     }
 
     private func sectionHeader(_ title: String) -> some View {
