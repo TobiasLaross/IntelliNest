@@ -33,10 +33,10 @@ extension HomeViewModel {
         }
 
         if let generalWasteDescription = generalWasteDate.date.daysRemainingDescription() {
-            text.addNewLineAndAppend("Restavfall töms \(generalWasteDescription)")
+            text.addNewLineAndAppend("Plast töms \(generalWasteDescription)")
         }
         if let plasticWasteDescription = plasticWasteDate.date.daysRemainingDescription() {
-            text.addNewLineAndAppend("Plast töms \(plasticWasteDescription)")
+            text.addNewLineAndAppend("Restavfall töms \(plasticWasteDescription)")
         }
         if let gardenWasteDescription = gardenWasteDate.date.daysRemainingDescription() {
             text.addNewLineAndAppend("Trädgårdsavfall töms \(gardenWasteDescription)")
