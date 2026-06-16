@@ -120,58 +120,74 @@ class ElectricityViewModelTests: XCTestCase {
 
     // MARK: - Computed Property: gridPower
 
-    func testGridPower_isDirectPulseSensorReading() {
-        // Given: house consumes 3 kW, solar produces 1 kW → grid imports 2 kW
-        // pulsePower sensor reads the net grid power directly
+    func testGridPower_isImportMinusExport() {
+        // Given: house consumes 3 kW, solar produces 1 kW → grid imports 2 kW.
+        // The Tibber Pulse reports import on pulse_power and export on
+        // pulse_power_production; neither is ever negative.
         viewModel.reload(entityID: .pulsePower, state: "2000")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         viewModel.reload(entityID: .solarPower, state: "1000")
-        // Then: gridPower equals the pulse sensor reading (2 kW imported from grid)
+        // Then: net grid power = import - export = 2000 - 0 (2 kW imported)
         XCTAssertEqual(viewModel.gridPower, 2000)
     }
 
     func testGridPower_isNegativeWhenSolarExceedsConsumption() {
-        // Given: house consumes 1 kW, solar produces 4 kW → grid exports 3 kW
-        // pulsePower sensor reads -3000 (negative = exporting to grid)
-        viewModel.reload(entityID: .pulsePower, state: "-3000")
+        // Given: house consumes 1 kW, solar produces 4 kW → grid exports 3 kW.
+        // pulse_power stays at 0 (no import), pulse_power_production reads 3000.
+        viewModel.reload(entityID: .pulsePower, state: "0")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "3000")
         viewModel.reload(entityID: .solarPower, state: "4000")
-        // Then
+        // Then: net grid power = 0 - 3000 (3 kW exported)
         XCTAssertEqual(viewModel.gridPower, -3000)
     }
 
-    func testHousePower_isSolarPlusPulsePowerSensorReading() {
+    func testHousePower_isSolarPlusImportMinusExport() {
         // Given: solar produces 1 kW, grid imports 2 kW → house consumes 3 kW total
         viewModel.reload(entityID: .pulsePower, state: "2000")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         viewModel.reload(entityID: .solarPower, state: "1000")
         // Then
         XCTAssertEqual(viewModel.housePower, 3000)
     }
 
+    func testHousePower_excludesExportedSolar() {
+        // Given: solar produces 1.12 kW, nothing imported, 0.49 kW exported to grid.
+        // Regression for the bug where exported solar was counted as house load:
+        // house = solar + import - export = 1120 + 0 - 494 = 626 W (not 1120 W).
+        viewModel.reload(entityID: .solarPower, state: "1120")
+        viewModel.reload(entityID: .pulsePower, state: "0")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "494")
+        // Then
+        XCTAssertEqual(viewModel.housePower, 626)
+    }
+
     // MARK: - Computed Property: isSolarToGrid
 
     func testIsSolarToGrid_whenSolarExceedsHouseConsumption() {
-        // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid
-        // pulsePower sensor reads -4000 (negative = exporting to grid)
+        // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid.
+        // pulse_power_production reads 4000, pulse_power stays at 0.
         viewModel.reload(entityID: .solarPower, state: "5000")
-        viewModel.reload(entityID: .pulsePower, state: "-4000")
+        viewModel.reload(entityID: .pulsePower, state: "0")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "4000")
         // Then
         XCTAssertTrue(viewModel.isSolarToGrid)
     }
 
     func testIsSolarToGrid_whenSolarIsBelowHouseConsumption() {
         // Given: solar produces 1 kW, house consumes 3 kW → drawing 2 kW from grid
-        // pulsePower sensor reads +2000 (positive = importing from grid)
         viewModel.reload(entityID: .solarPower, state: "1000")
         viewModel.reload(entityID: .pulsePower, state: "2000")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         // Then
         XCTAssertFalse(viewModel.isSolarToGrid)
     }
 
     func testIsSolarToGrid_whenSolarPartiallyCoversConsumption() {
         // Given: solar produces 1.5 kW, house consumes 3 kW → drawing 1.5 kW from grid (not exporting!)
-        // pulsePower sensor reads +1500 (positive = importing from grid)
-        // This is the key regression scenario: solar active but nothing exported to grid
+        // This is the key regression scenario: solar active but nothing exported to grid.
         viewModel.reload(entityID: .solarPower, state: "1500")
         viewModel.reload(entityID: .pulsePower, state: "1500")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         // Then: solar is covering part of the load, none exported to grid
         XCTAssertFalse(viewModel.isSolarToGrid)
     }
@@ -180,6 +196,7 @@ class ElectricityViewModelTests: XCTestCase {
         // Given: no solar production
         viewModel.reload(entityID: .solarPower, state: "0")
         viewModel.reload(entityID: .pulsePower, state: "2000")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         // Then
         XCTAssertFalse(viewModel.isSolarToGrid)
     }
@@ -188,18 +205,18 @@ class ElectricityViewModelTests: XCTestCase {
 
     func testIsSolarToHouse_whenSolarPartiallyCoversConsumption() {
         // Given: solar covers 1.5 kW of a 3 kW load, grid provides remaining 1.5 kW
-        // pulsePower sensor reads +1500 (positive = importing 1.5 kW from grid)
         viewModel.reload(entityID: .solarPower, state: "1500")
         viewModel.reload(entityID: .pulsePower, state: "1500")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         // Then
         XCTAssertTrue(viewModel.isSolarToHouse)
     }
 
     func testIsSolarToHouse_whenSolarFullyCoversPlusExports() {
         // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid
-        // pulsePower sensor reads -4000 (negative = exporting to grid)
         viewModel.reload(entityID: .solarPower, state: "5000")
-        viewModel.reload(entityID: .pulsePower, state: "-4000")
+        viewModel.reload(entityID: .pulsePower, state: "0")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "4000")
         // Then
         XCTAssertTrue(viewModel.isSolarToHouse)
     }
@@ -208,6 +225,7 @@ class ElectricityViewModelTests: XCTestCase {
         // Given: no solar production
         viewModel.reload(entityID: .solarPower, state: "0")
         viewModel.reload(entityID: .pulsePower, state: "2000")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         // Then
         XCTAssertFalse(viewModel.isSolarToHouse)
     }
@@ -223,19 +241,20 @@ class ElectricityViewModelTests: XCTestCase {
     }
 
     func testIsGridToHouse_whenSolarCoversAllConsumption() {
-        // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid
-        // pulsePower sensor reads -4000 (negative = exporting, not importing from grid)
+        // Given: solar produces 5 kW, house consumes 1 kW → exporting 4 kW to grid.
+        // Net grid power is negative, so nothing is being imported.
         viewModel.reload(entityID: .solarPower, state: "5000")
-        viewModel.reload(entityID: .pulsePower, state: "-4000")
+        viewModel.reload(entityID: .pulsePower, state: "0")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "4000")
         // Then
         XCTAssertFalse(viewModel.isGridToHouse)
     }
 
     func testIsGridToHouse_whenSolarPartiallyCoversConsumption() {
         // Given: solar covers 1 kW but house needs 3 kW → drawing 2 kW from grid
-        // pulsePower sensor reads +2000 (positive = importing 2 kW from grid)
         viewModel.reload(entityID: .solarPower, state: "1000")
         viewModel.reload(entityID: .pulsePower, state: "2000")
+        viewModel.reload(entityID: .pulsePowerProduction, state: "0")
         // Then
         XCTAssertTrue(viewModel.isGridToHouse)
     }
@@ -246,6 +265,7 @@ class ElectricityViewModelTests: XCTestCase {
         // Given: stub all non-NordPool entity URLs
         let entityStates: [EntityId: String] = [
             .pulsePower: "2000",
+            .pulsePowerProduction: "0",
             .tibberCostToday: "55.0",
             .pulseConsumptionToday: "20.5",
             .solarPower: "1000"

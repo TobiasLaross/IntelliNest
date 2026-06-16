@@ -4,12 +4,14 @@ import Foundation
 class ElectricityViewModel: ObservableObject, Reloadable {
     @Published var nordPool = NordPoolEntity(entityId: .nordPool)
     @Published private var pulsePowerEntity = Entity(entityId: .pulsePower)
+    @Published private var pulsePowerProductionEntity = Entity(entityId: .pulsePowerProduction)
     @Published private var solarPowerEntity = Entity(entityId: .solarPower)
     @Published var tibberCostToday = Entity(entityId: .tibberCostToday)
     @Published var pulseConsumptionToday = Entity(entityId: .pulseConsumptionToday)
 
     let entityIDs: [EntityId] = [
         .pulsePower,
+        .pulsePowerProduction,
         .tibberCostToday,
         .pulseConsumptionToday,
         .solarPower,
@@ -22,9 +24,21 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         Double(solarPowerEntity.state) ?? 0
     }
 
+    // The Tibber Pulse exposes import and export as two separate, always-non-negative
+    // sensors: pulse_power measures grid import, pulse_power_production measures grid
+    // export. It never reports a negative value, so the signed net grid power has to be
+    // reconstructed from the difference.
+    var gridImport: Double {
+        Double(pulsePowerEntity.state) ?? 0
+    }
+
+    var gridExport: Double {
+        Double(pulsePowerProductionEntity.state) ?? 0
+    }
+
     // Positive = importing from grid, negative = exporting to grid
     var gridPower: Double {
-        Double(pulsePowerEntity.state) ?? 0
+        gridImport - gridExport
     }
 
     var housePower: Double {
@@ -32,11 +46,11 @@ class ElectricityViewModel: ObservableObject, Reloadable {
     }
 
     var isSolarToGrid: Bool {
-        solarPower.toKW > 0 && gridPower.toKW < 0
+        solarPower.toKW > 0 && gridExport.toKW > 0
     }
 
     var isSolarToHouse: Bool {
-        solarPower.toKW > 0 && gridPower < housePower
+        solarPower.toKW > 0
     }
 
     var isGridToHouse: Bool {
@@ -97,6 +111,7 @@ class ElectricityViewModel: ObservableObject, Reloadable {
 
     private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<ElectricityViewModel, Entity>] = [
         .pulsePower: \.pulsePowerEntity,
+        .pulsePowerProduction: \.pulsePowerProductionEntity,
         .tibberCostToday: \.tibberCostToday,
         .pulseConsumptionToday: \.pulseConsumptionToday,
         .solarPower: \.solarPowerEntity
