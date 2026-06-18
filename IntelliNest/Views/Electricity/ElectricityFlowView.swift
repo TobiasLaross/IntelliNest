@@ -68,7 +68,7 @@ struct ElectricityFlowView: View {
     /// with magnitude up to 7 kW, where it saturates so very high readings don't blur into a streak.
     private func flowSpeed(forKW kilowatts: Double) -> Double {
         let clamped = min(abs(kilowatts), 7)
-        return 0.4 + clamped / 7 * 0.8
+        return 0.15 + clamped / 7 * 0.35
     }
 }
 
