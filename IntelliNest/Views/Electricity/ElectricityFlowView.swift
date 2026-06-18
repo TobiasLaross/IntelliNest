@@ -37,15 +37,15 @@ struct ElectricityFlowView: View {
             PowerView(text: viewModel.solarPower.toKWString, imageName: .solarPanel)
                 .overlay(alignment: .bottomLeading) {
                     FlowIndicatorView(isFlowing: viewModel.isSolarToGrid,
-                                      flowIntensity: flowSpeed(forKW: viewModel.solarPower.toKW),
-                                      arrowCount: 4)
+                                      flowIntensity: flowSpeed(forKW: viewModel.gridExport.toKW),
+                                      arrowCount: arrowCount(forKW: viewModel.gridExport.toKW))
                         .rotationEffect(.degrees(120))
                         .offset(x: -50, y: 35)
                 }
                 .overlay(alignment: .bottomTrailing) {
                     FlowIndicatorView(isFlowing: viewModel.isSolarToHouse,
-                                      flowIntensity: flowSpeed(forKW: viewModel.solarPower.toKW),
-                                      arrowCount: 4)
+                                      flowIntensity: flowSpeed(forKW: viewModel.solarToHousePower.toKW),
+                                      arrowCount: arrowCount(forKW: viewModel.solarToHousePower.toKW))
                         .rotationEffect(.degrees(70))
                         .offset(x: 40, y: 35)
                 }
@@ -54,7 +54,7 @@ struct ElectricityFlowView: View {
                     .overlay(alignment: .bottomLeading) {
                         FlowIndicatorView(isFlowing: viewModel.isGridToHouse,
                                           flowIntensity: flowSpeed(forKW: viewModel.gridPower.toKW),
-                                          arrowCount: 4)
+                                          arrowCount: arrowCount(forKW: viewModel.gridPower.toKW))
                             .offset(x: 50, y: -20)
                     }
                     .padding(.trailing, 80)
@@ -68,7 +68,17 @@ struct ElectricityFlowView: View {
     /// with magnitude up to 7 kW, where it saturates so very high readings don't blur into a streak.
     private func flowSpeed(forKW kilowatts: Double) -> Double {
         let clamped = min(abs(kilowatts), 7)
-        return 1.0 + clamped / 7 * 2.0
+        return 0.7 + clamped / 7 * 1.3
+    }
+
+    /// Scales how many arrows ride the track with the path's power, so a trickle reads as a single
+    /// arrow drifting by and a strong flow as a full stream of three.
+    private func arrowCount(forKW kilowatts: Double) -> Int {
+        switch abs(kilowatts) {
+        case ..<1: 1
+        case ..<4: 2
+        default: 3
+        }
     }
 }
 

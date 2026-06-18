@@ -30,6 +30,64 @@ Install `xcbeautify` with `brew install xcbeautify` if not present.
 
 **Local development** requires `IntelliNest-Info.xcconfig` (not committed). Copy `Github-Info.xcconfig` and fill in real secrets.
 
+## Running on Tobias's iPhone (physical device)
+
+Use this to verify changes that a screenshot can't prove — animation speed, gestures, live HA data.
+Mirrors the `lilaDevice` zsh helper (`~/dotfiles/zsh/config/functions.zsh`), adapted for IntelliNest.
+
+**Device IDs** (Tobias's iPhone 17 Pro):
+- Build-destination hardware UDID: `00008150-00124D500108401C`
+- CoreDevice UUID (for `devicectl` install/launch): `911101B1-0BE6-5943-A15E-E2F78F289A00`
+- App bundle id: `se.laross.IntelliNest`
+
+**One-time prerequisites (a human must do these in Xcode — they can't be scripted):**
+1. **Apple ID account.** Xcode → Settings → Accounts → add the Apple ID for team `2LLC328P4S`.
+   Without it, automatic signing fails with *"No Accounts: Add a new account in Accounts settings"*
+   because there is no `se.laross.IntelliNest` provisioning profile on disk and minting one needs
+   the account. (`lilaDevice` only works because the `se.laross.lila` profiles already exist locally.)
+2. **Generate the profiles once.** Open `IntelliNest.xcodeproj` in Xcode with the device connected and
+   build to it once, so Xcode creates the `se.laross.IntelliNest` and `se.laross.IntelliNest.IntelliWidget`
+   profiles under `~/Library/Developer/Xcode/UserData/Provisioning Profiles/`. After that the CLI build works.
+3. **Secrets file.** `IntelliNest-Info.xcconfig` must exist at the repo root. If missing, reconstruct a
+   minimal one — enough to reach HA on the LAN and show real data — from the local token:
+   ```bash
+   TOKEN=$(cat ~/.config/intellinest/ha_token)
+   cat > IntelliNest-Info.xcconfig <<EOF
+   EXTERNAL_URL = 192.168.1.205:8123/
+   LOCAL_SSID = None
+   SECRET_HASS_TOKEN = $TOKEN
+   SECRET_HASS_TOKEN_SARAH = $TOKEN
+   SECRET_YALE_API_KEY = abc
+   SECRET_YALE_API_URL = abc.com
+   SPOTIFY_CLIENT_ID = abc
+   MUSIC_ASSISTANT = abc
+   EOF
+   ```
+   `LOCAL_SSID = None` makes `URLCreator` skip the SSID check and race the hardcoded LAN address
+   `http://192.168.1.205:8123/` (in `GlobalConstants`), which wins when the device is on home wifi.
+   Yale/Spotify are placeholders; only electricity/HA features work. The file is git-ignored.
+
+**Build, install, launch** (run unsandboxed — signing needs keychain access; do NOT pass
+`-derivedDataPath` inside the repo or the SwiftLint build phase lints the SwiftPM package checkouts):
+```bash
+xcodebuild -project IntelliNest.xcodeproj -scheme IntelliNest -configuration Debug \
+  -destination "id=00008150-00124D500108401C" -allowProvisioningUpdates build
+
+APP=$(ls -td ~/Library/Developer/Xcode/DerivedData/IntelliNest-*/Build/Products/Debug-iphoneos/IntelliNest.app | head -1)
+xcrun devicectl device install app --device 911101B1-0BE6-5943-A15E-E2F78F289A00 "$APP"
+xcrun devicectl device process launch --device 911101B1-0BE6-5943-A15E-E2F78F289A00 se.laross.IntelliNest
+```
+
+**Driving the UI** (the device shows real prompts on first launch): tap with `idb ui tap <x> <y>`
+(point coords; `idb describe --udid <coredevice-uuid>` gives `width_points`). On first launch expect, in
+order: location prompt → notifications prompt → "Välj användare" (pick **Tobias**). The electricity
+dashboard is the **powergrid** button in the home grid.
+
+If device signing can't be set up, fall back to the **iOS Simulator** (no signing needed): build the
+`IntelliNest` scheme with `-destination "platform=iOS Simulator,name=iPhone 17,OS=latest"
+CODE_SIGNING_ALLOWED=NO`, install with `simctl`, and drive it with the same `idb` taps. The Mac is on
+the LAN so it reaches HA with the same reconstructed xcconfig.
+
 ## Architecture
 
 ### MVVM + Navigator

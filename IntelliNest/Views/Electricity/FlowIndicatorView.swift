@@ -9,8 +9,13 @@ struct FlowIndicatorView: View {
     private let arrowWidth: CGFloat = 12
     private let arrowSpacing: CGFloat = 8
 
+    /// The arrows always travel this same fixed distance regardless of how many there are — the count
+    /// only controls density. Tying the track to arrowCount collapsed a lone arrow into a 20pt stub
+    /// that pulsed in place instead of travelling from one node to the other.
+    private let maxArrows = 3
+
     private var trackWidth: CGFloat {
-        CGFloat(max(arrowCount, 1)) * (arrowWidth + arrowSpacing)
+        CGFloat(maxArrows) * (arrowWidth + arrowSpacing)
     }
 
     var body: some View {
