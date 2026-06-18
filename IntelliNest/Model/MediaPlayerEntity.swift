@@ -47,12 +47,18 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         state == "playing" || state == "paused"
     }
 
-    /// Whether this entity and another are on the same track, compared by title
-    /// and artist. The Music Assistant entity and its native Sonos twin share no
-    /// comparable content id (MA exposes a Spotify URI, the Sonos a stream URL),
-    /// so the track identity is matched on the human-readable metadata instead.
+    /// Whether this entity and another are confidently on the same track, compared
+    /// by title and artist. The Music Assistant entity and its native Sonos twin
+    /// share no comparable content id (MA exposes a Spotify URI, the Sonos a stream
+    /// URL), so the track identity is matched on the human-readable metadata.
+    /// A missing title can't confirm identity, so it counts as *not* the same track
+    /// — otherwise two metadata-less entities would match and a stale MA URI would
+    /// be wrongly preserved.
     func isSameTrack(as other: MediaPlayerEntity) -> Bool {
-        mediaTitle == other.mediaTitle && mediaArtist == other.mediaArtist
+        guard let title = mediaTitle, title.isNotEmpty else {
+            return false
+        }
+        return title == other.mediaTitle && mediaArtist == other.mediaArtist
     }
 
     /// Returns a copy of this Music Assistant entity with its now-playing display

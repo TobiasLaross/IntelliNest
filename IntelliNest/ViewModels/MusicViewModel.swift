@@ -159,13 +159,16 @@ class MusicViewModel: ObservableObject, Reloadable {
     let loadLastSpeaker: @MainActor () -> EntityId?
     let saveLastSpeaker: @MainActor (EntityId) -> Void
 
-    /// Speakers that are reachable right now (anything not `unavailable`), in the
-    /// fixed display order, each mirroring its hardware twin so the now-playing
-    /// metadata and play indicator reflect what's actually audible. Safe for the
-    /// picker, grouping, and default-selection: the mirror only touches display
-    /// fields, leaving id, group members, and volume from the MA entity.
+    /// Speakers that are reachable right now, in the fixed display order, each
+    /// mirroring its hardware twin so the now-playing metadata and play indicator
+    /// reflect what's actually audible. Reachability is judged on the raw Music
+    /// Assistant entity (the control path) — never the mirrored copy, whose twin
+    /// could otherwise paint an `unavailable` MA entity as playing and make an
+    /// uncontrollable speaker look selectable.
     var availableSpeakers: [MediaPlayerEntity] {
-        Self.speakerIDs.compactMap { displayedSpeaker($0) }.filter { !$0.isUnavailable }
+        Self.speakerIDs
+            .filter { speakers[$0]?.isUnavailable == false }
+            .compactMap { displayedSpeaker($0) }
     }
 
     /// The raw Music Assistant entity for the active speaker. Used by the playback,
@@ -176,44 +179,6 @@ class MusicViewModel: ObservableObject, Reloadable {
             return nil
         }
         return speakers[activeSpeakerID]
-    }
-
-    /// The active speaker as it should be shown: the MA entity mirroring its
-    /// hardware twin. Drives the now-playing card's track, art, and play/pause
-    /// state so they stay honest when playback was started outside the app.
-    var displayedActiveSpeaker: MediaPlayerEntity? {
-        guard let activeSpeakerID else {
-            return nil
-        }
-        return displayedSpeaker(activeSpeakerID)
-    }
-
-    /// A speaker mirrored against its live hardware twin (when one applies).
-    /// Returns the MA entity unchanged for an AirPlay room playing on its own, or
-    /// when no twin is driving audio.
-    func displayedSpeaker(_ speakerID: EntityId) -> MediaPlayerEntity? {
-        guard let speaker = speakers[speakerID] else {
-            return nil
-        }
-        return speaker.mirroring(liveTwin(for: speaker))
-    }
-
-    /// The hardware twin that reflects what this speaker is actually playing: its
-    /// own twin first, then — when it has none playing — a grouped member's twin.
-    /// The fallback covers an AirPlay leader synced with a Sonos: the leader has no
-    /// twin of its own, but the group's audio is real on the Sonos member, so its
-    /// twin is the source of truth. Group members are listed by Music Assistant id,
-    /// which is exactly how `hardwareTwins` is keyed.
-    private func liveTwin(for speaker: MediaPlayerEntity) -> MediaPlayerEntity? {
-        if let own = hardwareTwins[speaker.entityId], own.hasLiveAudio {
-            return own
-        }
-        for memberID in speaker.groupMembers where memberID != speaker.entityId {
-            if let memberTwin = hardwareTwins[memberID], memberTwin.hasLiveAudio {
-                return memberTwin
-            }
-        }
-        return nil
     }
 
     init(restAPIService: RestAPIService,
@@ -283,33 +248,6 @@ class MusicViewModel: ObservableObject, Reloadable {
         await reloadHardwareTwins()
     }
 
-    /// Re-fetches the native Sonos entities that back the four Sonos rooms, keyed
-    /// by the Music Assistant speaker they belong to. A failed fetch drops that
-    /// twin (the room then falls back to the MA entity's own now-playing) rather
-    /// than blocking the rest of the reload.
-    private func reloadHardwareTwins() async {
-        let service = restAPIService
-        await withTaskGroup(of: (EntityId, MediaPlayerEntity)?.self) { group in
-            for (speakerID, twinID) in Self.hardwareTwinIDs {
-                group.addTask {
-                    do {
-                        let twin = try await service.reload(entityId: twinID, entityType: MediaPlayerEntity.self)
-                        return (speakerID, twin)
-                    } catch {
-                        Log.error("Failed to reload hardware twin: \(twinID): \(error)")
-                        return nil
-                    }
-                }
-            }
-
-            for await result in group {
-                if let (speakerID, twin) = result {
-                    self.hardwareTwins[speakerID] = twin
-                }
-            }
-        }
-    }
-
     /// On the first reload after the view appears, default the active speaker to
     /// whatever is currently playing, falling back to the last speaker the user
     /// controlled (if it's reachable). If neither applies, leave it unselected so
@@ -331,22 +269,6 @@ class MusicViewModel: ObservableObject, Reloadable {
         if let activeSpeakerID, speakers[activeSpeakerID]?.isUnavailable == true {
             self.activeSpeakerID = nil
         }
-    }
-
-    /// Clears the "Spelas från <spellista>" breadcrumb once the active speaker's
-    /// hardware twin reports a different track than the Music Assistant queue. That
-    /// happens when playback was taken over from outside the app — the in-app
-    /// playlist the breadcrumb points at is no longer what's playing, so jumping to
-    /// it would mislead.
-    private func dropSourcePlaylistIfDiverged() {
-        guard nowPlayingSourcePlaylist != nil,
-              let activeSpeakerID,
-              let speaker = speakers[activeSpeakerID],
-              let twin = liveTwin(for: speaker),
-              !twin.isSameTrack(as: speaker) else {
-            return
-        }
-        nowPlayingSourcePlaylist = nil
     }
 
     func selectSpeaker(_ entityID: EntityId) {

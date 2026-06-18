@@ -45,16 +45,38 @@ extension MusicViewModelTests {
                  artist: "Lucia Choir",
                  album: "Lucia",
                  entityPicture: "/api/media_player_proxy/media_player.arc")
+        // Before the reload the twin is unknown, so the room shows its MA state.
+        XCTAssertNil(viewModel.displayedSpeaker(.mediaPlayerLivingRoom)?.mediaTitle)
         await viewModel.reload()
 
         let displayed = viewModel.displayedSpeaker(.mediaPlayerLivingRoom)
         XCTAssertEqual(displayed?.mediaTitle, "Sankta Lucia")
         XCTAssertEqual(displayed?.mediaArtist, "Lucia Choir")
         XCTAssertEqual(displayed?.mediaAlbumName, "Lucia")
+        XCTAssertEqual(displayed?.entityPicture, "/api/media_player_proxy/media_player.arc")
         XCTAssertTrue(displayed?.isPlaying == true)
         // The MA Spotify URI no longer matches what's audible, so it's dropped —
         // the favourite star and playlist-jump must not act on the wrong track.
         XCTAssertNil(displayed?.mediaContentID)
+    }
+
+    func testUnavailableMAEntityIsNotSelectableEvenWhenTwinPlays() async {
+        // The MA control entity is unavailable, but its hardware twin is playing.
+        // The room must stay out of the reachable list — control routes through the
+        // dead MA entity, so it can't be selected even though audio is coming out.
+        stubAllSpeakers()
+        stubSpeaker(.mediaPlayerLivingRoom,
+                    data: speakerJSON(entityID: .mediaPlayerLivingRoom,
+                                      state: "unavailable",
+                                      friendlyName: "Vardagsrummet"))
+        stubTwin(for: .mediaPlayerLivingRoom,
+                 state: "playing",
+                 title: "Sankta Lucia",
+                 artist: "Lucia Choir")
+        await viewModel.reload()
+
+        let availableIDs = viewModel.availableSpeakers.map(\.entityId)
+        XCTAssertFalse(availableIDs.contains(.mediaPlayerLivingRoom))
     }
 
     func testTwinKeepsMAContentIDWhenSameTrack() async {
