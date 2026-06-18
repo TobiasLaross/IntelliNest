@@ -58,6 +58,13 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         max(0, solarPower + gridPower)
     }
 
+    // The share of production the house consumes directly = everything not exported. Follows from the
+    // energy balance solarPower + gridImport = housePower + gridExport. Drives the solar→house arrow so
+    // it reflects that path's power rather than total production, which the solar→grid arrow carries.
+    var solarToHousePower: Double {
+        max(0, solarPower - gridExport)
+    }
+
     var isSolarToGrid: Bool {
         solarPower.toKW > 0 && gridExport.toKW > 0
     }

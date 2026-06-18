@@ -50,6 +50,36 @@ class ElectricityViewModelSensorLagTests: XCTestCase {
         XCTAssertEqual(viewModel.housePower, 0)
     }
 
+    // MARK: - Solar-to-house split (drives the solar→house flow arrow)
+
+    private struct SolarToHouseCase {
+        let name: String
+        let solar: String
+        let gridImport: String
+        let gridExport: String
+        let expected: Double
+    }
+
+    func testSolarToHousePower_isProductionMinusWhatIsExported() {
+        // Baseline: no state yet means no solar reaching the house.
+        XCTAssertEqual(viewModel.solarToHousePower, 0)
+
+        let cases = [
+            SolarToHouseCase(name: "exporting surplus: the house only draws the unexported remainder",
+                             solar: "9600", gridImport: "0", gridExport: "9000", expected: 600),
+            SolarToHouseCase(name: "no export, importing: every watt of solar feeds the house",
+                             solar: "1000", gridImport: "2000", gridExport: "0", expected: 1000),
+            SolarToHouseCase(name: "export exceeds solar (laggy sensor): clamped to zero, never negative",
+                             solar: "3000", gridImport: "0", gridExport: "5000", expected: 0)
+        ]
+        for testCase in cases {
+            viewModel.reload(entityID: .solarPower, state: testCase.solar)
+            viewModel.reload(entityID: .pulsePower, state: testCase.gridImport)
+            viewModel.reload(entityID: .pulsePowerProduction, state: testCase.gridExport)
+            XCTAssertEqual(viewModel.solarToHousePower, testCase.expected, testCase.name)
+        }
+    }
+
     // MARK: - Solar lift across sensor lag
 
     func testSolarPower_liftsStaleSolarToFreshExport() async {
