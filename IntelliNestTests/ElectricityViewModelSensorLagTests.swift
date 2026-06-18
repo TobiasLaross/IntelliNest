@@ -37,6 +37,9 @@ class ElectricityViewModelSensorLagTests: XCTestCase {
     // MARK: - House clamp (no timestamps needed)
 
     func testHousePower_clampsToZeroWhenExportExceedsSolar() {
+        // Baseline: everything starts at zero before any state arrives.
+        XCTAssertEqual(viewModel.housePower, 0)
+
         // Given: a fresh Pulse export of 5 kW against a 3 kW solar reading (equal timestamps, so no
         // recency lift). solar + gridPower = 3000 + (0 - 5000) = -2000, which is physically
         // impossible — a house never exports on its own.
@@ -50,6 +53,7 @@ class ElectricityViewModelSensorLagTests: XCTestCase {
     // MARK: - Solar lift across sensor lag
 
     func testSolarPower_liftsStaleSolarToFreshExport() async {
+        assertZeroBaseline()
         // Given: the screenshot scenario — SolarEdge stuck at a stale 3.2 kW while the Pulse freshly
         // reports 5.7 kW exported and nothing imported. The panels must be making at least what is
         // being exported, so solar is lifted to the live net export.
@@ -65,6 +69,7 @@ class ElectricityViewModelSensorLagTests: XCTestCase {
     }
 
     func testSolarPower_keepsInverterValueWhenItIsFresher() async {
+        assertZeroBaseline()
         // Given: the inverter reading is the newer of the two, so a stale-high export must not drag
         // the solar figure up — the fresh inverter value is authoritative.
         await reload(
@@ -79,6 +84,7 @@ class ElectricityViewModelSensorLagTests: XCTestCase {
     }
 
     func testSolarPower_doesNotLiftWhenImporting() async {
+        assertZeroBaseline()
         // Given: a fresher Pulse but the house is importing 2 kW (net export negative), so the lower
         // bound never exceeds the inverter reading and solar is left untouched.
         await reload(
@@ -93,6 +99,13 @@ class ElectricityViewModelSensorLagTests: XCTestCase {
     }
 
     // MARK: - Helpers
+
+    /// Every derived power reads zero until the first reload delivers state.
+    private func assertZeroBaseline(file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertEqual(viewModel.solarPower, 0, file: file, line: line)
+        XCTAssertEqual(viewModel.gridPower, 0, file: file, line: line)
+        XCTAssertEqual(viewModel.housePower, 0, file: file, line: line)
+    }
 
     /// Stubs the power trio with explicit timestamps plus the remaining entities, then reloads.
     private func reload(
