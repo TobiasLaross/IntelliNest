@@ -130,6 +130,7 @@
 		CC0000001000000000000001 /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000002000000000000002 /* TestHelpers.swift */; };
 		CC0000003000000000000003 /* HomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000004000000000000004 /* HomeViewModelTests.swift */; };
 		CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000006000000000000006 /* ElectricityViewModelTests.swift */; };
+		CC0000007000000000000007 /* ElectricityViewModelSensorLagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000008000000000000008 /* ElectricityViewModelSensorLagTests.swift */; };
 		BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000002000000000000002 /* HeatersViewModelTests.swift */; };
 		DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000002000000000000002 /* LynkViewModelTests.swift */; };
 		BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000004000000000000004 /* LightsViewModelTests.swift */; };
@@ -360,6 +361,7 @@
 		CC0000002000000000000002 /* TestHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		CC0000004000000000000004 /* HomeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
 		CC0000006000000000000006 /* ElectricityViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityViewModelTests.swift; sourceTree = "<group>"; };
+		CC0000008000000000000008 /* ElectricityViewModelSensorLagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityViewModelSensorLagTests.swift; sourceTree = "<group>"; };
 		BB0000002000000000000002 /* HeatersViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModelTests.swift; sourceTree = "<group>"; };
 		DD0000002000000000000002 /* LynkViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LynkViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000004000000000000004 /* LightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModelTests.swift; sourceTree = "<group>"; };
@@ -581,6 +583,7 @@
 			CC0000002000000000000002 /* TestHelpers.swift */,
 			CC0000004000000000000004 /* HomeViewModelTests.swift */,
 			CC0000006000000000000006 /* ElectricityViewModelTests.swift */,
+			CC0000008000000000000008 /* ElectricityViewModelSensorLagTests.swift */,
 			BB0000002000000000000002 /* HeatersViewModelTests.swift */,
 			DD0000002000000000000002 /* LynkViewModelTests.swift */,
 			BB0000004000000000000004 /* LightsViewModelTests.swift */,
@@ -1254,6 +1257,7 @@
 			CC0000001000000000000001 /* TestHelpers.swift in Sources */,
 			CC0000003000000000000003 /* HomeViewModelTests.swift in Sources */,
 			CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */,
+			CC0000007000000000000007 /* ElectricityViewModelSensorLagTests.swift in Sources */,
 			BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */,
 			DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */,
 				EE000011000000000000000B /* MusicViewModelTests.swift in Sources */,

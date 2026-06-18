@@ -20,8 +20,18 @@ class ElectricityViewModel: ObservableObject, Reloadable {
     var isReloading = false
     private let restAPIService: RestAPIService
 
+    // The SolarEdge cloud sensor lags ~13 minutes behind real time (its API is rate-limited),
+    // while the Tibber Pulse reports grid flow in near real time. With no home battery the house
+    // can never export more than the panels generate, so the live net export is a lower bound on
+    // current solar production. When the Pulse reading is newer than the inverter's, trust whichever
+    // value is higher — this lifts a stale-low solar reading during a fast morning ramp so the
+    // dashboard never shows the house exporting more power than the panels are making.
     var solarPower: Double {
-        Double(solarPowerEntity.state) ?? 0
+        let inverterSolar = Double(solarPowerEntity.state) ?? 0
+        guard pulsePowerProductionEntity.lastUpdated > solarPowerEntity.lastUpdated else {
+            return inverterSolar
+        }
+        return max(inverterSolar, gridExport - gridImport)
     }
 
     // The Tibber Pulse exposes import and export as two separate, always-non-negative
@@ -41,8 +51,11 @@ class ElectricityViewModel: ObservableObject, Reloadable {
         gridImport - gridExport
     }
 
+    // A house only ever consumes power; it never feeds the grid on its own. Clamp at zero so the
+    // transient negative values that appear when the laggy solar reading trails a fresh Pulse export
+    // never surface as the house "producing" power.
     var housePower: Double {
-        solarPower + gridPower
+        max(0, solarPower + gridPower)
     }
 
     var isSolarToGrid: Bool {
@@ -105,7 +118,7 @@ class ElectricityViewModel: ObservableObject, Reloadable {
             nordPool = newNordPool
         }
         for (entityID, entity) in entityUpdates {
-            reload(entityID: entityID, state: entity.state)
+            reload(entityID: entityID, entity: entity)
         }
     }
 
@@ -123,5 +136,15 @@ class ElectricityViewModel: ObservableObject, Reloadable {
             return
         }
         self[keyPath: keyPath].state = state
+    }
+
+    // Replaces the whole entity rather than just its state so the decoded last_updated timestamp
+    // flows through — solarPower relies on it to tell a stale inverter reading from a fresh one.
+    func reload(entityID: EntityId, entity: Entity) {
+        guard let keyPath = entityKeyPaths[entityID] else {
+            Log.error("ElectricityViewModel doesn't reload entityID: \(entityID)")
+            return
+        }
+        self[keyPath: keyPath] = entity
     }
 }
