@@ -38,14 +38,14 @@ struct ElectricityFlowView: View {
                 .overlay(alignment: .bottomLeading) {
                     FlowIndicatorView(isFlowing: viewModel.isSolarToGrid,
                                       flowIntensity: flowSpeed(forKW: viewModel.solarPower.toKW),
-                                      arrowCount: 4)
+                                      arrowCount: 3)
                         .rotationEffect(.degrees(120))
                         .offset(x: -50, y: 35)
                 }
                 .overlay(alignment: .bottomTrailing) {
                     FlowIndicatorView(isFlowing: viewModel.isSolarToHouse,
                                       flowIntensity: flowSpeed(forKW: viewModel.solarPower.toKW),
-                                      arrowCount: 4)
+                                      arrowCount: 3)
                         .rotationEffect(.degrees(70))
                         .offset(x: 40, y: 35)
                 }
@@ -54,7 +54,7 @@ struct ElectricityFlowView: View {
                     .overlay(alignment: .bottomLeading) {
                         FlowIndicatorView(isFlowing: viewModel.isGridToHouse,
                                           flowIntensity: flowSpeed(forKW: viewModel.gridPower.toKW),
-                                          arrowCount: 4)
+                                          arrowCount: 3)
                             .offset(x: 50, y: -20)
                     }
                     .padding(.trailing, 80)
@@ -68,7 +68,7 @@ struct ElectricityFlowView: View {
     /// with magnitude up to 7 kW, where it saturates so very high readings don't blur into a streak.
     private func flowSpeed(forKW kilowatts: Double) -> Double {
         let clamped = min(abs(kilowatts), 7)
-        return 0.15 + clamped / 7 * 0.35
+        return 0.4 + clamped / 7 * 0.6
     }
 }
 
