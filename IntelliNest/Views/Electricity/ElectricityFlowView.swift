@@ -37,14 +37,14 @@ struct ElectricityFlowView: View {
             PowerView(text: viewModel.solarPower.toKWString, imageName: .solarPanel)
                 .overlay(alignment: .bottomLeading) {
                     FlowIndicatorView(isFlowing: viewModel.isSolarToGrid,
-                                      flowIntensity: abs(viewModel.solarPower.toKW) >= 3 ? 2.0 : 1.0,
+                                      flowIntensity: flowSpeed(forKW: viewModel.solarPower.toKW),
                                       arrowCount: 4)
                         .rotationEffect(.degrees(120))
                         .offset(x: -50, y: 35)
                 }
                 .overlay(alignment: .bottomTrailing) {
                     FlowIndicatorView(isFlowing: viewModel.isSolarToHouse,
-                                      flowIntensity: abs(viewModel.solarPower.toKW) >= 3 ? 2.0 : 1.0,
+                                      flowIntensity: flowSpeed(forKW: viewModel.solarPower.toKW),
                                       arrowCount: 4)
                         .rotationEffect(.degrees(70))
                         .offset(x: 40, y: 35)
@@ -53,7 +53,7 @@ struct ElectricityFlowView: View {
                 PowerView(text: viewModel.gridPower.toKWString, imageName: .powerGrid)
                     .overlay(alignment: .bottomLeading) {
                         FlowIndicatorView(isFlowing: viewModel.isGridToHouse,
-                                          flowIntensity: abs(viewModel.gridPower.toKW) >= 3 ? 2.0 : 1.0,
+                                          flowIntensity: flowSpeed(forKW: viewModel.gridPower.toKW),
                                           arrowCount: 4)
                             .offset(x: 50, y: -20)
                     }
@@ -62,6 +62,13 @@ struct ElectricityFlowView: View {
             }
             .padding(.top, 65)
         }
+    }
+
+    /// Maps power to arrow speed (cycles/sec): a trickle drifts, a high flow zips. Scales linearly
+    /// with magnitude up to 7 kW, where it saturates so very high readings don't blur into a streak.
+    private func flowSpeed(forKW kilowatts: Double) -> Double {
+        let clamped = min(abs(kilowatts), 7)
+        return 1.0 + clamped / 7 * 2.0
     }
 }
 
