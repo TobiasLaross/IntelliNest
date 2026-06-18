@@ -38,10 +38,11 @@ struct SpeakerGroupingView: View {
     }
 
     /// The collapsed summary lists the whole playback group, active speaker first
-    /// (e.g. "Kitchen, Gästrummet, Lekrummet"), or notes that nothing is grouped.
+    /// (e.g. "Kitchen, Gästrummet, Lekrummet"). When nothing is grouped it just
+    /// shows the primary speaker on its own rather than a "nothing grouped" note.
     private var summary: String {
         guard !groupedNames.isEmpty else {
-            return "Inga grupperade"
+            return activeSpeakerName ?? "Inga högtalare"
         }
         return ([activeSpeakerName].compactMap { $0 } + groupedNames).joined(separator: ", ")
     }
