@@ -58,6 +58,9 @@ class MusicViewModelTests: XCTestCase {
                      volume: Double = 0.3,
                      title: String? = nil,
                      artist: String? = nil,
+                     album: String? = nil,
+                     contentID: String? = nil,
+                     entityPicture: String? = nil,
                      groupMembers: [String] = [],
                      shuffle: Bool = false,
                      repeatMode: String = "off") -> Data {
@@ -70,6 +73,9 @@ class MusicViewModelTests: XCTestCase {
         ]
         if let title { attributes["media_title"] = title }
         if let artist { attributes["media_artist"] = artist }
+        if let album { attributes["media_album_name"] = album }
+        if let contentID { attributes["media_content_id"] = contentID }
+        if let entityPicture { attributes["entity_picture"] = entityPicture }
         return makeEntityJSON(entityId: entityID.rawValue, state: state, attributes: attributes)
     }
 

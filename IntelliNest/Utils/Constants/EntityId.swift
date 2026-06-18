@@ -141,6 +141,15 @@ enum EntityId: String, Decodable, CaseIterable {
     case mediaPlayerOutdoorTable = "media_player.matbord_ute"
     case mediaPlayerSpa = "media_player.spa"
 
+    /* Native Sonos hardware entities backing four of the Music Assistant speakers
+     above (same physical device). The MA queue entity freezes on its last track
+     when playback starts outside the app's queue; its hardware twin always
+     reflects what's actually audible, so the now-playing display reads the twin. */
+    case mediaPlayerLivingRoomSonos = "media_player.arc"
+    case mediaPlayerKitchenSonos = "media_player.unnamed_room"
+    case mediaPlayerGuestRoomSonos = "media_player.move"
+    case mediaPlayerPlayroomSonos = "media_player.playbase"
+
     /* Yale Access token */
     case yaleAccessTokenPart1 = "input_text.yale_access_token_part1"
     case yaleAccessTokenPart2 = "input_text.yale_access_token_part2"

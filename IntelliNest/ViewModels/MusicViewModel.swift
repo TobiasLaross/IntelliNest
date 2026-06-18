@@ -30,7 +30,21 @@ class MusicViewModel: ObservableObject, Reloadable {
         .mediaPlayerSpa
     ]
 
+    /// Maps four of the controllable speakers to their native Sonos hardware
+    /// entity (same physical device). The two AirPlay rooms (outdoor table, spa)
+    /// have no separate hardware entity and so can't diverge — they're absent here.
+    static let hardwareTwinIDs: [EntityId: EntityId] = [
+        .mediaPlayerLivingRoom: .mediaPlayerLivingRoomSonos,
+        .mediaPlayerKitchen: .mediaPlayerKitchenSonos,
+        .mediaPlayerGuestRoom: .mediaPlayerGuestRoomSonos,
+        .mediaPlayerPlayroom: .mediaPlayerPlayroomSonos
+    ]
+
     @Published var speakers: [EntityId: MediaPlayerEntity]
+    /// The native Sonos hardware entities, keyed by the Music Assistant speaker
+    /// they back. Read as the source of truth for the now-playing display when the
+    /// MA queue entity has gone stale (playback started outside the app's queue).
+    @Published var hardwareTwins: [EntityId: MediaPlayerEntity] = [:]
     @Published var activeSpeakerID: EntityId?
     @Published var searchText = ""
     @Published var searchSections: [MusicSearchSection] = []
@@ -145,12 +159,21 @@ class MusicViewModel: ObservableObject, Reloadable {
     let loadLastSpeaker: @MainActor () -> EntityId?
     let saveLastSpeaker: @MainActor (EntityId) -> Void
 
-    /// Speakers that are reachable right now (anything not `unavailable`),
-    /// in the fixed display order.
+    /// Speakers that are reachable right now, in the fixed display order, each
+    /// mirroring its hardware twin so the now-playing metadata and play indicator
+    /// reflect what's actually audible. Reachability is judged on the raw Music
+    /// Assistant entity (the control path) — never the mirrored copy, whose twin
+    /// could otherwise paint an `unavailable` MA entity as playing and make an
+    /// uncontrollable speaker look selectable.
     var availableSpeakers: [MediaPlayerEntity] {
-        Self.speakerIDs.compactMap { speakers[$0] }.filter { !$0.isUnavailable }
+        Self.speakerIDs
+            .filter { speakers[$0]?.isUnavailable == false }
+            .compactMap { displayedSpeaker($0) }
     }
 
+    /// The raw Music Assistant entity for the active speaker. Used by the playback,
+    /// grouping, and volume commands, which must target the MA entity — not the
+    /// mirrored display copy. The now-playing card reads `displayedActiveSpeaker`.
     var activeSpeaker: MediaPlayerEntity? {
         guard let activeSpeakerID else {
             return nil
@@ -191,6 +214,7 @@ class MusicViewModel: ObservableObject, Reloadable {
             await self.reloadSpeakers()
             self.selectDefaultSpeakerIfNeeded()
             self.dropActiveSpeakerIfUnavailable()
+            self.dropSourcePlaylistIfDiverged()
         }
         await loadLibraryPlaylistsIfNeeded()
         await refreshQueueIfShowing()
@@ -221,6 +245,7 @@ class MusicViewModel: ObservableObject, Reloadable {
                 }
             }
         }
+        await reloadHardwareTwins()
     }
 
     /// On the first reload after the view appears, default the active speaker to
