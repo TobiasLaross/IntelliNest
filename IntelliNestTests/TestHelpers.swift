@@ -26,11 +26,29 @@ func makeEntityJSON(entityId: String, state: String, attributes: [String: Any]) 
     return (try? JSONSerialization.data(withJSONObject: dict)) ?? Data()
 }
 
+func makeEntityJSON(entityId: String, state: String, lastUpdated: String) -> Data {
+    Data("""
+    {
+        "entity_id": "\(entityId)",
+        "state": "\(state)",
+        "last_changed": "\(lastUpdated)",
+        "last_updated": "\(lastUpdated)"
+    }
+    """.utf8)
+}
+
 func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterval = 0) {
     let url = entityStateURL(for: entityID)
     let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
     let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
     URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
+}
+
+func stubEntityURL(entityID: EntityId, state: String, lastUpdated: String) {
+    let url = entityStateURL(for: entityID)
+    let data = makeEntityJSON(entityId: entityID.rawValue, state: state, lastUpdated: lastUpdated)
+    let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil)
 }
 
 func stubEntityURL(entityID: EntityId, data: Data) {
