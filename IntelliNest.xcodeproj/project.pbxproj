@@ -68,6 +68,7 @@
 		EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000400000000000000F1 /* MusicViewModel+Playback.swift */; };
 		FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000004 /* MusicViewModel+Queue.swift */; };
 		FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */; };
+		FE00000000000000000000F5 /* MusicViewModel+Grouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD00000000000000000000F5 /* MusicViewModel+Grouping.swift */; };
 		FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */; };
 		EE0000050000000000000005 /* MusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000050000000000000005 /* MusicView.swift */; };
 		EE0000060000000000000006 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000060000000000000006 /* NowPlayingView.swift */; };
@@ -300,6 +301,7 @@
 		EF00000400000000000000F1 /* MusicViewModel+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Playback.swift"; sourceTree = "<group>"; };
 		FD0000000000000000000004 /* MusicViewModel+Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Queue.swift"; sourceTree = "<group>"; };
 		FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Favourites.swift"; sourceTree = "<group>"; };
+		FD00000000000000000000F5 /* MusicViewModel+Grouping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Grouping.swift"; sourceTree = "<group>"; };
 		FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+SpotifyTracks.swift"; sourceTree = "<group>"; };
 		EF0000050000000000000005 /* MusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicView.swift; sourceTree = "<group>"; };
 		EF0000060000000000000006 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
@@ -634,6 +636,7 @@
 				EF00000400000000000000F1 /* MusicViewModel+Playback.swift */,
 				FD0000000000000000000004 /* MusicViewModel+Queue.swift */,
 				FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */,
+				FD00000000000000000000F5 /* MusicViewModel+Grouping.swift */,
 				FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */,
 			);
 			path = ViewModels;
@@ -1221,6 +1224,7 @@
 				EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */,
 				FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */,
 				FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */,
+				FE00000000000000000000F5 /* MusicViewModel+Grouping.swift in Sources */,
 				FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */,
 				EE0000050000000000000005 /* MusicView.swift in Sources */,
 				EE0000060000000000000006 /* NowPlayingView.swift in Sources */,

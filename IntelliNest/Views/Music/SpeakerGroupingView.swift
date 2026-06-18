@@ -17,12 +17,12 @@ struct SpeakerGroupingView: View {
         viewModel.availableSpeakers.filter { $0.entityId != viewModel.activeSpeakerID }
     }
 
-    /// The rows to show: every available speaker, but the active (primary) one is
-    /// only listed while it's grouped with others — so it can be removed, which
-    /// promotes another speaker to primary. Alone, removing it would be a no-op,
-    /// so it stays out of the list.
+    /// The rows to show: every available speaker, including the active (primary)
+    /// one so it's always visible as the group's leader. While grouped, tapping it
+    /// removes it and promotes another speaker to primary; alone, the tap is a
+    /// harmless no-op.
     private var listedSpeakers: [MediaPlayerEntity] {
-        viewModel.availableSpeakers.filter { $0.entityId != viewModel.activeSpeakerID || viewModel.isGroupActive }
+        viewModel.availableSpeakers
     }
 
     /// Names of the speakers grouped with the active one, used for the collapsed
@@ -101,6 +101,12 @@ private struct SpeakerGroupingRow: View {
         isPrimary || viewModel.isGrouped(speaker.entityId)
     }
 
+    // A join/unjoin for this speaker is still settling, so show a spinner and hold
+    // off further taps until the membership refreshes.
+    private var isPending: Bool {
+        viewModel.pendingGroupingSpeakers.contains(speaker.entityId)
+    }
+
     private var toggleAccessibilityLabel: String {
         if isPrimary {
             return "Ta bort \(speaker.friendlyName) som primär högtalare ur gruppen"
@@ -115,11 +121,21 @@ private struct SpeakerGroupingRow: View {
             // stay aligned) otherwise. Not a control of its own.
             Button(action: toggle) {
                 HStack(spacing: 8) {
-                    Image(systemName: "checkmark")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.yellow)
-                        .opacity(grouped ? 1 : 0)
-                        .frame(width: 18)
+                    // Spinner while a join/unjoin settles, otherwise the grouped
+                    // checkmark (kept space-reserved when ungrouped so names align).
+                    Group {
+                        if isPending {
+                            ProgressView()
+                                .controlSize(.mini)
+                                .tint(.yellow)
+                        } else {
+                            Image(systemName: "checkmark")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.yellow)
+                                .opacity(grouped ? 1 : 0)
+                        }
+                    }
+                    .frame(width: 18)
                     Text(speaker.friendlyName)
                     if speaker.isPlaying {
                         Image(systemName: "speaker.wave.2.fill")
@@ -138,8 +154,9 @@ private struct SpeakerGroupingRow: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .disabled(isPending)
             .accessibilityLabel(toggleAccessibilityLabel)
-            .accessibilityValue(grouped ? "Grupperad" : "Inte grupperad")
+            .accessibilityValue(isPending ? "Uppdaterar" : (grouped ? "Grupperad" : "Inte grupperad"))
 
             if grouped, !isPrimary {
                 Button {
@@ -148,6 +165,7 @@ private struct SpeakerGroupingRow: View {
                     primaryChip(filled: false)
                 }
                 .buttonStyle(.plain)
+                .disabled(isPending)
                 .accessibilityLabel("Gör \(speaker.friendlyName) till primär högtalare")
             }
         }

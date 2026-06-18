@@ -19,6 +19,38 @@ extension MusicViewModelTests {
         await fulfillment(of: [expectation], timeout: 2.0)
     }
 
+    func testJoinRefreshesMembershipImmediatelyAndClearsPending() async {
+        // Kitchen is the active, ungrouped leader.
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        await viewModel.reload()
+        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerGuestRoom))
+
+        // The join succeeds and the speakers now report the new group, so the
+        // confirming reload inside toggleGroupMember should reflect it right away —
+        // without waiting for the 5-second loop — and clear the pending spinner.
+        stubPostService(path: "/api/services/media_player/join")
+        let group = [EntityId.mediaPlayerKitchen.rawValue, EntityId.mediaPlayerGuestRoom.rawValue]
+        stubSpeaker(.mediaPlayerKitchen,
+                    data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing",
+                                      friendlyName: "Köket", groupMembers: group))
+        stubSpeaker(.mediaPlayerGuestRoom,
+                    data: speakerJSON(entityID: .mediaPlayerGuestRoom, state: "idle",
+                                      friendlyName: "Gästrummet", groupMembers: group))
+        await viewModel.toggleGroupMember(.mediaPlayerGuestRoom)
+
+        XCTAssertTrue(viewModel.isGrouped(.mediaPlayerGuestRoom))
+        XCTAssertTrue(viewModel.pendingGroupingSpeakers.isEmpty)
+    }
+
+    func testFailedJoinClearsPendingAndBanners() async {
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        await viewModel.reload()
+        stubPostService(path: "/api/services/media_player/join", statusCode: 500)
+        await viewModel.toggleGroupMember(.mediaPlayerGuestRoom)
+        XCTAssertTrue(viewModel.pendingGroupingSpeakers.isEmpty)
+        XCTAssertTrue(bannerTitles.contains("Kunde inte gruppera högtalare"))
+    }
+
     func testUnjoinRemovesSpeakerFromGroup() async {
         // Living room is leader with Kitchen already grouped in.
         stubSpeaker(.mediaPlayerLivingRoom,
