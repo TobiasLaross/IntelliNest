@@ -30,7 +30,21 @@ class MusicViewModel: ObservableObject, Reloadable {
         .mediaPlayerSpa
     ]
 
+    /// Maps four of the controllable speakers to their native Sonos hardware
+    /// entity (same physical device). The two AirPlay rooms (outdoor table, spa)
+    /// have no separate hardware entity and so can't diverge — they're absent here.
+    static let hardwareTwinIDs: [EntityId: EntityId] = [
+        .mediaPlayerLivingRoom: .mediaPlayerLivingRoomSonos,
+        .mediaPlayerKitchen: .mediaPlayerKitchenSonos,
+        .mediaPlayerGuestRoom: .mediaPlayerGuestRoomSonos,
+        .mediaPlayerPlayroom: .mediaPlayerPlayroomSonos
+    ]
+
     @Published var speakers: [EntityId: MediaPlayerEntity]
+    /// The native Sonos hardware entities, keyed by the Music Assistant speaker
+    /// they back. Read as the source of truth for the now-playing display when the
+    /// MA queue entity has gone stale (playback started outside the app's queue).
+    @Published var hardwareTwins: [EntityId: MediaPlayerEntity] = [:]
     @Published var activeSpeakerID: EntityId?
     @Published var searchText = ""
     @Published var searchSections: [MusicSearchSection] = []
@@ -145,17 +159,42 @@ class MusicViewModel: ObservableObject, Reloadable {
     let loadLastSpeaker: @MainActor () -> EntityId?
     let saveLastSpeaker: @MainActor (EntityId) -> Void
 
-    /// Speakers that are reachable right now (anything not `unavailable`),
-    /// in the fixed display order.
+    /// Speakers that are reachable right now (anything not `unavailable`), in the
+    /// fixed display order, each mirroring its hardware twin so the now-playing
+    /// metadata and play indicator reflect what's actually audible. Safe for the
+    /// picker, grouping, and default-selection: the mirror only touches display
+    /// fields, leaving id, group members, and volume from the MA entity.
     var availableSpeakers: [MediaPlayerEntity] {
-        Self.speakerIDs.compactMap { speakers[$0] }.filter { !$0.isUnavailable }
+        Self.speakerIDs.compactMap { displayedSpeaker($0) }.filter { !$0.isUnavailable }
     }
 
+    /// The raw Music Assistant entity for the active speaker. Used by the playback,
+    /// grouping, and volume commands, which must target the MA entity — not the
+    /// mirrored display copy. The now-playing card reads `displayedActiveSpeaker`.
     var activeSpeaker: MediaPlayerEntity? {
         guard let activeSpeakerID else {
             return nil
         }
         return speakers[activeSpeakerID]
+    }
+
+    /// The active speaker as it should be shown: the MA entity mirroring its
+    /// hardware twin. Drives the now-playing card's track, art, and play/pause
+    /// state so they stay honest when playback was started outside the app.
+    var displayedActiveSpeaker: MediaPlayerEntity? {
+        guard let activeSpeakerID else {
+            return nil
+        }
+        return displayedSpeaker(activeSpeakerID)
+    }
+
+    /// A speaker mirrored against its hardware twin (when it has one). Returns the
+    /// MA entity unchanged for the AirPlay rooms or when the twin is idle.
+    func displayedSpeaker(_ speakerID: EntityId) -> MediaPlayerEntity? {
+        guard let speaker = speakers[speakerID] else {
+            return nil
+        }
+        return speaker.mirroring(hardwareTwins[speakerID])
     }
 
     init(restAPIService: RestAPIService,
@@ -191,6 +230,7 @@ class MusicViewModel: ObservableObject, Reloadable {
             await self.reloadSpeakers()
             self.selectDefaultSpeakerIfNeeded()
             self.dropActiveSpeakerIfUnavailable()
+            self.dropSourcePlaylistIfDiverged()
         }
         await loadLibraryPlaylistsIfNeeded()
         await refreshQueueIfShowing()
@@ -221,6 +261,34 @@ class MusicViewModel: ObservableObject, Reloadable {
                 }
             }
         }
+        await reloadHardwareTwins()
+    }
+
+    /// Re-fetches the native Sonos entities that back the four Sonos rooms, keyed
+    /// by the Music Assistant speaker they belong to. A failed fetch drops that
+    /// twin (the room then falls back to the MA entity's own now-playing) rather
+    /// than blocking the rest of the reload.
+    private func reloadHardwareTwins() async {
+        let service = restAPIService
+        await withTaskGroup(of: (EntityId, MediaPlayerEntity)?.self) { group in
+            for (speakerID, twinID) in Self.hardwareTwinIDs {
+                group.addTask {
+                    do {
+                        let twin = try await service.reload(entityId: twinID, entityType: MediaPlayerEntity.self)
+                        return (speakerID, twin)
+                    } catch {
+                        Log.error("Failed to reload hardware twin: \(twinID): \(error)")
+                        return nil
+                    }
+                }
+            }
+
+            for await result in group {
+                if let (speakerID, twin) = result {
+                    self.hardwareTwins[speakerID] = twin
+                }
+            }
+        }
     }
 
     /// On the first reload after the view appears, default the active speaker to
@@ -244,6 +312,23 @@ class MusicViewModel: ObservableObject, Reloadable {
         if let activeSpeakerID, speakers[activeSpeakerID]?.isUnavailable == true {
             self.activeSpeakerID = nil
         }
+    }
+
+    /// Clears the "Spelas från <spellista>" breadcrumb once the active speaker's
+    /// hardware twin reports a different track than the Music Assistant queue. That
+    /// happens when playback was taken over from outside the app — the in-app
+    /// playlist the breadcrumb points at is no longer what's playing, so jumping to
+    /// it would mislead.
+    private func dropSourcePlaylistIfDiverged() {
+        guard nowPlayingSourcePlaylist != nil,
+              let activeSpeakerID,
+              let speaker = speakers[activeSpeakerID],
+              let twin = hardwareTwins[activeSpeakerID],
+              twin.hasLiveAudio,
+              !twin.isSameTrack(as: speaker) else {
+            return
+        }
+        nowPlayingSourcePlaylist = nil
     }
 
     func selectSpeaker(_ entityID: EntityId) {

@@ -281,8 +281,12 @@ extension MusicViewModel {
         guard let activeSpeaker, let targetID = playbackTargetID else {
             return
         }
-        let action: Action = activeSpeaker.isPlaying ? .mediaPause : .mediaPlay
-        speakers[activeSpeaker.entityId]?.state = activeSpeaker.isPlaying ? "paused" : "playing"
+        // Decide from the mirrored state the card actually shows (the hardware
+        // twin's when it diverges), so the button does what its icon implies. The
+        // command still routes to the Music Assistant group leader.
+        let isPlaying = displayedActiveSpeaker?.isPlaying ?? activeSpeaker.isPlaying
+        let action: Action = isPlaying ? .mediaPause : .mediaPlay
+        speakers[activeSpeaker.entityId]?.state = isPlaying ? "paused" : "playing"
         restAPIService.mediaTransport(entityID: targetID, action: action)
     }
 

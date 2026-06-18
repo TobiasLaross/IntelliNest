@@ -40,6 +40,45 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         state == "playing"
     }
 
+    /// Whether the speaker is actually driving audio (playing or paused on a
+    /// track), as opposed to idle or unavailable. Used to decide when a hardware
+    /// twin's now-playing should override the Music Assistant queue entity's.
+    var hasLiveAudio: Bool {
+        state == "playing" || state == "paused"
+    }
+
+    /// Whether this entity and another are on the same track, compared by title
+    /// and artist. The Music Assistant entity and its native Sonos twin share no
+    /// comparable content id (MA exposes a Spotify URI, the Sonos a stream URL),
+    /// so the track identity is matched on the human-readable metadata instead.
+    func isSameTrack(as other: MediaPlayerEntity) -> Bool {
+        mediaTitle == other.mediaTitle && mediaArtist == other.mediaArtist
+    }
+
+    /// Returns a copy of this Music Assistant entity with its now-playing display
+    /// (state, track metadata, album art) replaced by the hardware twin's whenever
+    /// the twin is driving audio. Keeps every control-relevant field — id, group
+    /// members, volume, shuffle, repeat — from the MA entity, since playback
+    /// commands still route through Music Assistant. When the twin is playing a
+    /// track the MA queue doesn't know about, the MA content id (a Spotify URI) no
+    /// longer matches what's audible, so it's cleared to keep the favourite star
+    /// and playlist-jump from acting on the wrong track.
+    func mirroring(_ twin: MediaPlayerEntity?) -> MediaPlayerEntity {
+        guard let twin, twin.hasLiveAudio else {
+            return self
+        }
+        var mirrored = self
+        mirrored.state = twin.state
+        mirrored.mediaTitle = twin.mediaTitle
+        mirrored.mediaArtist = twin.mediaArtist
+        mirrored.mediaAlbumName = twin.mediaAlbumName
+        mirrored.entityPicture = twin.entityPicture
+        if !twin.isSameTrack(as: self) {
+            mirrored.mediaContentID = nil
+        }
+        return mirrored
+    }
+
     /// The speaker that playback and queue commands must target. When this
     /// speaker is synced into a group, Music Assistant only accepts transport
     /// and play commands on the group leader (the first group member); a
