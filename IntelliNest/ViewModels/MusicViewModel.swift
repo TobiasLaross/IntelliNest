@@ -188,13 +188,32 @@ class MusicViewModel: ObservableObject, Reloadable {
         return displayedSpeaker(activeSpeakerID)
     }
 
-    /// A speaker mirrored against its hardware twin (when it has one). Returns the
-    /// MA entity unchanged for the AirPlay rooms or when the twin is idle.
+    /// A speaker mirrored against its live hardware twin (when one applies).
+    /// Returns the MA entity unchanged for an AirPlay room playing on its own, or
+    /// when no twin is driving audio.
     func displayedSpeaker(_ speakerID: EntityId) -> MediaPlayerEntity? {
         guard let speaker = speakers[speakerID] else {
             return nil
         }
-        return speaker.mirroring(hardwareTwins[speakerID])
+        return speaker.mirroring(liveTwin(for: speaker))
+    }
+
+    /// The hardware twin that reflects what this speaker is actually playing: its
+    /// own twin first, then — when it has none playing — a grouped member's twin.
+    /// The fallback covers an AirPlay leader synced with a Sonos: the leader has no
+    /// twin of its own, but the group's audio is real on the Sonos member, so its
+    /// twin is the source of truth. Group members are listed by Music Assistant id,
+    /// which is exactly how `hardwareTwins` is keyed.
+    private func liveTwin(for speaker: MediaPlayerEntity) -> MediaPlayerEntity? {
+        if let own = hardwareTwins[speaker.entityId], own.hasLiveAudio {
+            return own
+        }
+        for memberID in speaker.groupMembers where memberID != speaker.entityId {
+            if let memberTwin = hardwareTwins[memberID], memberTwin.hasLiveAudio {
+                return memberTwin
+            }
+        }
+        return nil
     }
 
     init(restAPIService: RestAPIService,
@@ -323,8 +342,7 @@ class MusicViewModel: ObservableObject, Reloadable {
         guard nowPlayingSourcePlaylist != nil,
               let activeSpeakerID,
               let speaker = speakers[activeSpeakerID],
-              let twin = hardwareTwins[activeSpeakerID],
-              twin.hasLiveAudio,
+              let twin = liveTwin(for: speaker),
               !twin.isSameTrack(as: speaker) else {
             return
         }

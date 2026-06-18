@@ -115,6 +115,61 @@ extension MusicViewModelTests {
         XCTAssertEqual(displayed?.mediaContentID, trackURI)
     }
 
+    func testAirPlayLeaderMirrorsGroupedSonosMemberTwin() async {
+        // Spa (AirPlay, no twin of its own) leads a group with the living-room
+        // Sonos. The spa MA entity is stale; the Sonos member's hardware twin
+        // carries the real track, so the leader's card must mirror it.
+        let group = [EntityId.mediaPlayerSpa.rawValue, EntityId.mediaPlayerLivingRoom.rawValue]
+        stubAllSpeakers()
+        stubSpeaker(.mediaPlayerSpa,
+                    data: speakerJSON(entityID: .mediaPlayerSpa,
+                                      state: "idle",
+                                      friendlyName: "Spa",
+                                      title: "Bara Bada Bastu",
+                                      artist: "KAJ",
+                                      contentID: trackURI,
+                                      groupMembers: group))
+        stubSpeaker(.mediaPlayerLivingRoom,
+                    data: speakerJSON(entityID: .mediaPlayerLivingRoom,
+                                      state: "idle",
+                                      friendlyName: "Vardagsrummet",
+                                      title: "Bara Bada Bastu",
+                                      artist: "KAJ",
+                                      groupMembers: group))
+        stubTwin(for: .mediaPlayerLivingRoom,
+                 state: "playing",
+                 title: "Sankta Lucia",
+                 artist: "Lucia Choir")
+        await viewModel.reload()
+
+        let displayed = viewModel.displayedSpeaker(.mediaPlayerSpa)
+        XCTAssertEqual(displayed?.mediaTitle, "Sankta Lucia")
+        XCTAssertTrue(displayed?.isPlaying == true)
+        XCTAssertNil(displayed?.mediaContentID)
+    }
+
+    func testUngroupedAirPlayLeaderIsNotMirroredFromOtherRoom() async {
+        // A live Sonos in a *different*, ungrouped room must not bleed into the
+        // spa's card — the fallback only follows the leader's own group members.
+        stubAllSpeakers()
+        stubSpeaker(.mediaPlayerSpa,
+                    data: speakerJSON(entityID: .mediaPlayerSpa,
+                                      state: "playing",
+                                      friendlyName: "Spa",
+                                      title: trackName,
+                                      artist: trackArtist,
+                                      contentID: trackURI))
+        stubTwin(for: .mediaPlayerLivingRoom,
+                 state: "playing",
+                 title: "Sankta Lucia",
+                 artist: "Lucia Choir")
+        await viewModel.reload()
+
+        let displayed = viewModel.displayedSpeaker(.mediaPlayerSpa)
+        XCTAssertEqual(displayed?.mediaTitle, trackName)
+        XCTAssertEqual(displayed?.mediaContentID, trackURI)
+    }
+
     func testDefaultSelectionPicksRoomPlayingOnlyOnHardwareTwin() async {
         // Every MA queue entity is idle, but the living-room Sonos is playing —
         // the default selection must still land on that room.
