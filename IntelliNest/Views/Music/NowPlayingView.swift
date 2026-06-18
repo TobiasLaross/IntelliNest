@@ -293,9 +293,10 @@ struct VolumeSliderView: View {
 }
 
 /// A fill slider mirroring `VerticalSlider`'s look (dark track, light fill, thin
-/// border). Tapping or dragging sets the value from the touch position; the
-/// change is reported live and committed on release. `axis` rotates it 90°:
-/// `.horizontal` fills left-to-right, `.vertical` fills bottom-to-top.
+/// border). Only a deliberate drag sets the value from the touch position — a
+/// plain tap is ignored so the volume can't jump (and blast) from an accidental
+/// touch. The change is reported live and committed on release. `axis` rotates
+/// it 90°: `.horizontal` fills left-to-right, `.vertical` fills bottom-to-top.
 private struct FillSlider: View {
     let fraction: Double
     var axis: Axis = .horizontal
@@ -321,7 +322,7 @@ private struct FillSlider: View {
             .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.black.opacity(0.5), lineWidth: 1))
             .contentShape(Rectangle())
             .gesture(
-                DragGesture(minimumDistance: 0)
+                DragGesture(minimumDistance: 10)
                     .onChanged { value in
                         let position: CGFloat = axis == .horizontal
                             ? value.location.x / width
