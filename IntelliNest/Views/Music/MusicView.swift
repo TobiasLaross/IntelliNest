@@ -25,7 +25,6 @@ struct MusicView: View {
                 VStack(spacing: 16) {
                     if let activeSpeaker = viewModel.displayedActiveSpeaker {
                         NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
-                        SpeakerGroupingView(viewModel: viewModel)
                         LibraryPlaylistsSection(title: "Senast spelade",
                                                 playlists: viewModel.recentlyPlayedPlaylists,
                                                 viewModel: viewModel)
