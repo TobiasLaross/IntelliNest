@@ -16,6 +16,21 @@ struct GroupVolumeView: View {
     @ObservedObject var viewModel: MusicViewModel
     @State private var isExpanded = false
 
+    /// The grouped speakers as a one-line summary, primary first
+    /// (e.g. "Kitchen, Matbord-ute"), shown under the collapsed slider so the
+    /// group is visible without expanding. Empty when nothing is grouped.
+    private var groupSummary: String {
+        guard viewModel.isGroupActive else {
+            return ""
+        }
+        let primaryName = viewModel.availableSpeakers
+            .first { $0.entityId == viewModel.activeSpeakerID }?.friendlyName
+        let followerNames = viewModel.groupedSpeakers
+            .filter { $0.entityId != viewModel.activeSpeakerID }
+            .map(\.friendlyName)
+        return ([primaryName].compactMap { $0 } + followerNames).joined(separator: ", ")
+    }
+
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 10) {
@@ -32,6 +47,19 @@ struct GroupVolumeView: View {
                 VolumeSliderView(volume: viewModel.groupVolume,
                                  onCommit: { viewModel.setGroupVolume($0) })
                     .accessibilityLabel(viewModel.isGroupActive ? "Gruppvolym" : "Volym")
+            }
+
+            // While collapsed, name the grouped speakers under the slider — the same
+            // summary the old grouping card showed — so the group is legible at a
+            // glance. Aligned with the slider (past the chevron) and kept to one line.
+            if !isExpanded, groupSummary.isNotEmpty {
+                Text(groupSummary)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.6))
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 26)
+                    .accessibilityLabel("Grupperade högtalare: \(groupSummary)")
             }
 
             if isExpanded {
