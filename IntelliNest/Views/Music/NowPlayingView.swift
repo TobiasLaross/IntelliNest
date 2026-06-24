@@ -46,12 +46,7 @@ struct NowPlayingView: View {
 
             TransportControlsView(speaker: speaker, viewModel: viewModel)
 
-            if viewModel.isGroupActive {
-                GroupVolumeView(viewModel: viewModel)
-            } else {
-                VolumeSliderView(volume: speaker.volumeLevel,
-                                 onCommit: { viewModel.setVolume($0) })
-            }
+            GroupVolumeView(viewModel: viewModel)
         }
         .padding()
         .background(Color.white.opacity(0.08))
@@ -164,60 +159,6 @@ private struct TransportControlsView: View {
         case .off: "Av"
         case .all: "Alla"
         case .one: "En"
-        }
-    }
-}
-
-/// The group-volume banner shown when the active speaker is synced with others.
-/// The top slider sets every grouped speaker at once; the chevron expands an
-/// individual volume slider per speaker so the balance can be fine-tuned.
-private struct GroupVolumeView: View {
-    @ObservedObject var viewModel: MusicViewModel
-    @State private var isExpanded = false
-
-    var body: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 10) {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() }
-                } label: {
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 16)
-                }
-                .accessibilityLabel(isExpanded ? "Dölj enskilda volymer" : "Visa enskilda volymer")
-
-                VolumeSliderView(volume: viewModel.groupVolume,
-                                 onCommit: { viewModel.setGroupVolume($0) })
-                    .accessibilityLabel("Gruppvolym")
-            }
-
-            if isExpanded {
-                VStack(spacing: 12) {
-                    ForEach(viewModel.groupedSpeakers, id: \.entityId) { speaker in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack(spacing: 6) {
-                                Text(speaker.friendlyName)
-                                    .font(.subheadline)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                // The group leader (the active speaker) is the sync
-                                // source the others follow — flag it as primary.
-                                if speaker.entityId == viewModel.activeSpeakerID {
-                                    Text("Primär")
-                                        .font(.caption2)
-                                        .foregroundStyle(.yellow.opacity(0.8))
-                                }
-                                Spacer(minLength: 0)
-                            }
-                            VolumeSliderView(volume: speaker.volumeLevel,
-                                             onCommit: { viewModel.setVolume($0, for: speaker.entityId) })
-                                .accessibilityLabel("Volym \(speaker.friendlyName)")
-                        }
-                    }
-                }
-                .padding(.leading, 26)
-            }
         }
     }
 }
