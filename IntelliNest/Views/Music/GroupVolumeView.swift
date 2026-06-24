@@ -73,9 +73,19 @@ private struct SpeakerVolumeRow: View {
         grouped && viewModel.isGroupActive
     }
 
+    // A follower can always be tapped to join or leave; the primary can only be
+    // tapped to leave once a real group exists. Alone there's nothing to ungroup,
+    // so the primary row is inert (no dead "remove from group" tap, no misleading
+    // VoiceOver action) rather than a no-op button.
+    private var canToggle: Bool {
+        isPrimary ? viewModel.isGroupActive : true
+    }
+
     private var toggleAccessibilityLabel: String {
         if isPrimary {
-            return "Ta bort \(speaker.friendlyName) som primär högtalare ur gruppen"
+            return viewModel.isGroupActive
+                ? "Ta bort \(speaker.friendlyName) som primär högtalare ur gruppen"
+                : "\(speaker.friendlyName), primär högtalare"
         }
         return "\(grouped ? "Ta bort" : "Lägg till") \(speaker.friendlyName) i gruppen"
     }
@@ -83,46 +93,19 @@ private struct SpeakerVolumeRow: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
-                // The whole row toggles membership, so this is just a status mark —
-                // a checkmark when grouped, empty (space-reserved so names stay
-                // aligned) otherwise. Not a control of its own.
-                Button(action: toggle) {
-                    HStack(spacing: 8) {
-                        Group {
-                            if isPending {
-                                ProgressView()
-                                    .controlSize(.mini)
-                                    .tint(.yellow)
-                            } else {
-                                Image(systemName: "checkmark")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.yellow)
-                                    .opacity(grouped ? 1 : 0)
-                            }
-                        }
-                        .frame(width: 18)
-                        Text(speaker.friendlyName)
-                            .font(.subheadline)
-                        if speaker.isPlaying {
-                            Image(systemName: "speaker.wave.2.fill")
-                                .font(.caption)
-                                .foregroundStyle(.green)
-                                .accessibilityLabel("Spelar nu")
-                        }
-                        Spacer(minLength: 8)
-                        // The current primary's chip rides along with the row tap
-                        // (which removes it); a follower's chip is a separate button.
-                        if isPrimary {
-                            primaryChip(filled: true)
-                        }
-                    }
-                    .frame(minHeight: 28)
-                    .contentShape(Rectangle())
+                // The lone primary has nothing to ungroup, so its row is plain
+                // status — not a button; everyone else taps to join or leave.
+                if canToggle {
+                    Button(action: toggle) { membershipMark }
+                        .buttonStyle(.plain)
+                        .disabled(isPending)
+                        .accessibilityLabel(toggleAccessibilityLabel)
+                        .accessibilityValue(isPending ? "Uppdaterar" : (grouped ? "Grupperad" : "Inte grupperad"))
+                } else {
+                    membershipMark
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(toggleAccessibilityLabel)
                 }
-                .buttonStyle(.plain)
-                .disabled(isPending)
-                .accessibilityLabel(toggleAccessibilityLabel)
-                .accessibilityValue(isPending ? "Uppdaterar" : (grouped ? "Grupperad" : "Inte grupperad"))
 
                 if grouped, !isPrimary {
                     Button {
@@ -146,6 +129,42 @@ private struct SpeakerVolumeRow: View {
         .padding(.horizontal, 12)
         .background(grouped ? Color.yellow.opacity(0.12) : Color.white.opacity(0.06))
         .cornerRadius(10)
+    }
+
+    /// The status content of the row: the grouped checkmark (or a spinner while a
+    /// join/unjoin settles), the speaker name, a now-playing mark, and the primary's
+    /// solid chip. The checkmark is a status mark, not a control — the row tap (when
+    /// present) owns the membership toggle.
+    private var membershipMark: some View {
+        HStack(spacing: 8) {
+            Group {
+                if isPending {
+                    ProgressView()
+                        .controlSize(.mini)
+                        .tint(.yellow)
+                } else {
+                    Image(systemName: "checkmark")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.yellow)
+                        .opacity(grouped ? 1 : 0)
+                }
+            }
+            .frame(width: 18)
+            Text(speaker.friendlyName)
+                .font(.subheadline)
+            if speaker.isPlaying {
+                Image(systemName: "speaker.wave.2.fill")
+                    .font(.caption)
+                    .foregroundStyle(.green)
+                    .accessibilityLabel("Spelar nu")
+            }
+            Spacer(minLength: 8)
+            if isPrimary {
+                primaryChip(filled: true)
+            }
+        }
+        .frame(minHeight: 28)
+        .contentShape(Rectangle())
     }
 
     /// The "Primär" pill. Solid yellow marks the current primary; an outline marks
