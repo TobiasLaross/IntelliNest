@@ -16,13 +16,12 @@ struct GroupVolumeView: View {
     @ObservedObject var viewModel: MusicViewModel
     @State private var isExpanded = false
 
-    /// The grouped speakers as a one-line summary, primary first
-    /// (e.g. "Kitchen, Matbord-ute"), shown under the collapsed slider so the
-    /// group is visible without expanding. Empty when nothing is grouped.
+    /// The speakers the volume slider controls, as a one-line summary with the
+    /// primary first (e.g. "Köket, Matbord-ute"), shown under the collapsed slider
+    /// so it's clear which speaker — or group — is being controlled. A single
+    /// ungrouped speaker shows just its own name; empty only when no speaker is
+    /// selected.
     private var groupSummary: String {
-        guard viewModel.isGroupActive else {
-            return ""
-        }
         let primaryName = viewModel.availableSpeakers
             .first { $0.entityId == viewModel.activeSpeakerID }?.friendlyName
         let followerNames = viewModel.groupedSpeakers
@@ -49,9 +48,10 @@ struct GroupVolumeView: View {
                     .accessibilityLabel(viewModel.isGroupActive ? "Gruppvolym" : "Volym")
             }
 
-            // While collapsed, name the grouped speakers under the slider — the same
-            // summary the old grouping card showed — so the group is legible at a
-            // glance. Aligned with the slider (past the chevron) and kept to one line.
+            // While collapsed, name the speaker(s) the slider controls under it — the
+            // same summary the old grouping card showed for a group, or just the
+            // single speaker's name on its own — so it's legible without expanding.
+            // Aligned with the slider (past the chevron) and kept to one line.
             if !isExpanded, groupSummary.isNotEmpty {
                 Text(groupSummary)
                     .font(.caption)
@@ -59,7 +59,7 @@ struct GroupVolumeView: View {
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading, 26)
-                    .accessibilityLabel("Grupperade högtalare: \(groupSummary)")
+                    .accessibilityLabel("\(viewModel.isGroupActive ? "Grupperade högtalare" : "Högtalare"): \(groupSummary)")
             }
 
             if isExpanded {
