@@ -125,6 +125,29 @@ entities conform to `Reloadable` (`Model/Reloadable.swift`); a `reload()` re-fet
 `/api/states/{entityId}`) and republishes. A few services that return a body (e.g. Music Assistant search) use a
 dedicated `return_response` request path rather than the fire-and-forget POST used for most service calls.
 
+### Music: Music Assistant + Sonos hardware twins
+
+The music controller drives speakers through **Music Assistant** `media_player.*` queue entities
+(e.g. `media_player.vardagsrummet`). All control — play/pause, transport, volume, grouping — routes through the
+MA entity, even when the speaker is a Sonos. The four Sonos rooms *also* expose a **native Sonos hardware entity**
+("hardware twin", e.g. `media_player.arc`), mapped to its MA entity in `MusicViewModel.hardwareTwinIDs`.
+
+**Which entity knows the now-playing track depends on what's playing:**
+
+- **Sonos playing MA's universal flow stream (the normal case).** The MA queue entity holds the real track; the
+  Sonos hardware twin shows the generic placeholder title `"Music Assistant"` with no artist and a `…/flow/…`
+  `media_content_id`. So for flow playback **the MA entity is authoritative** and the twin carries nothing useful.
+- **Sonos playing a native source MA doesn't drive** (AirPlay, Spotify Connect, TV). The MA queue entity freezes on
+  its last queued track while the hardware twin reflects what's actually audible — here **the twin is authoritative**.
+
+The now-playing card reads `displayedActiveSpeaker` / `displayedSpeaker(_:)` (`MusicViewModel+HardwareMirror`), which
+mirrors the MA entity against its live twin only when the twin `hasMirrorableNowPlaying` — i.e. it has live audio
+*and* is not merely rendering the MA flow (`isRenderingMusicAssistantFlow`, detected by a `/flow/` content id). A
+flow-only twin is ignored so it can't clobber the real MA title with `"Music Assistant"`. MA entity and Sonos twin
+share no comparable content id (MA exposes a Spotify URI, the Sonos a stream URL), so track identity is matched on
+title+artist via `isSameTrack`. The queue screen (`get_queue`, a `return_response` call) reads the real track
+directly and bypasses the mirror entirely, so it stays correct regardless of which entity the card trusts.
+
 ### Models
 
 `EntityProtocol` is the base for all Home Assistant entities. It carries `state`, `entityId`, and timestamps. Concrete types (`LightEntity`, `LockEntity`, `HeaterEntity`, etc.) add domain-specific decoded properties.
