@@ -47,6 +47,23 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         state == "playing" || state == "paused"
     }
 
+    /// Whether this entity is only rendering Music Assistant's own universal flow
+    /// stream rather than a source it has real metadata for. A Sonos playing the
+    /// MA flow reports the generic "Music Assistant" title with no artist and a
+    /// `…/flow/…` stream as its content id, while the MA queue entity holds the
+    /// real track — so in that case the twin must not override the MA now-playing.
+    var isRenderingMusicAssistantFlow: Bool {
+        mediaContentID?.contains("/flow/") == true
+    }
+
+    /// Whether this hardware twin carries a now-playing worth mirroring onto its
+    /// Music Assistant entity: it's driving audio for a source it actually has
+    /// metadata for (native AirPlay, Spotify Connect, TV), not merely rendering
+    /// the MA flow stream the MA queue entity already describes.
+    var hasMirrorableNowPlaying: Bool {
+        hasLiveAudio && !isRenderingMusicAssistantFlow
+    }
+
     /// Whether this entity and another are confidently on the same track, compared
     /// by title and artist. The Music Assistant entity and its native Sonos twin
     /// share no comparable content id (MA exposes a Spotify URI, the Sonos a stream
