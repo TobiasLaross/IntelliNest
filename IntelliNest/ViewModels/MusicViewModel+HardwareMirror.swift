@@ -41,11 +41,11 @@ extension MusicViewModel {
     /// twin is the source of truth. Group members are listed by Music Assistant id,
     /// which is exactly how `hardwareTwins` is keyed.
     private func liveTwin(for speaker: MediaPlayerEntity) -> MediaPlayerEntity? {
-        if let own = hardwareTwins[speaker.entityId], own.hasLiveAudio {
+        if let own = hardwareTwins[speaker.entityId], own.hasMirrorableNowPlaying {
             return own
         }
         for memberID in speaker.groupMembers where memberID != speaker.entityId {
-            if let memberTwin = hardwareTwins[memberID], memberTwin.hasLiveAudio {
+            if let memberTwin = hardwareTwins[memberID], memberTwin.hasMirrorableNowPlaying {
                 return memberTwin
             }
         }

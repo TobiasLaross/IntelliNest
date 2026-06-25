@@ -119,6 +119,58 @@ extension MusicViewModelTests {
         XCTAssertEqual(displayed?.mediaContentID, trackURI)
     }
 
+    func testTwinRenderingMusicAssistantFlowDoesNotOverrideMAQueue() async {
+        // The Sonos is rendering Music Assistant's own universal flow stream, so it
+        // reports the generic "Music Assistant" title with no artist and a /flow/
+        // stream id. The MA queue entity holds the real track, so the now-playing
+        // card must keep the MA metadata rather than the placeholder twin.
+        stubAllSpeakers()
+        stubSpeaker(.mediaPlayerLivingRoom,
+                    data: speakerJSON(entityID: .mediaPlayerLivingRoom,
+                                      state: "playing",
+                                      friendlyName: "Vardagsrummet",
+                                      title: trackName,
+                                      artist: trackArtist,
+                                      contentID: trackURI))
+        stubTwin(for: .mediaPlayerLivingRoom,
+                 state: "playing",
+                 title: "Music Assistant",
+                 contentID: "aac://http://192.168.1.205:8097/flow/TpckjpsZ/RINCON_F0F6C1705FFD01400/abc.aac")
+        await viewModel.reload()
+
+        let displayed = viewModel.displayedSpeaker(.mediaPlayerLivingRoom)
+        XCTAssertEqual(displayed?.mediaTitle, trackName)
+        XCTAssertEqual(displayed?.mediaArtist, trackArtist)
+        XCTAssertEqual(displayed?.mediaContentID, trackURI)
+        XCTAssertTrue(displayed?.isPlaying == true)
+    }
+
+    func testSourcePlaylistKeptWhenTwinOnlyRendersMusicAssistantFlow() async {
+        // The flow twin's "Music Assistant" title never matches the MA track, but it
+        // isn't a real divergence — the Sonos is just playing the MA queue. The
+        // "Spelas från <spellista>" breadcrumb must survive, not be dropped.
+        stubAllSpeakers(playing: .mediaPlayerLivingRoom)
+        stubSpeaker(.mediaPlayerLivingRoom,
+                    data: speakerJSON(entityID: .mediaPlayerLivingRoom,
+                                      state: "playing",
+                                      friendlyName: "Vardagsrummet",
+                                      title: trackName,
+                                      artist: trackArtist))
+        stubTwin(for: .mediaPlayerLivingRoom,
+                 state: "playing",
+                 title: "Music Assistant",
+                 contentID: "aac://http://192.168.1.205:8097/flow/TpckjpsZ/RINCON_F0F6C1705FFD01400/abc.aac")
+        viewModel.activeSpeakerID = .mediaPlayerLivingRoom
+        let playlist = MusicSearchItem(uri: "spotify://playlist/9",
+                                       name: "Låtar som går och går",
+                                       mediaType: .playlist,
+                                       imageURL: nil,
+                                       artist: nil)
+        viewModel.nowPlayingSourcePlaylist = playlist
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.nowPlayingSourcePlaylist?.uri, playlist.uri)
+    }
+
     func testAirPlayRoomHasNoTwinAndShowsMAState() async {
         // The spa is AirPlay — no hardware twin — so it always shows the MA entity.
         stubAllSpeakers()
