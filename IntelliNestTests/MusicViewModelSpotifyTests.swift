@@ -309,6 +309,46 @@ extension MusicViewModelTests {
         XCTAssertEqual(stub.accountPlaylistsCallCount, 0)
     }
 
+    // MARK: - Favourites union with the Music Assistant favourite store
+
+    func testFavoritesUnionWithMusicAssistantFavouriteStore() async {
+        struct UnionCase {
+            let description: String
+            let spotifyLibrary: [MusicSearchItem]
+            let maFavorites: [MusicSearchItem]
+            let expectedFavorites: [String]
+            let expectedPersonal: [String]
+        }
+        // The huset Spotify library minus the per-person sections, unioned with any
+        // MA favourite the library doesn't carry yet (matched by name).
+        let cases = [
+            UnionCase(description: "MA favourite not yet followed on Spotify surfaces in Favoriter",
+                      spotifyLibrary: [playlistItem(uri: "spotify://playlist/h1", name: "Husets", ownerID: "huset")],
+                      maFavorites: [playlistItem(uri: "library://playlist/24", name: "Pippi Långstrump - Alla sånger")],
+                      expectedFavorites: ["Husets", "Pippi Långstrump - Alla sånger"],
+                      expectedPersonal: []),
+            UnionCase(description: "MA favourite already in the Spotify library is not duplicated",
+                      spotifyLibrary: [playlistItem(uri: "spotify://playlist/h1", name: "Sommarklassiker", ownerID: "huset")],
+                      maFavorites: [playlistItem(uri: "library://playlist/21", name: "Sommarklassiker")],
+                      expectedFavorites: ["Sommarklassiker"],
+                      expectedPersonal: []),
+            UnionCase(description: "MA favourite owned by a personal account stays in that section, not Favoriter",
+                      spotifyLibrary: [playlistItem(uri: "spotify://playlist/p1", name: "Vigsel Laross 2019", ownerID: "tobiasc91")],
+                      maFavorites: [playlistItem(uri: "library://playlist/16", name: "Vigsel Laross 2019")],
+                      expectedFavorites: [],
+                      expectedPersonal: ["Vigsel Laross 2019"])
+        ]
+        for unionCase in cases {
+            let stub = StubSpotifyPlaylistService(accountPlaylistItems: unionCase.spotifyLibrary)
+            let model = makeViewModel(spotify: stub)
+            model.maFavorites = unionCase.maFavorites
+            await model.refreshSpotifyPlaylists()
+            XCTAssertEqual(model.favoritePlaylists.map(\.name), unionCase.expectedFavorites, unionCase.description)
+            XCTAssertEqual(model.personalPlaylistSections.flatMap(\.playlists).map(\.name),
+                           unionCase.expectedPersonal, unionCase.description)
+        }
+    }
+
     func testToggleRefreshesListing() async {
         let item = MusicSearchItem(uri: "spotify://playlist/x", name: "Ny",
                                    mediaType: .playlist, imageURL: nil, artist: nil)
@@ -316,7 +356,10 @@ extension MusicViewModelTests {
         let model = makeViewModel(spotify: stub, socket: StubMusicAssistantQueueSocket())
         // A successful favourite refreshes the listing (which 2-way sync may change).
         await model.toggleFavorite(spotifyPlaylist())
-        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Ny"])
+        // The refreshed Spotify listing ("Ny") plus the just-favourited playlist,
+        // which surfaces immediately via the MA favourite store even before the
+        // Spotify follow syncs into the library.
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Ny", "Lugnt & Skönt"])
         XCTAssertGreaterThanOrEqual(stub.accountPlaylistsCallCount, 1)
     }
 

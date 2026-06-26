@@ -58,8 +58,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     @Published var openedPlaylist: MusicSearchItem?
     @Published var playlistTracks: [MusicPlaylistTrack] = []
     @Published var isLoadingPlaylist = false
-    /// The user's favourite Spotify playlists, shown for quick launch in place of
-    /// the speaker list. Loaded on the first reload.
+    /// The favourites shown for quick launch in place of the speaker list: the
+    /// huset Spotify library (minus the per-person sections) unioned with any
+    /// Music Assistant favourite not yet mirrored into that library, so a freshly
+    /// starred playlist appears here at once. Loaded on the first reload.
     @Published var favoritePlaylists: [MusicSearchItem] = []
     /// The most recently played playlists (Music Assistant `last_played` order),
     /// shown above the favourites. Refreshed whenever a playlist is launched.

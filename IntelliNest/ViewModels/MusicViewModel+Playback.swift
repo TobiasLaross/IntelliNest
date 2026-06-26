@@ -66,12 +66,22 @@ extension MusicViewModel {
             return
         }
         let personalAccountIDs = Set(personalAccounts.map(\.userID))
-        favoritePlaylists = playlists.filter { playlist in
+        let spotifyFavorites = playlists.filter { playlist in
             guard let ownerID = playlist.ownerID else {
                 return true
             }
             return !personalAccountIDs.contains(ownerID)
         }
+        // MA is the favourite store, so surface any starred playlist the Spotify
+        // library doesn't carry yet — MA's 2-way follow sync can lag a fresh star,
+        // and without this the playlist shows only in recently-played until the
+        // follow propagates and the next `/me/playlists` fetch picks it up. Matched
+        // by name since MA favourites are `library://` items while the listing is
+        // `spotify://`; deduping against the whole library (not just the favourites)
+        // keeps a personal-account favourite in its own section, not Favoriter.
+        let spotifyLibraryNames = Set(playlists.map { normalizedName($0.name) })
+        let starredOnlyInMA = maFavorites.filter { !spotifyLibraryNames.contains(normalizedName($0.name)) }
+        favoritePlaylists = spotifyFavorites + starredOnlyInMA
         // Show the viewer's own section first; the rest keep configured order.
         // Every section is titled by its owner's name (e.g. "Tobias spellistor").
         let viewer = currentUser()

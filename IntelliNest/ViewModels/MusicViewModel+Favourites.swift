@@ -51,7 +51,11 @@ extension MusicViewModel {
         return id.isNotEmpty ? id : nil
     }
 
-    private func normalizedName(_ name: String) -> String {
+    /// Lowercased, trimmed playlist name used to match across sources: MA
+    /// favourites are `library://` items while the Spotify listing is `spotify://`,
+    /// so they can only be reconciled by name. Internal so the playlist loader can
+    /// dedupe the favourites union against the Spotify library.
+    func normalizedName(_ name: String) -> String {
         name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     }
 
