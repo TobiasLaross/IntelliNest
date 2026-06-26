@@ -356,7 +356,10 @@ extension MusicViewModelTests {
         let model = makeViewModel(spotify: stub, socket: StubMusicAssistantQueueSocket())
         // A successful favourite refreshes the listing (which 2-way sync may change).
         await model.toggleFavorite(spotifyPlaylist())
-        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Ny"])
+        // The refreshed Spotify listing ("Ny") plus the just-favourited playlist,
+        // which surfaces immediately via the MA favourite store even before the
+        // Spotify follow syncs into the library.
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Ny", "Lugnt & Skönt"])
         XCTAssertGreaterThanOrEqual(stub.accountPlaylistsCallCount, 1)
     }
 
