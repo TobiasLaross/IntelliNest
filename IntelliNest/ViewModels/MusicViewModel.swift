@@ -119,6 +119,28 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// and the refreshed membership. Mutated by the grouping calls in
     /// `MusicViewModel+Grouping`.
     @Published var pendingGroupingSpeakers: Set<EntityId> = []
+    /// Drives the inline lyrics peek inside the now-playing card.
+    @Published var isLyricsExpanded = false
+    /// Drives the full-screen lyrics sheet opened from the peek.
+    @Published var isShowingFullLyrics = false
+    /// The lyrics loaded for the current track (synced, plain, or not found).
+    @Published var lyrics: LyricsResult = .notFound
+    /// Whether a lyrics fetch is in flight, so the UI shows a spinner instead of
+    /// flashing "not found" while a new track's lyrics load.
+    @Published var isLoadingLyrics = false
+    /// A manual timing nudge added to every synced-lyrics lookup so the user can
+    /// scroll a line to "now" and correct drifting LRC timestamps. Reset to 0 on
+    /// each track change (offset-per-track).
+    @Published var lyricsOffset: TimeInterval = 0
+    /// The track (title+artist) whose lyrics are currently applied, so a refresh
+    /// only refetches when the song actually changes. Latched **only on a
+    /// successful** load, so a transient failure doesn't permanently suppress
+    /// retries. Set by `MusicViewModel+Lyrics`.
+    var lyricsTrackKey: String?
+    /// The track key of an in-flight lyrics fetch, used to dedupe concurrent
+    /// requests for the same song without latching the cached key. Set by
+    /// `MusicViewModel+Lyrics`.
+    var inFlightLyricsKey: String?
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
@@ -146,6 +168,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Home Assistant exposes no REST service for). Defaults to a disabled no-op
     /// so previews and tests need no socket.
     let queueSocket: MusicAssistantQueueSocket
+    /// Fetches lyrics for the now-playing track. Defaults to a disabled no-op so
+    /// previews and tests reach no network; the real LRCLIB/lyrics.ovh service is
+    /// injected by the `Navigator`.
+    let lyricsService: LyricsService
     /// The personal accounts whose public playlists are surfaced as their own
     /// sections. Injectable so tests can exercise multiple-account ordering and the
     /// hide-when-empty rule without depending on the baked-in list.
@@ -187,6 +213,7 @@ class MusicViewModel: ObservableObject, Reloadable {
          setErrorBannerText: @escaping StringStringClosure = { _, _ in },
          spotify: SpotifyPlaylistService = DisabledSpotifyPlaylistService(),
          queueSocket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
+         lyricsService: LyricsService = DisabledLyricsService(),
          personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
          currentUser: @escaping @MainActor () -> User = { UserManager.currentUser },
          loadLastSpeaker: @escaping @MainActor () -> EntityId? = {
@@ -199,6 +226,7 @@ class MusicViewModel: ObservableObject, Reloadable {
         self.setErrorBannerText = setErrorBannerText
         self.spotify = spotify
         self.queueSocket = queueSocket
+        self.lyricsService = lyricsService
         self.personalAccounts = personalAccounts
         self.currentUser = currentUser
         self.loadLastSpeaker = loadLastSpeaker

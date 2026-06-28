@@ -20,19 +20,25 @@ struct NowPlayingView: View {
                     .font(.headline)
                     .foregroundStyle(.yellow)
                     .lineLimit(1)
-                Spacer()
-                Button {
-                    Task { await viewModel.openQueue() }
-                } label: {
-                    Image(systemName: "list.bullet")
+                Spacer(minLength: 4)
+                // Each action gets a full 44×44 hit target so the three controls are
+                // comfortably tappable and evenly spaced.
+                HStack(spacing: 4) {
+                    headerButton("quote.bubble",
+                                 label: "Visa sångtext",
+                                 isActive: viewModel.isLyricsExpanded) {
+                        viewModel.toggleLyricsExpanded()
+                    }
+                    headerButton("list.bullet", label: "Visa kö") {
+                        Task { await viewModel.openQueue() }
+                    }
+                    headerButton("hifispeaker.2.fill", label: "Byt högtalare") {
+                        viewModel.activeSpeakerID = nil
+                    }
                 }
-                .accessibilityLabel("Visa kö")
-                Button {
-                    viewModel.activeSpeakerID = nil
-                } label: {
-                    Image(systemName: "hifispeaker.2.fill")
-                }
-                .accessibilityLabel("Byt högtalare")
+                // Pull the row of icons to the card's edge so the 44pt hit targets
+                // don't add visible padding beyond the card's own inset.
+                .padding(.trailing, -10)
             }
 
             HStack(spacing: 12) {
@@ -44,7 +50,13 @@ struct NowPlayingView: View {
                 }
             }
 
+            SeekBarView(speaker: speaker, viewModel: viewModel)
+
             TransportControlsView(speaker: speaker, viewModel: viewModel)
+
+            if viewModel.isLyricsExpanded {
+                LyricsStripView(speaker: speaker, viewModel: viewModel)
+            }
 
             GroupVolumeView(viewModel: viewModel)
         }
@@ -59,6 +71,28 @@ struct NowPlayingView: View {
         .task(id: speaker.mediaContentID) {
             await viewModel.loadSavedSongStates(uris: [speaker.mediaContentID].compactMap { $0 })
         }
+        // Refetch lyrics when the track changes while the lyrics panel is open
+        // (a no-op otherwise).
+        .task(id: viewModel.currentLyricsTrackKey) {
+            await viewModel.refreshLyricsForCurrentTrack()
+        }
+    }
+
+    /// A header action rendered with a full 44×44 hit target (Apple's minimum), so
+    /// the three now-playing controls are easy to tap and evenly spaced. `isActive`
+    /// tints the icon yellow to show a toggled-on state (used by the lyrics toggle).
+    private func headerButton(_ systemName: String,
+                              label: String,
+                              isActive: Bool = false,
+                              action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.title3)
+                .foregroundStyle(isActive ? .yellow : .white)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel(label)
     }
 
     /// The album art and track metadata. Tapping it opens the playlist the track

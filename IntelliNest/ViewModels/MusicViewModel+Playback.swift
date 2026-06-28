@@ -314,6 +314,29 @@ extension MusicViewModel {
         restAPIService.mediaTransport(entityID: targetID, action: .mediaPreviousTrack)
     }
 
+    /// Seeks the current track to `seconds`. Optimistically anchors the active
+    /// speaker's position to the new spot (so the scrubber and lyrics jump at once)
+    /// and routes the command to the group leader; the follow-up reload reconciles
+    /// with the real position.
+    func seek(to seconds: Double) {
+        guard let activeSpeakerID else {
+            return
+        }
+        let clamped = max(seconds, 0)
+        speakers[activeSpeakerID]?.mediaPosition = clamped
+        speakers[activeSpeakerID]?.mediaPositionUpdatedAt = Date()
+        Task {
+            // Group membership can change between reloads; refresh before resolving
+            // the leader so the seek isn't routed to a stale leader (or a follower
+            // that rejects it), matching `startPlayback`.
+            await refreshActiveSpeaker(activeSpeakerID)
+            guard let targetID = playbackTargetID else {
+                return
+            }
+            restAPIService.seek(entityID: targetID, positionSeconds: clamped)
+        }
+    }
+
     func setVolume(_ volume: Double) {
         guard let activeSpeakerID else {
             return

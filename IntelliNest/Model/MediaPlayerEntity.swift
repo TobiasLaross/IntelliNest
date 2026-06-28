@@ -31,6 +31,17 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
     var groupMembers: [EntityId]
     var shuffle: Bool
     var repeatMode: MediaRepeatMode
+    /// Playback position in seconds at the moment Home Assistant last reported it
+    /// (`media_position`). It is *not* live — it only advances in the payload when
+    /// HA re-reports it (on play/pause/seek/track change), so the live elapsed time
+    /// must be extrapolated from `mediaPositionUpdatedAt`. See `currentElapsed(asOf:)`.
+    var mediaPosition: Double?
+    /// Track length in seconds (`media_duration`). Nil for sources with no known
+    /// length (e.g. a live stream), which hides the scrubber.
+    var mediaDuration: Double?
+    /// When `mediaPosition` was sampled (`media_position_updated_at`), the anchor
+    /// for extrapolating the live position while playing.
+    var mediaPositionUpdatedAt: Date?
 
     var isActive: Bool {
         state == "playing"
@@ -96,6 +107,11 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         mirrored.mediaArtist = twin.mediaArtist
         mirrored.mediaAlbumName = twin.mediaAlbumName
         mirrored.entityPicture = twin.entityPicture
+        // The twin drives the audio here, so its position is the real one; the MA
+        // queue entity's frozen position would mis-place the scrubber and lyrics.
+        mirrored.mediaPosition = twin.mediaPosition
+        mirrored.mediaDuration = twin.mediaDuration
+        mirrored.mediaPositionUpdatedAt = twin.mediaPositionUpdatedAt
         if !twin.isSameTrack(as: self) {
             mirrored.mediaContentID = nil
         }
@@ -122,6 +138,28 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         state == "unavailable"
     }
 
+    /// The live playback position in seconds as of `now`. While playing, the
+    /// last-reported `mediaPosition` is extrapolated forward from its sample time
+    /// (`mediaPositionUpdatedAt`) and clamped to the track length; while paused (or
+    /// with no sample time) the reported position is returned as-is. Nil when the
+    /// source reports no position at all. `now` is passed in so the computation is
+    /// deterministic and testable.
+    func currentElapsed(asOf now: Date) -> TimeInterval? {
+        guard let mediaPosition else {
+            return nil
+        }
+        guard isPlaying, let mediaPositionUpdatedAt else {
+            return max(mediaPosition, 0)
+        }
+        // Never extrapolate backward: if the device clock lags Home Assistant the
+        // delta is negative, which would make the scrubber and lyrics jump back.
+        let elapsed = max(mediaPosition, mediaPosition + now.timeIntervalSince(mediaPositionUpdatedAt))
+        if let mediaDuration {
+            return min(max(elapsed, 0), mediaDuration)
+        }
+        return max(elapsed, 0)
+    }
+
     enum CodingKeys: String, CodingKey {
         case entityId = "entity_id"
         case state
@@ -139,6 +177,9 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         case groupMembers = "group_members"
         case shuffle
         case repeatMode = "repeat"
+        case mediaPosition = "media_position"
+        case mediaDuration = "media_duration"
+        case mediaPositionUpdatedAt = "media_position_updated_at"
     }
 
     init(entityId: EntityId, state: String = "Loading", friendlyName: String = "") {
@@ -168,6 +209,11 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
             groupMembers = memberStrings.compactMap { EntityId(rawValue: $0) }
             shuffle = try attributes.decodeIfPresent(Bool.self, forKey: .shuffle) ?? false
             repeatMode = try attributes.decodeIfPresent(MediaRepeatMode.self, forKey: .repeatMode) ?? .off
+            mediaPosition = try attributes.decodeIfPresent(Double.self, forKey: .mediaPosition)
+            mediaDuration = try attributes.decodeIfPresent(Double.self, forKey: .mediaDuration)
+            if let updatedAtString = try attributes.decodeIfPresent(String.self, forKey: .mediaPositionUpdatedAt) {
+                mediaPositionUpdatedAt = Entity.utcDateFormatter.date(from: updatedAtString)
+            }
         } else {
             friendlyName = ""
             volumeLevel = 0
@@ -193,6 +239,9 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
             lhs.entityPicture == rhs.entityPicture &&
             lhs.groupMembers == rhs.groupMembers &&
             lhs.shuffle == rhs.shuffle &&
-            lhs.repeatMode == rhs.repeatMode
+            lhs.repeatMode == rhs.repeatMode &&
+            lhs.mediaPosition == rhs.mediaPosition &&
+            lhs.mediaDuration == rhs.mediaDuration &&
+            lhs.mediaPositionUpdatedAt == rhs.mediaPositionUpdatedAt
     }
 }
