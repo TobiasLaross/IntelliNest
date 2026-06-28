@@ -142,6 +142,13 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// `MusicViewModel+Lyrics`.
     var inFlightLyricsKey: String?
 
+    /// An optimistic playback position (set by a seek or a pause) the reload loop
+    /// keeps on the active speaker until Home Assistant confirms it, so a transient
+    /// pre-seek / mid-pause position can't snap the scrubber and lyrics back. Read
+    /// and cleared in `reloadSpeakers`; set by the transport calls in
+    /// `MusicViewModel+Playback`.
+    var positionHold: PlaybackPositionHold?
+
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
     /// Read/written by the library-playlist loader in `MusicViewModel+Playback`.
@@ -271,11 +278,27 @@ class MusicViewModel: ObservableObject, Reloadable {
 
             for await result in group {
                 if let (speakerID, speaker) = result {
-                    self.speakers[speakerID] = speaker
+                    self.speakers[speakerID] = reconcilePositionHold(speakerID: speakerID, fresh: speaker)
                 }
             }
         }
         await reloadHardwareTwins()
+    }
+
+    /// Applies the pending position hold to a freshly reloaded speaker. Only the
+    /// active speaker (whose position drives the scrubber and lyrics) is held; every
+    /// other speaker is published as-is. Drops the hold once HA confirms the position
+    /// or it expires. Internal so the targeted `refreshActiveSpeaker` in
+    /// `MusicViewModel+Playback` reuses it and doesn't clobber a just-seeked position.
+    func reconcilePositionHold(speakerID: EntityId, fresh: MediaPlayerEntity) -> MediaPlayerEntity {
+        guard speakerID == activeSpeakerID, let hold = positionHold else {
+            return fresh
+        }
+        let (entity, stillPending) = hold.reconcile(fresh, asOf: Date())
+        if !stillPending {
+            positionHold = nil
+        }
+        return entity
     }
 
     /// On the first reload after the view appears, default the active speaker to
@@ -302,6 +325,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     }
 
     func selectSpeaker(_ entityID: EntityId) {
+        // A different speaker has its own position; drop any hold tied to the old one.
+        if entityID != activeSpeakerID {
+            positionHold = nil
+        }
         activeSpeakerID = entityID
         saveLastSpeaker(entityID)
     }

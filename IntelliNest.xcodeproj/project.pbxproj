@@ -67,6 +67,7 @@
 		FE0000000000000000000007 /* MusicQueueModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000007 /* MusicQueueModelTests.swift */; };
 		EE0000040000000000000004 /* MusicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000040000000000000004 /* MusicViewModel.swift */; };
 		EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000400000000000000F1 /* MusicViewModel+Playback.swift */; };
+		EE00000400000000000000F2 /* MusicViewModel+Transport.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000400000000000000F2 /* MusicViewModel+Transport.swift */; };
 		EE0000040000000000000F2A1 /* MusicViewModel+HardwareMirror.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000040000000000000F2A1 /* MusicViewModel+HardwareMirror.swift */; };
 		FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000004 /* MusicViewModel+Queue.swift */; };
 		FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */; };
@@ -312,6 +313,7 @@
 		FD0000000000000000000007 /* MusicQueueModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicQueueModelTests.swift; sourceTree = "<group>"; };
 		EF0000040000000000000004 /* MusicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModel.swift; sourceTree = "<group>"; };
 		EF00000400000000000000F1 /* MusicViewModel+Playback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Playback.swift"; sourceTree = "<group>"; };
+		EF00000400000000000000F2 /* MusicViewModel+Transport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Transport.swift"; sourceTree = "<group>"; };
 		EF0000040000000000000F2A1 /* MusicViewModel+HardwareMirror.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+HardwareMirror.swift"; sourceTree = "<group>"; };
 		FD0000000000000000000004 /* MusicViewModel+Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Queue.swift"; sourceTree = "<group>"; };
 		FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Favourites.swift"; sourceTree = "<group>"; };
@@ -666,6 +668,7 @@
 				D89BCA06BE3A45F2A8E3DAE4 /* LynkViewModelHelpers.swift */,
 				EF0000040000000000000004 /* MusicViewModel.swift */,
 				EF00000400000000000000F1 /* MusicViewModel+Playback.swift */,
+				EF00000400000000000000F2 /* MusicViewModel+Transport.swift */,
 				EF0000000000000000000A03 /* MusicViewModel+Lyrics.swift */,
 				EF0000040000000000000F2A1 /* MusicViewModel+HardwareMirror.swift */,
 				FD0000000000000000000004 /* MusicViewModel+Queue.swift */,
@@ -1258,6 +1261,7 @@
 				FE0000000000000000000002 /* MusicAssistantSocketService.swift in Sources */,
 				EE0000040000000000000004 /* MusicViewModel.swift in Sources */,
 				EE00000400000000000000F1 /* MusicViewModel+Playback.swift in Sources */,
+				EE00000400000000000000F2 /* MusicViewModel+Transport.swift in Sources */,
 				EE0000040000000000000F2A1 /* MusicViewModel+HardwareMirror.swift in Sources */,
 				FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */,
 				FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */,

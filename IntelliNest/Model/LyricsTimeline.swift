@@ -72,7 +72,7 @@ enum LyricsTimeline {
 
     /// The timing offset that makes `lineIndex` the current line at `elapsed`, i.e.
     /// `currentLineIndex(at: elapsed + offset)` returns `lineIndex`. Used by the
-    /// scroll-to-realign correction: the user scrolls a line to "now" and this is
+    /// tap-to-realign correction: the user taps a line to mark it "now" and this is
     /// the nudge applied to every subsequent lookup. Zero for an out-of-range index.
     static func offset(toAlign lineIndex: Int, in lines: [LyricLine], at elapsed: TimeInterval) -> TimeInterval {
         guard lines.indices.contains(lineIndex) else {

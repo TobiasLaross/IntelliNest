@@ -37,6 +37,9 @@ final class LyricsApiService: LyricsService {
 
     private let lrclibBaseURL = "https://lrclib.net/api"
     private let lyricsOvhBaseURL = "https://api.lyrics.ovh/v1"
+    /// Per-request timeout. Short enough that a stalled provider doesn't hang the
+    /// lyrics spinner, generous enough for a slow mobile network.
+    private static let requestTimeout: TimeInterval = 8
 
     init(session: URLSession = .shared, userAgent: String = LyricsApiService.defaultUserAgent) {
         self.session = session
@@ -133,7 +136,9 @@ final class LyricsApiService: LyricsService {
     // MARK: - Networking
 
     private func getJSON<Response: Decodable>(_ url: URL, as type: Response.Type) async -> Response? {
-        var request = URLRequest(url: url)
+        // Cap each lookup so a slow or stalled provider can't leave the lyrics
+        // spinner hanging — the chain has a backup source, and a miss is fine.
+        var request = URLRequest(url: url, timeoutInterval: Self.requestTimeout)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         do {
             let (data, response) = try await session.data(for: request)
