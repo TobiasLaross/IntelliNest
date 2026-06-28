@@ -59,6 +59,10 @@ struct MusicView: View {
         .sheet(isPresented: $viewModel.isShowingFullLyrics) {
             if let activeSpeaker = viewModel.displayedActiveSpeaker {
                 LyricsFullView(speaker: activeSpeaker, viewModel: viewModel)
+            } else {
+                // The speaker dropped out while the sheet was open — don't strand an
+                // empty modal; dismiss it.
+                Color.clear.onAppear { viewModel.isShowingFullLyrics = false }
             }
         }
         .sheet(item: $viewModel.browsingLibraryPlaylist) { playlist in

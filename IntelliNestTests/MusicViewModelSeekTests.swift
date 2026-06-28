@@ -31,9 +31,68 @@ extension MusicViewModelTests {
         XCTAssertEqual(capturedBody?["seek_position"] as? Double, 42)
     }
 
-    func testSeekWithoutActiveSpeakerIsNoOp() {
+    func testSeekWithoutActiveSpeakerIsNoOp() async {
+        let noRequest = XCTestExpectation(description: "no media_seek request")
+        noRequest.isInverted = true
+        URLProtocolStub.observerRequests { request in
+            if request.url?.path.contains("/media_seek") == true {
+                noRequest.fulfill()
+            }
+        }
         viewModel.seek(to: 10)
         XCTAssertNil(viewModel.activeSpeakerID)
+        XCTAssertNil(viewModel.speakers[.mediaPlayerKitchen]?.mediaPosition)
+        await fulfillment(of: [noRequest], timeout: 0.5)
+    }
+}
+
+// MARK: - Lyrics loading
+
+@MainActor
+private final class StubLyricsService: LyricsService {
+    private let results: [LyricsResult]
+    private(set) var callCount = 0
+
+    init(results: [LyricsResult]) {
+        self.results = results
+    }
+
+    func fetchLyrics(title: String, artist: String, album: String?, durationSeconds: Double?) async -> LyricsResult {
+        defer { callCount += 1 }
+        return callCount < results.count ? results[callCount] : .notFound
+    }
+}
+
+@MainActor
+extension MusicViewModelTests {
+    private func playingSpeaker() -> MediaPlayerEntity {
+        var speaker = MediaPlayerEntity(entityId: .mediaPlayerKitchen, state: "playing", friendlyName: "Kitchen")
+        speaker.mediaTitle = "Song"
+        speaker.mediaArtist = "Artist"
+        return speaker
+    }
+
+    func testLyricsRetryAfterNotFoundThenLatchOnHit() async {
+        let line = LyricLine(time: 0, text: "hi")
+        let stub = StubLyricsService(results: [.notFound, .synced([line])])
+        let viewModel = MusicViewModel(restAPIService: restAPIService, lyricsService: stub)
+        viewModel.activeSpeakerID = .mediaPlayerKitchen
+        viewModel.speakers[.mediaPlayerKitchen] = playingSpeaker()
+        viewModel.isLyricsExpanded = true
+
+        await viewModel.refreshLyricsForCurrentTrack()
+        XCTAssertEqual(viewModel.lyrics, .notFound)
+        XCTAssertNil(viewModel.lyricsTrackKey, "a miss must not latch — it has to stay retryable")
+
+        // Same track, second trigger: it should retry rather than be suppressed.
+        await viewModel.refreshLyricsForCurrentTrack()
+        XCTAssertEqual(stub.callCount, 2)
+        XCTAssertEqual(viewModel.lyrics, .synced([line]))
+        XCTAssertNotNil(viewModel.lyricsTrackKey, "a hit latches so it isn't refetched")
+
+        // Third trigger on the now-loaded track is a no-op.
+        await viewModel.refreshLyricsForCurrentTrack()
+        XCTAssertEqual(stub.callCount, 2)
     }
 }
 

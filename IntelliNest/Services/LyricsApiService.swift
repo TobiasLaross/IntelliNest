@@ -143,7 +143,9 @@ final class LyricsApiService: LyricsService {
             }
             return try JSONDecoder().decode(Response.self, from: data)
         } catch {
-            Log.error("Lyrics fetch failed for \(url.absoluteString): \(error)")
+            // Log only the host, never the full URL — it carries the song/artist, and
+            // app logs are forwarded to Home Assistant's system log.
+            Log.error("Lyrics fetch failed for \(url.host ?? "lyrics provider"): \(error)")
             return nil
         }
     }

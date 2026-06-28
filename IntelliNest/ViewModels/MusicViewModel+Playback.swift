@@ -319,13 +319,22 @@ extension MusicViewModel {
     /// and routes the command to the group leader; the follow-up reload reconciles
     /// with the real position.
     func seek(to seconds: Double) {
-        guard let activeSpeakerID, let targetID = playbackTargetID else {
+        guard let activeSpeakerID else {
             return
         }
         let clamped = max(seconds, 0)
         speakers[activeSpeakerID]?.mediaPosition = clamped
         speakers[activeSpeakerID]?.mediaPositionUpdatedAt = Date()
-        restAPIService.seek(entityID: targetID, positionSeconds: clamped)
+        Task {
+            // Group membership can change between reloads; refresh before resolving
+            // the leader so the seek isn't routed to a stale leader (or a follower
+            // that rejects it), matching `startPlayback`.
+            await refreshActiveSpeaker(activeSpeakerID)
+            guard let targetID = playbackTargetID else {
+                return
+            }
+            restAPIService.seek(entityID: targetID, positionSeconds: clamped)
+        }
     }
 
     func setVolume(_ volume: Double) {

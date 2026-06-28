@@ -151,7 +151,9 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         guard isPlaying, let mediaPositionUpdatedAt else {
             return max(mediaPosition, 0)
         }
-        let elapsed = mediaPosition + now.timeIntervalSince(mediaPositionUpdatedAt)
+        // Never extrapolate backward: if the device clock lags Home Assistant the
+        // delta is negative, which would make the scrubber and lyrics jump back.
+        let elapsed = max(mediaPosition, mediaPosition + now.timeIntervalSince(mediaPositionUpdatedAt))
         if let mediaDuration {
             return min(max(elapsed, 0), mediaDuration)
         }

@@ -42,23 +42,36 @@ extension MusicViewModel {
             resetLyrics()
             return
         }
-        guard key != lyricsTrackKey else {
+        // Skip when this song's lyrics are already applied, or a fetch for it is
+        // already in flight. The cached key is latched only on success below, so a
+        // failed lookup can still be retried.
+        guard key != lyricsTrackKey, key != inFlightLyricsKey else {
             return
         }
-        lyricsTrackKey = key
-        lyricsOffset = 0
+        inFlightLyricsKey = key
         isLoadingLyrics = true
         let result = await lyricsService.fetchLyrics(title: speaker.mediaTitle ?? "",
                                                      artist: speaker.mediaArtist ?? "",
                                                      album: speaker.mediaAlbumName,
                                                      durationSeconds: speaker.mediaDuration)
-        // The track may have changed while the fetch was in flight; only apply the
-        // result if it still matches what's playing.
+        // The track may have changed while the fetch was in flight; drop a stale
+        // result so it can't clobber the new song's lyrics.
         guard currentLyricsTrackKey == key else {
+            if inFlightLyricsKey == key {
+                inFlightLyricsKey = nil
+                isLoadingLyrics = false
+            }
             return
         }
         lyrics = result
+        lyricsOffset = 0
         isLoadingLyrics = false
+        inFlightLyricsKey = nil
+        // Latch only on a real hit; `.notFound` collapses transient failures and
+        // true misses, so leaving the key unset lets a later trigger retry.
+        if result != .notFound {
+            lyricsTrackKey = key
+        }
     }
 
     /// Re-aligns synced lyrics so `lineIndex` is the current line at `elapsed`, by
@@ -74,6 +87,7 @@ extension MusicViewModel {
     private func resetLyrics() {
         lyrics = .notFound
         lyricsTrackKey = nil
+        inFlightLyricsKey = nil
         lyricsOffset = 0
         isLoadingLyrics = false
     }

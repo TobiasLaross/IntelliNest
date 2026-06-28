@@ -132,9 +132,15 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// scroll a line to "now" and correct drifting LRC timestamps. Reset to 0 on
     /// each track change (offset-per-track).
     @Published var lyricsOffset: TimeInterval = 0
-    /// The track (title+artist) the loaded `lyrics` belong to, so a refresh only
-    /// refetches when the song actually changes. Set by `MusicViewModel+Lyrics`.
+    /// The track (title+artist) whose lyrics are currently applied, so a refresh
+    /// only refetches when the song actually changes. Latched **only on a
+    /// successful** load, so a transient failure doesn't permanently suppress
+    /// retries. Set by `MusicViewModel+Lyrics`.
     var lyricsTrackKey: String?
+    /// The track key of an in-flight lyrics fetch, used to dedupe concurrent
+    /// requests for the same song without latching the cached key. Set by
+    /// `MusicViewModel+Lyrics`.
+    var inFlightLyricsKey: String?
 
     var isReloading = false
     private var hasSelectedDefaultSpeaker = false
