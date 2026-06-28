@@ -48,6 +48,7 @@ enum Action: String, Codable {
     case mediaPause = "media_pause"
     case mediaNextTrack = "media_next_track"
     case mediaPreviousTrack = "media_previous_track"
+    case mediaSeek = "media_seek"
     case volumeSet = "volume_set"
     case shuffleSet = "shuffle_set"
     case repeatSet = "repeat_set"

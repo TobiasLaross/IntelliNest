@@ -165,6 +165,19 @@ extension RestAPIService {
                reloadTimes: reloadTimes)
     }
 
+    /// Seeks the player to `positionSeconds` from the start of the current track
+    /// via `media_player.media_seek`. The repeated reload picks up the new
+    /// `media_position`/`media_position_updated_at` so the scrubber and lyrics
+    /// settle on the real position after the optimistic jump.
+    func seek(entityID: EntityId, positionSeconds: Double, reloadTimes: Int = 2) {
+        update(entityID: entityID,
+               domain: .mediaPlayer,
+               action: .mediaSeek,
+               dataKey: .seekPosition,
+               dataValue: positionSeconds,
+               reloadTimes: reloadTimes)
+    }
+
     func setShuffle(entityID: EntityId, shuffle: Bool, reloadTimes: Int = 2) {
         Task {
             var json = [JSONKey: Any]()

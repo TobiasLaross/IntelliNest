@@ -56,6 +56,11 @@ struct MusicView: View {
         .sheet(isPresented: $viewModel.isShowingQueue) {
             QueueView(viewModel: viewModel)
         }
+        .sheet(isPresented: $viewModel.isShowingFullLyrics) {
+            if let activeSpeaker = viewModel.displayedActiveSpeaker {
+                LyricsFullView(speaker: activeSpeaker, viewModel: viewModel)
+            }
+        }
         .sheet(item: $viewModel.browsingLibraryPlaylist) { playlist in
             NavigationStack {
                 MusicPlaylistView(viewModel: viewModel, playlist: playlist)
