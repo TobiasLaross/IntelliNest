@@ -150,7 +150,11 @@ final class LyricsCacheTests: XCTestCase {
     private var directory: URL!
 
     override func setUpWithError() throws {
-        directory = FileManager.default.temporaryDirectory.appendingPathComponent("lyrics-cache-tests")
+        // Per-test subdirectory (keyed by the deterministic test name, not a runtime
+        // UUID) so the persistence fixtures can't collide between tests.
+        let safeName = name.components(separatedBy: CharacterSet.alphanumerics.inverted).joined()
+        directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("lyrics-cache-tests-\(safeName)", isDirectory: true)
         try? FileManager.default.removeItem(at: directory)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     }

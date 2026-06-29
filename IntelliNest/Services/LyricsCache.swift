@@ -105,6 +105,10 @@ actor LyricsCache {
         guard let fileURL else {
             return
         }
+        // The default Caches directory always exists, but an injected one might not —
+        // create it first so the write doesn't silently fail and drop the cache.
+        try? FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(),
+                                                 withIntermediateDirectories: true)
         let stored = lru.compactMap { key in entries[key].map { StoredEntry(key: key, result: $0) } }
         guard let data = try? JSONEncoder().encode(stored) else {
             return
