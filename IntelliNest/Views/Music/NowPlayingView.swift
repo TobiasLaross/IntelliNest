@@ -71,8 +71,8 @@ struct NowPlayingView: View {
         .task(id: speaker.mediaContentID) {
             await viewModel.loadSavedSongStates(uris: [speaker.mediaContentID].compactMap { $0 })
         }
-        // Refetch lyrics when the track changes while the lyrics panel is open
-        // (a no-op otherwise).
+        // Prefetch lyrics whenever the track changes so they're ready the moment the
+        // user opens the panel, rather than starting the lookup on that tap.
         .task(id: viewModel.currentLyricsTrackKey) {
             await viewModel.refreshLyricsForCurrentTrack()
         }

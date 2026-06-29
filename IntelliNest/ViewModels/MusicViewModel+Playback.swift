@@ -119,7 +119,8 @@ extension MusicViewModel {
     /// Playback and queue commands must go to the active speaker's group leader;
     /// a synced follower rejects them. Returns the active speaker itself when it
     /// is ungrouped. Volume stays per-speaker, so it is not redirected here.
-    private var playbackTargetID: EntityId? {
+    /// Internal so the transport controls in `MusicViewModel+Transport` can route.
+    var playbackTargetID: EntityId? {
         guard let activeSpeaker else {
             return activeSpeakerID
         }
@@ -128,10 +129,14 @@ extension MusicViewModel {
 
     /// Re-fetches the active speaker's state so playback routing reads its
     /// current group membership rather than a value up to one reload cycle
-    /// stale. A failed fetch leaves the existing state in place.
-    private func refreshActiveSpeaker(_ speakerID: EntityId) async {
+    /// stale. A failed fetch leaves the existing state in place. Internal so the
+    /// seek control in `MusicViewModel+Transport` can refresh before routing.
+    func refreshActiveSpeaker(_ speakerID: EntityId) async {
         if let fresh = try? await restAPIService.reload(entityId: speakerID, entityType: MediaPlayerEntity.self) {
-            speakers[speakerID] = fresh
+            // Route through the position hold so a refresh fired right after a seek
+            // (to resolve the group leader) doesn't overwrite the optimistic position
+            // with HA's still-stale pre-seek one.
+            speakers[speakerID] = reconcilePositionHold(speakerID: speakerID, fresh: fresh)
         }
     }
 
@@ -157,6 +162,9 @@ extension MusicViewModel {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return false
         }
+        // A new track resets playback position, so any seek/pause hold is obsolete —
+        // clear it before the refresh below can re-pin a stale position.
+        positionHold = nil
         // Group membership can change between the 5-second reloads (e.g. the
         // speaker was just ungrouped). Refresh the active speaker before routing
         // so playback isn't sent to a stale group leader it's no longer synced
@@ -283,95 +291,5 @@ extension MusicViewModel {
             Log.error("Spotify login failed: \(error)")
             setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")
         }
-    }
-
-    // MARK: - Transport & volume
-
-    func togglePlayPause() {
-        guard let activeSpeaker, let targetID = playbackTargetID else {
-            return
-        }
-        // Decide from the mirrored state the card actually shows (the hardware
-        // twin's when it diverges), so the button does what its icon implies. The
-        // command still routes to the Music Assistant group leader.
-        let isPlaying = displayedActiveSpeaker?.isPlaying ?? activeSpeaker.isPlaying
-        let action: Action = isPlaying ? .mediaPause : .mediaPlay
-        speakers[activeSpeaker.entityId]?.state = isPlaying ? "paused" : "playing"
-        restAPIService.mediaTransport(entityID: targetID, action: action)
-    }
-
-    func nextTrack() {
-        guard let targetID = playbackTargetID else {
-            return
-        }
-        restAPIService.mediaTransport(entityID: targetID, action: .mediaNextTrack)
-    }
-
-    func previousTrack() {
-        guard let targetID = playbackTargetID else {
-            return
-        }
-        restAPIService.mediaTransport(entityID: targetID, action: .mediaPreviousTrack)
-    }
-
-    /// Seeks the current track to `seconds`. Optimistically anchors the active
-    /// speaker's position to the new spot (so the scrubber and lyrics jump at once)
-    /// and routes the command to the group leader; the follow-up reload reconciles
-    /// with the real position.
-    func seek(to seconds: Double) {
-        guard let activeSpeakerID else {
-            return
-        }
-        let clamped = max(seconds, 0)
-        speakers[activeSpeakerID]?.mediaPosition = clamped
-        speakers[activeSpeakerID]?.mediaPositionUpdatedAt = Date()
-        Task {
-            // Group membership can change between reloads; refresh before resolving
-            // the leader so the seek isn't routed to a stale leader (or a follower
-            // that rejects it), matching `startPlayback`.
-            await refreshActiveSpeaker(activeSpeakerID)
-            guard let targetID = playbackTargetID else {
-                return
-            }
-            restAPIService.seek(entityID: targetID, positionSeconds: clamped)
-        }
-    }
-
-    func setVolume(_ volume: Double) {
-        guard let activeSpeakerID else {
-            return
-        }
-        setVolume(volume, for: activeSpeakerID)
-    }
-
-    /// Sets the volume of a specific speaker. Volume is always per-speaker (never
-    /// redirected to a group leader), so any speaker in the list can be adjusted
-    /// in place.
-    func setVolume(_ volume: Double, for speakerID: EntityId) {
-        speakers[speakerID]?.volumeLevel = volume
-        restAPIService.setVolume(entityID: speakerID, volume: volume)
-    }
-
-    func toggleShuffle() {
-        guard let activeSpeaker, let targetID = playbackTargetID else {
-            return
-        }
-        let newValue = !activeSpeaker.shuffle
-        speakers[activeSpeaker.entityId]?.shuffle = newValue
-        restAPIService.setShuffle(entityID: targetID, shuffle: newValue)
-    }
-
-    func toggleRepeat() {
-        guard let activeSpeaker, let targetID = playbackTargetID else {
-            return
-        }
-        // Cycle off → all → one → off, matching the Sonos-style three-state control.
-        let newMode: MediaRepeatMode = switch activeSpeaker.repeatMode {
-        case .off: .all
-        case .all: .one
-        case .one: .off
-        }
-        speakers[activeSpeaker.entityId]?.repeatMode = newMode
-        restAPIService.setRepeat(entityID: targetID, repeatMode: newMode)
     }
 }

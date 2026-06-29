@@ -245,3 +245,41 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
             lhs.mediaPositionUpdatedAt == rhs.mediaPositionUpdatedAt
     }
 }
+
+/// A playback position the app applied locally (after a seek or a pause) that Home
+/// Assistant hasn't confirmed yet. The reload loop reconciles each refreshed speaker
+/// against this so a transient position from HA doesn't snap the scrubber and lyrics
+/// away from where the user just put them: after a seek HA often still reports the
+/// pre-seek spot for a cycle, and a pausing player can briefly drop its position to
+/// nil/0. The hold keeps `target` on the active speaker until HA reports a position
+/// near it, or the hold expires (so a source that never reports the exact spot can't
+/// freeze the scrubber forever).
+struct PlaybackPositionHold: Equatable {
+    let target: TimeInterval
+    let since: Date
+
+    /// How long to keep holding before giving up and trusting HA again.
+    static let timeout: TimeInterval = 8
+    /// How close HA's reported position must be to `target` to count as confirmed.
+    static let tolerance: TimeInterval = 3
+
+    /// Reconciles a freshly reloaded speaker against the held position. Returns the
+    /// entity to publish and whether the hold is still pending — `false` once HA has
+    /// confirmed the position (so the caller drops the hold) or the hold expired.
+    /// While pending, `target` is pinned onto the entity, anchored at `since` so a
+    /// still-playing track keeps advancing from the held spot rather than restarting.
+    func reconcile(_ fresh: MediaPlayerEntity, asOf now: Date) -> (entity: MediaPlayerEntity, stillPending: Bool) {
+        if now.timeIntervalSince(since) > Self.timeout {
+            return (fresh, false)
+        }
+        // A nil reported position (common mid-transition) counts as unconfirmed, so
+        // the hold persists rather than letting the scrubber fall to 0.
+        if let reported = fresh.currentElapsed(asOf: now), abs(reported - target) <= Self.tolerance {
+            return (fresh, false)
+        }
+        var held = fresh
+        held.mediaPosition = target
+        held.mediaPositionUpdatedAt = since
+        return (held, true)
+    }
+}

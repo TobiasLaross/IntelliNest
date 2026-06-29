@@ -44,6 +44,158 @@ extension MusicViewModelTests {
         XCTAssertNil(viewModel.speakers[.mediaPlayerKitchen]?.mediaPosition)
         await fulfillment(of: [noRequest], timeout: 0.5)
     }
+
+    func testSeekRegistersPositionHold() async {
+        viewModel.selectSpeaker(.mediaPlayerSpa)
+        viewModel.speakers[.mediaPlayerSpa] = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "playing", friendlyName: "Spa")
+        // Await the fired request so the async seek Task can't bleed a stray media_seek
+        // POST into a sibling test sharing the process-global URLProtocolStub.
+        let sent = transportExpectation(path: "/media_seek")
+        stubPostService(path: "/api/services/media_player/media_seek")
+
+        viewModel.seek(to: 42)
+
+        // The hold keeps the seeked spot through the reloads that still report the
+        // pre-seek position, so the scrubber doesn't snap back.
+        XCTAssertEqual(viewModel.positionHold?.target ?? -1, 42, accuracy: 0.001)
+        await fulfillment(of: [sent], timeout: 2.0)
+    }
+
+    func testPauseHoldsTheLivePositionSoItCannotSnapToZero() async {
+        var speaker = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "playing", friendlyName: "Spa")
+        speaker.mediaPosition = 30
+        speaker.mediaPositionUpdatedAt = Date()
+        viewModel.speakers[.mediaPlayerSpa] = speaker
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        let sent = transportExpectation(path: "/media_pause")
+        stubPostService(path: "/api/services/media_player/media_pause")
+
+        viewModel.togglePlayPause()
+
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.state, "paused")
+        XCTAssertEqual(viewModel.positionHold?.target ?? -1, 30, accuracy: 0.5)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.mediaPosition ?? -1, 30, accuracy: 0.5)
+        await fulfillment(of: [sent], timeout: 2.0)
+    }
+
+    func testResumeClearsThePositionHold() async {
+        var speaker = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "paused", friendlyName: "Spa")
+        speaker.mediaPosition = 30
+        viewModel.speakers[.mediaPlayerSpa] = speaker
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        viewModel.positionHold = PlaybackPositionHold(target: 30, since: Date())
+        let sent = transportExpectation(path: "/media_play")
+        stubPostService(path: "/api/services/media_player/media_play")
+
+        viewModel.togglePlayPause()
+
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.state, "playing")
+        XCTAssertNil(viewModel.positionHold, "resuming must let the live position advance freely")
+        await fulfillment(of: [sent], timeout: 2.0)
+    }
+
+    func testReconcileDropsHoldWhenReloadConfirmsThePosition() {
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        viewModel.positionHold = PlaybackPositionHold(target: 100, since: Date())
+        var fresh = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "paused", friendlyName: "Spa")
+        fresh.mediaPosition = 99
+
+        let result = viewModel.reconcilePositionHold(speakerID: .mediaPlayerSpa, fresh: fresh)
+
+        XCTAssertEqual(result.mediaPosition, 99, "a confirmed reload passes through untouched")
+        XCTAssertNil(viewModel.positionHold)
+    }
+
+    func testReconcileKeepsHeldPositionWhenReloadIsStillStale() {
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        viewModel.positionHold = PlaybackPositionHold(target: 100, since: Date())
+        var fresh = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "paused", friendlyName: "Spa")
+        fresh.mediaPosition = 5
+
+        let result = viewModel.reconcilePositionHold(speakerID: .mediaPlayerSpa, fresh: fresh)
+
+        XCTAssertEqual(result.mediaPosition, 100, "the stale pre-seek position is overridden by the hold")
+        XCTAssertNotNil(viewModel.positionHold, "the hold persists until HA confirms")
+    }
+
+    func testReconcileLeavesNonActiveSpeakersUntouched() {
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        viewModel.positionHold = PlaybackPositionHold(target: 100, since: Date())
+        var fresh = MediaPlayerEntity(entityId: .mediaPlayerKitchen, state: "paused", friendlyName: "Kitchen")
+        fresh.mediaPosition = 5
+
+        let result = viewModel.reconcilePositionHold(speakerID: .mediaPlayerKitchen, fresh: fresh)
+
+        XCTAssertEqual(result.mediaPosition, 5, "only the active speaker's position is held")
+        XCTAssertNotNil(viewModel.positionHold)
+    }
+
+    /// Fulfilled when a POST to `path` is observed, so a test can await the async
+    /// transport Task it kicked off and not leak a request into the next test.
+    private func transportExpectation(path: String) -> XCTestExpectation {
+        let expectation = XCTestExpectation(description: "POST \(path)")
+        URLProtocolStub.observerRequests { request in
+            if request.httpMethod == "POST", request.url?.path.contains(path) == true {
+                expectation.fulfill()
+            }
+        }
+        return expectation
+    }
+}
+
+// MARK: - Position hold
+
+final class PlaybackPositionHoldTests: XCTestCase {
+    // Fixed epoch — no wall-clock or random data, so the timing math is deterministic.
+    private let epoch = Date(timeIntervalSince1970: 1_700_000_000)
+
+    private func speaker(position: Double?, state: String = "paused", updatedAt: Date? = nil) -> MediaPlayerEntity {
+        var entity = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: state, friendlyName: "Spa")
+        entity.mediaPosition = position
+        entity.mediaPositionUpdatedAt = updatedAt
+        return entity
+    }
+
+    func testHoldsWhileHaStillReportsThePreSeekPosition() {
+        let hold = PlaybackPositionHold(target: 100, since: epoch)
+        let (entity, stillPending) = hold.reconcile(speaker(position: 10), asOf: epoch.addingTimeInterval(1))
+        XCTAssertTrue(stillPending)
+        XCTAssertEqual(entity.mediaPosition, 100)
+    }
+
+    func testReleasesOnceHaConfirmsThePositionWithinTolerance() {
+        let hold = PlaybackPositionHold(target: 100, since: epoch)
+        let (entity, stillPending) = hold.reconcile(speaker(position: 99), asOf: epoch.addingTimeInterval(1))
+        XCTAssertFalse(stillPending)
+        XCTAssertEqual(entity.mediaPosition, 99, "the confirmed HA state passes through untouched")
+    }
+
+    func testHoldsWhenReportedPositionIsMissing() {
+        // A pausing player that drops its position to nil must not snap the scrubber to 0.
+        let hold = PlaybackPositionHold(target: 55, since: epoch)
+        let (entity, stillPending) = hold.reconcile(speaker(position: nil), asOf: epoch.addingTimeInterval(1))
+        XCTAssertTrue(stillPending)
+        XCTAssertEqual(entity.mediaPosition, 55)
+    }
+
+    func testReleasesAfterTimeoutEvenWhenUnconfirmed() {
+        let hold = PlaybackPositionHold(target: 100, since: epoch)
+        let pastTimeout = epoch.addingTimeInterval(PlaybackPositionHold.timeout + 1)
+        let (entity, stillPending) = hold.reconcile(speaker(position: 10), asOf: pastTimeout)
+        XCTAssertFalse(stillPending)
+        XCTAssertEqual(entity.mediaPosition, 10, "a source that never reports the spot can't freeze the scrubber forever")
+    }
+
+    func testHeldPlayingPositionKeepsAdvancingFromTheSeekedSpot() {
+        // While playing, the held position is anchored at `since`, so the scrubber
+        // resumes advancing from the seeked spot rather than freezing or restarting.
+        let hold = PlaybackPositionHold(target: 100, since: epoch)
+        let fresh = speaker(position: 10, state: "playing", updatedAt: epoch)
+        let now = epoch.addingTimeInterval(2)
+        let (entity, stillPending) = hold.reconcile(fresh, asOf: now)
+        XCTAssertTrue(stillPending)
+        XCTAssertEqual(entity.currentElapsed(asOf: now) ?? -1, 102, accuracy: 0.001)
+    }
 }
 
 // MARK: - Lyrics loading
@@ -93,6 +245,22 @@ extension MusicViewModelTests {
         // Third trigger on the now-loaded track is a no-op.
         await viewModel.refreshLyricsForCurrentTrack()
         XCTAssertEqual(stub.callCount, 2)
+    }
+
+    func testLyricsPrefetchWhilePanelClosed() async {
+        let line = LyricLine(time: 0, text: "hi")
+        let stub = StubLyricsService(results: [.synced([line])])
+        let viewModel = MusicViewModel(restAPIService: restAPIService, lyricsService: stub)
+        viewModel.activeSpeakerID = .mediaPlayerKitchen
+        viewModel.speakers[.mediaPlayerKitchen] = playingSpeaker()
+        XCTAssertFalse(viewModel.isLyricsExpanded, "the panel is closed — prefetch must still run")
+
+        await viewModel.refreshLyricsForCurrentTrack()
+
+        // Lyrics are fetched on the track change so they're ready the instant the
+        // user opens the panel, not started by that tap.
+        XCTAssertEqual(stub.callCount, 1)
+        XCTAssertEqual(viewModel.lyrics, .synced([line]))
     }
 }
 

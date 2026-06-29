@@ -110,21 +110,26 @@ struct LyricsStripView: View {
 }
 
 /// The full-screen lyrics view. Synced lyrics auto-scroll to keep the current line
-/// near the top; dragging the lyrics re-aligns the timing (the line the user scrolls
-/// into focus becomes "now"), correcting drifting LRC timestamps without touching
-/// playback. Plain lyrics show as static scrollable text.
+/// near the top; tapping a line re-aligns the timing (the tapped line becomes
+/// "now"), correcting drifting LRC timestamps without touching playback. Scrolling
+/// just browses — it pauses the auto-follow for a few seconds so the user can read
+/// ahead without being yanked back. Plain lyrics show as static scrollable text.
 struct LyricsFullView: View {
     let speaker: MediaPlayerEntity
     @ObservedObject var viewModel: MusicViewModel
     @Environment(\.dismiss) private var dismiss
 
     /// The line currently scrolled into focus (the topmost line below the top
-    /// margin). Written programmatically to auto-follow playback and read back to
-    /// re-align when the user scrolls.
+    /// margin). Written programmatically to auto-follow playback.
     @State private var focusedLineID: Int?
     @State private var currentIndex: Int?
-    @State private var isDragging = false
+    /// When the user last scrolled the lyrics by hand. Auto-follow stays paused for
+    /// `browseGracePeriod` after this so a scroll to read ahead isn't immediately
+    /// snapped back to the playing line. Nil while following.
+    @State private var lastManualScroll: Date?
 
+    /// How long auto-follow stays paused after a manual scroll.
+    private let browseGracePeriod: TimeInterval = 4
     private let ticker = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -170,6 +175,8 @@ struct LyricsFullView: View {
                         .fontWeight(index == currentIndex ? .bold : .regular)
                         .foregroundStyle(index == currentIndex ? .yellow : .white.opacity(0.45))
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                        .onTapGesture { realign(to: index, in: lines) }
                         .id(index)
                 }
             }
@@ -180,20 +187,24 @@ struct LyricsFullView: View {
         // leave room to scroll the last lines into focus.
         .contentMargins(.vertical, 140, for: .scrollContent)
         .scrollPosition(id: $focusedLineID)
-        .simultaneousGesture(
-            DragGesture()
-                .onChanged { _ in isDragging = true }
-                .onEnded { _ in
-                    if let focusedLineID {
-                        viewModel.applyRealign(toLineIndex: focusedLineID, at: speaker.currentElapsed(asOf: Date()) ?? 0)
-                    }
-                    isDragging = false
-                }
-        )
+        // A scroll drag pauses auto-follow so the user can browse; a plain tap moves
+        // no distance, so it falls through to a line's tap-to-realign instead.
+        .simultaneousGesture(DragGesture().onChanged { _ in lastManualScroll = Date() })
         .onReceive(ticker) { _ in
             advance(lines)
         }
         .onAppear { advance(lines) }
+    }
+
+    /// Re-aligns the timeline so the tapped line becomes "now" and resumes
+    /// auto-follow from there, snapping it into focus.
+    private func realign(to index: Int, in lines: [LyricLine]) {
+        viewModel.applyRealign(toLineIndex: index, at: speaker.currentElapsed(asOf: Date()) ?? 0)
+        lastManualScroll = nil
+        currentIndex = index
+        withAnimation(.easeInOut(duration: 0.3)) {
+            focusedLineID = index
+        }
     }
 
     private func plainView(_ text: String) -> some View {
@@ -206,16 +217,21 @@ struct LyricsFullView: View {
         }
     }
 
-    /// Recomputes the current line from playback time + the manual offset and, unless
-    /// the user is actively scrolling, scrolls it into focus.
+    /// Recomputes the current line from playback time + the manual offset, updating
+    /// the highlight. Scrolls it into focus unless the user is browsing — i.e. has
+    /// scrolled by hand within the last `browseGracePeriod`.
     private func advance(_ lines: [LyricLine]) {
         let elapsed = (speaker.currentElapsed(asOf: Date()) ?? 0) + viewModel.lyricsOffset
         let index = LyricsTimeline.currentLineIndex(in: lines, at: elapsed)
-        guard index != currentIndex else {
+        let isBrowsing = lastManualScroll.map { Date().timeIntervalSince($0) < browseGracePeriod } ?? false
+        // Re-focus once browsing ends even if the current line hasn't changed — e.g.
+        // the user scrolled away during a long line and playback is still on it.
+        let shouldRefocus = !isBrowsing && index != focusedLineID
+        guard index != currentIndex || shouldRefocus else {
             return
         }
         currentIndex = index
-        if !isDragging, let index {
+        if shouldRefocus, let index {
             withAnimation(.easeInOut(duration: 0.3)) {
                 focusedLineID = index
             }
