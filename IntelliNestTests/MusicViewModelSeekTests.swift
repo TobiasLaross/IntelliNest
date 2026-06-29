@@ -94,6 +94,42 @@ extension MusicViewModelTests {
         await fulfillment(of: [sent], timeout: 2.0)
     }
 
+    func testReconcileDropsHoldWhenReloadConfirmsThePosition() {
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        viewModel.positionHold = PlaybackPositionHold(target: 100, since: Date())
+        var fresh = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "paused", friendlyName: "Spa")
+        fresh.mediaPosition = 99
+
+        let result = viewModel.reconcilePositionHold(speakerID: .mediaPlayerSpa, fresh: fresh)
+
+        XCTAssertEqual(result.mediaPosition, 99, "a confirmed reload passes through untouched")
+        XCTAssertNil(viewModel.positionHold)
+    }
+
+    func testReconcileKeepsHeldPositionWhenReloadIsStillStale() {
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        viewModel.positionHold = PlaybackPositionHold(target: 100, since: Date())
+        var fresh = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "paused", friendlyName: "Spa")
+        fresh.mediaPosition = 5
+
+        let result = viewModel.reconcilePositionHold(speakerID: .mediaPlayerSpa, fresh: fresh)
+
+        XCTAssertEqual(result.mediaPosition, 100, "the stale pre-seek position is overridden by the hold")
+        XCTAssertNotNil(viewModel.positionHold, "the hold persists until HA confirms")
+    }
+
+    func testReconcileLeavesNonActiveSpeakersUntouched() {
+        viewModel.activeSpeakerID = .mediaPlayerSpa
+        viewModel.positionHold = PlaybackPositionHold(target: 100, since: Date())
+        var fresh = MediaPlayerEntity(entityId: .mediaPlayerKitchen, state: "paused", friendlyName: "Kitchen")
+        fresh.mediaPosition = 5
+
+        let result = viewModel.reconcilePositionHold(speakerID: .mediaPlayerKitchen, fresh: fresh)
+
+        XCTAssertEqual(result.mediaPosition, 5, "only the active speaker's position is held")
+        XCTAssertNotNil(viewModel.positionHold)
+    }
+
     /// Fulfilled when a POST to `path` is observed, so a test can await the async
     /// transport Task it kicked off and not leak a request into the next test.
     private func transportExpectation(path: String) -> XCTestExpectation {

@@ -71,15 +71,21 @@ extension MusicViewModel {
         speakers[activeSpeakerID]?.mediaPositionUpdatedAt = now
         // Hold the new spot through the next reloads: HA keeps reporting the pre-seek
         // position for a cycle or two, which would otherwise snap the scrubber back.
-        positionHold = PlaybackPositionHold(target: clamped, since: now)
+        let hold = PlaybackPositionHold(target: clamped, since: now)
+        positionHold = hold
         Task {
             // Group membership can change between reloads; refresh before resolving
             // the leader so the seek isn't routed to a stale leader (or a follower
             // that rejects it), matching `startPlayback`.
             await refreshActiveSpeaker(activeSpeakerID)
-            guard let targetID = playbackTargetID else {
+            // If the user switched speakers or seeked again during the await, this
+            // seek is stale — bail rather than route it to whatever is now active.
+            // Resolve the leader from the speaker that initiated the seek, not the
+            // current `playbackTargetID` (which reads whatever is active now).
+            guard self.activeSpeakerID == activeSpeakerID, positionHold == hold else {
                 return
             }
+            let targetID = speakers[activeSpeakerID]?.playbackTargetID ?? activeSpeakerID
             restAPIService.seek(entityID: targetID, positionSeconds: clamped)
         }
         // Pull the confirmed position in quickly so the hold releases without waiting

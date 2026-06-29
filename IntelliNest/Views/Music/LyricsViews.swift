@@ -223,12 +223,15 @@ struct LyricsFullView: View {
     private func advance(_ lines: [LyricLine]) {
         let elapsed = (speaker.currentElapsed(asOf: Date()) ?? 0) + viewModel.lyricsOffset
         let index = LyricsTimeline.currentLineIndex(in: lines, at: elapsed)
-        guard index != currentIndex else {
+        let isBrowsing = lastManualScroll.map { Date().timeIntervalSince($0) < browseGracePeriod } ?? false
+        // Re-focus once browsing ends even if the current line hasn't changed — e.g.
+        // the user scrolled away during a long line and playback is still on it.
+        let shouldRefocus = !isBrowsing && index != focusedLineID
+        guard index != currentIndex || shouldRefocus else {
             return
         }
         currentIndex = index
-        let isBrowsing = lastManualScroll.map { Date().timeIntervalSince($0) < browseGracePeriod } ?? false
-        if !isBrowsing, let index {
+        if shouldRefocus, let index {
             withAnimation(.easeInOut(duration: 0.3)) {
                 focusedLineID = index
             }

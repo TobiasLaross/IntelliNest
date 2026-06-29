@@ -40,6 +40,10 @@ final class LyricsApiService: LyricsService {
     /// Per-request timeout. Short enough that a stalled provider doesn't hang the
     /// lyrics spinner, generous enough for a slow mobile network.
     private static let requestTimeout: TimeInterval = 8
+    /// Cap for the whole fallback chain (LRCLIB get → search → lyrics.ovh). A single
+    /// shared deadline bounds the total wait so three sequential stalls can't add up
+    /// to the sum of their per-request timeouts.
+    private static let totalTimeout: TimeInterval = 10
 
     init(session: URLSession = .shared, userAgent: String = LyricsApiService.defaultUserAgent) {
         self.session = session
@@ -58,11 +62,15 @@ final class LyricsApiService: LyricsService {
         guard title.isNotEmpty, artist.isNotEmpty else {
             return .notFound
         }
-        let primary = await fetchFromLRCLIB(title: title, artist: artist, album: album, durationSeconds: durationSeconds)
+        // One shared deadline for the whole chain so the spinner can't hang for the
+        // sum of every provider's individual timeout.
+        let deadline = Date().addingTimeInterval(Self.totalTimeout)
+        let primary = await fetchFromLRCLIB(title: title, artist: artist, album: album,
+                                            durationSeconds: durationSeconds, deadline: deadline)
         if primary != .notFound {
             return primary
         }
-        if let plain = await fetchFromLyricsOvh(title: title, artist: artist) {
+        if let plain = await fetchFromLyricsOvh(title: title, artist: artist, deadline: deadline) {
             return .plain(plain)
         }
         return .notFound
@@ -70,7 +78,8 @@ final class LyricsApiService: LyricsService {
 
     // MARK: - LRCLIB (primary, synced)
 
-    private func fetchFromLRCLIB(title: String, artist: String, album: String?, durationSeconds: Double?) async -> LyricsResult {
+    private func fetchFromLRCLIB(title: String, artist: String, album: String?,
+                                 durationSeconds: Double?, deadline: Date) async -> LyricsResult {
         var components = URLComponents(string: "\(lrclibBaseURL)/get")
         var queryItems = [
             URLQueryItem(name: "artist_name", value: artist),
@@ -84,22 +93,22 @@ final class LyricsApiService: LyricsService {
         }
         components?.queryItems = queryItems
 
-        if let url = components?.url, let record = await getJSON(url, as: LRCLIBRecord.self) {
+        if let url = components?.url, let record = await getJSON(url, as: LRCLIBRecord.self, deadline: deadline) {
             let result = record.lyricsResult
             if result != .notFound {
                 return result
             }
         }
-        return await searchLRCLIB(title: title, artist: artist, durationSeconds: durationSeconds)
+        return await searchLRCLIB(title: title, artist: artist, durationSeconds: durationSeconds, deadline: deadline)
     }
 
     /// Falls back to LRCLIB's fuzzy search when the exact `get` misses, then picks
     /// the candidate closest to the known track length (preferring synced ones).
-    private func searchLRCLIB(title: String, artist: String, durationSeconds: Double?) async -> LyricsResult {
+    private func searchLRCLIB(title: String, artist: String, durationSeconds: Double?, deadline: Date) async -> LyricsResult {
         var components = URLComponents(string: "\(lrclibBaseURL)/search")
         components?.queryItems = [URLQueryItem(name: "q", value: "\(title) \(artist)")]
         guard let url = components?.url,
-              let records = await getJSON(url, as: [LRCLIBRecord].self),
+              let records = await getJSON(url, as: [LRCLIBRecord].self, deadline: deadline),
               records.isNotEmpty else {
             return .notFound
         }
@@ -117,7 +126,7 @@ final class LyricsApiService: LyricsService {
 
     // MARK: - lyrics.ovh (backup, plain)
 
-    private func fetchFromLyricsOvh(title: String, artist: String) async -> String? {
+    private func fetchFromLyricsOvh(title: String, artist: String, deadline: Date) async -> String? {
         var allowed = CharacterSet.urlPathAllowed
         allowed.remove("/")
         guard let escapedArtist = artist.addingPercentEncoding(withAllowedCharacters: allowed),
@@ -125,7 +134,7 @@ final class LyricsApiService: LyricsService {
               let url = URL(string: "\(lyricsOvhBaseURL)/\(escapedArtist)/\(escapedTitle)") else {
             return nil
         }
-        guard let record = await getJSON(url, as: LyricsOvhRecord.self),
+        guard let record = await getJSON(url, as: LyricsOvhRecord.self, deadline: deadline),
               let lyrics = record.lyrics,
               lyrics.isNotEmpty else {
             return nil
@@ -135,10 +144,15 @@ final class LyricsApiService: LyricsService {
 
     // MARK: - Networking
 
-    private func getJSON<Response: Decodable>(_ url: URL, as type: Response.Type) async -> Response? {
-        // Cap each lookup so a slow or stalled provider can't leave the lyrics
-        // spinner hanging — the chain has a backup source, and a miss is fine.
-        var request = URLRequest(url: url, timeoutInterval: Self.requestTimeout)
+    private func getJSON<Response: Decodable>(_ url: URL, as type: Response.Type, deadline: Date) async -> Response? {
+        // Bound each lookup by whatever is left of the shared chain deadline (never
+        // more than the per-request cap), so a stalled provider can't hang the lyrics
+        // spinner — the chain has a backup source, and a miss is fine.
+        let remaining = deadline.timeIntervalSinceNow
+        guard remaining > 0 else {
+            return nil
+        }
+        var request = URLRequest(url: url, timeoutInterval: min(Self.requestTimeout, remaining))
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         do {
             let (data, response) = try await session.data(for: request)
