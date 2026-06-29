@@ -34,6 +34,9 @@ final class DisabledLyricsService: LyricsService {
 final class LyricsApiService: LyricsService {
     private let session: URLSession
     private let userAgent: String
+    /// Caches successful lookups across launches so a re-opened (or replayed) track
+    /// loads instantly without re-hitting the providers.
+    private let cache: LyricsCache
 
     private let lrclibBaseURL = "https://lrclib.net/api"
     private let lyricsOvhBaseURL = "https://api.lyrics.ovh/v1"
@@ -45,9 +48,12 @@ final class LyricsApiService: LyricsService {
     /// to the sum of their per-request timeouts.
     private static let totalTimeout: TimeInterval = 10
 
-    init(session: URLSession = .shared, userAgent: String = LyricsApiService.defaultUserAgent) {
+    init(session: URLSession = .shared,
+         userAgent: String = LyricsApiService.defaultUserAgent,
+         cache: LyricsCache = LyricsCache()) {
         self.session = session
         self.userAgent = userAgent
+        self.cache = cache
     }
 
     /// `IntelliNest/<app version> (+repo url)`, the descriptive agent LRCLIB requests.
@@ -62,9 +68,25 @@ final class LyricsApiService: LyricsService {
         guard title.isNotEmpty, artist.isNotEmpty else {
             return .notFound
         }
+        // Serve a previously-fetched track straight from the cache — no network.
+        let key = LyricsCache.key(title: title, artist: artist, album: album)
+        if let cached = await cache.value(forKey: key) {
+            return cached
+        }
         // One shared deadline for the whole chain so the spinner can't hang for the
         // sum of every provider's individual timeout.
         let deadline = Date().addingTimeInterval(Self.totalTimeout)
+        let result = await lookup(title: title, artist: artist, album: album,
+                                  durationSeconds: durationSeconds, deadline: deadline)
+        // `insert` ignores `.notFound`, so a miss stays retryable next time.
+        await cache.insert(result, forKey: key)
+        return result
+    }
+
+    /// Runs the provider fallback chain (LRCLIB get → search → lyrics.ovh) within the
+    /// shared `deadline`, returning the first hit or `.notFound`.
+    private func lookup(title: String, artist: String, album: String?,
+                        durationSeconds: Double?, deadline: Date) async -> LyricsResult {
         let primary = await fetchFromLRCLIB(title: title, artist: artist, album: album,
                                             durationSeconds: durationSeconds, deadline: deadline)
         if primary != .notFound {

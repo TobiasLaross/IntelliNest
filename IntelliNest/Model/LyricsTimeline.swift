@@ -9,7 +9,7 @@ import Foundation
 
 /// One timed line of lyrics: the `time` (seconds from the start of the track) at
 /// which `text` should become the current line.
-struct LyricLine: Equatable {
+struct LyricLine: Equatable, Codable {
     let time: TimeInterval
     let text: String
 }
@@ -17,7 +17,7 @@ struct LyricLine: Equatable {
 /// The outcome of a lyrics lookup. `synced` carries timestamped lines that follow
 /// playback; `plain` carries untimed text shown statically (Spotify does the same
 /// for tracks with no synced lyrics); `notFound` means neither source had a match.
-enum LyricsResult: Equatable {
+enum LyricsResult: Equatable, Codable {
     case synced([LyricLine])
     case plain(String)
     case notFound
