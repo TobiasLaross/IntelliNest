@@ -276,6 +276,22 @@ class HeatersViewModelTests: XCTestCase {
                                  "Concurrent guard failed: \(requestCount) requests > \(viewModel.entityIDs.count)")
     }
 
+    // MARK: - PurifierSpeed decoding
+
+    func testPurifierSpeedDecodesPercentage() throws {
+        let data = makeEntityJSON(entityId: EntityId.purifier500FanSpeed.rawValue, state: "on", attributes: ["percentage": 40.0])
+        let decoded = try JSONDecoder().decode(PurifierSpeed.self, from: data)
+        XCTAssertEqual(decoded.entityId, .purifier500FanSpeed)
+        XCTAssertEqual(decoded.percentage, 40.0)
+    }
+
+    func testPurifierSpeedDefaultsPercentageToZeroWhenAbsent() throws {
+        // A fan that is off reports no percentage; the optional attribute must fall back to 0, not throw.
+        let data = makeEntityJSON(entityId: EntityId.purifier500FanSpeed.rawValue, state: "off", attributes: [:])
+        let decoded = try JSONDecoder().decode(PurifierSpeed.self, from: data)
+        XCTAssertEqual(decoded.percentage, 0)
+    }
+
     // MARK: - Helpers
 
     private func stubFanSpeed(_ entityID: EntityId, percentage: Double) {
