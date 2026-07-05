@@ -43,11 +43,27 @@ struct HeatersView: View {
                                  setClimateScheduleTimeClosure: viewModel.setClimateSchedule)
                     .padding(.bottom)
                 Divider()
-                PurifierView(purifier: $viewModel.purifier,
+                PurifierView(title: "Luftrenare",
+                             subtitle: viewModel.purifierSubtitle,
+                             fanEntityId: .purifierFanSpeed,
+                             maxLevel: PurifierFanScale.pure.levelCount,
+                             currentLevel: viewModel.purifier.speed,
                              resetClimateTimeEntity: $viewModel.resetPurifierTime,
                              isTimerModeEnabled: viewModel.purifierTimerMode.isActive,
                              setFanSpeedClosure: viewModel.setPurifierFanSpeed,
                              toggleTimerModeClosure: viewModel.togglePurifierTimerMode,
+                             setClimateScheduleTimeClosure: viewModel.setClimateSchedule)
+                    .padding(.bottom)
+                Divider()
+                PurifierView(title: "Luftrenare 500",
+                             subtitle: viewModel.purifier500Subtitle,
+                             fanEntityId: .purifier500FanSpeed,
+                             maxLevel: PurifierFanScale.pure500.levelCount,
+                             currentLevel: viewModel.purifier500.speed,
+                             resetClimateTimeEntity: $viewModel.resetPurifier500Time,
+                             isTimerModeEnabled: viewModel.purifier500TimerMode.isActive,
+                             setFanSpeedClosure: viewModel.setPurifier500FanSpeed,
+                             toggleTimerModeClosure: viewModel.togglePurifier500TimerMode,
                              setClimateScheduleTimeClosure: viewModel.setClimateSchedule)
                     .padding(.bottom)
             }

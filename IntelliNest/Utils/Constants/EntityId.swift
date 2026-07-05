@@ -119,6 +119,12 @@ enum EntityId: String, Decodable, CaseIterable {
     case purifierTimerMode = "input_boolean.purifier_timer_mode"
     case resetPurifierTime = "input_datetime.reset_purifier_heater_time"
     case purifierSavedSpeed = "input_number.purifier_saved_speed"
+    /* Pure 500 */
+    case purifier500FanSpeed = "fan.wellbeing_pure_500_fanspeed"
+    case purifier500PM25 = "sensor.wellbeing_pure_500_pm2_5_approximate"
+    case purifier500TimerMode = "input_boolean.purifier_500_timer_mode"
+    case resetPurifier500Time = "input_datetime.reset_purifier_500_time"
+    case purifier500SavedSpeed = "input_number.purifier_500_saved_speed"
     /* Heaters */
     case heaterCorridor = "climate.varmepump"
     case heaterPlayroom = "climate.mellanrummet"

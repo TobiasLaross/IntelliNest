@@ -94,61 +94,59 @@ class DoubleExtensionTests: XCTestCase {
         XCTAssertEqual((-1000.0).toKWString, "-1.0kW")
     }
 
-    // MARK: - toFanSpeedPercentage
+    // MARK: - PurifierFanScale (original Pure, 9 speeds)
 
-    func testToFanSpeedPercentageZeroInput() {
-        XCTAssertEqual(0.0.toFanSpeedPercentage, 0.0)
+    func testPureFanScalePercentageForLevel() {
+        let cases: [(level: Double, percentage: Double)] = [
+            (0, 0), (1, 11), (2, 22), (3, 33), (4, 44), (5, 56), (6, 67), (7, 78), (8, 89), (9, 100)
+        ]
+        for testCase in cases {
+            XCTAssertEqual(PurifierFanScale.pure.percentage(forLevel: testCase.level), testCase.percentage,
+                           "Pure level \(testCase.level) should map to \(testCase.percentage)%")
+        }
     }
 
-    func testToFanSpeedPercentageOneInput() {
-        // 1 → 11 (special case)
-        XCTAssertEqual(1.0.toFanSpeedPercentage, 11.0)
+    func testPureFanScaleLevelForPercentage() {
+        // The device reports its own snapped percentages (multiples of 100/9); each maps back to its level.
+        let cases: [(percentage: Double, level: Double)] = [
+            (0, 0), (11, 1), (22, 2), (33, 3), (44, 4), (56, 5), (67, 6), (78, 7), (89, 8), (100, 9)
+        ]
+        for testCase in cases {
+            XCTAssertEqual(PurifierFanScale.pure.level(forPercentage: testCase.percentage), testCase.level,
+                           "Pure \(testCase.percentage)% should map to level \(testCase.level)")
+        }
     }
 
-    func testToFanSpeedPercentageTwoInput() {
-        // 2 → (2+2)*10 = 40
-        XCTAssertEqual(2.0.toFanSpeedPercentage, 40.0)
+    func testPureFanScaleRoundTripIsStable() {
+        for level in stride(from: 0.0, through: 9.0, by: 1) {
+            let percentage = PurifierFanScale.pure.percentage(forLevel: level)
+            XCTAssertEqual(PurifierFanScale.pure.level(forPercentage: percentage), level,
+                           "Pure round-trip broke for level \(level) (percentage \(percentage))")
+        }
     }
 
-    func testToFanSpeedPercentageThreeInput() {
-        // 3 → (3+2)*10 = 50
-        XCTAssertEqual(3.0.toFanSpeedPercentage, 50.0)
+    // MARK: - PurifierFanScale (Pure 500, 3 speeds)
+
+    func testPure500FanScalePercentageForLevel() {
+        let cases: [(level: Double, percentage: Double)] = [(0, 0), (1, 20), (2, 40), (3, 60)]
+        for testCase in cases {
+            XCTAssertEqual(PurifierFanScale.pure500.percentage(forLevel: testCase.level), testCase.percentage,
+                           "Pure 500 level \(testCase.level) should map to \(testCase.percentage)%")
+        }
     }
 
-    func testToFanSpeedPercentageEightInput() {
-        // 8 → (8+2)*10 = 100
-        XCTAssertEqual(8.0.toFanSpeedPercentage, 100.0)
+    func testPure500FanScaleClampsAboveMax() {
+        // The device only accepts Fanspeed 1-3, so the app never emits 80/100 % (which the API rejects with 406).
+        XCTAssertEqual(PurifierFanScale.pure500.percentage(forLevel: 4), 60)
+        XCTAssertEqual(PurifierFanScale.pure500.level(forPercentage: 80), 3)
+        XCTAssertEqual(PurifierFanScale.pure500.level(forPercentage: 100), 3)
     }
 
-    // MARK: - toFanSpeedTargetNumber
-
-    func testToFanSpeedTargetNumberKnownValues() {
-        XCTAssertEqual(11.0.toFanSpeedTargetNumber, 1.0)
-        XCTAssertEqual(33.0.toFanSpeedTargetNumber, 2.0)
-        XCTAssertEqual(44.0.toFanSpeedTargetNumber, 3.0)
-        XCTAssertEqual(55.0.toFanSpeedTargetNumber, 4.0)
-        XCTAssertEqual(66.0.toFanSpeedTargetNumber, 5.0)
-        XCTAssertEqual(77.0.toFanSpeedTargetNumber, 6.0)
-        XCTAssertEqual(88.0.toFanSpeedTargetNumber, 7.0)
-        XCTAssertEqual(100.0.toFanSpeedTargetNumber, 8.0)
-    }
-
-    func testToFanSpeedTargetNumberUnknownValueReturnsZero() {
-        XCTAssertEqual(0.0.toFanSpeedTargetNumber, 0.0)
-        XCTAssertEqual(50.0.toFanSpeedTargetNumber, 0.0)
-        XCTAssertEqual(99.0.toFanSpeedTargetNumber, 0.0)
-    }
-
-    // MARK: - toFanSpeedPercentage / toFanSpeedTargetNumber round-trip
-
-    // Verifies that converting a target number to percentage and back yields the original
-    func testFanSpeedRoundTripForKnownValues() {
-        // Target 1 → percentage 11 → target 1
-        XCTAssertEqual(1.0.toFanSpeedPercentage.toFanSpeedTargetNumber, 1.0)
-        // Target 2 → percentage 40 — note: 40 is not in the toFanSpeedTargetNumber switch,
-        // so this intentionally returns 0, revealing a gap in the mapping.
-        // This test documents the current (potentially incorrect) behavior:
-        XCTAssertEqual(2.0.toFanSpeedPercentage.toFanSpeedTargetNumber, 0.0,
-                       "toFanSpeedPercentage(2) = 40, but toFanSpeedTargetNumber has no case for 40 — round-trip is broken for speed 2")
+    func testPure500FanScaleRoundTripIsStable() {
+        for level in stride(from: 0.0, through: 3.0, by: 1) {
+            let percentage = PurifierFanScale.pure500.percentage(forLevel: level)
+            XCTAssertEqual(PurifierFanScale.pure500.level(forPercentage: percentage), level,
+                           "Pure 500 round-trip broke for level \(level) (percentage \(percentage))")
+        }
     }
 }

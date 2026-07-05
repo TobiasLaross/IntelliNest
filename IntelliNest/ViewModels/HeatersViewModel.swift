@@ -12,10 +12,12 @@ class HeatersViewModel: ObservableObject, Reloadable {
     @Published var heaterCorridor = HeaterEntity(entityId: .heaterCorridor)
     @Published var heaterPlayroom = HeaterEntity(entityId: .heaterPlayroom)
     @Published var purifier = PurifierEntity()
+    @Published var purifier500 = PurifierEntity()
     @Published var thermCorridor = Entity(entityId: .thermCorridor)
     @Published var resetCorridorHeaterTime = Entity(entityId: .resetCorridorHeaterTime)
     @Published var resetPlayroomHeaterTime = Entity(entityId: .resetPlayroomHeaterTime)
     @Published var resetPurifierTime = Entity(entityId: .resetPurifierTime)
+    @Published var resetPurifier500Time = Entity(entityId: .resetPurifier500Time)
     @Published var thermBedroom = Entity(entityId: .thermBedroom)
     @Published var thermGym = Entity(entityId: .thermGym)
     @Published var thermVince = Entity(entityId: .thermVince)
@@ -26,10 +28,20 @@ class HeatersViewModel: ObservableObject, Reloadable {
     @Published var heaterCorridorTimerMode = Entity(entityId: .heaterCorridorTimerMode)
     @Published var heaterPlayroomTimerMode = Entity(entityId: .heaterPlayroomTimerMode)
     @Published var purifierTimerMode = Entity(entityId: .purifierTimerMode)
+    @Published var purifier500TimerMode = Entity(entityId: .purifier500TimerMode)
 
     let entityIDs: [EntityId] = [.resetCorridorHeaterTime, .resetPlayroomHeaterTime, .heaterCorridorTimerMode, .heaterPlayroomTimerMode,
                                  .purifierTimerMode, .purifierFanSpeed, .purifierHumidity, .purifierTemperature, .purifierMode,
-                                 .resetPurifierTime]
+                                 .resetPurifierTime, .purifier500TimerMode, .purifier500FanSpeed, .purifier500PM25,
+                                 .resetPurifier500Time]
+
+    var purifierSubtitle: String {
+        "\(purifier.temperature)℃ - \(purifier.humidity)%"
+    }
+
+    var purifier500Subtitle: String {
+        "PM2.5 \(purifier500.pm25) µg/m³"
+    }
 
     var isReloading = false
 
@@ -54,7 +66,16 @@ class HeatersViewModel: ObservableObject, Reloadable {
                               domain: .fan,
                               action: .setPercentage,
                               dataKey: .percentage,
-                              dataValue: speed.toFanSpeedPercentage,
+                              dataValue: PurifierFanScale.pure.percentage(forLevel: speed),
+                              reloadTimes: 5)
+    }
+
+    func setPurifier500FanSpeed(_ speed: Double) {
+        restAPIService.update(entityID: .purifier500FanSpeed,
+                              domain: .fan,
+                              action: .setPercentage,
+                              dataKey: .percentage,
+                              dataValue: PurifierFanScale.pure500.percentage(forLevel: speed),
                               reloadTimes: 5)
     }
 
@@ -121,7 +142,17 @@ class HeatersViewModel: ObservableObject, Reloadable {
         toggleHeaterTimerMode(heaterEntityID: .purifierFanSpeed,
                               heaterTimerModeEntityID: purifierTimerMode.entityId,
                               dateEntity: resetPurifierTime,
-                              action: action)
+                              action: action,
+                              savedSpeed: (.purifierSavedSpeed, PurifierFanScale.pure.percentage(forLevel: purifier.speed)))
+    }
+
+    func togglePurifier500TimerMode() {
+        let action: Action = purifier500TimerMode.isActive ? .turnOff : .turnOn
+        toggleHeaterTimerMode(heaterEntityID: .purifier500FanSpeed,
+                              heaterTimerModeEntityID: purifier500TimerMode.entityId,
+                              dateEntity: resetPurifier500Time,
+                              action: action,
+                              savedSpeed: (.purifier500SavedSpeed, PurifierFanScale.pure500.percentage(forLevel: purifier500.speed)))
     }
 
     private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<HeatersViewModel, Entity>] = [
@@ -130,14 +161,20 @@ class HeatersViewModel: ObservableObject, Reloadable {
         .heaterCorridorTimerMode: \.heaterCorridorTimerMode,
         .heaterPlayroomTimerMode: \.heaterPlayroomTimerMode,
         .resetPurifierTime: \.resetPurifierTime,
-        .purifierTimerMode: \.purifierTimerMode
+        .purifierTimerMode: \.purifierTimerMode,
+        .resetPurifier500Time: \.resetPurifier500Time,
+        .purifier500TimerMode: \.purifier500TimerMode
     ]
 
     private lazy var purifierReloaders: [EntityId: (String) -> Void] = [
         .purifierMode: { [unowned self] state in purifier.fanMode = PurifierFanMode(rawValue: state) ?? .off },
-        .purifierFanSpeed: { [unowned self] state in purifier.speed = Double(state)?.toFanSpeedTargetNumber ?? 0 },
+        .purifierFanSpeed: { [unowned self] state in purifier.speed = PurifierFanScale.pure.level(forPercentage: Double(state) ?? 0) },
         .purifierTemperature: { [unowned self] state in purifier.temperature = Double(state) ?? 0 },
-        .purifierHumidity: { [unowned self] state in purifier.humidity = Int(state) ?? 0 }
+        .purifierHumidity: { [unowned self] state in purifier.humidity = Int(state) ?? 0 },
+        .purifier500FanSpeed: { [unowned self] state in
+            purifier500.speed = PurifierFanScale.pure500.level(forPercentage: Double(state) ?? 0)
+        },
+        .purifier500PM25: { [unowned self] state in purifier500.pm25 = Int(Double(state) ?? 0) }
     ]
 
     func reload(entityID: EntityId, state: String) {
@@ -162,7 +199,14 @@ class HeatersViewModel: ObservableObject, Reloadable {
 }
 
 private extension HeatersViewModel {
-    func toggleHeaterTimerMode(heaterEntityID: EntityId, heaterTimerModeEntityID: EntityId, dateEntity: Entity, action: Action) {
+    /// Toggles a timer-mode helper. On enable it schedules the reset time 15 minutes out and snapshots the
+    /// current speed/state so a Home Assistant automation can restore it: purifiers save their fan percentage
+    /// into `savedSpeed`, heaters snapshot via the `saveClimateState` script.
+    func toggleHeaterTimerMode(heaterEntityID: EntityId,
+                               heaterTimerModeEntityID: EntityId,
+                               dateEntity: Entity,
+                               action: Action,
+                               savedSpeed: (entityID: EntityId, percentage: Double)? = nil) {
         var dateEntity = dateEntity
         restAPIService.update(entityID: heaterTimerModeEntityID, domain: .inputBoolean, action: action)
 
@@ -172,12 +216,12 @@ private extension HeatersViewModel {
             if let newDate = calendar.date(byAdding: .minute, value: 15, to: now) {
                 dateEntity.date = newDate
                 setClimateSchedule(dateEntity: dateEntity)
-                if heaterEntityID == .purifierFanSpeed {
-                    restAPIService.update(entityID: .purifierSavedSpeed,
+                if let savedSpeed {
+                    restAPIService.update(entityID: savedSpeed.entityID,
                                           domain: .inputNumber,
                                           action: .setValue,
                                           dataKey: .value,
-                                          dataValue: purifier.speed.toFanSpeedPercentage)
+                                          dataValue: savedSpeed.percentage)
                 } else {
                     restAPIService.callScript(scriptID: .saveClimateState, variables: [.entityID: heaterEntityID.rawValue])
                 }

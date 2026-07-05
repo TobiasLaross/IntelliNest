@@ -5,7 +5,8 @@ struct PurifierSpeed: Decodable, EntityProtocol {
     var state = ""
     var nextUpdate = Date.now
     var isActive = false
-    var speed: Double
+    /// Raw Home Assistant fan percentage; the caller converts it to a level with the matching `PurifierFanScale`.
+    var percentage: Double
 
     enum CodingKeys: String, CodingKey {
         case entityId = "entity_id"
@@ -20,10 +21,10 @@ struct PurifierSpeed: Decodable, EntityProtocol {
         state = try container.decode(String.self, forKey: .state)
 
         let attributes = try container.decode(PurifierSpeedAttributes.self, forKey: .attributes)
-        speed = attributes.percentage.toFanSpeedTargetNumber
+        percentage = attributes.percentage ?? 0
     }
 }
 
 struct PurifierSpeedAttributes: Decodable {
-    let percentage: Double
+    let percentage: Double?
 }
