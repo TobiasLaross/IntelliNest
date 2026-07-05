@@ -4,7 +4,11 @@ struct PurifierView: View {
     @State private var targetNumber: Double
     @Binding private var resetClimateTimeDate: Date
 
-    @Binding var purifier: PurifierEntity
+    let title: String
+    let subtitle: String
+    let fanEntityId: EntityId
+    let maxLevel: Int
+    let currentLevel: Double
     @Binding var resetClimateTimeEntity: Entity
     var isTimerModeEnabled: Bool
     let setFanSpeedClosure: DoubleClosure
@@ -20,19 +24,19 @@ struct PurifierView: View {
                     .padding(.horizontal, 4)
             }
             VStack {
-                INText("Luftrenare", font: .title)
-                INText("\(purifier.temperature)℃ - \(purifier.humidity)%", font: .subheadline)
+                INText(title, font: .title)
+                INText(subtitle, font: .subheadline)
 
                 ZStack(alignment: .center) {
                     VStack {
-                        NumberPickerScrollView(entityId: .purifierFanSpeed,
+                        NumberPickerScrollView(entityId: fanEntityId,
                                                targetNumber: $targetNumber,
                                                numberSelectedCallback: { _, targetNumber in
                                                    self.targetNumber = targetNumber
                                                    setFanSpeedClosure(targetNumber)
                                                },
                                                strideFrom: 0,
-                                               strideTo: 9,
+                                               strideTo: CGFloat(maxLevel + 1),
                                                strideStep: 1)
                             .padding(.vertical)
                     }
@@ -65,23 +69,34 @@ struct PurifierView: View {
             }
         }
         .onAppear {
-            targetNumber = purifier.speed
+            targetNumber = currentLevel
+        }
+        .onChange(of: currentLevel) {
+            targetNumber = currentLevel
         }
     }
 
-    init(purifier: Binding<PurifierEntity>,
+    init(title: String,
+         subtitle: String,
+         fanEntityId: EntityId,
+         maxLevel: Int,
+         currentLevel: Double,
          resetClimateTimeEntity: Binding<Entity>,
          isTimerModeEnabled: Bool,
          setFanSpeedClosure: @escaping DoubleClosure,
          toggleTimerModeClosure: @escaping VoidClosure,
          setClimateScheduleTimeClosure: @escaping MainActorEntityClosure) {
-        _purifier = purifier
+        self.title = title
+        self.subtitle = subtitle
+        self.fanEntityId = fanEntityId
+        self.maxLevel = maxLevel
+        self.currentLevel = currentLevel
         _resetClimateTimeEntity = resetClimateTimeEntity
         _resetClimateTimeDate = resetClimateTimeEntity.date
         self.isTimerModeEnabled = isTimerModeEnabled
         self.setFanSpeedClosure = setFanSpeedClosure
         self.toggleTimerModeClosure = toggleTimerModeClosure
         self.setClimateScheduleTimeClosure = setClimateScheduleTimeClosure
-        targetNumber = 0
+        targetNumber = currentLevel
     }
 }

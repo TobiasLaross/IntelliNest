@@ -37,7 +37,10 @@ extension HeatersViewModel {
                 do {
                     if entityID == .purifierFanSpeed {
                         let purifierSpeed = try await self.restAPIService.reload(entityId: entityID, entityType: PurifierSpeed.self)
-                        self.purifier.speed = purifierSpeed.speed
+                        self.purifier.speed = PurifierFanScale.pure.level(forPercentage: purifierSpeed.percentage)
+                    } else if entityID == .purifier500FanSpeed {
+                        let purifierSpeed = try await self.restAPIService.reload(entityId: entityID, entityType: PurifierSpeed.self)
+                        self.purifier500.speed = PurifierFanScale.pure500.level(forPercentage: purifierSpeed.percentage)
                     } else {
                         let entity = try await self.restAPIService.reloadState(entityID: entityID)
                         self.reload(entityID: entityID, state: entity.state)
