@@ -71,9 +71,6 @@ struct PurifierView: View {
         .onAppear {
             targetNumber = currentLevel
         }
-        .onChange(of: currentLevel) {
-            targetNumber = currentLevel
-        }
     }
 
     init(title: String,
