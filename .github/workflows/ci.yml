@@ -12,9 +12,10 @@ env:
 jobs:
   build-and-test:
     name: Build and Test
-    # Runs on the self-hosted macOS fleet, like the other iOS repos, instead of
-    # GitHub-hosted macos-latest (10x-billed, per-job minute rounding).
-    runs-on: [self-hosted, macOS, arm64]
+    # GitHub-hosted, not the self-hosted fleet: this repo is public, so hosted
+    # minutes are free (no quota to protect), and it has no self-hosted runner
+    # registered — running here also keeps untrusted fork-PR code off our Macs.
+    runs-on: macos-latest
     timeout-minutes: 30
     permissions:
       contents: write
