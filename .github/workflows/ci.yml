@@ -12,7 +12,9 @@ env:
 jobs:
   build-and-test:
     name: Build and Test
-    runs-on: macos-latest
+    # Runs on the self-hosted macOS fleet, like the other iOS repos, instead of
+    # GitHub-hosted macos-latest (10x-billed, per-job minute rounding).
+    runs-on: [self-hosted, macOS, arm64]
     timeout-minutes: 30
     permissions:
       contents: write
