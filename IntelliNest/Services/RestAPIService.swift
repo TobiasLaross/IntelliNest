@@ -329,12 +329,13 @@ extension RestAPIService {
         }
     }
 
-    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double, reloadTimes: Int = 1) {
+    func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double,
+                reloadTimes: Int = 1, fireAndForget: Bool = false) {
         Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
-            await sendPostRequest(json: json, domain: domain, action: action)
+            await sendPostRequest(json: json, domain: domain, action: action, fireAndForget: fireAndForget)
             repeatReloadAction(reloadTimes)
         }
     }

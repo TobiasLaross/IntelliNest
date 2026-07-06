@@ -13,6 +13,10 @@ struct NumberTextView: View {
     @Binding var selectedNewTarget: Bool
     var index: Double
     let numberPickerFormat: NumberFormatter
+    /// The value the backend confirms is actually set. When it matches this tile, a dot marks it so the user
+    /// can see the real state catch up to their selection (used by the slow-to-apply purifier fans).
+    var confirmedNumber: Double?
+
     var body: some View {
         Text("\(index as NSNumber, formatter: numberPickerFormat)")
             .id(index)
@@ -23,6 +27,14 @@ struct NumberTextView: View {
                 targetTemperature = index
             })
             .foregroundColor(targetTemperature == index ? .white : .white.opacity(0.667))
+            .overlay(alignment: .bottom) {
+                if confirmedNumber == index {
+                    Circle()
+                        .fill(Color.lightBlue)
+                        .frame(width: 6, height: 6)
+                        .offset(y: 7)
+                }
+            }
     }
 }
 

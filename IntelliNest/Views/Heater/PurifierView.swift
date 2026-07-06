@@ -37,7 +37,8 @@ struct PurifierView: View {
                                                },
                                                strideFrom: 0,
                                                strideTo: CGFloat(maxLevel + 1),
-                                               strideStep: 1)
+                                               strideStep: 1,
+                                               confirmedNumber: currentLevel)
                             .padding(.vertical)
                     }
 

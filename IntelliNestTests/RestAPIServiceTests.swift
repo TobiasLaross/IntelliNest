@@ -161,6 +161,43 @@ class RestAPIServiceTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(errorBannerCallCount, 1, "Error banner should be shown when both POST URLs fail")
     }
 
+    func testSendPostRequest_fireAndForget_doesNotSetErrorBannerOnFailure() async {
+        // No stubs — the POST fails; fire-and-forget must swallow it instead of alarming the user.
+        var errorBannerCallCount = 0
+        let localService = RestAPIService(
+            urlCreator: urlCreator,
+            session: URLProtocolStub.createStubbedURLSession(),
+            setErrorBannerText: { _, _ in errorBannerCallCount += 1 },
+            repeatReloadAction: { _ in }
+        )
+
+        await localService.sendPostRequest(json: [.entityID: EntityId.purifier500FanSpeed.rawValue],
+                                           domain: .fan, action: .setPercentage, fireAndForget: true)
+
+        XCTAssertEqual(errorBannerCallCount, 0, "fire-and-forget must not raise the error banner")
+    }
+
+    func testSendPostRequest_fireAndForget_doesNotRetryExternalURL() async {
+        // Internal returns 500; fire-and-forget must send exactly one POST (no external re-fire).
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/fan/set_percentage"
+        let url = components.url!
+        let response = HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: nil, response: response, error: nil)
+
+        let lock = NSLock()
+        var postCount = 0
+        URLProtocolStub.observerRequests { request in
+            guard request.httpMethod == "POST" else { return }
+            lock.lock(); postCount += 1; lock.unlock()
+        }
+
+        await restAPIService.sendPostRequest(json: [.entityID: EntityId.purifier500FanSpeed.rawValue],
+                                             domain: .fan, action: .setPercentage, fireAndForget: true)
+
+        XCTAssertEqual(postCount, 1, "fire-and-forget must send exactly one POST (no external retry)")
+    }
+
     // MARK: - sendRequest tests
 
     func testSendRequest_nonHTTPResponse_returnsBadResponse() async {

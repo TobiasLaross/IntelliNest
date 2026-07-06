@@ -16,6 +16,7 @@ struct NumberPickerScrollView: View {
     let strideFrom: CGFloat
     let strideTo: CGFloat
     let strideStep: CGFloat
+    var confirmedNumber: Double?
 
     static let numberFormat: NumberFormatter = {
         let numberFormatter = NumberFormatter()
@@ -37,7 +38,8 @@ struct NumberPickerScrollView: View {
                                            targetTemperature: $targetNumber,
                                            selectedNewTarget: $selectedNewNumber,
                                            index: index,
-                                           numberPickerFormat: NumberPickerScrollView.numberFormat)
+                                           numberPickerFormat: NumberPickerScrollView.numberFormat,
+                                           confirmedNumber: confirmedNumber)
                             Rectangle()
                                 .padding([.top, .bottom], 14)
                                 .frame(width: 2)
@@ -70,7 +72,8 @@ struct NumberPickerScrollView: View {
          selectedNewNumber: Bool = false,
          strideFrom: CGFloat = 16,
          strideTo: CGFloat = 29,
-         strideStep: CGFloat = 0.5) {
+         strideStep: CGFloat = 0.5,
+         confirmedNumber: Double? = nil) {
         self.entityId = entityId
         _targetNumber = targetNumber
         self.numberSelectedCallback = numberSelectedCallback
@@ -79,6 +82,7 @@ struct NumberPickerScrollView: View {
         self.strideFrom = strideFrom
         self.strideTo = strideTo
         self.strideStep = strideStep
+        self.confirmedNumber = confirmedNumber
     }
 }
 

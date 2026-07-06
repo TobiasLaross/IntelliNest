@@ -67,7 +67,8 @@ class HeatersViewModel: ObservableObject, Reloadable {
                               action: .setPercentage,
                               dataKey: .percentage,
                               dataValue: PurifierFanScale.pure.percentage(forLevel: speed),
-                              reloadTimes: 5)
+                              reloadTimes: 5,
+                              fireAndForget: true)
     }
 
     func setPurifier500FanSpeed(_ speed: Double) {
@@ -76,7 +77,8 @@ class HeatersViewModel: ObservableObject, Reloadable {
                               action: .setPercentage,
                               dataKey: .percentage,
                               dataValue: PurifierFanScale.pure500.percentage(forLevel: speed),
-                              reloadTimes: 5)
+                              reloadTimes: 5,
+                              fireAndForget: true)
     }
 
     func setHvacMode(heater: HeaterEntity, hvacMode: HvacMode) {
