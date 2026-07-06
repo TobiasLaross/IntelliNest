@@ -1,18 +1,25 @@
 import Foundation
 
 extension RestAPIService {
-    func sendPostRequest(customPath: String? = nil, json: [JSONKey: Any]?, domain: Domain, action: Action) async {
+    /// Sends a service-call POST.
+    ///
+    /// - Parameter fireAndForget: when `true`, the request is sent once with no external-URL failover and any
+    ///   failure is logged instead of raising the error banner. Use it for eventually-consistent commands whose
+    ///   true state the reload loop reflects anyway — e.g. the Wellbeing purifier fans, whose integration holds the
+    ///   HTTP response ~20 s (a `sleep` + cloud re-poll) even though the command itself lands in the first second.
+    ///   Waiting on and retrying that long-held connection is what surfaced 500 / -1005 errors and double-fired the
+    ///   command.
+    func sendPostRequest(customPath: String? = nil,
+                         json: [JSONKey: Any]?,
+                         domain: Domain,
+                         action: Action,
+                         fireAndForget: Bool = false) async {
         let path: String = if let customPath {
             customPath
         } else {
             "/api/services/\(domain.rawValue)/\(action.rawValue)"
         }
-        let errorBannerTitle = "Misslyckades med att skicka request"
-        let errorBannerMessageEnd = "(\(domain.rawValue), \(action.rawValue))"
-        var jsonData: Data?
-        if let json {
-            jsonData = createJSONData(json: json)
-        }
+        let jsonData: Data? = json.flatMap { createJSONData(json: $0) }
 
         guard let request = createURLRequest(path: path,
                                              jsonData: jsonData,
@@ -21,30 +28,53 @@ extension RestAPIService {
             return
         }
 
-        var (statusCodeExternal, externalData): (Int, Data?) = (-1, nil)
         let (statusCode, data) = await sendRequest(request)
-        let url = request.url?.absoluteString ?? ""
-        if statusCode != statusCodeOK {
-            if !url.contains(GlobalConstants.baseExternalUrlString) {
-                guard let request = createURLRequest(shouldForceExternalURL: true, path: path, jsonData: jsonData, method: .post) else {
-                    logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
-                    setErrorBannerText("Misslyckades med att skapa external http request", "POST: \(path). \(statusCode.errorDescription)")
-                    return
-                }
+        if statusCode == statusCodeOK {
+            if let data {
+                handleSuccessfulResponse(domain: domain, action: action, data: data)
+            }
+            return
+        }
 
-                (statusCodeExternal, externalData) = await sendRequest(request)
-                if statusCodeExternal != statusCodeOK {
-                    setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
-                } else if let externalData {
-                    handleSuccessfulResponse(domain: domain, action: action, data: externalData)
-                }
+        if fireAndForget {
+            Log.error("Fire-and-forget POST failed (\(domain.rawValue), \(action.rawValue)): \(statusCode.errorDescription)")
+            return
+        }
+
+        let context = PostRetryContext(path: path,
+                                       jsonData: jsonData,
+                                       domain: domain,
+                                       action: action,
+                                       primaryURL: request.url?.absoluteString ?? "",
+                                       primaryStatusCode: statusCode)
+        await retryOnExternalURL(context: context)
+    }
+
+    /// Failover path when the primary POST failed: retry on the external URL, otherwise surface the error banner.
+    private func retryOnExternalURL(context: PostRetryContext) async {
+        let errorBannerTitle = "Misslyckades med att skicka request"
+        let errorBannerMessageEnd = "(\(context.domain.rawValue), \(context.action.rawValue))"
+
+        guard !context.primaryURL.contains(GlobalConstants.baseExternalUrlString) else {
+            setErrorBannerText(errorBannerTitle, "\(context.primaryStatusCode.errorDescription) \(errorBannerMessageEnd)")
+            return
+        }
+        guard let request = createURLRequest(shouldForceExternalURL: true, path: context.path,
+                                             jsonData: context.jsonData, method: .post) else {
+            logCreateRequestFailed(path: context.path, domain: context.domain, action: context.action,
+                                   json: nil, jsonData: context.jsonData)
+            setErrorBannerText("Misslyckades med att skapa external http request",
+                               "POST: \(context.path). \(context.primaryStatusCode.errorDescription)")
+            return
+        }
+
+        let (statusCodeExternal, externalData) = await sendRequest(request)
+        if statusCodeExternal == statusCodeOK {
+            if let externalData {
+                handleSuccessfulResponse(domain: context.domain, action: context.action, data: externalData)
             }
-            if statusCode != statusCodeOK, statusCodeExternal != statusCodeOK {
-                let errorCode = statusCode != statusCodeOK ? statusCode : statusCodeExternal
-                setErrorBannerText(errorBannerTitle, "\(errorCode.errorDescription) \(errorBannerMessageEnd)")
-            }
-        } else if let data {
-            handleSuccessfulResponse(domain: domain, action: action, data: data)
+        } else {
+            setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
         }
     }
 
@@ -73,6 +103,15 @@ extension RestAPIService {
             }
         }
     }
+}
+
+private struct PostRetryContext {
+    let path: String
+    let jsonData: Data?
+    let domain: Domain
+    let action: Action
+    let primaryURL: String
+    let primaryStatusCode: Int
 }
 
 private extension Int {
