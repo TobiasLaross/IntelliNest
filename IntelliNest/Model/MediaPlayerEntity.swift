@@ -259,7 +259,8 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
             lhs.repeatMode == rhs.repeatMode &&
             lhs.mediaPosition == rhs.mediaPosition &&
             lhs.mediaDuration == rhs.mediaDuration &&
-            lhs.mediaPositionUpdatedAt == rhs.mediaPositionUpdatedAt
+            lhs.mediaPositionUpdatedAt == rhs.mediaPositionUpdatedAt &&
+            lhs.activeQueueID == rhs.activeQueueID
     }
 }
 

@@ -8,6 +8,9 @@ class MusicViewModelTests: XCTestCase {
     var urlCreator: URLCreator!
     var bannerTitles: [String] = []
     var bannerMessages: [String] = []
+    /// Runs when the view model pauses between confirmation reloads, so a test can
+    /// change the world mid-flight (re-stub speakers, select another speaker).
+    var onGroupRecheckWait: (() -> Void)?
     /// In-memory backing for the last-used-speaker persistence so tests stay
     /// deterministic instead of touching shared `UserDefaults`.
     var storedLastSpeaker: EntityId?
@@ -20,6 +23,7 @@ class MusicViewModelTests: XCTestCase {
     override func setUp() async throws {
         bannerTitles = []
         bannerMessages = []
+        onGroupRecheckWait = nil
         storedLastSpeaker = nil
         URLProtocolStub.startInterceptingRequests()
         let stubbedSession = URLProtocolStub.createStubbedURLSession()
@@ -38,7 +42,7 @@ class MusicViewModelTests: XCTestCase {
                                    },
                                    loadLastSpeaker: { [weak self] in self?.storedLastSpeaker },
                                    saveLastSpeaker: { [weak self] in self?.storedLastSpeaker = $0 },
-                                   waitBeforeGroupRecheck: {})
+                                   waitBeforeGroupRecheck: { [weak self] in self?.onGroupRecheckWait?() })
     }
 
     override func tearDown() async throws {

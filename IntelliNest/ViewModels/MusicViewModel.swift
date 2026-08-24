@@ -191,7 +191,7 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Pauses between the reloads that confirm a group change landed. Home Assistant
     /// applies the membership a beat after the service call returns, so it has to be
     /// re-read rather than trusted once. Injected so tests confirm without wall time.
-    let waitBeforeGroupRecheck: @Sendable () async -> Void
+    let waitBeforeGroupRecheck: @MainActor () async -> Void
 
     /// Reads/writes the last speaker the user controlled, so it can be
     /// pre-selected when the music view next opens. Injected as closures so tests
@@ -234,7 +234,7 @@ class MusicViewModel: ObservableObject, Reloadable {
          saveLastSpeaker: @escaping @MainActor (EntityId) -> Void = {
              UserDefaults.shared.set($0.rawValue, forKey: StorageKeys.lastMusicSpeaker.rawValue)
          },
-         waitBeforeGroupRecheck: @escaping @Sendable () async -> Void = {
+         waitBeforeGroupRecheck: @escaping @MainActor () async -> Void = {
              try? await Task.sleep(for: .seconds(1))
          }) {
         self.restAPIService = restAPIService

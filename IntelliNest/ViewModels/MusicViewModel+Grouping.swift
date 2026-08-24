@@ -76,7 +76,7 @@ extension MusicViewModel {
         defer { pendingGroupingSpeakers.remove(speakerID) }
         if wasGrouped {
             let success = await restAPIService.unjoinSpeaker(memberID: speakerID)
-            if success, await confirmGroupChange(speakerID, shouldBeGrouped: false) {
+            if success, await confirmGroupChange(speakerID, with: activeSpeakerID, shouldBeGrouped: false) {
                 return
             }
             setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
@@ -90,12 +90,12 @@ extension MusicViewModel {
             let success = await restAPIService.joinSpeakers(leaderID: activeSpeakerID,
                                                             memberIDs: [speakerID],
                                                             unjoinFirst: isInOtherGroup)
-            if success, await confirmGroupChange(speakerID, shouldBeGrouped: true) {
+            if success, await confirmGroupChange(speakerID, with: activeSpeakerID, shouldBeGrouped: true) {
                 return
             }
             // A leader playing a source Music Assistant doesn't own is the usual
             // reason a join lands nowhere, and it's the one the user can act on.
-            if activeSpeaker?.isPlayingExternalSource == true {
+            if speakers[activeSpeakerID]?.isPlayingExternalSource == true {
                 let leaderName = speakers[activeSpeakerID]?.friendlyName ?? activeSpeakerID.rawValue
                 setErrorBannerText("Kunde inte gruppera högtalare",
                                    "\(leaderName) spelar från en annan app. Starta musiken härifrån för att spela på flera högtalare")
@@ -105,14 +105,21 @@ extension MusicViewModel {
         }
     }
 
-    /// Reloads the speakers until `speakerID`'s membership matches what the group
-    /// change asked for, and reports whether it ever did. Home Assistant returns 200
-    /// from `join`/`unjoin` before the membership is live, so a single reload can't
-    /// tell "not applied yet" from a group Music Assistant quietly refused to build.
-    private func confirmGroupChange(_ speakerID: EntityId, shouldBeGrouped: Bool, attempts: Int = 3) async -> Bool {
+    /// Reloads the speakers until `speakerID`'s membership in `leaderID`'s group
+    /// matches what the change asked for, and reports whether it ever did. Home
+    /// Assistant returns 200 from `join`/`unjoin` before the membership is live, so a
+    /// single reload can't tell "not applied yet" from a group Music Assistant quietly
+    /// refused to build. Membership is read against the leader the request was sent to
+    /// rather than `isGrouped`, since the user can select a different speaker while
+    /// these reloads are in flight.
+    private func confirmGroupChange(_ speakerID: EntityId,
+                                    with leaderID: EntityId,
+                                    shouldBeGrouped: Bool,
+                                    attempts: Int = 3) async -> Bool {
         for attempt in 1 ... attempts {
             await reloadSpeakers()
-            if isGrouped(speakerID) == shouldBeGrouped {
+            let isMember = speakers[leaderID]?.groupMembers.contains(speakerID) == true
+            if isMember == shouldBeGrouped {
                 return true
             }
             if attempt < attempts {

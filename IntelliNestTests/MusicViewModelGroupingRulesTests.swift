@@ -13,6 +13,7 @@ extension MusicViewModelTests {
                     data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing",
                                       friendlyName: "Köket", activeQueue: "RINCON_38420B10EC2801400"))
         await viewModel.reload()
+        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerSpa))
         stubPostService(path: "/api/services/media_player/join")
         await viewModel.toggleGroupMember(.mediaPlayerSpa)
         XCTAssertFalse(viewModel.isGrouped(.mediaPlayerSpa))
@@ -31,6 +32,7 @@ extension MusicViewModelTests {
                                       friendlyName: "Köket", title: "Kite", artist: "Benjamin Ingrosso"))
         await viewModel.reload()
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerSpa))
 
         stubPostService(path: "/api/services/media_player/join")
         await viewModel.toggleGroupMember(.mediaPlayerSpa)
@@ -38,5 +40,41 @@ extension MusicViewModelTests {
         XCTAssertTrue(bannerTitles.contains("Kunde inte gruppera högtalare"))
         XCTAssertEqual(bannerMessages.last,
                        "Köket spelar från en annan app. Starta musiken härifrån för att spela på flera högtalare")
+    }
+
+    func testJoinConfirmedAgainstTheLeaderItWasSentTo() async {
+        // Home Assistant applies the group a beat late, and the user picks another
+        // speaker while the confirmation reloads are still running. The join still
+        // has to be judged against Köket, the leader it was sent to — not against
+        // whatever is selected by the time the reloads finish.
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        stubSpeaker(.mediaPlayerKitchen,
+                    data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing",
+                                      friendlyName: "Köket", activeQueue: "RINCON_38420B10EC2801400"))
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+        XCTAssertFalse(viewModel.isGrouped(.mediaPlayerSpa))
+
+        stubPostService(path: "/api/services/media_player/join")
+        let group = [EntityId.mediaPlayerKitchen.rawValue, EntityId.mediaPlayerSpa.rawValue]
+        onGroupRecheckWait = { [weak self] in
+            guard let self else {
+                return
+            }
+            stubSpeaker(.mediaPlayerKitchen,
+                        data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing",
+                                          friendlyName: "Köket", groupMembers: group,
+                                          activeQueue: "RINCON_38420B10EC2801400"))
+            stubSpeaker(.mediaPlayerSpa,
+                        data: speakerJSON(entityID: .mediaPlayerSpa, state: "playing",
+                                          friendlyName: "Spa", groupMembers: group))
+            viewModel.selectSpeaker(.mediaPlayerLivingRoom)
+        }
+
+        await viewModel.toggleGroupMember(.mediaPlayerSpa)
+
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.groupMembers,
+                       [.mediaPlayerKitchen, .mediaPlayerSpa])
+        XCTAssertTrue(bannerTitles.isEmpty)
     }
 }
