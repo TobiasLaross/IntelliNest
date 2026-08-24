@@ -70,16 +70,16 @@ extension MusicViewModel {
         guard let activeSpeakerID, speakerID != activeSpeakerID else {
             return
         }
+        let speakerName = speakers[speakerID]?.friendlyName ?? speakerID.rawValue
+        let wasGrouped = isGrouped(speakerID)
         pendingGroupingSpeakers.insert(speakerID)
         defer { pendingGroupingSpeakers.remove(speakerID) }
-        let speakerName = speakers[speakerID]?.friendlyName ?? speakerID.rawValue
-        if isGrouped(speakerID) {
+        if wasGrouped {
             let success = await restAPIService.unjoinSpeaker(memberID: speakerID)
-            if success {
-                await reloadSpeakers()
-            } else {
-                setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
+            if success, await confirmGroupChange(speakerID, with: activeSpeakerID, shouldBeGrouped: false) {
+                return
             }
+            setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
         } else {
             // A speaker already synced into a different group (e.g. Spa paired with
             // Matbord-ute) can't be moved by a plain join, so unjoin it from its
@@ -90,12 +90,43 @@ extension MusicViewModel {
             let success = await restAPIService.joinSpeakers(leaderID: activeSpeakerID,
                                                             memberIDs: [speakerID],
                                                             unjoinFirst: isInOtherGroup)
-            if success {
-                await reloadSpeakers()
+            if success, await confirmGroupChange(speakerID, with: activeSpeakerID, shouldBeGrouped: true) {
+                return
+            }
+            // A leader playing a source Music Assistant doesn't own is the usual
+            // reason a join lands nowhere, and it's the one the user can act on.
+            if speakers[activeSpeakerID]?.isPlayingExternalSource == true {
+                let leaderName = speakers[activeSpeakerID]?.friendlyName ?? activeSpeakerID.rawValue
+                setErrorBannerText("Kunde inte gruppera högtalare",
+                                   "\(leaderName) spelar från en annan app. Starta musiken härifrån för att spela på flera högtalare")
             } else {
                 setErrorBannerText("Kunde inte gruppera högtalare", "Det gick inte att lägga till \(speakerName) i gruppen")
             }
         }
+    }
+
+    /// Reloads the speakers until `speakerID`'s membership in `leaderID`'s group
+    /// matches what the change asked for, and reports whether it ever did. Home
+    /// Assistant returns 200 from `join`/`unjoin` before the membership is live, so a
+    /// single reload can't tell "not applied yet" from a group Music Assistant quietly
+    /// refused to build. Membership is read against the leader the request was sent to
+    /// rather than `isGrouped`, since the user can select a different speaker while
+    /// these reloads are in flight.
+    private func confirmGroupChange(_ speakerID: EntityId,
+                                    with leaderID: EntityId,
+                                    shouldBeGrouped: Bool,
+                                    attempts: Int = 3) async -> Bool {
+        for attempt in 1 ... attempts {
+            await reloadSpeakers()
+            let isMember = speakers[leaderID]?.groupMembers.contains(speakerID) == true
+            if isMember == shouldBeGrouped {
+                return true
+            }
+            if attempt < attempts {
+                await waitBeforeGroupRecheck()
+            }
+        }
+        return false
     }
 
     /// Promotes a grouped speaker to primary — the one shown and controlled as the
