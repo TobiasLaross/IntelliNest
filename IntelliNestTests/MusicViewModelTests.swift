@@ -7,6 +7,7 @@ class MusicViewModelTests: XCTestCase {
     var restAPIService: RestAPIService!
     var urlCreator: URLCreator!
     var bannerTitles: [String] = []
+    var bannerMessages: [String] = []
     /// In-memory backing for the last-used-speaker persistence so tests stay
     /// deterministic instead of touching shared `UserDefaults`.
     var storedLastSpeaker: EntityId?
@@ -18,6 +19,7 @@ class MusicViewModelTests: XCTestCase {
 
     override func setUp() async throws {
         bannerTitles = []
+        bannerMessages = []
         storedLastSpeaker = nil
         URLProtocolStub.startInterceptingRequests()
         let stubbedSession = URLProtocolStub.createStubbedURLSession()
@@ -30,11 +32,13 @@ class MusicViewModelTests: XCTestCase {
             repeatReloadAction: { _ in }
         )
         viewModel = MusicViewModel(restAPIService: restAPIService,
-                                   setErrorBannerText: { [weak self] title, _ in
+                                   setErrorBannerText: { [weak self] title, message in
                                        self?.bannerTitles.append(title)
+                                       self?.bannerMessages.append(message)
                                    },
                                    loadLastSpeaker: { [weak self] in self?.storedLastSpeaker },
-                                   saveLastSpeaker: { [weak self] in self?.storedLastSpeaker = $0 })
+                                   saveLastSpeaker: { [weak self] in self?.storedLastSpeaker = $0 },
+                                   waitBeforeGroupRecheck: {})
     }
 
     override func tearDown() async throws {
@@ -63,7 +67,8 @@ class MusicViewModelTests: XCTestCase {
                      entityPicture: String? = nil,
                      groupMembers: [String] = [],
                      shuffle: Bool = false,
-                     repeatMode: String = "off") -> Data {
+                     repeatMode: String = "off",
+                     activeQueue: String? = nil) -> Data {
         var attributes: [String: Any] = [
             "friendly_name": friendlyName,
             "volume_level": volume,
@@ -76,6 +81,7 @@ class MusicViewModelTests: XCTestCase {
         if let album { attributes["media_album_name"] = album }
         if let contentID { attributes["media_content_id"] = contentID }
         if let entityPicture { attributes["entity_picture"] = entityPicture }
+        if let activeQueue { attributes["active_queue"] = activeQueue }
         return makeEntityJSON(entityId: entityID.rawValue, state: state, attributes: attributes)
     }
 

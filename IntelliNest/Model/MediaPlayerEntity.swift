@@ -42,6 +42,21 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
     /// When `mediaPosition` was sampled (`media_position_updated_at`), the anchor
     /// for extrapolating the live position while playing.
     var mediaPositionUpdatedAt: Date?
+    /// The Music Assistant queue driving this player (`active_queue`), or nil when
+    /// nothing MA controls is playing on it. A Sonos streaming from the Spotify app
+    /// over Spotify Connect reports no active queue, because Music Assistant is not
+    /// in the path at all.
+    var activeQueueID: String?
+
+    /// Whether the speaker is playing something Music Assistant doesn't control —
+    /// Spotify Connect straight to the Sonos, an AirPlay session, the TV. Grouping
+    /// another speaker onto this one can't work in that state: Home Assistant
+    /// accepts the `join` with a 200 and Music Assistant drops it, having no stream
+    /// of its own to extend. Playback has to be (re)started through Music Assistant
+    /// first.
+    var isPlayingExternalSource: Bool {
+        hasLiveAudio && activeQueueID == nil
+    }
 
     var isActive: Bool {
         state == "playing"
@@ -180,6 +195,7 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
         case mediaPosition = "media_position"
         case mediaDuration = "media_duration"
         case mediaPositionUpdatedAt = "media_position_updated_at"
+        case activeQueue = "active_queue"
     }
 
     init(entityId: EntityId, state: String = "Loading", friendlyName: String = "") {
@@ -214,6 +230,7 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
             if let updatedAtString = try attributes.decodeIfPresent(String.self, forKey: .mediaPositionUpdatedAt) {
                 mediaPositionUpdatedAt = Entity.utcDateFormatter.date(from: updatedAtString)
             }
+            activeQueueID = try attributes.decodeIfPresent(String.self, forKey: .activeQueue)
         } else {
             friendlyName = ""
             volumeLevel = 0
