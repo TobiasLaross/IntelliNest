@@ -19,6 +19,9 @@ struct MusicView: View {
                 if !viewModel.isSpotifyAuthorized {
                     spotifyLoginTriangle
                 }
+                if viewModel.displayedActiveSpeaker != nil {
+                    speakerPickerButton
+                }
             }
 
             ScrollView {
@@ -53,6 +56,9 @@ struct MusicView: View {
         .sheet(isPresented: $viewModel.isShowingSearchResults) {
             MusicSearchResultsView(viewModel: viewModel)
         }
+        .sheet(isPresented: $viewModel.isShowingSpeakerPicker) {
+            SpeakerPickerSheet(viewModel: viewModel)
+        }
         .sheet(isPresented: $viewModel.isShowingQueue) {
             QueueView(viewModel: viewModel)
         }
@@ -79,6 +85,22 @@ struct MusicView: View {
         .sheet(isPresented: $isShowingSpotifyLogin) {
             SpotifyLoginPromptView(viewModel: viewModel)
         }
+    }
+
+    /// Opens the speaker picker. It sits at screen level rather than inside the
+    /// now-playing card: picking a speaker (or a new group leader) is a choice
+    /// about the whole screen, not an action on the speaker currently playing.
+    private var speakerPickerButton: some View {
+        Button {
+            viewModel.isShowingSpeakerPicker = true
+        } label: {
+            Image(systemName: "hifispeaker.2.fill")
+                .font(.title3)
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel("Byt högtalare")
     }
 
     /// A discrete warning triangle shown next to the search bar while logged out
