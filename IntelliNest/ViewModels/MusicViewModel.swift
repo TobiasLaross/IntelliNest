@@ -46,6 +46,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// MA queue entity has gone stale (playback started outside the app's queue).
     @Published var hardwareTwins: [EntityId: MediaPlayerEntity] = [:]
     @Published var activeSpeakerID: EntityId?
+    /// Drives the speaker-picker sheet, opened from the screen-level speaker
+    /// button. The picker only replaces the screen content inline while no
+    /// speaker is active yet.
+    @Published var isShowingSpeakerPicker = false
     @Published var searchText = ""
     @Published var searchSections: [MusicSearchSection] = []
     @Published var hasSearched = false

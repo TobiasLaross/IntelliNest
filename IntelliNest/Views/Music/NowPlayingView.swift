@@ -21,7 +21,7 @@ struct NowPlayingView: View {
                     .foregroundStyle(.yellow)
                     .lineLimit(1)
                 Spacer(minLength: 4)
-                // Each action gets a full 44×44 hit target so the three controls are
+                // Each action gets a full 44×44 hit target so the controls are
                 // comfortably tappable and evenly spaced.
                 HStack(spacing: 4) {
                     headerButton("quote.bubble",
@@ -31,9 +31,6 @@ struct NowPlayingView: View {
                     }
                     headerButton("list.bullet", label: "Visa kö") {
                         Task { await viewModel.openQueue() }
-                    }
-                    headerButton("hifispeaker.2.fill", label: "Byt högtalare") {
-                        viewModel.activeSpeakerID = nil
                     }
                 }
                 // Pull the row of icons to the card's edge so the 44pt hit targets
@@ -79,7 +76,7 @@ struct NowPlayingView: View {
     }
 
     /// A header action rendered with a full 44×44 hit target (Apple's minimum), so
-    /// the three now-playing controls are easy to tap and evenly spaced. `isActive`
+    /// the now-playing controls are easy to tap and evenly spaced. `isActive`
     /// tints the icon yellow to show a toggled-on state (used by the lyrics toggle).
     private func headerButton(_ systemName: String,
                               label: String,
