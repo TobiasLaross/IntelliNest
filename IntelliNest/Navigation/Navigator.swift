@@ -51,6 +51,10 @@ class Navigator: ObservableObject {
     }
 
     private var homeCoordinates: Coordinates?
+    /// Bumped on every geofence crossing. Entry and exit each run slow Yale writes, so a delayed entry
+    /// could otherwise land after a later exit and leave the doors unlocked and the user marked home.
+    var geofenceGeneration = 0
+    var geofenceTask: Task<Void, Never>?
     private var isAppInForeground = true
     private var errorBannerDismissTask: Task<Void, Error>?
     private lazy var geoFenceManager = GeofenceManager(didEnterHomeAction: { [weak self] in
@@ -273,83 +277,6 @@ private extension Navigator {
         }
     }
 
-    func didEnterHome() {
-        Task {
-            await withBackgroundTask(name: "Geofence-did-enter-home") {
-                await self.unlockAfterEnteringHome()
-            }
-        }
-    }
-
-    private func unlockAfterEnteringHome() async {
-        let lastEnteredHomeTime = UserDefaults.shared.value(forKey: StorageKeys.enteredHomeTime.rawValue) as? Date
-        UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.enteredHomeTime.rawValue)
-        guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
-            Log.warning("Geofence utan användare: \(UserManager.currentUser)")
-            return
-        }
-        do {
-            if let lastEnteredHomeTime, Date.now.timeIntervalSince(lastEnteredHomeTime) < 10 * 60 {
-                let userIsAway = try await restAPIService.get(entityId: currentUserAwayEntityID, entityType: Entity.self)
-                guard userIsAway.isActive else {
-                    Log.debug("Geofence användare redan hemma")
-                    return
-                }
-            }
-        } catch {
-            Log.error("Failed to fetch user away status for \(currentUserAwayEntityID)")
-        }
-
-        NotificationService.sendNotification(title: "Välkommen hem",
-                                             message: "",
-                                             identifier: "Geofence-did-enter-home")
-        await updateYaleLocks(with: .unlock)
-        restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOff)
-    }
-
-    func didExitHome() {
-        Task {
-            await withBackgroundTask(name: "Geofence-did-exit-home") {
-                await self.lockAfterExitingHome()
-            }
-        }
-    }
-
-    private func lockAfterExitingHome() async {
-        await updateYaleLocks(with: .lock)
-        guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
-            Log.warning("Geofence utan användare: \(UserManager.currentUser)")
-            return
-        }
-        restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOn)
-    }
-
-    func updateYaleLocks(with action: Action) async {
-        async let tmpFrontDoorSuccess = homeViewModel.setLockState(lockID: .frontDoor, action: action)
-        async let tmpSideDoorSuccess = homeViewModel.setLockState(lockID: .sideDoor, action: action)
-        _ = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
-    }
-
-    /// A geofence callback wakes the app with no runtime guarantee, and the Yale calls it makes are cloud
-    /// round-trips that take seconds - long enough for iOS to suspend the process mid-request and strand
-    /// them until they surface as timeouts. The Home Assistant calls in the same flow survive without this
-    /// only because they are LAN requests that finish in milliseconds.
-    private func withBackgroundTask(name: String, _ work: () async -> Void) async {
-        let application = UIApplication.shared
-        var taskIdentifier = UIBackgroundTaskIdentifier.invalid
-        taskIdentifier = application.beginBackgroundTask(withName: name) {
-            application.endBackgroundTask(taskIdentifier)
-            taskIdentifier = .invalid
-        }
-
-        await work()
-
-        if taskIdentifier != .invalid {
-            application.endBackgroundTask(taskIdentifier)
-            taskIdentifier = .invalid
-        }
-    }
-
     func setErrorBannerText(title: String, message: String) {
         if isAppInForeground {
             Task { @MainActor in
@@ -376,19 +303,5 @@ private extension Navigator {
                 restAPIService.registerAPNSToken(apnsToken)
             }
         #endif
-    }
-}
-
-private extension UserManager {
-    @MainActor
-    static var currentUserAwayEntityID: EntityId? {
-        switch currentUser {
-        case .sarah:
-            .sarahIsAway
-        case .tobias:
-            .tobiasIsAway
-        default:
-            nil
-        }
     }
 }

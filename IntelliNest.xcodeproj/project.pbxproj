@@ -44,6 +44,7 @@
 		F62542E82A5DD27600B4DDD4 /* ScriptID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E72A5DD27600B4DDD4 /* ScriptID.swift */; };
 		F62542EA2A5DD36F00B4DDD4 /* CallScriptRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */; };
 		F627509F29FD120F00C1253F /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F627509E29FD120F00C1253F /* Navigator.swift */; };
+		FE0000000000000000000C02 /* Navigator+Geofence.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000C02 /* Navigator+Geofence.swift */; };
 		F62750A129FE39B100C1253F /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A029FE39B100C1253F /* Destination.swift */; };
 		F62750A92A00ED9500C1253F /* UINavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750A82A00ED9500C1253F /* UINavigationController.swift */; };
 		F62750AB2A00EE8800C1253F /* ToolbarBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */; };
@@ -292,6 +293,7 @@
 		F62542E72A5DD27600B4DDD4 /* ScriptID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptID.swift; sourceTree = "<group>"; };
 		F62542E92A5DD36F00B4DDD4 /* CallScriptRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallScriptRequest.swift; sourceTree = "<group>"; };
 		F627509E29FD120F00C1253F /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		FD0000000000000000000C02 /* Navigator+Geofence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Navigator+Geofence.swift"; sourceTree = "<group>"; };
 		F62750A029FE39B100C1253F /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		F62750A82A00ED9500C1253F /* UINavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UINavigationController.swift; sourceTree = "<group>"; };
 		F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarBackButton.swift; sourceTree = "<group>"; };
@@ -656,6 +658,7 @@
 			children = (
 				F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */,
 				F627509E29FD120F00C1253F /* Navigator.swift */,
+				FD0000000000000000000C02 /* Navigator+Geofence.swift */,
 				F62750A029FE39B100C1253F /* Destination.swift */,
 				F62750AE2A01123500C1253F /* ToolbarItems.swift */,
 				AE35931A9C554E855ADCD646 /* NavigatorHelpers.swift */,
@@ -1174,6 +1177,7 @@
 				F61BF9A42A166E0D00C1802E /* LockState.swift in Sources */,
 				F6F8556128DF9EE8004B9517 /* HeatersViewModel.swift in Sources */,
 				F627509F29FD120F00C1253F /* Navigator.swift in Sources */,
+				FE0000000000000000000C02 /* Navigator+Geofence.swift in Sources */,
 				F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */,
 				F67023FB27A177320070FFBB /* AppMain.swift in Sources */,
 				F6F1D08629A94E8900A3292E /* LimitPickerView.swift in Sources */,

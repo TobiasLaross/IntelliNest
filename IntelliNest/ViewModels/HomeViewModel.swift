@@ -254,8 +254,7 @@ class HomeViewModel: ObservableObject, Reloadable {
             return false
         }
         Log.warning("Yale write failed for \(lockID), falling back to Home Assistant")
-        await restAPIService.setState(for: entityID, in: .lock, using: action, reloadTimes: 0)
-        return true
+        return await restAPIService.setState(for: entityID, in: .lock, using: action, reloadTimes: 0)
     }
 
     private func reload(lockID: LockID) async -> LockState {

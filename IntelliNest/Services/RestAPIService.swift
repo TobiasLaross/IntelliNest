@@ -163,11 +163,13 @@ class RestAPIService: URLRequestBuilder {
         await setStateFor(entity: lock, domain: .lock, action: action)
     }
 
-    func setState(for entityId: EntityId, in domain: Domain, using action: Action, reloadTimes: Int = 1) async {
+    @discardableResult
+    func setState(for entityId: EntityId, in domain: Domain, using action: Action, reloadTimes: Int = 1) async -> Bool {
         var json = [JSONKey: Any]()
         json[JSONKey.entityID] = entityId.rawValue
-        await sendPostRequest(json: json, domain: domain, action: action)
+        let success = await sendPostRequest(json: json, domain: domain, action: action)
         repeatReloadAction(reloadTimes)
+        return success
     }
 
     func setStateFor(entity: some EntityProtocol, domain: Domain, action: Action, reloadTimes: Int = 1) async {

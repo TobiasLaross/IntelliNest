@@ -9,11 +9,12 @@ extension RestAPIService {
     ///   HTTP response ~20 s (a `sleep` + cloud re-poll) even though the command itself lands in the first second.
     ///   Waiting on and retrying that long-held connection is what surfaced 500 / -1005 errors and double-fired the
     ///   command.
+    @discardableResult
     func sendPostRequest(customPath: String? = nil,
                          json: [JSONKey: Any]?,
                          domain: Domain,
                          action: Action,
-                         fireAndForget: Bool = false) async {
+                         fireAndForget: Bool = false) async -> Bool {
         let path: String = if let customPath {
             customPath
         } else {
@@ -25,7 +26,7 @@ extension RestAPIService {
                                              jsonData: jsonData,
                                              method: .post) else {
             logCreateRequestFailed(path: path, domain: domain, action: action, json: json, jsonData: jsonData)
-            return
+            return false
         }
 
         let (statusCode, data) = await sendRequest(request)
@@ -33,12 +34,12 @@ extension RestAPIService {
             if let data {
                 handleSuccessfulResponse(domain: domain, action: action, data: data)
             }
-            return
+            return true
         }
 
         if fireAndForget {
             Log.error("Fire-and-forget POST failed (\(domain.rawValue), \(action.rawValue)): \(statusCode.errorDescription)")
-            return
+            return false
         }
 
         let context = PostRetryContext(path: path,
@@ -47,17 +48,17 @@ extension RestAPIService {
                                        action: action,
                                        primaryURL: request.url?.absoluteString ?? "",
                                        primaryStatusCode: statusCode)
-        await retryOnExternalURL(context: context)
+        return await retryOnExternalURL(context: context)
     }
 
     /// Failover path when the primary POST failed: retry on the external URL, otherwise surface the error banner.
-    private func retryOnExternalURL(context: PostRetryContext) async {
+    private func retryOnExternalURL(context: PostRetryContext) async -> Bool {
         let errorBannerTitle = "Misslyckades med att skicka request"
         let errorBannerMessageEnd = "(\(context.domain.rawValue), \(context.action.rawValue))"
 
         guard !context.primaryURL.contains(GlobalConstants.baseExternalUrlString) else {
             setErrorBannerText(errorBannerTitle, "\(context.primaryStatusCode.errorDescription) \(errorBannerMessageEnd)")
-            return
+            return false
         }
         guard let request = createURLRequest(shouldForceExternalURL: true, path: context.path,
                                              jsonData: context.jsonData, method: .post) else {
@@ -65,7 +66,7 @@ extension RestAPIService {
                                    json: nil, jsonData: context.jsonData)
             setErrorBannerText("Misslyckades med att skapa external http request",
                                "POST: \(context.path). \(context.primaryStatusCode.errorDescription)")
-            return
+            return false
         }
 
         let (statusCodeExternal, externalData) = await sendRequest(request)
@@ -73,9 +74,10 @@ extension RestAPIService {
             if let externalData {
                 handleSuccessfulResponse(domain: context.domain, action: context.action, data: externalData)
             }
-        } else {
-            setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
+            return true
         }
+        setErrorBannerText(errorBannerTitle, "\(statusCodeExternal.errorDescription) \(errorBannerMessageEnd)")
+        return false
     }
 
     private func logCreateRequestFailed(

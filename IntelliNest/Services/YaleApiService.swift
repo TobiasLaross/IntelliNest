@@ -82,8 +82,10 @@ class YaleApiService: URLRequestBuilder {
     /// operate path because that is the only request the app actually makes in normal use - if it only
     /// ran on reads, the token would quietly reach its expiry date and lock control would die with it.
     private func refreshAccessTokenIfNeeded(from httpResponse: HTTPURLResponse) {
+        // allHeaderFields bridges to a case-sensitive Swift dictionary, so a response spelled
+        // X-August-Access-Token would silently miss and rotation would never happen.
         guard willAccessTokenExpireSoon(accessToken: accessToken),
-              let renewedAccessToken = httpResponse.allHeaderFields["x-august-access-token"] as? String,
+              let renewedAccessToken = httpResponse.value(forHTTPHeaderField: "x-august-access-token"),
               renewedAccessToken != accessToken else {
             return
         }
@@ -189,7 +191,8 @@ class YaleApiService: URLRequestBuilder {
             Log.error("Could not get utf8 data from accessToken")
             return
         }
-        let attributesToUpdate: [String: Any] = [kSecValueData as String: accessTokenData]
+        let attributesToUpdate: [String: Any] = [kSecValueData as String: accessTokenData,
+                                                 kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock]
         let updateStatus = SecItemUpdate(query as CFDictionary, attributesToUpdate as CFDictionary)
         if updateStatus == errSecSuccess {
             return
