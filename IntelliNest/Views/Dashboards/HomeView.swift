@@ -43,6 +43,9 @@ struct HomeView: View {
         }
         .onAppear {
             viewModel.checkLocationAccess()
+            Task {
+                await viewModel.reloadYaleLocks()
+            }
         }
     }
 }

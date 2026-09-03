@@ -12,6 +12,9 @@ import UIKit
 
 @MainActor
 class HomeViewModel: ObservableObject, Reloadable {
+    static let expectedStateAttempts = 20
+    static let expectedStatePollInterval: CGFloat = 0.5
+
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
     @Published var storageLock = LockEntity(entityId: .storageLock)
@@ -216,6 +219,53 @@ class HomeViewModel: ObservableObject, Reloadable {
         .gardenWasteDate: \.gardenWasteDate
     ]
 
+    /// Yale has no push, so the only moment its state is worth chasing is right after we asked for a
+    /// change: keep reading until the lock reports what we asked for, then stop. Every other refresh
+    /// comes from the screen appearing or the reload button, not a timer.
+    func reloadLockUntilExpectedState(lockID: LockID,
+                                      attempts: Int = HomeViewModel.expectedStateAttempts,
+                                      pollInterval: CGFloat = HomeViewModel.expectedStatePollInterval) async {
+        for _ in 0 ..< attempts {
+            if pollInterval > 0 {
+                try? await Task.sleep(seconds: pollInterval)
+            }
+            switch lockID {
+            case .frontDoor:
+                frontDoor.lockState = await reload(lockID: frontDoor.id)
+                if !frontDoor.isLoading { return }
+            case .sideDoor:
+                sideDoor.lockState = await reload(lockID: sideDoor.id)
+                if !sideDoor.isLoading { return }
+            case .storageDoor, .lynkDoor:
+                Log.error("Tried to reload unhandled lock: \(lockID)")
+                return
+            }
+        }
+    }
+
+    /// A write straight to the Yale cloud is the fast path from the phone, but it is also the one that
+    /// fails - it timed out 218 times while the side door battery was dying. Home Assistant reaches the
+    /// same locks over the LAN, so it stands in when the direct write does not land.
+    func setLockState(lockID: LockID, action: Action) async -> Bool {
+        if await yaleApiService.setLockState(lockID: lockID, action: action) {
+            return true
+        }
+        guard let entityID = lockID.homeAssistantEntityID else {
+            return false
+        }
+        Log.warning("Yale write failed for \(lockID), falling back to Home Assistant")
+        return await restAPIService.setState(for: entityID, in: .lock, using: action, reloadTimes: 0)
+    }
+
+    private func reload(lockID: LockID) async -> LockState {
+        do {
+            return try await yaleApiService.getLockState(lockID: lockID)
+        } catch {
+            Log.error("Failed to load \(lockID) with error: \(error)")
+            return .unknown
+        }
+    }
+
     func reload(entityID: EntityId, state: String, lastChanged: Date? = nil) {
         if let keyPath = entityKeyPaths[entityID] {
             self[keyPath: keyPath].state = state
@@ -230,38 +280,6 @@ class HomeViewModel: ObservableObject, Reloadable {
             storageLock.state = state
         } else {
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
-        }
-    }
-
-    func reloadLockUntilExpectedState(lockID: LockID) async {
-        var isLoading = true
-        var count = 0
-        while isLoading == true {
-            try? await Task.sleep(seconds: 0.3)
-            if lockID == .frontDoor {
-                frontDoor.lockState = await reload(lockID: frontDoor.id)
-                isLoading = frontDoor.isLoading
-            } else if lockID == .sideDoor {
-                sideDoor.lockState = await reload(lockID: sideDoor.id)
-                isLoading = sideDoor.isLoading
-            } else {
-                Log.error("Tried to reload unhandled lock: \(lockID)")
-                isLoading = false
-            }
-            count += 1
-            if count > 25 {
-                isLoading = false
-                break
-            }
-        }
-    }
-
-    private func reload(lockID: LockID) async -> LockState {
-        do {
-            return try await yaleApiService.getLockState(lockID: lockID)
-        } catch {
-            Log.error("Failed to load \(lockID) with error: \(error)")
-            return .unknown
         }
     }
 }
