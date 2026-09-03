@@ -41,11 +41,16 @@ extension Navigator {
         guard isCurrentGeofenceGeneration(generation) else {
             return
         }
-        await updateYaleLocks(with: .unlock)
+        let locksUpdated = await updateYaleLocks(with: .unlock)
         guard isCurrentGeofenceGeneration(generation) else {
             return
         }
-        restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOff)
+        if !locksUpdated {
+            // Presence is still written: Home Assistant's backup unlock triggers on this boolean
+            // going off, so skipping it would disable the fallback in exactly the case it exists for.
+            Log.warning("Geofence-upplåsning misslyckades, skriver ändå närvaro för att armera HA-backupen")
+        }
+        await restAPIService.setState(for: currentUserAwayEntityID, in: .inputBoolean, using: .turnOff)
     }
 
     func didExitHome() {
@@ -55,7 +60,6 @@ extension Navigator {
     }
 
     func lockAfterExitingHome(generation: Int) async {
-        await updateYaleLocks(with: .lock)
         guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
             Log.warning("Geofence utan användare: \(UserManager.currentUser)")
             return
@@ -63,13 +67,21 @@ extension Navigator {
         guard isCurrentGeofenceGeneration(generation) else {
             return
         }
-        restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOn)
+        if await !updateYaleLocks(with: .lock) {
+            Log.warning("Geofence-låsning misslyckades för minst en dörr")
+        }
+        guard isCurrentGeofenceGeneration(generation) else {
+            return
+        }
+        await restAPIService.setState(for: currentUserAwayEntityID, in: .inputBoolean, using: .turnOn)
     }
 
-    func updateYaleLocks(with action: Action) async {
-        async let tmpFrontDoorSuccess = homeViewModel.setLockState(lockID: .frontDoor, action: action)
-        async let tmpSideDoorSuccess = homeViewModel.setLockState(lockID: .sideDoor, action: action)
-        _ = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
+    @discardableResult
+    func updateYaleLocks(with action: Action) async -> Bool {
+        async let frontDoorWrite = homeViewModel.setLockState(lockID: .frontDoor, action: action)
+        async let sideDoorWrite = homeViewModel.setLockState(lockID: .sideDoor, action: action)
+        let (frontDoorSucceeded, sideDoorSucceeded) = await (frontDoorWrite, sideDoorWrite)
+        return frontDoorSucceeded && sideDoorSucceeded
     }
 
     func startGeofenceFlow(name: String, _ work: @escaping (Int) async -> Void) {
