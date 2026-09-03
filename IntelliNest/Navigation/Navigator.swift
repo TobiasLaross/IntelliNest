@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import UIKit
 import WidgetKit
 
 @MainActor
@@ -17,7 +18,6 @@ class Navigator: ObservableObject {
             if navigationPath.isEmpty {
                 Task {
                     await homeViewModel.reload()
-                    await homeViewModel.reloadYaleLocks()
                 }
             }
         }
@@ -153,7 +153,6 @@ class Navigator: ObservableObject {
         case .home:
             homeViewModel.checkLocationAccess()
             await homeViewModel.reload()
-            await homeViewModel.reloadYaleLocks()
         case .electricity:
             await electricityViewModel.reload()
         case .heaters, .playroomHeaterDetails, .corridorHeaterDetails:
@@ -194,6 +193,9 @@ class Navigator: ObservableObject {
             repeatReload(times: 6)
         } else {
             await reloadCurrentModel()
+            if currentDestination == .home {
+                await homeViewModel.reloadYaleLocks()
+            }
         }
     }
 
@@ -273,34 +275,48 @@ private extension Navigator {
 
     func didEnterHome() {
         Task {
-            let lastEnteredHomeTime = UserDefaults.shared.value(forKey: StorageKeys.enteredHomeTime.rawValue) as? Date
-            UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.enteredHomeTime.rawValue)
-            guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
-                Log.warning("Geofence utan användare: \(UserManager.currentUser)")
-                return
+            await withBackgroundTask(name: "Geofence-did-enter-home") {
+                await self.unlockAfterEnteringHome()
             }
-            do {
-                if let lastEnteredHomeTime, Date.now.timeIntervalSince(lastEnteredHomeTime) < 10 * 60 {
-                    let userIsAway = try await restAPIService.get(entityId: currentUserAwayEntityID, entityType: Entity.self)
-                    guard userIsAway.isActive else {
-                        Log.debug("Geofence användare redan hemma")
-                        return
-                    }
-                }
-            } catch {
-                Log.error("Failed to fetch user away status for \(currentUserAwayEntityID)")
-            }
-
-            NotificationService.sendNotification(title: "Välkommen hem",
-                                                 message: "",
-                                                 identifier: "Geofence-did-enter-home")
-            updateYaleLocks(with: .unlock)
-            restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOff)
         }
     }
 
+    private func unlockAfterEnteringHome() async {
+        let lastEnteredHomeTime = UserDefaults.shared.value(forKey: StorageKeys.enteredHomeTime.rawValue) as? Date
+        UserDefaults.shared.setValue(Date.now, forKey: StorageKeys.enteredHomeTime.rawValue)
+        guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
+            Log.warning("Geofence utan användare: \(UserManager.currentUser)")
+            return
+        }
+        do {
+            if let lastEnteredHomeTime, Date.now.timeIntervalSince(lastEnteredHomeTime) < 10 * 60 {
+                let userIsAway = try await restAPIService.get(entityId: currentUserAwayEntityID, entityType: Entity.self)
+                guard userIsAway.isActive else {
+                    Log.debug("Geofence användare redan hemma")
+                    return
+                }
+            }
+        } catch {
+            Log.error("Failed to fetch user away status for \(currentUserAwayEntityID)")
+        }
+
+        NotificationService.sendNotification(title: "Välkommen hem",
+                                             message: "",
+                                             identifier: "Geofence-did-enter-home")
+        await updateYaleLocks(with: .unlock)
+        restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOff)
+    }
+
     func didExitHome() {
-        updateYaleLocks(with: .lock)
+        Task {
+            await withBackgroundTask(name: "Geofence-did-exit-home") {
+                await self.lockAfterExitingHome()
+            }
+        }
+    }
+
+    private func lockAfterExitingHome() async {
+        await updateYaleLocks(with: .lock)
         guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
             Log.warning("Geofence utan användare: \(UserManager.currentUser)")
             return
@@ -308,11 +324,29 @@ private extension Navigator {
         restAPIService.update(entityID: currentUserAwayEntityID, domain: .inputBoolean, action: .turnOn)
     }
 
-    func updateYaleLocks(with action: Action) {
-        Task {
-            async let tmpFrontDoorSuccess = yaleApiService.setLockState(lockID: .frontDoor, action: action)
-            async let tmpSideDoorSuccess = yaleApiService.setLockState(lockID: .sideDoor, action: action)
-            _ = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
+    func updateYaleLocks(with action: Action) async {
+        async let tmpFrontDoorSuccess = homeViewModel.setLockState(lockID: .frontDoor, action: action)
+        async let tmpSideDoorSuccess = homeViewModel.setLockState(lockID: .sideDoor, action: action)
+        _ = await (tmpFrontDoorSuccess, tmpSideDoorSuccess)
+    }
+
+    /// A geofence callback wakes the app with no runtime guarantee, and the Yale calls it makes are cloud
+    /// round-trips that take seconds - long enough for iOS to suspend the process mid-request and strand
+    /// them until they surface as timeouts. The Home Assistant calls in the same flow survive without this
+    /// only because they are LAN requests that finish in milliseconds.
+    private func withBackgroundTask(name: String, _ work: () async -> Void) async {
+        let application = UIApplication.shared
+        var taskIdentifier = UIBackgroundTaskIdentifier.invalid
+        taskIdentifier = application.beginBackgroundTask(withName: name) {
+            application.endBackgroundTask(taskIdentifier)
+            taskIdentifier = .invalid
+        }
+
+        await work()
+
+        if taskIdentifier != .invalid {
+            application.endBackgroundTask(taskIdentifier)
+            taskIdentifier = .invalid
         }
     }
 

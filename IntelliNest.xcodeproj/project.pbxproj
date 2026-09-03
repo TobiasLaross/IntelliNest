@@ -85,6 +85,7 @@
 		FE0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */; };
 		FE0000000000000000000B03 /* LyricsApiServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B03 /* LyricsApiServiceTests.swift */; };
 		FE0000000000000000000B04 /* MusicViewModelSeekTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B04 /* MusicViewModelSeekTests.swift */; };
+		FE0000000000000000000C01 /* HomeViewModelYaleLockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000C01 /* HomeViewModelYaleLockTests.swift */; };
 		EE0000070000000000000007 /* AlbumArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000070000000000000007 /* AlbumArtView.swift */; };
 		EE0000080000000000000008 /* SpeakerPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000080000000000000008 /* SpeakerPickerView.swift */; };
 		EE0000090000000000000009 /* GroupVolumeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000090000000000000009 /* GroupVolumeView.swift */; };
@@ -333,6 +334,7 @@
 		FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerEntityLyricsTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000B03 /* LyricsApiServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsApiServiceTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000B04 /* MusicViewModelSeekTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSeekTests.swift; sourceTree = "<group>"; };
+		FD0000000000000000000C01 /* HomeViewModelYaleLockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModelYaleLockTests.swift; sourceTree = "<group>"; };
 		EF0000070000000000000007 /* AlbumArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtView.swift; sourceTree = "<group>"; };
 		EF0000080000000000000008 /* SpeakerPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerPickerView.swift; sourceTree = "<group>"; };
 		EF0000090000000000000009 /* GroupVolumeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupVolumeView.swift; sourceTree = "<group>"; };
@@ -640,6 +642,7 @@
 				FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */,
 				FD0000000000000000000B03 /* LyricsApiServiceTests.swift */,
 				FD0000000000000000000B04 /* MusicViewModelSeekTests.swift */,
+				FD0000000000000000000C01 /* HomeViewModelYaleLockTests.swift */,
 				FD0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift */,
 				FD0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift */,
 				FD0000000000000000FA0299 /* MusicViewModelHardwareMirrorTests.swift */,
@@ -1327,6 +1330,7 @@
 				FE0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift in Sources */,
 				FE0000000000000000000B03 /* LyricsApiServiceTests.swift in Sources */,
 				FE0000000000000000000B04 /* MusicViewModelSeekTests.swift in Sources */,
+				FE0000000000000000000C01 /* HomeViewModelYaleLockTests.swift in Sources */,
 				FE0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift in Sources */,
 				FE0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift in Sources */,
 				FE0000000000000000FA0299 /* MusicViewModelHardwareMirrorTests.swift in Sources */,

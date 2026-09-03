@@ -39,11 +39,7 @@ class YaleApiService: URLRequestBuilder {
             Log.error("Failed request with status: \(httpResponse.statusCode) and body:\n \(String(data: data, encoding: .utf8) ?? "")")
             throw EntityError.httpRequestFailure
         }
-        if willAccessTokenExpireSoon(accessToken: accessToken),
-           let accessToken = httpResponse.allHeaderFields["x-august-access-token"] as? String {
-            updateLocalAccessToken(newAccessToken: accessToken)
-            updateRemoteAccessToken(newAccessToken: accessToken)
-        }
+        refreshAccessTokenIfNeeded(from: httpResponse)
         let decoder = JSONDecoder()
         let yaleLockResponse = try decoder.decode(YaleLockResponse.self, from: data)
         return LockState(rawValue: yaleLockResponse.lockStatus.status) ?? .unknown
@@ -61,6 +57,7 @@ class YaleApiService: URLRequestBuilder {
                 Log.error("Failed to get response as HTTPURLResponse")
                 return false
             }
+            refreshAccessTokenIfNeeded(from: httpResponse)
             if [200, 202].contains(httpResponse.statusCode) {
                 return true
             }
@@ -79,6 +76,20 @@ class YaleApiService: URLRequestBuilder {
             "x-august-access-token": "\(accessToken)",
             "x-kease-api-key": "\(GlobalConstants.secretYaleAPIKey)"
         ]
+    }
+
+    /// Yale hands back a renewed token on every authenticated response. Rotation has to hang off the
+    /// operate path because that is the only request the app actually makes in normal use - if it only
+    /// ran on reads, the token would quietly reach its expiry date and lock control would die with it.
+    private func refreshAccessTokenIfNeeded(from httpResponse: HTTPURLResponse) {
+        guard willAccessTokenExpireSoon(accessToken: accessToken),
+              let renewedAccessToken = httpResponse.allHeaderFields["x-august-access-token"] as? String,
+              renewedAccessToken != accessToken else {
+            return
+        }
+        accessToken = renewedAccessToken
+        updateLocalAccessToken(newAccessToken: renewedAccessToken)
+        updateRemoteAccessToken(newAccessToken: renewedAccessToken)
     }
 
     private func willAccessTokenExpireSoon(accessToken: String) -> Bool {
@@ -111,6 +122,9 @@ class YaleApiService: URLRequestBuilder {
             }
         }
 
+        if status != errSecItemNotFound {
+            Log.warning("Keychain read for the Yale access token failed with OSStatus \(status)")
+        }
         Log.warning("Missing access token, retrieving from backend")
         return nil
     }
@@ -176,17 +190,26 @@ class YaleApiService: URLRequestBuilder {
             return
         }
         let attributesToUpdate: [String: Any] = [kSecValueData as String: accessTokenData]
-        var status = SecItemUpdate(query as CFDictionary, attributesToUpdate as CFDictionary)
-        if status == errSecItemNotFound {
-            // The token doesn't exist, add it to the keychain
-            let newQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
-                                           kSecAttrAccount as String: StorageKeys.yaleAccessToken.rawValue,
-                                           kSecValueData as String: accessTokenData]
-
-            status = SecItemAdd(newQuery as CFDictionary, nil)
+        let updateStatus = SecItemUpdate(query as CFDictionary, attributesToUpdate as CFDictionary)
+        if updateStatus == errSecSuccess {
+            return
         }
-        if status != errSecSuccess {
-            Log.error("Failed to add item to keychain")
+        if updateStatus != errSecItemNotFound {
+            Log.error("Failed to update the Yale access token in the keychain, OSStatus \(updateStatus)")
+            return
+        }
+
+        // The geofence unlock runs in the background with the phone still in a pocket, so the item has
+        // to survive a locked screen. The default (kSecAttrAccessibleWhenUnlocked) makes every write
+        // from that path fail with errSecInteractionNotAllowed.
+        let newQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+                                       kSecAttrAccount as String: StorageKeys.yaleAccessToken.rawValue,
+                                       kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
+                                       kSecValueData as String: accessTokenData]
+
+        let addStatus = SecItemAdd(newQuery as CFDictionary, nil)
+        if addStatus != errSecSuccess {
+            Log.error("Failed to add the Yale access token to the keychain, OSStatus \(addStatus)")
         }
     }
 

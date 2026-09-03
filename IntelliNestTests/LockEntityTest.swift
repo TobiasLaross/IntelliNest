@@ -19,7 +19,7 @@ class LockEntityTest: XCTestCase {
 
     func testStateToString() {
         // Given
-        var lockEntity = LockEntity(entityId: EntityId.framdorren, state: "Loading")
+        var lockEntity = LockEntity(entityId: EntityId.frontDoorLock, state: "Loading")
         lockEntity.state = "unlocked"
         let translatedStateUnlocked = lockEntity.stateToString()
         lockEntity.state = "locked"
@@ -40,7 +40,7 @@ class LockEntityTest: XCTestCase {
 
     func testActionText() {
         // Given
-        var lockEntity = LockEntity(entityId: EntityId.framdorren, state: "Loading")
+        var lockEntity = LockEntity(entityId: EntityId.frontDoorLock, state: "Loading")
         lockEntity.state = "unlocked"
         let lockEntityUnlocked = lockEntity
         lockEntity.state = "locked"
@@ -61,7 +61,7 @@ class LockEntityTest: XCTestCase {
 
     func testCalculateIsActive() {
         // Given
-        var lockEntity = LockEntity(entityId: EntityId.framdorren, state: "Loading")
+        var lockEntity = LockEntity(entityId: EntityId.frontDoorLock, state: "Loading")
         lockEntity.state = "unlocked"
         let lockEntityUnlocked = lockEntity
         lockEntity.state = "locked"

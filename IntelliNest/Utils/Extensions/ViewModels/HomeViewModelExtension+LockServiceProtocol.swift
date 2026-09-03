@@ -9,32 +9,28 @@ import Foundation
 
 extension HomeViewModel: LockServiceProtocol {
     func toggleStateForSideDoor() {
-        guard let capturedLock = getUpdatedLock(sideDoor) else {
-            return
-        }
-        Task { @MainActor in
-            let action: Action = sideDoor.lockState == .unlocked ? .lock : .unlock
-            sideDoor.expectedState = capturedLock.expectedState
-            let success = await yaleApiService.setLockState(lockID: capturedLock.id, action: action)
-            if success {
-                sideDoor.lockState = capturedLock.expectedState
-            }
-            sideDoor.expectedState = .unknown
-        }
+        toggleYaleLock(at: \.sideDoor)
     }
 
     func toggleStateForFrontDoor() {
-        guard let capturedLock = getUpdatedLock(frontDoor) else {
+        toggleYaleLock(at: \.frontDoor)
+    }
+
+    private func toggleYaleLock(at keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock>) {
+        guard let capturedLock = getUpdatedLock(self[keyPath: keyPath]) else {
             return
         }
         Task { @MainActor in
-            let action: Action = frontDoor.lockState == .unlocked ? .lock : .unlock
-            frontDoor.expectedState = capturedLock.expectedState
-            let success = await yaleApiService.setLockState(lockID: capturedLock.id, action: action)
-            if success {
-                frontDoor.lockState = capturedLock.expectedState
+            let action: Action = capturedLock.expectedState == .locked ? .lock : .unlock
+            self[keyPath: keyPath].expectedState = capturedLock.expectedState
+            guard await setLockState(lockID: capturedLock.id, action: action) else {
+                self[keyPath: keyPath].expectedState = .unknown
+                return
             }
-            frontDoor.expectedState = .unknown
+            // The lock takes a couple of seconds to actually throw the bolt, so read it back rather than
+            // assuming the write means it is done - the state we show should be the state it reports.
+            await reloadLockUntilExpectedState(lockID: capturedLock.id)
+            self[keyPath: keyPath].expectedState = .unknown
         }
     }
 
