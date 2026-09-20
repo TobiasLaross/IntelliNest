@@ -105,7 +105,7 @@ struct MusicPlaylistView: View {
             }
             .musicListStyle()
             // Reflect each track's Liked-Songs state when the list loads.
-            .task(id: viewModel.playlistTracks.map(\.uri).joined(separator: "|")) {
+            .task(id: viewModel.playlistTracks.map(\.id).joined(separator: "|")) {
                 await viewModel.loadSavedSongStates(uris: viewModel.playlistTracks.map(\.uri))
             }
         }

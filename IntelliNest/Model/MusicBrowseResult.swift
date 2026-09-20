@@ -8,12 +8,22 @@
 import Foundation
 
 /// A single track inside a playlist, decoded from a `browse_media` response.
+///
+/// `id` carries the track's position in the playlist, not just its uri: a playlist
+/// may legitimately hold the same song twice, and two rows sharing a SwiftUI
+/// identity inside a `List` let a swipe act on the wrong one.
 struct MusicPlaylistTrack: Identifiable, Equatable {
+    let id: String
     let uri: String
     let title: String
     let imageURL: String?
 
-    var id: String { uri }
+    init(id: String? = nil, uri: String, title: String, imageURL: String?) {
+        self.id = id ?? uri
+        self.uri = uri
+        self.title = title
+        self.imageURL = imageURL
+    }
 }
 
 /// One child of a browsed node: a playlist's track, or an artist's album or top
@@ -74,11 +84,11 @@ struct MusicPlaylistBrowseResponse: Decodable {
     let tracks: [MusicPlaylistTrack]
 
     init(from decoder: Decoder) throws {
-        tracks = try MusicBrowseNode.children(from: decoder).compactMap { child in
+        tracks = try MusicBrowseNode.children(from: decoder).enumerated().compactMap { index, child in
             guard let uri = child.mediaContentID, let title = child.title else {
                 return nil
             }
-            return MusicPlaylistTrack(uri: uri, title: title, imageURL: child.thumbnail)
+            return MusicPlaylistTrack(id: "\(uri)#\(index)", uri: uri, title: title, imageURL: child.thumbnail)
         }
     }
 }
