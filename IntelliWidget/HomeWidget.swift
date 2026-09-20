@@ -15,7 +15,7 @@ struct HomeWidgetEntryView: View {
             Link(destination: URL(string: "IntelliNest://home")!) {
                 Image(systemName: "house")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFit()
                     .padding(12)
             }
         }

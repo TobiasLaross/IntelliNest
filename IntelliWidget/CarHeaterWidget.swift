@@ -15,7 +15,7 @@ struct CarHeaterEntryView: View {
             Link(destination: URL(string: "IntelliNest://start-car-heater")!) {
                 Image(systemName: "car")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFit()
                     .padding(12)
             }
         }
