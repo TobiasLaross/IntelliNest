@@ -65,6 +65,7 @@ extension MusicViewModel {
         guard playlists.isNotEmpty else {
             return
         }
+        husetLibraryPlaylistURIs = Set(playlists.map(\.uri))
         let personalAccountIDs = Set(personalAccounts.map(\.userID))
         let spotifyFavorites = playlists.filter { playlist in
             guard let ownerID = playlist.ownerID else {
@@ -87,15 +88,37 @@ extension MusicViewModel {
         let viewer = currentUser()
         let orderedAccounts = personalAccounts.filter { $0.user == viewer }
             + personalAccounts.filter { $0.user != viewer }
-        personalPlaylistSections = orderedAccounts.compactMap { account in
+        var sections: [PersonalPlaylistSection] = []
+        for account in orderedAccounts {
             let owned = playlists.filter { $0.ownerID == account.userID }
-            guard owned.isNotEmpty else {
-                return nil
+            let published = await spotify.publicPlaylists(ofUser: account.userID)
+            let merged = mergedPersonalPlaylists(followedByHuset: owned, publicOnProfile: published)
+            guard merged.isNotEmpty else {
+                continue
             }
-            return PersonalPlaylistSection(account: account, title: account.user.playlistSectionTitle, playlists: owned)
+            sections.append(PersonalPlaylistSection(account: account,
+                                                    title: account.user.playlistSectionTitle,
+                                                    playlists: merged))
         }
+        personalPlaylistSections = sections
         hasLoadedSpotifyPlaylists = true
         editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()
+    }
+
+    /// Unions the person's playlists huset already follows with the public ones read
+    /// straight off their Spotify profile, deduped by uri. The followed ones keep
+    /// their existing order and stay first, so nothing the user is used to moves;
+    /// the previously-invisible ones are appended after them. When the profile read
+    /// is refused this collapses to exactly the old library-only behaviour.
+    private func mergedPersonalPlaylists(followedByHuset: [MusicSearchItem],
+                                         publicOnProfile: [MusicSearchItem]) -> [MusicSearchItem] {
+        var seenURIs = Set(followedByHuset.map(\.uri))
+        var merged = followedByHuset
+        for playlist in publicOnProfile where !seenURIs.contains(playlist.uri) {
+            seenURIs.insert(playlist.uri)
+            merged.append(playlist)
+        }
+        return merged
     }
 
     /// Re-fetches the recently-played list after a playlist launch so the new
@@ -207,6 +230,7 @@ extension MusicViewModel {
     /// Loads a playlist's tracks into `playlistTracks`, toggling the loading
     /// flag. Shared by the search-sheet drill-in and the main-view browse sheet.
     func loadPlaylistTracks(_ playlist: MusicSearchItem) async {
+        lastBrowsedPlaylist = playlist
         playlistTracks = []
         isLoadingPlaylist = true
         let browseSpeaker = activeSpeakerID ?? availableSpeakers.first?.entityId
@@ -274,7 +298,9 @@ extension MusicViewModel {
     func closeSearchResults() {
         isShowingSearchResults = false
         openedPlaylist = nil
+        openedArtist = nil
         browsingLibraryPlaylist = nil
+        expandedLibrarySection = nil
     }
 
     // MARK: - Spotify login

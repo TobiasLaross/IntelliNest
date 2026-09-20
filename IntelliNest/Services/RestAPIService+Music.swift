@@ -13,7 +13,7 @@ extension RestAPIService {
     /// app that returns a response body, so it gets a dedicated POST path that
     /// reads the JSON back instead of going through `sendPostRequest` (which
     /// discards bodies).
-    func searchMusic(query: String, limit: Int = 10) async throws -> MusicSearchResponse {
+    func searchMusic(query: String, limit: Int = 25) async throws -> MusicSearchResponse {
         let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.search.rawValue)"
         var json = [JSONKey: Any]()
         json[.configEntryID] = GlobalConstants.musicAssistantConfigEntryID
@@ -78,6 +78,25 @@ extension RestAPIService {
             return wrapper.serviceResponse.tracks
         }
         return try decoder.decode(MusicPlaylistBrowseResponse.self, from: data).tracks
+    }
+
+    /// Browses an artist's or album's children via `media_player.browse_media` —
+    /// an artist's albums and top tracks, an album's tracks. Same call shape as the
+    /// playlist browse and, like it, read-only: it does not change what `entityID`
+    /// is playing.
+    func browseArtistItems(uri: String, mediaType: MusicMediaType, on entityID: EntityId) async throws -> [MusicSearchItem] {
+        let path = "/api/services/\(Domain.mediaPlayer.rawValue)/\(Action.browseMedia.rawValue)"
+        var json = [JSONKey: Any]()
+        json[.entityID] = entityID.rawValue
+        json[.mediaContentType] = mediaType.rawValue
+        json[.mediaContentID] = uri
+
+        let data = try await postExpectingResponseData(path: path, json: json)
+        let decoder = JSONDecoder()
+        if let wrapper = try? decoder.decode(MusicArtistBrowseServiceResponse.self, from: data) {
+            return wrapper.serviceResponse.items
+        }
+        return try decoder.decode(MusicArtistBrowseResponse.self, from: data).items
     }
 
     /// Reads the active queue for `entityID` via `music_assistant.get_queue`
@@ -282,6 +301,15 @@ private struct MusicSearchServiceResponse: Decodable {
 /// Wrapper for the `get_library` service-call response envelope.
 private struct MusicLibraryServiceResponse: Decodable {
     let serviceResponse: MusicLibraryResponse
+
+    enum CodingKeys: String, CodingKey {
+        case serviceResponse = "service_response"
+    }
+}
+
+/// Wrapper for the artist/album `browse_media` service-call response envelope.
+private struct MusicArtistBrowseServiceResponse: Decodable {
+    let serviceResponse: MusicArtistBrowseResponse
 
     enum CodingKeys: String, CodingKey {
         case serviceResponse = "service_response"

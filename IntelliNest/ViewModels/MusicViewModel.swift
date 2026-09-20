@@ -60,7 +60,14 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// The playlist the user drilled into (nil = showing the result list). Tapping
     /// a playlist opens it here instead of playing it immediately.
     @Published var openedPlaylist: MusicSearchItem?
+    /// The artist the user drilled into from the search results, pushed inside the
+    /// results sheet. Nil while the result list is showing.
+    @Published var openedArtist: MusicSearchItem?
     @Published var playlistTracks: [MusicPlaylistTrack] = []
+    /// The playlist `playlistTracks` was loaded for, whichever surface opened it.
+    /// Lets an add-to-playlist refresh the list it is looking at without the caller
+    /// having to know how the detail was presented.
+    var lastBrowsedPlaylist: MusicSearchItem?
     @Published var isLoadingPlaylist = false
     /// The favourites shown for quick launch in place of the speaker list: the
     /// huset Spotify library (minus the per-person sections) unioned with any
@@ -164,8 +171,22 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// session and can't re-add a playlist the user just unstarred.
     var hasSyncedSpotifyFavorites = false
     /// Increments on every search so a slow, older response can't overwrite the
-    /// results of a newer query.
-    private var searchRequestToken = 0
+    /// results of a newer query. Internal so `MusicViewModel+Search` can bump it.
+    var searchRequestToken = 0
+    /// The query whose results `searchSections` currently holds, so pressing Enter
+    /// on a query the debounced background search already fetched doesn't pay for a
+    /// second round trip. Nil whenever the results are empty or stale.
+    var lastCompletedSearchQuery: String?
+    /// The in-flight debounced search, cancelled on the next keystroke so only the
+    /// pause the user actually stopped at reaches Home Assistant.
+    var pendingSearchTask: Task<Void, Never>?
+    /// URIs of the playlists the huset Spotify library carries. A personal playlist
+    /// found on its owner's public profile is deliberately absent, which keeps the
+    /// MA auto-favourite sync from following somebody's whole public catalogue.
+    var husetLibraryPlaylistURIs: Set<String> = []
+    /// The library section the user opened via "Visa alla", shown full-screen with
+    /// its own filter field. Nil while no section is expanded.
+    @Published var expandedLibrarySection: MusicLibrarySection?
 
     /// Injected dependencies — internal (not private) so the playback/playlist
     /// methods extracted into `MusicViewModel+Playback` can reach them.
@@ -192,6 +213,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// owner's name). Injected as a closure so tests don't depend on shared
     /// `UserDefaults`.
     let currentUser: @MainActor () -> User
+    /// The pause between the last keystroke and the Music Assistant search it
+    /// triggers. Injected as a closure for the same reason as the group recheck
+    /// below: a test drives the debounce without sleeping.
+    let searchDebounce: @MainActor () async -> Void
     /// Pauses between the reloads that confirm a group change landed. Home Assistant
     /// applies the membership a beat after the service call returns, so it has to be
     /// re-read rather than trusted once. Injected so tests confirm without wall time.
@@ -238,6 +263,9 @@ class MusicViewModel: ObservableObject, Reloadable {
          saveLastSpeaker: @escaping @MainActor (EntityId) -> Void = {
              UserDefaults.shared.set($0.rawValue, forKey: StorageKeys.lastMusicSpeaker.rawValue)
          },
+         searchDebounce: @escaping @MainActor () async -> Void = {
+             try? await Task.sleep(for: .milliseconds(400))
+         },
          waitBeforeGroupRecheck: @escaping @MainActor () async -> Void = {
              try? await Task.sleep(for: .seconds(1))
          }) {
@@ -250,6 +278,7 @@ class MusicViewModel: ObservableObject, Reloadable {
         self.currentUser = currentUser
         self.loadLastSpeaker = loadLastSpeaker
         self.saveLastSpeaker = saveLastSpeaker
+        self.searchDebounce = searchDebounce
         self.waitBeforeGroupRecheck = waitBeforeGroupRecheck
         isSpotifyAuthorized = spotify.isAuthorized
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
@@ -344,48 +373,5 @@ class MusicViewModel: ObservableObject, Reloadable {
         }
         activeSpeakerID = entityID
         saveLastSpeaker(entityID)
-    }
-
-    // MARK: - Search
-
-    func search() async {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard query.isNotEmpty else {
-            searchSections = []
-            hasSearched = false
-            return
-        }
-
-        searchRequestToken += 1
-        let token = searchRequestToken
-        openedPlaylist = nil
-        isShowingSearchResults = true
-        isSearching = true
-        hasSearched = true
-        do {
-            let response = try await restAPIService.searchMusic(query: query)
-            guard token == searchRequestToken else {
-                return
-            }
-            searchSections = response.sections
-        } catch {
-            guard token == searchRequestToken else {
-                return
-            }
-            Log.error("Music search failed: \(error)")
-            // Don't leave the UI in a "no results" state — close the results
-            // sheet and surface the failure through the error banner instead.
-            searchSections = []
-            hasSearched = false
-            isShowingSearchResults = false
-            setErrorBannerText("Sökningen misslyckades", "Kunde inte söka efter musik")
-        }
-        if token == searchRequestToken {
-            isSearching = false
-        }
-    }
-
-    var hasNoResults: Bool {
-        hasSearched && !isSearching && searchSections.isEmpty
     }
 }

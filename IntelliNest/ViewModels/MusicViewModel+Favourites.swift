@@ -156,7 +156,13 @@ extension MusicViewModel {
         guard spotify.isAuthorized, !hasSyncedSpotifyFavorites else {
             return
         }
-        let libraryPlaylists = favoritePlaylists + personalPlaylistSections.flatMap(\.playlists)
+        // Only playlists the huset library already carries are auto-starred. A
+        // personal playlist discovered from its owner's public profile is shown but
+        // not followed — silently adding somebody's whole public catalogue to the
+        // house library is not what surfacing it was meant to do.
+        let personalFromLibrary = personalPlaylistSections.flatMap(\.playlists)
+            .filter { husetLibraryPlaylistURIs.contains($0.uri) }
+        let libraryPlaylists = favoritePlaylists + personalFromLibrary
         guard libraryPlaylists.isNotEmpty else {
             // Spotify side not loaded yet — leave the latch open so a later refresh
             // retries once the library is available.
