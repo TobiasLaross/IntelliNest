@@ -18,7 +18,7 @@ struct AlbumArtView: View {
         Group {
             if let url = resolvedURL {
                 AsyncImage(url: url) { image in
-                    image.resizable().aspectRatio(contentMode: .fill)
+                    image.resizable().scaledToFill()
                 } placeholder: {
                     placeholder
                 }

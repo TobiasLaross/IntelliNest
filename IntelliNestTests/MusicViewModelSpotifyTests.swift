@@ -11,12 +11,17 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     var operationSucceeds: Bool
     var authorizeThrows: Bool
     var accountPlaylistItems: [MusicSearchItem]
+    /// Public playlists keyed by Spotify user id, standing in for what
+    /// `/users/<id>/playlists` returns. Empty by default, which is exactly how the
+    /// real service behaves when Spotify refuses the read.
+    var publicPlaylistsByUser: [String: [MusicSearchItem]]
     var editableIDs: Set<String>
     var savedSongTrackIDs: Set<String>
     private(set) var authorizeCallCount = 0
     private(set) var saveCallCount = 0
     private(set) var removeCallCount = 0
     private(set) var accountPlaylistsCallCount = 0
+    private(set) var publicPlaylistsCallCount = 0
     private(set) var saveSongCallCount = 0
     private(set) var removeSongCallCount = 0
     private(set) var addedTracks: [(playlistID: String, trackID: String)] = []
@@ -27,6 +32,7 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
          operationSucceeds: Bool = true,
          authorizeThrows: Bool = false,
          accountPlaylistItems: [MusicSearchItem] = [],
+         publicPlaylistsByUser: [String: [MusicSearchItem]] = [:],
          editableIDs: Set<String> = [],
          savedSongTrackIDs: Set<String> = []) {
         self.authorized = authorized
@@ -34,6 +40,7 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
         self.operationSucceeds = operationSucceeds
         self.authorizeThrows = authorizeThrows
         self.accountPlaylistItems = accountPlaylistItems
+        self.publicPlaylistsByUser = publicPlaylistsByUser
         self.editableIDs = editableIDs
         self.savedSongTrackIDs = savedSongTrackIDs
     }
@@ -51,6 +58,11 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     func accountPlaylists() async -> [MusicSearchItem] {
         accountPlaylistsCallCount += 1
         return accountPlaylistItems
+    }
+
+    func publicPlaylists(ofUser userID: String) async -> [MusicSearchItem] {
+        publicPlaylistsCallCount += 1
+        return publicPlaylistsByUser[userID] ?? []
     }
 
     func editablePlaylistIDs() async -> Set<String> {
@@ -133,7 +145,10 @@ extension MusicViewModelTests {
                        spotify: spotify,
                        queueSocket: socket,
                        personalAccounts: personalAccounts,
-                       currentUser: currentUser)
+                       currentUser: currentUser,
+                       // No wall-clock wait in tests: a scheduled search runs as soon
+                       // as its task is awaited.
+                       searchDebounce: {})
     }
 
     // Fixed personal-account ids — grep-searchable, no random data.

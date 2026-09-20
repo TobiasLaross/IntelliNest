@@ -336,6 +336,24 @@ extension MusicModelTests {
         XCTAssertNil(response.tracks.last?.imageURL)
     }
 
+    func testRepeatedTrackKeepsADistinctRowIdentity() throws {
+        // A playlist may hold the same song twice. Two rows sharing a SwiftUI
+        // identity in a List let a swipe queue or remove the wrong occurrence.
+        let json = """
+        {"media_player.kitchen":{"children":[
+          {"title":"Song A","media_content_id":"spotify://track/a"},
+          {"title":"Song B","media_content_id":"spotify://track/b"},
+          {"title":"Song A","media_content_id":"spotify://track/a"}
+        ]}}
+        """
+        let response = try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8))
+        XCTAssertEqual(response.tracks.map(\.uri), ["spotify://track/a", "spotify://track/b", "spotify://track/a"])
+        XCTAssertEqual(Set(response.tracks.map(\.id)).count, 3)
+        // The uri still addresses the track itself, which is what playback and the
+        // queue send to Music Assistant.
+        XCTAssertEqual(response.tracks.first?.uri, response.tracks.last?.uri)
+    }
+
     func testPlaylistBrowseResponseEmptyWhenNoChildren() throws {
         let json = "{\"media_player.kitchen\":{\"title\":\"Sommar\"}}"
         let response = try JSONDecoder().decode(MusicPlaylistBrowseResponse.self, from: Data(json.utf8))

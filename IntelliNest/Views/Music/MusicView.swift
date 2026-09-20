@@ -27,17 +27,25 @@ struct MusicView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     if let activeSpeaker = viewModel.displayedActiveSpeaker {
-                        NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
-                        LibraryPlaylistsSection(title: "Senast spelade",
-                                                playlists: viewModel.recentlyPlayedPlaylists,
-                                                viewModel: viewModel)
-                        LibraryPlaylistsSection(title: "Favoriter",
-                                                playlists: viewModel.favoritePlaylists,
-                                                viewModel: viewModel)
-                        ForEach(viewModel.personalPlaylistSections) { section in
-                            LibraryPlaylistsSection(title: section.title,
-                                                    playlists: section.playlists,
-                                                    viewModel: viewModel)
+                        // The now-playing card is only in the way while the user is
+                        // hunting for something to play.
+                        if !viewModel.isFilteringLibrary {
+                            NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
+                        }
+                        ForEach(viewModel.librarySections) { section in
+                            LibraryPlaylistsSection(viewModel: viewModel,
+                                                    section: section,
+                                                    onShowAll: { viewModel.expandedLibrarySection = section })
+                        }
+                        if viewModel.isFilteringLibrary {
+                            if viewModel.librarySections.isEmpty {
+                                Text("Inget i biblioteket matchar")
+                                    .foregroundStyle(.white.opacity(0.7))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            SpotifySearchEscalationRow(query: viewModel.trimmedSearchText) {
+                                Task { await viewModel.search() }
+                            }
                         }
                     } else {
                         SpeakerPickerView(viewModel: viewModel)
@@ -52,6 +60,12 @@ struct MusicView: View {
         // the view appears rather than trusting the once-per-session cache.
         .task {
             await viewModel.refreshFavorites()
+        }
+        // Typing filters the loaded library instantly and, a beat later, warms the
+        // Music Assistant search in the background — so the results sheet is already
+        // populated by the time the user asks for it.
+        .onChange(of: viewModel.searchText) { _, _ in
+            viewModel.scheduleSearch()
         }
         .sheet(isPresented: $viewModel.isShowingSearchResults) {
             MusicSearchResultsView(viewModel: viewModel)
@@ -84,6 +98,9 @@ struct MusicView: View {
         }
         .sheet(isPresented: $isShowingSpotifyLogin) {
             SpotifyLoginPromptView(viewModel: viewModel)
+        }
+        .sheet(item: $viewModel.expandedLibrarySection) { section in
+            MusicLibraryListView(viewModel: viewModel, section: section)
         }
     }
 
@@ -177,13 +194,14 @@ private struct SpotifyLoginPromptView: View {
 
 struct MusicSearchBar: View {
     @Binding var searchText: String
+    var prompt = "Sök i biblioteket eller på Spotify"
     let onSubmit: MainActorVoidClosure
 
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.white.opacity(0.7))
-            TextField("", text: $searchText, prompt: Text("Sök på Spotify").foregroundColor(.white.opacity(0.6)))
+            TextField("", text: $searchText, prompt: Text(prompt).foregroundColor(.white.opacity(0.6)))
                 .foregroundStyle(.white)
                 .submitLabel(.search)
                 .onSubmit(onSubmit)
@@ -192,86 +210,6 @@ struct MusicSearchBar: View {
         .padding(10)
         .background(Color.white.opacity(0.12))
         .cornerRadius(12)
-    }
-}
-
-/// A titled card of library playlists (favourites or recently played) shown
-/// under the speaker grouping in place of the old per-speaker list. Renders
-/// nothing while the list is empty.
-struct LibraryPlaylistsSection: View {
-    let title: String
-    let playlists: [MusicSearchItem]
-    @ObservedObject var viewModel: MusicViewModel
-
-    var body: some View {
-        if playlists.isNotEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(title)
-                    .font(.headline)
-                ForEach(playlists) { playlist in
-                    LibraryPlaylistRow(
-                        viewModel: viewModel,
-                        playlist: playlist,
-                        onOpen: { Task { await viewModel.browseLibraryPlaylist(playlist) } }
-                    )
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(Color.white.opacity(0.05))
-            .cornerRadius(16)
-        }
-    }
-}
-
-/// A single playlist row. Tapping the row opens the playlist detail
-/// (Spotify-style), where playback lives. Spotify-resolvable playlists also show
-/// a favourite star — filled for ones already in the library (the "Favoriter"
-/// rows are always filled; tapping un-favorites), empty and tappable-to-save for
-/// a recently-played playlist that isn't saved yet. Non-Spotify rows keep the
-/// plain chevron.
-private struct LibraryPlaylistRow: View {
-    @ObservedObject var viewModel: MusicViewModel
-    let playlist: MusicSearchItem
-    let onOpen: MainActorVoidClosure
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Button(action: onOpen) {
-                HStack(spacing: 12) {
-                    AlbumArtView(urlString: playlist.imageURL, size: 48)
-                    Text(playlist.name)
-                        .font(.body)
-                        .lineLimit(1)
-                    Spacer(minLength: 8)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(playlist.name)
-            .accessibilityHint("Öppna spellistan")
-
-            if viewModel.canFavoritePlaylist(playlist) {
-                favoriteStar
-            } else {
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.4))
-            }
-        }
-        .foregroundStyle(.white)
-    }
-
-    private var favoriteStar: some View {
-        let saved = viewModel.isSaved(playlist)
-        return Button {
-            Task { await viewModel.toggleFavorite(playlist) }
-        } label: {
-            Image(systemName: saved ? "star.fill" : "star")
-                .foregroundStyle(saved ? .yellow : .white.opacity(0.6))
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(saved ? "Ta bort \(playlist.name) från favoriter" : "Lägg till \(playlist.name) i favoriter")
     }
 }
 

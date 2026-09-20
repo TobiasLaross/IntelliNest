@@ -7,61 +7,6 @@
 
 import Foundation
 
-/// A known personal Spotify account whose public playlists are surfaced in the
-/// music view as its own titled section. Baked into the app (no in-app management);
-/// add another account by appending to `SpotifyPersonalAccount.configured`.
-struct SpotifyPersonalAccount: Identifiable, Equatable {
-    /// The Spotify user id that owns these playlists in the huset library.
-    let userID: String
-    /// The app user this account belongs to — drives the section title (the
-    /// owner's name, e.g. "Tobias spellistor") and ordering (the viewer's own
-    /// section is shown first).
-    let user: User
-
-    var id: String { userID }
-
-    /// The configured personal accounts. The viewer's own is surfaced first at
-    /// render time; this is just the known set.
-    static let configured: [SpotifyPersonalAccount] = [
-        SpotifyPersonalAccount(userID: "tobiasc91", user: .tobias),
-        SpotifyPersonalAccount(userID: "mbostroem", user: .sarah)
-    ]
-}
-
-/// The Spotify playlist operations the music UI needs. Hidden behind a protocol
-/// so `MusicViewModel` can be tested with a stub and so the feature degrades
-/// cleanly when no Spotify client is configured.
-@MainActor
-protocol SpotifyPlaylistService {
-    /// Whether the user has completed the Spotify login at least once.
-    var isAuthorized: Bool { get }
-    /// Runs the interactive Spotify login.
-    func authorize() async throws
-    /// The playlists in the signed-in account's library (owned + followed), across
-    /// all pages. Each item carries its `ownerID` so the library can be split into
-    /// per-person sections.
-    func accountPlaylists() async -> [MusicSearchItem]
-    /// The Spotify ids of the playlists the user can edit (owned or collaborative).
-    /// Used to gate the add-to-playlist picker and the remove-from-playlist action.
-    func editablePlaylistIDs() async -> Set<String>
-    /// Whether the playlist is currently in the user's Spotify library.
-    func isPlaylistSaved(playlistID: String) async -> Bool
-    /// Adds the playlist to the user's Spotify library. Returns success.
-    func savePlaylist(playlistID: String) async -> Bool
-    /// Removes the playlist from the user's Spotify library. Returns success.
-    func removePlaylist(playlistID: String) async -> Bool
-    /// The subset of `trackIDs` that are in the user's Liked Songs.
-    func savedSongIDs(trackIDs: [String]) async -> Set<String>
-    /// Adds the track to the user's Liked Songs. Returns success.
-    func saveSong(trackID: String) async -> Bool
-    /// Removes the track from the user's Liked Songs. Returns success.
-    func removeSong(trackID: String) async -> Bool
-    /// Adds the track to the given playlist. Returns success.
-    func addTrack(playlistID: String, trackID: String) async -> Bool
-    /// Removes every occurrence of the track from the given playlist. Returns success.
-    func removeTrack(playlistID: String, trackID: String) async -> Bool
-}
-
 /// Talks to the Spotify Web API to save/unsave (follow/unfollow) playlists in the
 /// signed-in user's library and to read the current saved state. Bearer tokens
 /// come from an injected `SpotifyTokenProviding`.
@@ -90,26 +35,40 @@ final class SpotifyApiService: SpotifyPlaylistService {
         await fetchAllLibraryPlaylistItems().compactMap(\.searchItem)
     }
 
-    /// Fetches every page of the signed-in account's `/me/playlists`. Spotify caps a
-    /// page at 50, so we walk the `offset` until a short page ends it — the huset
-    /// library plus the followed personal-account playlists easily exceeds 50, and a
-    /// single page would silently truncate them. `maxPages` guards against an
-    /// unbounded loop. A page fetch that fails stops paging and returns what we have.
+    /// Reads `/users/<id>/playlists`, which lists that person's public playlists
+    /// without needing their login. The huset token is enough, so a playlist Tobias
+    /// or Sarah made but huset never followed still reaches the music view. A
+    /// refusal (Spotify has historically 403'd this for a development-mode app)
+    /// logs and returns empty, leaving the library-derived sections untouched.
+    func publicPlaylists(ofUser userID: String) async -> [MusicSearchItem] {
+        await fetchAllPlaylistItems(path: "/users/\(userID)/playlists", label: "publicPlaylists(\(userID))")
+            .compactMap(\.searchItem)
+    }
+
     private func fetchAllLibraryPlaylistItems() async -> [SpotifyPlaylistItem] {
+        await fetchAllPlaylistItems(path: "/me/playlists", label: "accountPlaylists")
+    }
+
+    /// Fetches every page of a playlist listing endpoint. Spotify caps a page at 50,
+    /// so we walk the `offset` until a short page ends it — the huset library plus
+    /// the followed personal-account playlists easily exceeds 50, and a single page
+    /// would silently truncate them. `maxPages` guards against an unbounded loop. A
+    /// page fetch that fails stops paging and returns what we have.
+    private func fetchAllPlaylistItems(path: String, label: String) async -> [SpotifyPlaylistItem] {
         let pageSize = 50
         let maxPages = 10
         var items: [SpotifyPlaylistItem] = []
         for page in 0 ..< maxPages {
             do {
                 let request = try await authorizedRequest(
-                    path: "/me/playlists",
+                    path: path,
                     method: "GET",
                     queryItems: [URLQueryItem(name: "limit", value: "\(pageSize)"),
                                  URLQueryItem(name: "offset", value: "\(page * pageSize)")]
                 )
                 let (data, response) = try await session.data(for: request)
                 guard isSuccess(response) else {
-                    Log.error("Spotify accountPlaylists failed: \(httpFailureDescription(response, data))")
+                    Log.error("Spotify \(label) failed: \(httpFailureDescription(response, data))")
                     break
                 }
                 let decoded = try JSONDecoder().decode(SpotifyPlaylistPage.self, from: data)
@@ -118,7 +77,7 @@ final class SpotifyApiService: SpotifyPlaylistService {
                     break
                 }
             } catch {
-                Log.error("Spotify accountPlaylists failed: \(error)")
+                Log.error("Spotify \(label) failed: \(error)")
                 break
             }
         }
@@ -364,23 +323,4 @@ private struct SpotifyOwner: Decodable {
         case id
         case displayName = "display_name"
     }
-}
-
-/// Stand-in used when no Spotify client is configured (SwiftUI previews, tests
-/// that don't exercise Spotify). Reports unauthorized and no-ops every call, so
-/// the star never appears and the favourites section stays empty.
-@MainActor
-struct DisabledSpotifyPlaylistService: SpotifyPlaylistService {
-    var isAuthorized: Bool { false }
-    func authorize() async throws {}
-    func accountPlaylists() async -> [MusicSearchItem] { [] }
-    func editablePlaylistIDs() async -> Set<String> { [] }
-    func isPlaylistSaved(playlistID _: String) async -> Bool { false }
-    func savePlaylist(playlistID _: String) async -> Bool { false }
-    func removePlaylist(playlistID _: String) async -> Bool { false }
-    func savedSongIDs(trackIDs _: [String]) async -> Set<String> { [] }
-    func saveSong(trackID _: String) async -> Bool { false }
-    func removeSong(trackID _: String) async -> Bool { false }
-    func addTrack(playlistID _: String, trackID _: String) async -> Bool { false }
-    func removeTrack(playlistID _: String, trackID _: String) async -> Bool { false }
 }

@@ -7,13 +7,40 @@
 
 import SwiftUI
 
-/// Presents the search results in their own sheet with a tab per media-type
-/// category (Låtar / Album / Artister / Spellistor). Shows a spinner while the
-/// search runs and a Swedish "no results" state when nothing matched. Tapping a
-/// playlist drills into ``MusicPlaylistView`` rather than playing immediately.
+/// Which slice of the search results is on screen. "Allt" leads because a search
+/// is usually for one specific thing and the user shouldn't have to guess which
+/// category Music Assistant filed it under — the old view opened on Låtar, so
+/// finding a playlist started with noticing the picker and tapping across.
+enum MusicSearchTab: Hashable, Identifiable {
+    case all
+    case mediaType(MusicMediaType)
+
+    var id: String {
+        switch self {
+        case .all:
+            "all"
+        case let .mediaType(mediaType):
+            mediaType.rawValue
+        }
+    }
+
+    var swedishTitle: String {
+        switch self {
+        case .all:
+            "Allt"
+        case let .mediaType(mediaType):
+            mediaType.swedishTitle
+        }
+    }
+}
+
+/// Presents the search results in their own sheet: an "Allt" overview plus a tab
+/// per media-type category (Låtar / Album / Artister / Spellistor). Shows a
+/// spinner while the search runs and a Swedish "no results" state when nothing
+/// matched. A playlist or artist drills in rather than playing immediately.
 struct MusicSearchResultsView: View {
     @ObservedObject var viewModel: MusicViewModel
-    @State private var selectedType: MusicMediaType?
+    @State private var selectedTab: MusicSearchTab = .all
 
     var body: some View {
         NavigationStack {
@@ -21,6 +48,7 @@ struct MusicSearchResultsView: View {
                 // Keep an editable search bar in the sheet so a new query can be
                 // run without dismissing the results popup first.
                 MusicSearchBar(searchText: $viewModel.searchText,
+                               prompt: "Sök på Spotify",
                                onSubmit: { Task { await viewModel.search() } })
                     .padding(.horizontal)
                     .padding(.top, 12)
@@ -38,273 +66,131 @@ struct MusicSearchResultsView: View {
             .navigationDestination(item: $viewModel.openedPlaylist) { playlist in
                 MusicPlaylistView(viewModel: viewModel, playlist: playlist)
             }
+            .navigationDestination(item: $viewModel.openedArtist) { artist in
+                MusicArtistView(viewModel: viewModel, item: artist)
+            }
+        }
+        // Typing in the sheet's field searches on its own after a short pause, so
+        // the results follow the query without a trip to the keyboard's Sök key.
+        .onChange(of: viewModel.searchText) { _, _ in
+            viewModel.scheduleSearch()
         }
     }
 
     @ViewBuilder private var content: some View {
-        if viewModel.isSearching {
+        if viewModel.isSearching, viewModel.searchSections.isEmpty {
             ProgressView()
                 .tint(.white)
                 .padding(.top, 40)
+            Spacer()
         } else if viewModel.hasNoResults {
             Text("Inga resultat")
                 .foregroundStyle(.white.opacity(0.7))
                 .padding(.top, 40)
+            Spacer()
         } else {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 categoryPicker
+                    .padding(.horizontal)
                 resultsList
             }
-            .padding(.horizontal)
         }
     }
 
     private var categoryPicker: some View {
         Picker("Kategori", selection: selectionBinding) {
-            ForEach(viewModel.searchSections) { section in
-                Text(section.mediaType.swedishTitle).tag(section.mediaType)
+            ForEach(tabs) { tab in
+                Text(tab.swedishTitle).tag(tab)
             }
         }
         .pickerStyle(.segmented)
     }
 
-    @ViewBuilder private var resultsList: some View {
-        if let section = currentSection {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 8) {
+    /// "Allt" first, then one tab per category the search actually returned.
+    private var tabs: [MusicSearchTab] {
+        [.all] + viewModel.searchSections.map { MusicSearchTab.mediaType($0.mediaType) }
+    }
+
+    /// The sections shown under the current tab: a trimmed overview of every
+    /// category under "Allt", or the one category in full.
+    private var visibleSections: [MusicSearchSection] {
+        switch resolvedTab {
+        case .all:
+            viewModel.searchOverviewSections
+        case let .mediaType(mediaType):
+            viewModel.searchSections.filter { $0.mediaType == mediaType }
+        }
+    }
+
+    private var resultsList: some View {
+        List {
+            ForEach(visibleSections) { section in
+                Section {
                     ForEach(section.items) { item in
-                        if item.mediaType == .playlist {
-                            // A playlist opens its track list instead of playing.
-                            MusicResultRow(viewModel: viewModel, item: item, trailingSystemImage: "chevron.right") {
-                                Task { await viewModel.openPlaylist(item) }
-                            }
-                        } else {
-                            MusicResultRow(viewModel: viewModel, item: item) {
-                                Task { await viewModel.play(item: item) }
-                            }
-                        }
+                        resultRow(item)
+                    }
+                } header: {
+                    // Under a single-category tab the picker already says which
+                    // category this is; only the overview needs headings.
+                    if resolvedTab == .all {
+                        Text(section.mediaType.swedishTitle)
+                            .font(.headline)
+                            .foregroundStyle(.white)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .scrollDismissesKeyboard(.interactively)
-        }
-    }
-
-    /// The currently selected category's section, falling back to the first
-    /// available category when nothing is selected yet or the previous
-    /// selection is no longer present (e.g. after a fresh search).
-    private var currentSection: MusicSearchSection? {
-        viewModel.searchSections.first { $0.mediaType == resolvedType }
-    }
-
-    private var resolvedType: MusicMediaType {
-        if let selectedType, viewModel.searchSections.contains(where: { $0.mediaType == selectedType }) {
-            return selectedType
-        }
-        return viewModel.searchSections.first?.mediaType ?? .track
-    }
-
-    private var selectionBinding: Binding<MusicMediaType> {
-        Binding(get: { resolvedType }, set: { selectedType = $0 })
-    }
-}
-
-/// The drill-in view for a playlist: a header with cover art and a play button
-/// that plays the whole list, plus the track list where tapping a song plays
-/// that song followed by the rest of the playlist.
-struct MusicPlaylistView: View {
-    @ObservedObject var viewModel: MusicViewModel
-    let playlist: MusicSearchItem
-
-    var body: some View {
-        VStack(spacing: 16) {
-            header
-            trackList
-        }
-        .padding(.horizontal)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .backgroundModifier()
-        .foregroundStyle(.white)
-        .navigationBarTitleDisplayMode(.inline)
-        .task { await viewModel.loadSavedState(for: playlist) }
-        .toolbar {
-            // No principal title here on purpose — the full playlist name is shown
-            // large in the header below, so a cramped, truncated nav-bar copy adds
-            // nothing. Keep only the favourite star.
-            ToolbarItem(placement: .topBarTrailing) {
-                if viewModel.canFavoritePlaylist(playlist) {
-                    favoriteButton
-                }
             }
         }
+        .musicListStyle()
     }
 
-    private var header: some View {
-        VStack(spacing: 12) {
-            AlbumArtView(urlString: playlist.imageURL, size: 140)
-            Text(playlist.name)
-                .font(.title3)
-                .bold()
-                .multilineTextAlignment(.center)
-            HStack(spacing: 12) {
-                capsuleButton(title: "Spela", systemImage: "play.fill") {
-                    await viewModel.playPlaylist(playlist)
-                }
-                .accessibilityLabel("Spela spellistan \(playlist.name)")
-                capsuleButton(title: "Shuffle", systemImage: "shuffle") {
-                    await viewModel.playPlaylistShuffled(playlist)
-                }
-                .accessibilityLabel("Spela spellistan \(playlist.name) blandat")
+    /// A track plays and can be swiped into the queue. A playlist or artist opens
+    /// its own screen — playing an artist on a stray tap wipes the current queue,
+    /// which is exactly what a mistyped search shouldn't do.
+    @ViewBuilder private func resultRow(_ item: MusicSearchItem) -> some View {
+        switch item.mediaType {
+        case .track:
+            MusicMediaRow(name: item.name, subtitle: item.artist, imageURL: item.imageURL) {
+                Task { await viewModel.play(item: item) }
             }
-        }
-        .padding(.top, 12)
-    }
-
-    /// The favourite star. Filled and yellow when favourited in Music Assistant,
-    /// outlined otherwise. Toggling it adds/removes the MA favourite (which 2-way
-    /// syncs to the Spotify follow).
-    private var favoriteButton: some View {
-        let saved = viewModel.isSaved(playlist)
-        return Button {
-            Task { await viewModel.toggleFavorite(playlist) }
-        } label: {
-            Image(systemName: saved ? "star.fill" : "star")
-                .foregroundStyle(saved ? .yellow : .white)
-        }
-        .accessibilityLabel(saved ? "Ta bort från favoriter" : "Lägg till i favoriter")
-    }
-
-    private func capsuleButton(title: String,
-                               systemImage: String,
-                               action: @escaping () async -> Void) -> some View {
-        Button {
-            Task { await action() }
-        } label: {
-            Label(title, systemImage: systemImage)
-                .font(.headline)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 24)
-                .background(Color.white.opacity(0.15))
-                .clipShape(Capsule())
-        }
-    }
-
-    @ViewBuilder private var trackList: some View {
-        if viewModel.isLoadingPlaylist {
-            ProgressView()
-                .tint(.white)
-                .padding(.top, 40)
-            Spacer()
-        } else if viewModel.playlistTracks.isEmpty {
-            Text("Inga låtar")
-                .foregroundStyle(.white.opacity(0.7))
-                .padding(.top, 40)
-            Spacer()
-        } else {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    ForEach(viewModel.playlistTracks) { track in
-                        trackRow(track)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            // Reflect each track's Liked-Songs state when the list loads.
-            .task(id: viewModel.playlistTracks.map(\.uri).joined(separator: "|")) {
-                await viewModel.loadSavedSongStates(uris: viewModel.playlistTracks.map(\.uri))
-            }
-        }
-    }
-
-    /// A playlist track row: tapping plays it (then the rest of the playlist),
-    /// the trailing heart toggles Liked Songs, and a long-press exposes add to
-    /// queue / add to playlist / remove from this playlist.
-    private func trackRow(_ track: MusicPlaylistTrack) -> some View {
-        // Only an editable playlist offers "remove from this playlist".
-        var removeAction: MainActorVoidClosure?
-        if viewModel.canEditPlaylist(playlist) {
-            removeAction = { Task { await viewModel.removeTrack(track, fromPlaylist: playlist) } }
-        }
-        return HStack(spacing: 12) {
-            Button {
-                Task { await viewModel.playTrackInPlaylist(track, from: playlist) }
-            } label: {
-                HStack(spacing: 12) {
-                    AlbumArtView(urlString: track.imageURL, size: 44)
-                    Text(track.title)
-                        .font(.body)
-                        .lineLimit(1)
-                    Spacer(minLength: 8)
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Spela \(track.title)")
-
-            if viewModel.canFavoriteSong(uri: track.uri) {
-                SongFavoriteButton(viewModel: viewModel, uri: track.uri)
-            } else {
-                Image(systemName: "play.fill")
-                    .foregroundStyle(.white.opacity(0.6))
-            }
-        }
-        .padding(.vertical, 4)
-        .foregroundStyle(.white)
-        .contextMenu {
-            TrackActionButtons(viewModel: viewModel,
-                               uri: track.uri,
-                               title: track.title,
-                               imageURL: track.imageURL,
-                               onRemoveFromPlaylist: removeAction)
-        }
-    }
-}
-
-private struct MusicResultRow: View {
-    @ObservedObject var viewModel: MusicViewModel
-    let item: MusicSearchItem
-    var trailingSystemImage = "play.fill"
-    let onTap: MainActorVoidClosure
-
-    var body: some View {
-        // A track also offers add-to-queue / add-to-playlist via long-press; the
-        // other result types (album, artist, playlist) have no track actions.
-        if item.mediaType == .track {
-            rowButton.contextMenu {
+            .musicListRow()
+            .queueSwipeActions(viewModel: viewModel,
+                               uri: item.uri,
+                               title: item.name,
+                               artist: item.artist,
+                               imageURL: item.imageURL)
+            .contextMenu {
                 TrackActionButtons(viewModel: viewModel,
                                    uri: item.uri,
                                    title: item.name,
                                    artist: item.artist,
                                    imageURL: item.imageURL)
             }
-        } else {
-            rowButton
+        case .playlist:
+            MusicMediaRow(name: item.name,
+                          subtitle: item.artist,
+                          imageURL: item.imageURL,
+                          trailingSystemImage: "chevron.right") {
+                Task { await viewModel.openPlaylist(item) }
+            }
+            .musicListRow()
+        case .artist, .album:
+            MusicMediaRow(name: item.name,
+                          subtitle: item.artist,
+                          imageURL: item.imageURL,
+                          trailingSystemImage: "chevron.right") {
+                viewModel.openedArtist = item
+            }
+            .musicListRow()
         }
     }
 
-    private var rowButton: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
-                AlbumArtView(urlString: item.imageURL, size: 44)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.name)
-                        .font(.body)
-                        .lineLimit(1)
-                    if let artist = item.artist {
-                        Text(artist)
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.6))
-                            .lineLimit(1)
-                    }
-                }
-                Spacer()
-                Image(systemName: trailingSystemImage)
-                    .foregroundStyle(.white.opacity(0.6))
-            }
-            .padding(.vertical, 4)
-        }
-        .foregroundStyle(.white)
-        .accessibilityLabel(item.mediaType == .playlist ? "Öppna \(item.name)" : "Spela \(item.name)")
+    /// The selected tab, falling back to "Allt" when the previous selection is no
+    /// longer present (e.g. the new query returned no artists).
+    private var resolvedTab: MusicSearchTab {
+        tabs.contains(selectedTab) ? selectedTab : .all
+    }
+
+    private var selectionBinding: Binding<MusicSearchTab> {
+        Binding(get: { resolvedTab }, set: { selectedTab = $0 })
     }
 }

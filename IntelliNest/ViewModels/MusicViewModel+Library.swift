@@ -1,0 +1,104 @@
+//
+//  MusicViewModel+Library.swift
+//  IntelliNest
+//
+//  Created by Tobias on 2026-09-20.
+//
+
+import Foundation
+
+/// One titled block of playlists on the music start screen. The three sources
+/// (recently played, the huset favourites, and each person's own playlists) are
+/// flattened to this so the view renders one list instead of four hand-wired
+/// variants, and so the filter and the "Visa alla" drill-in work the same in all
+/// of them.
+struct MusicLibrarySection: Identifiable, Equatable {
+    let id: String
+    let title: String
+    let playlists: [MusicSearchItem]
+}
+
+/// The start screen's library: which sections it shows, the instant filter over
+/// them, and the full listing behind "Visa alla".
+extension MusicViewModel {
+    /// Rows a section shows before the rest go behind "Visa alla". Four keeps the
+    /// whole screen — now-playing card included — inside one thumb-scroll while
+    /// every section stays visible; before this, four fully-expanded sections
+    /// pushed the later ones off the bottom entirely.
+    static let collapsedLibraryRowCount = 4
+    /// Characters needed before typing reaches Home Assistant. The library filter
+    /// itself runs from the first character; only the network call waits.
+    static let minimumSearchLength = 2
+    /// Items per media type in the results sheet's "Allt" tab.
+    static let overviewRowCount = 3
+
+    /// Every library section that has something in it, in display order: what was
+    /// played most recently, the house favourites, then one section per person.
+    var allLibrarySections: [MusicLibrarySection] {
+        var sections = [
+            MusicLibrarySection(id: "recentlyPlayed", title: "Senast spelade", playlists: recentlyPlayedPlaylists),
+            MusicLibrarySection(id: "favorites", title: "Favoriter", playlists: favoritePlaylists)
+        ]
+        sections += personalPlaylistSections.map {
+            MusicLibrarySection(id: $0.id, title: $0.title, playlists: $0.playlists)
+        }
+        return sections.filter(\.playlists.isNotEmpty)
+    }
+
+    /// Whether the search field currently narrows the library.
+    var isFilteringLibrary: Bool {
+        trimmedSearchText.isNotEmpty
+    }
+
+    /// The sections as rendered: everything while the field is empty, only the
+    /// matching playlists while it isn't. A section with no match drops out rather
+    /// than leaving an empty heading behind.
+    var librarySections: [MusicLibrarySection] {
+        guard isFilteringLibrary else {
+            return allLibrarySections
+        }
+        let query = trimmedSearchText
+        return allLibrarySections.compactMap { section in
+            let matches = section.playlists.filter { matchesLibrarySearch($0.name, query: query) }
+            guard matches.isNotEmpty else {
+                return nil
+            }
+            return MusicLibrarySection(id: section.id, title: section.title, playlists: matches)
+        }
+    }
+
+    /// Every distinct library playlist matching the query, across all sections.
+    /// Pinned above the remote hits in the search sheet's Spellistor tab.
+    func matchingLibraryPlaylists(query: String) -> [MusicSearchItem] {
+        var seenURIs: Set<String> = []
+        var matches: [MusicSearchItem] = []
+        for playlist in allLibrarySections.flatMap(\.playlists) {
+            guard matchesLibrarySearch(playlist.name, query: query), !seenURIs.contains(playlist.uri) else {
+                continue
+            }
+            seenURIs.insert(playlist.uri)
+            matches.append(playlist)
+        }
+        return matches
+    }
+
+    /// The rows a collapsed section shows, and whether it is holding any back.
+    func collapsedPlaylists(in section: MusicLibrarySection) -> [MusicSearchItem] {
+        // While filtering, every match is worth seeing — the list is short by
+        // definition and hiding matches behind "Visa alla" defeats the search.
+        guard !isFilteringLibrary else {
+            return section.playlists
+        }
+        return Array(section.playlists.prefix(Self.collapsedLibraryRowCount))
+    }
+
+    func hiddenPlaylistCount(in section: MusicLibrarySection) -> Int {
+        section.playlists.count - collapsedPlaylists(in: section).count
+    }
+
+    /// Case- and diacritic-insensitive substring match, so "lugnt" finds "Lugnt &
+    /// Skönt" and "skont" finds it too — nobody reaches for the ö key mid-search.
+    func matchesLibrarySearch(_ name: String, query: String) -> Bool {
+        name.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+    }
+}

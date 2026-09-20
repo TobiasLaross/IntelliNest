@@ -167,10 +167,12 @@ extension MusicViewModel {
         }
     }
 
-    /// The playlist whose detail is currently on screen (the search drill-in or
-    /// the main-view browse sheet), used to refresh after an add.
+    /// The playlist whose tracks are on screen, used to refresh after an add.
+    /// Set wherever the tracks were loaded rather than derived from the presentation
+    /// state, so a detail reached from the search sheet, the main screen, or the
+    /// "Visa alla" listing all refresh the same way.
     private var currentlyOpenPlaylist: MusicSearchItem? {
-        browsingLibraryPlaylist ?? openedPlaylist
+        lastBrowsedPlaylist
     }
 
     func spotifyTrackID(from uri: String) -> String? {

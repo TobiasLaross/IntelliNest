@@ -28,7 +28,7 @@ struct ZoomableImageView: View {
                 } else {
                     image
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
+                        .scaledToFill()
                         .scaleEffect(accumulatedScale * latestScale)
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .rotationEffect(.degrees(90))
