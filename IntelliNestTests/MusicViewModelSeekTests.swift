@@ -11,13 +11,11 @@ extension MusicViewModelTests {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         viewModel.speakers[.mediaPlayerKitchen]?.groupMembers = [.mediaPlayerLivingRoom, .mediaPlayerKitchen]
 
-        let expectation = XCTestExpectation(description: "POST media_seek")
         var capturedBody: [String: Any]?
         URLProtocolStub.observerRequests { request in
             if request.httpMethod == "POST", request.url?.path.contains("/media_seek") == true {
                 let data = request.httpBodyStreamData() ?? request.httpBody
                 capturedBody = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
-                expectation.fulfill()
             }
         }
         stubPostService(path: "/api/services/media_player/media_seek")
@@ -26,31 +24,24 @@ extension MusicViewModelTests {
 
         // Optimistic position lands on the selected speaker so the UI jumps at once.
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaPosition, 42)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        await awaitSeekCommand()
         XCTAssertEqual(capturedBody?["entity_id"] as? String, EntityId.mediaPlayerLivingRoom.rawValue)
         XCTAssertEqual(capturedBody?["seek_position"] as? Double, 42)
     }
 
-    func testSeekWithoutActiveSpeakerIsNoOp() async {
-        let noRequest = XCTestExpectation(description: "no media_seek request")
-        noRequest.isInverted = true
-        URLProtocolStub.observerRequests { request in
-            if request.url?.path.contains("/media_seek") == true {
-                noRequest.fulfill()
-            }
-        }
+    func testSeekWithoutActiveSpeakerIsNoOp() {
         viewModel.seek(to: 10)
+
         XCTAssertNil(viewModel.activeSpeakerID)
         XCTAssertNil(viewModel.speakers[.mediaPlayerKitchen]?.mediaPosition)
-        await fulfillment(of: [noRequest], timeout: 0.5)
+        // No task was started, so there is nothing that could reach the network —
+        // a stronger statement than an inverted expectation timing out.
+        XCTAssertNil(viewModel.pendingSeekTask)
     }
 
     func testSeekRegistersPositionHold() async {
         viewModel.selectSpeaker(.mediaPlayerSpa)
         viewModel.speakers[.mediaPlayerSpa] = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "playing", friendlyName: "Spa")
-        // Await the fired request so the async seek Task can't bleed a stray media_seek
-        // POST into a sibling test sharing the process-global URLProtocolStub.
-        let sent = transportExpectation(path: "/media_seek")
         stubPostService(path: "/api/services/media_player/media_seek")
 
         viewModel.seek(to: 42)
@@ -58,7 +49,9 @@ extension MusicViewModelTests {
         // The hold keeps the seeked spot through the reloads that still report the
         // pre-seek position, so the scrubber doesn't snap back.
         XCTAssertEqual(viewModel.positionHold?.target ?? -1, 42, accuracy: 0.001)
-        await fulfillment(of: [sent], timeout: 2.0)
+        // Drain the seek before finishing, so its POST can't bleed into a sibling
+        // test sharing the process-global URLProtocolStub.
+        await awaitSeekCommand()
     }
 
     func testPauseHoldsTheLivePositionSoItCannotSnapToZero() async {
@@ -67,7 +60,6 @@ extension MusicViewModelTests {
         speaker.mediaPositionUpdatedAt = Date()
         viewModel.speakers[.mediaPlayerSpa] = speaker
         viewModel.activeSpeakerID = .mediaPlayerSpa
-        let sent = transportExpectation(path: "/media_pause")
         stubPostService(path: "/api/services/media_player/media_pause")
 
         viewModel.togglePlayPause()
@@ -75,7 +67,7 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.state, "paused")
         XCTAssertEqual(viewModel.positionHold?.target ?? -1, 30, accuracy: 0.5)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.mediaPosition ?? -1, 30, accuracy: 0.5)
-        await fulfillment(of: [sent], timeout: 2.0)
+        await restAPIService.lastCommandTask?.value
     }
 
     func testResumeClearsThePositionHold() async {
@@ -84,14 +76,13 @@ extension MusicViewModelTests {
         viewModel.speakers[.mediaPlayerSpa] = speaker
         viewModel.activeSpeakerID = .mediaPlayerSpa
         viewModel.positionHold = PlaybackPositionHold(target: 30, since: Date())
-        let sent = transportExpectation(path: "/media_play")
         stubPostService(path: "/api/services/media_player/media_play")
 
         viewModel.togglePlayPause()
 
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.state, "playing")
         XCTAssertNil(viewModel.positionHold, "resuming must let the live position advance freely")
-        await fulfillment(of: [sent], timeout: 2.0)
+        await restAPIService.lastCommandTask?.value
     }
 
     func testReconcileDropsHoldWhenReloadConfirmsThePosition() {
@@ -130,16 +121,14 @@ extension MusicViewModelTests {
         XCTAssertNotNil(viewModel.positionHold)
     }
 
-    /// Fulfilled when a POST to `path` is observed, so a test can await the async
-    /// transport Task it kicked off and not leak a request into the next test.
-    private func transportExpectation(path: String) -> XCTestExpectation {
-        let expectation = XCTestExpectation(description: "POST \(path)")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains(path) == true {
-                expectation.fulfill()
-            }
-        }
-        return expectation
+    /// Waits for a seek to actually finish, in both its stages: the view model
+    /// resolves the group leader in its own Task, then hands the command to
+    /// `RestAPIService`, which POSTs it in another. Awaiting both is deterministic —
+    /// these tests used to wait out a 2-second deadline and failed on CI whenever a
+    /// loaded runner did not make it in time.
+    private func awaitSeekCommand() async {
+        await viewModel.pendingSeekTask?.value
+        await restAPIService.lastCommandTask?.value
     }
 }
 
