@@ -244,23 +244,15 @@ class RestAPIServiceTests: XCTestCase {
     func testReportToSystemLog_postsMessageLevelAndLoggerToSystemLogWrite() async {
         _ = stubInternalSystemLogURL()
 
-        let requestObserved = expectation(description: "system_log.write POST observed")
-        var capturedPath: String?
-        var capturedBody: [String: Any]?
-        URLProtocolStub.observerRequests { request in
-            guard request.httpMethod == "POST" else { return }
-            capturedPath = request.url?.path
-            if let body = request.httpBodyStreamData() ?? request.httpBody,
-               let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any] {
-                capturedBody = json
-            }
-            requestObserved.fulfill()
-        }
+        // reportToSystemLog dispatches a detached Task, so await the request itself.
+        let recorder = RequestRecorder { $0.httpMethod == "POST" }
 
         restAPIService.reportToSystemLog(message: "Something broke", level: "error")
 
-        await fulfillment(of: [requestObserved], timeout: 2)
-        XCTAssertEqual(capturedPath, "/api/services/system_log/write")
+        let request = await recorder.first()
+        let capturedBody = (request.httpBodyStreamData() ?? request.httpBody)
+            .flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+        XCTAssertEqual(request.url?.path, "/api/services/system_log/write")
         XCTAssertEqual(capturedBody?["message"] as? String, "Something broke")
         XCTAssertEqual(capturedBody?["level"] as? String, "error")
         XCTAssertEqual(capturedBody?["logger"] as? String, "intellinest")
@@ -274,17 +266,14 @@ class RestAPIServiceTests: XCTestCase {
         let response = HTTPURLResponse(url: externalURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: externalURL, data: Data(), response: response, error: nil)
 
-        let externalObserved = expectation(description: "external system_log.write POST observed")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST",
-               request.url?.absoluteString.contains(GlobalConstants.baseExternalUrlString) == true {
-                externalObserved.fulfill()
-            }
+        let recorder = RequestRecorder { request in
+            request.httpMethod == "POST"
+                && request.url?.absoluteString.contains(GlobalConstants.baseExternalUrlString) == true
         }
 
         restAPIService.reportToSystemLog(message: "Fallback please", level: "warning")
 
-        await fulfillment(of: [externalObserved], timeout: 2)
+        _ = await recorder.first()
     }
 
     // MARK: - Log → Home Assistant forwarding
@@ -299,17 +288,14 @@ class RestAPIServiceTests: XCTestCase {
         Log.resetRemoteReporting()
         defer { Log.resetRemoteReporting() }
 
-        let forwarded = expectation(description: "error forwarded")
-        var capturedLevel: String?
-        Log.remoteReporter = { level, _ in
-            capturedLevel = level
-            forwarded.fulfill()
+        // Logging hops to the main actor in a detached Task, so await the callback
+        // itself rather than a deadline.
+        let level = await withCheckedContinuation { (continuation: CheckedContinuation<String, Never>) in
+            Log.remoteReporter = { level, _ in continuation.resume(returning: level) }
+            Log.error("Boom")
         }
 
-        Log.error("Boom")
-
-        await fulfillment(of: [forwarded], timeout: 2)
-        XCTAssertEqual(capturedLevel, "error")
+        XCTAssertEqual(level, "error")
     }
 
     func testLogInfo_isNotForwardedToReporter() async {

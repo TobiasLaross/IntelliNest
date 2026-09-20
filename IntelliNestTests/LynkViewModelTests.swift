@@ -426,9 +426,9 @@ class LynkViewModelTests: XCTestCase {
     // MARK: - Concurrent Reload Guard
 
     func testReloadGuard_preventsConcurrentReload() async {
-        // Stub with small delay so first reload() is in-flight when second starts
+        let gate = StubGate()
         for entityID in viewModel.entityIDs {
-            stubEntityURL(entityID: entityID, state: "on", delay: 0.05)
+            stubEntityURL(entityID: entityID, state: "on", gate: gate)
         }
 
         let lock = NSLock()
@@ -440,9 +440,15 @@ class LynkViewModelTests: XCTestCase {
             lock.unlock()
         }
 
-        async let first: () = viewModel.reload()
-        async let second: () = viewModel.reload()
-        _ = await (first, second)
+        // Hold the first reload inside reloadEntities, then call reload() again. The
+        // guard returns straight away while a reload is in flight, so the second call
+        // completing without adding requests is what proves it. Previously the overlap
+        // was bought with a 50 ms stub delay and hoped for.
+        let first = Task { await viewModel.reload() }
+        await gate.waitForRequests(count: 1)
+        await viewModel.reload()
+        gate.open()
+        await first.value
 
         // Guard allows only one pass through reloadEntities() = 26 GETs
         XCTAssertEqual(requestCount, viewModel.entityIDs.count,

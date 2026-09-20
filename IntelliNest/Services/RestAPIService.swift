@@ -12,9 +12,21 @@ class RestAPIService: URLRequestBuilder {
     private let statusCodeFailedRequest = 3
 
     private let urlCreator: URLCreator
-    private let session: URLSession
+    let session: URLSession
     let setErrorBannerText: StringStringClosure
     private let repeatReloadAction: IntClosure
+
+    /// The most recent fire-and-forget command this service dispatched.
+    ///
+    /// Every command here returns immediately and does its work in a detached
+    /// `Task` so the UI can update optimistically. That leaves a test with nothing
+    /// to await, so the transport tests waited out a wall-clock deadline instead and
+    /// went flaky whenever a loaded CI runner missed it. Awaiting this is
+    /// deterministic. It holds only the latest command, so a test firing two in a row
+    /// must await each before firing the next. Logging and APNs registration stay
+    /// untracked on purpose, so a log written mid-test can't displace the command a
+    /// test is about to await.
+    var lastCommandTask: Task<Void, Never>?
 
     init(
         urlCreator: URLCreator,
@@ -143,7 +155,7 @@ class RestAPIService: URLRequestBuilder {
     // MARK: Post requests
 
     func callService(serviceID: ServiceID, domain: Domain, json: [JSONKey: Any]? = nil, reloadTimes: Int = 2) {
-        Task {
+        lastCommandTask = Task {
             if let action = serviceID.toAction {
                 await sendPostRequest(json: json, domain: domain, action: action)
             } else {
@@ -180,7 +192,7 @@ class RestAPIService: URLRequestBuilder {
     }
 
     func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil, reloadTimes: Int = 1) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = scriptID.rawValue
             if let variables {
@@ -273,7 +285,7 @@ class RestAPIService: URLRequestBuilder {
 
 extension RestAPIService {
     func update(entityID: EntityId, domain: Domain, action: Action, reloadTimes: Int = 1) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             await sendPostRequest(json: json, domain: domain, action: action)
@@ -282,7 +294,7 @@ extension RestAPIService {
     }
 
     func update(lightIDs: [EntityId], action: Action, brightness: Int, reloadTimes: Int = 1) {
-        Task {
+        lastCommandTask = Task {
             await withTaskGroup(of: Void.self) { group in
                 for lightID in lightIDs {
                     group.addTask {
@@ -302,7 +314,7 @@ extension RestAPIService {
     }
 
     func update(dateEntityID: EntityId, date: Date, reloadTimes: Int = 1) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = dateEntityID.rawValue
             json[.dateTime] = date
@@ -312,7 +324,7 @@ extension RestAPIService {
     }
 
     func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: String, reloadTimes: Int = 1) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
@@ -322,7 +334,7 @@ extension RestAPIService {
     }
 
     func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Int, reloadTimes: Int = 1) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
@@ -333,7 +345,7 @@ extension RestAPIService {
 
     func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: Double,
                 reloadTimes: Int = 1, fireAndForget: Bool = false) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[dataKey] = dataValue
@@ -343,56 +355,12 @@ extension RestAPIService {
     }
 
     func update(numberEntityID: EntityId, number: Double, reloadTimes: Int = 1) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = numberEntityID.rawValue
             json[.value] = number
             await sendPostRequest(json: json, domain: .inputNumber, action: .setValue)
             repeatReloadAction(reloadTimes)
-        }
-    }
-}
-
-// MARK: - Remote logging
-
-extension RestAPIService {
-    /// Forwards a log line to Home Assistant's system log (`system_log.write`) so the
-    /// app's errors and warnings show up next to HA's own logs. Failures here are
-    /// swallowed on purpose: this runs from `Log.error`/`Log.warning`, so logging a
-    /// failure — or showing the error banner — would recurse or spam the user.
-    func reportToSystemLog(message: String, level: String) {
-        let json: [JSONKey: Any] = [
-            .message: message,
-            .level: level,
-            .logger: "intellinest"
-        ]
-        guard let jsonData = createJSONData(json: json) else { return }
-        let path = "/api/services/\(Domain.systemLog.rawValue)/\(Action.write.rawValue)"
-        Task {
-            await sendSystemLogRequest(path: path, jsonData: jsonData, forceExternalURL: false)
-        }
-    }
-
-    private func sendSystemLogRequest(path: String, jsonData: Data, forceExternalURL: Bool) async {
-        guard let request = createURLRequest(shouldForceExternalURL: forceExternalURL,
-                                             path: path,
-                                             jsonData: jsonData,
-                                             method: .post) else {
-            return
-        }
-
-        let statusCode: Int?
-        do {
-            let (_, response) = try await session.data(for: request)
-            statusCode = (response as? HTTPURLResponse)?.statusCode
-        } catch {
-            statusCode = nil
-        }
-
-        let succeeded = (statusCode ?? 500) < 300
-        let url = request.url?.absoluteString ?? ""
-        if !succeeded, !forceExternalURL, !url.contains(GlobalConstants.baseExternalUrlString) {
-            await sendSystemLogRequest(path: path, jsonData: jsonData, forceExternalURL: true)
         }
     }
 }

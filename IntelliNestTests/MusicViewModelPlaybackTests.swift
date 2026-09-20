@@ -50,31 +50,23 @@ extension MusicViewModelTests {
     func testTogglePlayPause_pausesWhenPlaying() async {
         stubAllSpeakers(playing: .mediaPlayerKitchen)
         await viewModel.reload()
-        let expectation = XCTestExpectation(description: "POST media_pause")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/media_pause") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_pause") == true }
         stubPostService(path: "/api/services/media_player/media_pause")
         viewModel.togglePlayPause()
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "paused")
-        await fulfillment(of: [expectation], timeout: 2.0)
+        await restAPIService.lastCommandTask?.value
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 
     func testTogglePlayPause_playsWhenPaused() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         viewModel.speakers[.mediaPlayerKitchen]?.state = "paused"
-        let expectation = XCTestExpectation(description: "POST media_play")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/media_play") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_play") == true }
         stubPostService(path: "/api/services/media_player/media_play")
         viewModel.togglePlayPause()
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
-        await fulfillment(of: [expectation], timeout: 2.0)
+        await restAPIService.lastCommandTask?.value
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 
     func testNextAndPreviousTrack() async {
@@ -84,15 +76,11 @@ extension MusicViewModelTests {
             (viewModel.previousTrack, "/api/services/media_player/media_previous_track")
         ]
         for testCase in cases {
-            let expectation = XCTestExpectation(description: "POST \(testCase.path)")
-            URLProtocolStub.observerRequests { request in
-                if request.httpMethod == "POST", request.url?.path == testCase.path {
-                    expectation.fulfill()
-                }
-            }
+            let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path == testCase.path }
             stubPostService(path: testCase.path)
             testCase.action()
-            await fulfillment(of: [expectation], timeout: 2.0)
+            await restAPIService.lastCommandTask?.value
+            XCTAssertEqual(recorder.requests.count, 1, testCase.path)
         }
     }
 
@@ -111,31 +99,23 @@ extension MusicViewModelTests {
 
     func testSetVolumeUpdatesStateAndPosts() async {
         viewModel.selectSpeaker(.mediaPlayerGuestRoom)
-        let expectation = XCTestExpectation(description: "POST volume_set")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/volume_set") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/volume_set") == true }
         stubPostService(path: "/api/services/media_player/volume_set")
         viewModel.setVolume(0.75)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerGuestRoom]?.volumeLevel, 0.75)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        await restAPIService.lastCommandTask?.value
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 
     func testSetVolumeForSpecificSpeakerAdjustsThatSpeakerWithoutSelecting() async {
         // No active speaker — volume can still be set on any speaker in place.
-        let expectation = XCTestExpectation(description: "POST volume_set")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/volume_set") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/volume_set") == true }
         stubPostService(path: "/api/services/media_player/volume_set")
         viewModel.setVolume(0.42, for: .mediaPlayerSpa)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.volumeLevel, 0.42)
         XCTAssertNil(viewModel.activeSpeakerID)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        await restAPIService.lastCommandTask?.value
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 
     // MARK: - Shuffle / Repeat
@@ -143,16 +123,12 @@ extension MusicViewModelTests {
     func testToggleShuffle() async {
         viewModel.selectSpeaker(.mediaPlayerPlayroom)
         viewModel.speakers[.mediaPlayerPlayroom]?.shuffle = false
-        let expectation = XCTestExpectation(description: "POST shuffle_set")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/shuffle_set") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/shuffle_set") == true }
         stubPostService(path: "/api/services/media_player/shuffle_set")
         viewModel.toggleShuffle()
         XCTAssertEqual(viewModel.speakers[.mediaPlayerPlayroom]?.shuffle, true)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        await restAPIService.lastCommandTask?.value
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 
     func testToggleRepeatCyclesOffAllOne() async {

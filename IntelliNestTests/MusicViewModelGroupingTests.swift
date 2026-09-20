@@ -7,16 +7,11 @@ import XCTest
 extension MusicViewModelTests {
     func testJoinAddsSpeakerToGroup() async {
         viewModel.selectSpeaker(.mediaPlayerLivingRoom)
-        let expectation = XCTestExpectation(description: "POST join")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/media_player/join") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_player/join") == true }
         stubPostService(path: "/api/services/media_player/join")
         XCTAssertFalse(viewModel.isGrouped(.mediaPlayerKitchen))
         await viewModel.toggleGroupMember(.mediaPlayerKitchen)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 
     func testJoinRefreshesMembershipImmediatelyAndClearsPending() async {
@@ -65,15 +60,10 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerLivingRoom)
         XCTAssertTrue(viewModel.isGrouped(.mediaPlayerKitchen))
 
-        let expectation = XCTestExpectation(description: "POST unjoin")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/media_player/unjoin") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_player/unjoin") == true }
         stubPostService(path: "/api/services/media_player/unjoin")
         await viewModel.toggleGroupMember(.mediaPlayerKitchen)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 
     func testJoinUnjoinsSpeakerFromItsOldGroupFirst() async {
@@ -179,15 +169,10 @@ extension MusicViewModelTests {
         await reloadGroupedKitchenLeader()
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
 
-        let expectation = XCTestExpectation(description: "POST unjoin")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "POST", request.url?.path.contains("/media_player/unjoin") == true {
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_player/unjoin") == true }
         stubPostService(path: "/api/services/media_player/unjoin")
         await viewModel.removeActiveSpeakerFromGroup()
-        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertEqual(recorder.requests.count, 1)
         // The next remaining member in display order takes over as active.
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerPlayroom)
     }

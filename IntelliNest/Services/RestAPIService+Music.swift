@@ -198,7 +198,7 @@ extension RestAPIService {
     }
 
     func setShuffle(entityID: EntityId, shuffle: Bool, reloadTimes: Int = 2) {
-        Task {
+        lastCommandTask = Task {
             var json = [JSONKey: Any]()
             json[.entityID] = entityID.rawValue
             json[.shuffle] = shuffle

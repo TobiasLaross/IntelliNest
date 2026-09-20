@@ -73,7 +73,7 @@ extension MusicViewModel {
         // position for a cycle or two, which would otherwise snap the scrubber back.
         let hold = PlaybackPositionHold(target: clamped, since: now)
         positionHold = hold
-        Task {
+        pendingSeekTask = Task {
             // Group membership can change between reloads; refresh before resolving
             // the leader so the seek isn't routed to a stale leader (or a follower
             // that rejects it), matching `startPlayback`.

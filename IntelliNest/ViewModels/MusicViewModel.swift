@@ -180,6 +180,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// The in-flight debounced search, cancelled on the next keystroke so only the
     /// pause the user actually stopped at reaches Home Assistant.
     var pendingSearchTask: Task<Void, Never>?
+    /// The in-flight seek. A seek resolves the group leader asynchronously before
+    /// routing the command, so this is what a test awaits to know the command has
+    /// reached `RestAPIService` — whose `lastCommandTask` then covers the POST.
+    var pendingSeekTask: Task<Void, Never>?
     /// URIs of the playlists the huset Spotify library carries. A personal playlist
     /// found on its owner's public profile is deliberately absent, which keeps the
     /// MA auto-favourite sync from following somebody's whole public catalogue.

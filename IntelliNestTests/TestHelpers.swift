@@ -37,11 +37,11 @@ func makeEntityJSON(entityId: String, state: String, lastUpdated: String) -> Dat
     """.utf8)
 }
 
-func stubEntityURL(entityID: EntityId, state: String, delay: TimeInterval = 0) {
+func stubEntityURL(entityID: EntityId, state: String, gate: StubGate? = nil) {
     let url = entityStateURL(for: entityID)
     let data = makeEntityJSON(entityId: entityID.rawValue, state: state)
     let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delay)
+    URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, gate: gate)
 }
 
 func stubEntityURL(entityID: EntityId, state: String, lastUpdated: String) {

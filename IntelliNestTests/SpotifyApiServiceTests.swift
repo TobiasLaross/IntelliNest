@@ -182,17 +182,16 @@ final class SpotifyApiServiceTests: XCTestCase {
     }
 
     func testSaveSendsBearerTokenAndPutMethod() async {
-        let expectation = XCTestExpectation(description: "PUT followers with bearer token")
-        URLProtocolStub.observerRequests { request in
-            if request.httpMethod == "PUT",
-               request.url?.path == "/v1/playlists/\(self.playlistID)/followers",
-               request.value(forHTTPHeaderField: "Authorization") == "Bearer stub-access-token" {
-                expectation.fulfill()
-            }
+        let recorder = RequestRecorder { request in
+            request.httpMethod == "PUT"
+                && request.url?.path == "/v1/playlists/\(self.playlistID)/followers"
+                && request.value(forHTTPHeaderField: "Authorization") == "Bearer stub-access-token"
         }
         stub(url: spotifyURL(path: "/playlists/\(playlistID)/followers"), statusCode: 200)
+
         let result = await service.savePlaylist(playlistID: playlistID)
+
         XCTAssertTrue(result)
-        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertEqual(recorder.requests.count, 1)
     }
 }

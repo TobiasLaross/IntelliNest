@@ -240,4 +240,27 @@ Tests live in `IntelliNestTests/`. The pattern:
 2. `TestHelpers.swift` provides factory helpers for common stub setups.
 3. ViewModels are instantiated with a stubbed `URLSession` passed through `RestAPIService`.
 
-Tests validate both initial state and post-`reload()` state. Use `await Task.yield()` or short `Task.sleep` calls only when async work must settle — check existing tests for the established pattern before adding new ones.
+Tests validate both initial state and post-`reload()` state.
+
+**No wall-clock waiting in tests — ever.** No `Task.sleep`, no `XCTestExpectation`
+with a `timeout:`, no asserting that something "finished in under N seconds". A
+deadline either makes the suite slow or makes it flaky, and it fails for reasons
+that have nothing to do with the code under test. Await the work itself instead:
+
+- **A fire-and-forget `Task`** — the dispatcher exposes its handle, so await that:
+  `RestAPIService.lastCommandTask`, `MusicViewModel.pendingSeekTask`,
+  `MusicViewModel.pendingSearchTask`. Add one the same way when you introduce
+  another fire-and-forget path.
+- **A request that must be observed** — `RequestRecorder` (`URLProtocolStub.swift`)
+  suspends until a matching request arrives, with no deadline.
+- **Requests that must overlap** — `StubGate` holds stubbed responses until the test
+  opens it, so "these ran concurrently" is a fact rather than an inference from
+  elapsed time. `waitForRequests(count:)` resumes when they actually arrive.
+- **A callback** — wrap it in a `withCheckedContinuation` and await that.
+- **An injected delay in production code** — pass a closure (see `searchDebounce`
+  and `waitBeforeGroupRecheck` on `MusicViewModel`) and hand tests one that returns
+  immediately.
+
+If a test seems to need a deadline, the code under test is missing a seam. Add the
+seam. A test that hangs because the work never happened is a better outcome than one
+that passes because a timer expired.
