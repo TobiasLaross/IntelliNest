@@ -31,9 +31,12 @@ extension HomeViewModelTests {
     }
 
     func testReloadFetchesEntitiesInParallel() async {
-        // Given: each entity stub has a 0.1 s delay.
-        // Sequential execution would take n × 0.1 s; parallel should finish in ~0.1 s.
-        let delayPerEntity = 0.1
+        // Every entity stub is held at the same gate, so none of them can answer
+        // until this test opens it. A sequential reload would block on the first
+        // request and the rest would never arrive — so all of them reaching the gate
+        // at once *is* the proof of parallelism. The old version inferred it from
+        // elapsed time instead, which measured how busy the machine was.
+        let gate = StubGate()
         XCTAssertNotEqual(viewModel.coffeeMachine.state, "on")
         XCTAssertNotEqual(viewModel.easeeStatus.state, "on")
         XCTAssertNotEqual(viewModel.allLights.state, "on")
@@ -43,17 +46,14 @@ extension HomeViewModelTests {
             let url = components.url!
             let data = makeEntityJSON(entityId: entityID.rawValue, state: "on")
             let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-            URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, delay: delayPerEntity)
+            URLProtocolStub.setStub(for: url, data: data, response: response, error: nil, gate: gate)
         }
 
-        // When
-        let start = Date()
-        await viewModel.reload()
-        let elapsed = Date().timeIntervalSince(start)
+        let reload = Task { await viewModel.reload() }
+        await gate.waitForRequests(count: viewModel.entityIDs.count)
+        gate.open()
+        await reload.value
 
-        // Then: all entities loaded, and total time is well under sequential execution time
-        let sequentialTime = Double(viewModel.entityIDs.count) * delayPerEntity
-        XCTAssertLessThan(elapsed, sequentialTime * 0.5, "Parallel: \(elapsed)s; sequential would be \(sequentialTime)s")
         XCTAssertEqual(viewModel.coffeeMachine.state, "on")
         XCTAssertEqual(viewModel.easeeStatus.state, "on")
         XCTAssertEqual(viewModel.allLights.state, "on")

@@ -253,8 +253,9 @@ class HeatersViewModelTests: XCTestCase {
     // MARK: - Concurrent Reload Guard
 
     func testReloadGuard_preventsConcurrentReload() async {
+        let gate = StubGate()
         for entityID in viewModel.entityIDs where entityID != .purifierFanSpeed && entityID != .purifier500FanSpeed {
-            stubEntityURL(entityID: entityID, state: "on", delay: 0.05)
+            stubEntityURL(entityID: entityID, state: "on", gate: gate)
         }
         stubFanSpeed(.purifierFanSpeed, percentage: 100.0)
         stubFanSpeed(.purifier500FanSpeed, percentage: 40.0)
@@ -268,9 +269,15 @@ class HeatersViewModelTests: XCTestCase {
             lock.unlock()
         }
 
-        async let first: () = viewModel.reload()
-        async let second: () = viewModel.reload()
-        _ = await (first, second)
+        // Hold the first reload inside reloadEntities, then call reload() again. The
+        // guard returns straight away while a reload is in flight, so the second call
+        // completing without adding requests is what proves it. Previously the overlap
+        // was bought with a 50 ms stub delay and hoped for.
+        let first = Task { await viewModel.reload() }
+        await gate.waitForRequests(count: 1)
+        await viewModel.reload()
+        gate.open()
+        await first.value
 
         XCTAssertLessThanOrEqual(requestCount, viewModel.entityIDs.count,
                                  "Concurrent guard failed: \(requestCount) requests > \(viewModel.entityIDs.count)")

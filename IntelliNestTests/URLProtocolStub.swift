@@ -7,6 +7,137 @@
 
 import Foundation
 
+/// Holds stubbed responses open until a test releases them.
+///
+/// This replaces the stub's old `delay:` parameter. A delay bought request overlap
+/// with wall-clock time, which is what made the tests using it racy: on a loaded
+/// machine the "still in flight" window could close before the test looked, and the
+/// assertions that measured elapsed time were really measuring the runner's mood. A
+/// gate makes the overlap a fact — a held request cannot complete until `open()` —
+/// and `waitForRequests(count:)` resumes the moment the requests actually arrive.
+final class StubGate: @unchecked Sendable {
+    private let lock = NSLock()
+    private var isOpen = false
+    private var heldWork: [DispatchWorkItem] = []
+    private var arrivedCount = 0
+    private var waiters: [(needed: Int, continuation: CheckedContinuation<Void, Never>)] = []
+
+    /// Called by the stub when a request reaches this gate.
+    func arrive(_ work: DispatchWorkItem) {
+        lock.lock()
+        arrivedCount += 1
+        let ready = waiters.filter { arrivedCount >= $0.needed }
+        waiters.removeAll { arrivedCount >= $0.needed }
+        let runNow = isOpen
+        if !runNow {
+            heldWork.append(work)
+        }
+        lock.unlock()
+
+        for waiter in ready {
+            waiter.continuation.resume()
+        }
+        if runNow {
+            work.perform()
+        }
+    }
+
+    /// Resumes once `count` requests have reached the gate.
+    ///
+    /// Deliberately has no deadline. If the requests never arrive the test hangs and
+    /// the run says so, which is the honest outcome — a short wait expiring instead
+    /// would let the assertions that follow pass on a lie.
+    func waitForRequests(count: Int) async {
+        await withCheckedContinuation { continuation in
+            lock.lock()
+            if arrivedCount >= count {
+                lock.unlock()
+                continuation.resume()
+                return
+            }
+            waiters.append((count, continuation))
+            lock.unlock()
+        }
+    }
+
+    /// Lets every held request finish, and any later one straight through.
+    func open() {
+        lock.lock()
+        isOpen = true
+        let pending = heldWork
+        heldWork = []
+        lock.unlock()
+        // Off the caller's thread, matching where a held response used to resume.
+        for work in pending {
+            DispatchQueue.global().async(execute: work)
+        }
+    }
+}
+
+/// Records intercepted requests matching a predicate, and lets a test await the
+/// first match.
+///
+/// Some work is dispatched into a detached `Task` (logging, the system-log
+/// forwarder) and so finishes after the call that started it has returned. Awaiting
+/// the request itself is exact; the `XCTestExpectation` + `timeout:` this replaces
+/// was a wall-clock deadline that a loaded machine could miss.
+///
+/// Installing a recorder replaces the stub's single request observer, so use one at
+/// a time — which is how these tests already worked.
+final class RequestRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private let matches: (URLRequest) -> Bool
+    private var recorded: [URLRequest] = []
+    private var waiters: [CheckedContinuation<URLRequest, Never>] = []
+
+    init(where matches: @escaping (URLRequest) -> Bool) {
+        self.matches = matches
+        URLProtocolStub.observerRequests { [weak self] request in
+            self?.record(request)
+        }
+    }
+
+    /// Every matching request seen so far. Use this when the call under test is
+    /// itself `await`ed, so the request has already been made by the time you look.
+    var requests: [URLRequest] {
+        lock.lock()
+        defer { lock.unlock() }
+        return recorded
+    }
+
+    /// Suspends until a matching request arrives, returning the first one.
+    ///
+    /// Deliberately has no deadline: a request that never arrives hangs the test and
+    /// the run says so, rather than a short wait expiring and letting the assertions
+    /// after it pass on a lie.
+    func first() async -> URLRequest {
+        await withCheckedContinuation { continuation in
+            lock.lock()
+            if let existing = recorded.first {
+                lock.unlock()
+                continuation.resume(returning: existing)
+                return
+            }
+            waiters.append(continuation)
+            lock.unlock()
+        }
+    }
+
+    private func record(_ request: URLRequest) {
+        guard matches(request) else {
+            return
+        }
+        lock.lock()
+        recorded.append(request)
+        let pending = waiters
+        waiters = []
+        lock.unlock()
+        for continuation in pending {
+            continuation.resume(returning: request)
+        }
+    }
+}
+
 class URLProtocolStub: URLProtocol {
     private static let stubLock = NSLock()
     private static var stubs: [URL: Stub] = [:]
@@ -16,13 +147,13 @@ class URLProtocolStub: URLProtocol {
         let data: Data?
         let response: URLResponse?
         let error: Error?
-        let delay: TimeInterval
+        let gate: StubGate?
     }
 
     private var pendingWork: DispatchWorkItem?
 
-    static func setStub(for url: URL, data: Data?, response: URLResponse?, error: Error?, delay: TimeInterval = 0) {
-        let stub = Stub(data: data, response: response, error: error, delay: delay)
+    static func setStub(for url: URL, data: Data?, response: URLResponse?, error: Error?, gate: StubGate? = nil) {
+        let stub = Stub(data: data, response: response, error: error, gate: gate)
         stubLock.lock()
         stubs[url] = stub
         stubLock.unlock()
@@ -91,8 +222,8 @@ class URLProtocolStub: URLProtocol {
         }
         pendingWork = work
 
-        if stub.delay > 0 {
-            DispatchQueue.global().asyncAfter(deadline: .now() + stub.delay, execute: work)
+        if let gate = stub.gate {
+            gate.arrive(work)
         } else {
             work.perform()
         }

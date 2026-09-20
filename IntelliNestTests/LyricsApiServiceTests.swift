@@ -125,18 +125,14 @@ final class LyricsApiServiceTests: XCTestCase {
 
     func testSendsDescriptiveUserAgentToLRCLIB() async {
         let getURL = lrclibGetURL(duration: 233)
-        let expectation = XCTestExpectation(description: "User-Agent on LRCLIB request")
-        URLProtocolStub.observerRequests { request in
-            if request.url == getURL {
-                XCTAssertEqual(request.value(forHTTPHeaderField: "User-Agent"), self.userAgent)
-                expectation.fulfill()
-            }
-        }
+        let recorder = RequestRecorder { $0.url == getURL }
         stub(getURL, json: """
         {"duration":233,"plainLyrics":null,"syncedLyrics":"[00:01.00]Hello world"}
         """)
+
         _ = await service.fetchLyrics(title: title, artist: artist, album: nil, durationSeconds: 233)
-        await fulfillment(of: [expectation], timeout: 2.0)
+
+        XCTAssertEqual(recorder.requests.first?.value(forHTTPHeaderField: "User-Agent"), userAgent)
     }
 }
 

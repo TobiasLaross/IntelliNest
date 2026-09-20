@@ -18,12 +18,12 @@ class URLCreatorTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func stubAPIURL(baseURLString: String, statusCode: Int = 200, delay: TimeInterval = 0) {
+    private func stubAPIURL(baseURLString: String, statusCode: Int = 200, gate: StubGate? = nil) {
         var components = URLComponents(string: baseURLString)!
         components.path = "/api"
         let url = components.url!
         let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
-        URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil, delay: delay)
+        URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil, gate: gate)
     }
 
     // MARK: - Connection State Tests
@@ -54,28 +54,26 @@ class URLCreatorTests: XCTestCase {
     }
 
     func testUpdateConnectionState_localSucceedsFirst_doesNotWaitForSlowExternal() async {
-        // Local URL responds immediately; external has a 10-second delay
-        stubAPIURL(baseURLString: GlobalConstants.baseInternalUrlString, delay: 0)
-        stubAPIURL(baseURLString: GlobalConstants.baseExternalUrlString, delay: 10)
+        // The external URL is gated and never released, so it cannot answer at all.
+        // Returning is therefore proof that the local result was enough — stronger
+        // than the old "finished in under 3 seconds", and it can't be swayed by how
+        // busy the machine is.
+        let neverAnswers = StubGate()
+        stubAPIURL(baseURLString: GlobalConstants.baseInternalUrlString)
+        stubAPIURL(baseURLString: GlobalConstants.baseExternalUrlString, gate: neverAnswers)
 
-        let start = Date()
         await urlCreator.updateConnectionState(ignoreLocalSSID: true)
-        let elapsed = Date().timeIntervalSince(start)
 
         XCTAssertEqual(urlCreator.connectionState, .local)
-        XCTAssertLessThan(elapsed, 3.0, "Should not wait for the slow external URL – got \(elapsed)s")
     }
 
     func testUpdateConnectionState_externalSucceedsFirst_doesNotWaitForSlowLocal() async {
-        // Internal URL has a 10-second delay; external responds immediately
-        stubAPIURL(baseURLString: GlobalConstants.baseInternalUrlString, delay: 10)
-        stubAPIURL(baseURLString: GlobalConstants.baseExternalUrlString, delay: 0)
+        let neverAnswers = StubGate()
+        stubAPIURL(baseURLString: GlobalConstants.baseInternalUrlString, gate: neverAnswers)
+        stubAPIURL(baseURLString: GlobalConstants.baseExternalUrlString)
 
-        let start = Date()
         await urlCreator.updateConnectionState(ignoreLocalSSID: true)
-        let elapsed = Date().timeIntervalSince(start)
 
         XCTAssertEqual(urlCreator.connectionState, .internet)
-        XCTAssertLessThan(elapsed, 3.0, "Should not wait for the slow internal URL – got \(elapsed)s")
     }
 }
