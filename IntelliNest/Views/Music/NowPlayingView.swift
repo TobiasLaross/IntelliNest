@@ -14,12 +14,7 @@ struct NowPlayingView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 8) {
-                Image(systemName: "hifispeaker.fill")
-                    .foregroundStyle(.yellow)
-                Text(speaker.friendlyName)
-                    .font(.headline)
-                    .foregroundStyle(.yellow)
-                    .lineLimit(1)
+                speakerNameButton
                 Spacer(minLength: 4)
                 // Each action gets a full 44×44 hit target so the controls are
                 // comfortably tappable and evenly spaced.
@@ -78,6 +73,27 @@ struct NowPlayingView: View {
     /// A header action rendered with a full 44×44 hit target (Apple's minimum), so
     /// the now-playing controls are easy to tap and evenly spaced. `isActive`
     /// tints the icon yellow to show a toggled-on state (used by the lyrics toggle).
+    /// The speaker name doubles as the way to switch speaker — the same picker as
+    /// the button beside the search field, where a thumb already rests on the card.
+    private var speakerNameButton: some View {
+        Button {
+            viewModel.isShowingSpeakerPicker = true
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "hifispeaker.fill")
+                Text(speaker.friendlyName)
+                    .font(.headline)
+                    .lineLimit(1)
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+            }
+            .foregroundStyle(.yellow)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(speaker.friendlyName), byt högtalare")
+    }
+
     private func headerButton(_ systemName: String,
                               label: String,
                               isActive: Bool = false,

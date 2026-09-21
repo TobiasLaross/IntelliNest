@@ -139,13 +139,15 @@ extension MusicViewModelTests {
     func makeViewModel(spotify: SpotifyPlaylistService,
                        socket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
                        personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
-                       currentUser: @escaping @MainActor () -> User = { .tobias }) -> MusicViewModel {
+                       currentUser: @escaping @MainActor () -> User = { .tobias },
+                       pinnedPlaylistStore: PinnedPlaylistStore = PinnedPlaylistStore(load: { [:] }, save: { _ in })) -> MusicViewModel {
         MusicViewModel(restAPIService: restAPIService,
                        setErrorBannerText: { [weak self] title, _ in self?.bannerTitles.append(title) },
                        spotify: spotify,
                        queueSocket: socket,
                        personalAccounts: personalAccounts,
                        currentUser: currentUser,
+                       pinnedPlaylistStore: pinnedPlaylistStore,
                        // No wall-clock wait in tests: a scheduled search runs as soon
                        // as its task is awaited.
                        searchDebounce: {})

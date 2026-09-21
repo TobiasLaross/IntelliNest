@@ -195,6 +195,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// The library section the user opened via "Visa alla", shown full-screen with
     /// its own filter field. Nil while no section is expanded.
     @Published var expandedLibrarySection: MusicLibrarySection?
+    /// Playlist URIs pinned to the start screen, per library section id, in pin
+    /// order. Managed by `MusicViewModel+Library`.
+    @Published var pinnedPlaylistURIs: [String: [String]] = [:]
+    let pinnedPlaylistStore: PinnedPlaylistStore
 
     /// Injected dependencies — internal (not private) so the playback/playlist
     /// methods extracted into `MusicViewModel+Playback` can reach them.
@@ -265,6 +269,7 @@ class MusicViewModel: ObservableObject, Reloadable {
          lyricsService: LyricsService = DisabledLyricsService(),
          personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
          currentUser: @escaping @MainActor () -> User = { UserManager.currentUser },
+         pinnedPlaylistStore: PinnedPlaylistStore = .userDefaults,
          loadLastSpeaker: @escaping @MainActor () -> EntityId? = {
              UserDefaults.shared.string(forKey: StorageKeys.lastMusicSpeaker.rawValue).flatMap { EntityId(rawValue: $0) }
          },
@@ -284,6 +289,8 @@ class MusicViewModel: ObservableObject, Reloadable {
         self.lyricsService = lyricsService
         self.personalAccounts = personalAccounts
         self.currentUser = currentUser
+        self.pinnedPlaylistStore = pinnedPlaylistStore
+        pinnedPlaylistURIs = pinnedPlaylistStore.load()
         self.loadLastSpeaker = loadLastSpeaker
         self.saveLastSpeaker = saveLastSpeaker
         self.searchDebounce = searchDebounce
