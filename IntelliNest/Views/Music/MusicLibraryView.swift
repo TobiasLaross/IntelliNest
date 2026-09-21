@@ -190,33 +190,105 @@ struct MusicLibraryListView: View {
     }
 }
 
-/// Shown under the filtered library: the library is what the user has, and this
-/// is the way out to everything else. It doubles as the empty state — when no
-/// playlist matches it is the only thing left on screen, which reads as "not
-/// here, try Spotify" rather than a blank panel.
-struct SpotifySearchEscalationRow: View {
-    let query: String
-    let onTap: MainActorVoidClosure
+/// The Spotify hits listed under the filtered library, one card per category,
+/// so a search shows the house's own playlists and everything else together
+/// without a tap in between. Each card shows the first few hits; "Visa alla"
+/// opens the full results sheet on that category.
+struct SpotifySearchResultsSections: View {
+    @ObservedObject var viewModel: MusicViewModel
+    let onShowAll: (MusicMediaType) -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 12) {
-                Image(systemName: "magnifyingglass")
-                Text("Sök på Spotify efter \"\(query)\"")
-                    .lineLimit(1)
-                Spacer(minLength: 8)
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.4))
+        let sections = viewModel.inlineSearchSections
+        if sections.isEmpty {
+            status
+        } else {
+            ForEach(sections) { section in
+                card(section)
             }
-            .foregroundStyle(.white)
-            .padding()
+        }
+    }
+
+    @ViewBuilder private var status: some View {
+        if viewModel.isSearching {
+            HStack(spacing: 8) {
+                ProgressView()
+                    .tint(.white)
+                Text("Söker på Spotify…")
+            }
+            .foregroundStyle(.white.opacity(0.7))
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.white.opacity(0.05))
-            .cornerRadius(16)
+        } else if viewModel.hasNoResults {
+            Text("Inga träffar på Spotify")
+                .foregroundStyle(.white.opacity(0.7))
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func card(_ section: MusicSearchSection) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("\(section.mediaType.swedishTitle) på Spotify")
+                .font(.headline)
+            ForEach(section.items.prefix(MusicViewModel.overviewRowCount)) { item in
+                row(item)
+            }
+            if section.items.count > MusicViewModel.overviewRowCount {
+                showAllButton(section)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(Color.white.opacity(0.05))
+        .cornerRadius(16)
+    }
+
+    /// Same behaviour as the results sheet: a track plays, anything else opens
+    /// its own screen so a stray tap can't replace the queue.
+    @ViewBuilder private func row(_ item: MusicSearchItem) -> some View {
+        switch item.mediaType {
+        case .track:
+            MusicMediaRow(name: item.name, subtitle: item.artist, imageURL: item.imageURL) {
+                Task { await viewModel.play(item: item) }
+            }
+            .contextMenu {
+                TrackActionButtons(viewModel: viewModel,
+                                   uri: item.uri,
+                                   title: item.name,
+                                   artist: item.artist,
+                                   imageURL: item.imageURL)
+            }
+        case .playlist:
+            MusicMediaRow(name: item.name,
+                          subtitle: item.artist,
+                          imageURL: item.imageURL,
+                          trailingSystemImage: "chevron.right") {
+                Task { await viewModel.browseLibraryPlaylist(item) }
+            }
+        case .artist, .album:
+            MusicMediaRow(name: item.name,
+                          subtitle: item.artist,
+                          imageURL: item.imageURL,
+                          trailingSystemImage: "chevron.right") {
+                viewModel.browsingArtist = item
+            }
+        }
+    }
+
+    private func showAllButton(_ section: MusicSearchSection) -> some View {
+        Button {
+            onShowAll(section.mediaType)
+        } label: {
+            HStack(spacing: 4) {
+                Text("Visa alla (\(section.items.count))")
+                    .font(.subheadline.weight(.semibold))
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+            }
+            .foregroundStyle(.white.opacity(0.7))
+            .padding(.top, 2)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Sök på Spotify efter \(query)")
+        .accessibilityLabel("Visa alla \(section.items.count) \(section.mediaType.swedishTitle.lowercased()) på Spotify")
     }
 }

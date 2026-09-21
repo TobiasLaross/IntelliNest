@@ -39,10 +39,23 @@ extension MusicViewModel {
         }
     }
 
+    /// Runs the search for the current query straight away, skipping the debounce.
+    /// Enter on the music screen: the hits are already listed inline under the
+    /// library, so Enter only makes them arrive sooner rather than opening a sheet.
+    func searchNow() async {
+        pendingSearchTask?.cancel()
+        pendingSearchTask = nil
+        guard trimmedSearchText.count >= Self.minimumSearchLength,
+              lastCompletedSearchQuery != trimmedSearchText || isSearching else {
+            return
+        }
+        await search(presentResults: false)
+    }
+
     /// Runs the Music Assistant search. `presentResults` distinguishes the two
-    /// callers: an explicit search (Enter, or the "sök på Spotify" row) opens the
-    /// results sheet and reports failures, while the debounced background search
-    /// only warms `searchSections`.
+    /// callers: an explicit search (Enter in the results sheet, or "Visa alla" on
+    /// an inline category) opens the results sheet and reports failures, while the
+    /// background search only fills `searchSections`.
     func search(presentResults: Bool = true) async {
         let query = trimmedSearchText
         guard query.isNotEmpty else {
@@ -109,6 +122,26 @@ extension MusicViewModel {
             Log.error("Failed to browse \(item.mediaType.rawValue): \(error)")
             setErrorBannerText("Kunde inte öppna \(item.name)", "Det gick inte att hämta innehållet")
             return []
+        }
+    }
+
+    /// The Spotify hits listed under the library matches on the music screen, so a
+    /// search shows everything at once instead of behind a "search Spotify" tap.
+    /// Playlists already listed above as library matches are left out rather than
+    /// shown twice. Empty until the search for the query in the field has
+    /// finished, so an older query's hits never sit under a newer query.
+    var inlineSearchSections: [MusicSearchSection] {
+        let query = trimmedSearchText
+        guard query.count >= Self.minimumSearchLength, lastCompletedSearchQuery == query else {
+            return []
+        }
+        let libraryURIs = Set(librarySections.flatMap(\.playlists).map(\.uri))
+        return searchSections.compactMap { section in
+            let items = section.items.filter { !libraryURIs.contains($0.uri) }
+            guard items.isNotEmpty else {
+                return nil
+            }
+            return MusicSearchSection(mediaType: section.mediaType, items: items)
         }
     }
 

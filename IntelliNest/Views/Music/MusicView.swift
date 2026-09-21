@@ -10,12 +10,13 @@ import SwiftUI
 struct MusicView: View {
     @ObservedObject var viewModel: MusicViewModel
     @State private var isShowingSpotifyLogin = false
+    @State private var searchResultsTab: MusicSearchTab = .all
 
     var body: some View {
         VStack(spacing: 16) {
             HStack(spacing: 8) {
                 MusicSearchBar(searchText: $viewModel.searchText,
-                               onSubmit: { Task { await viewModel.search() } })
+                               onSubmit: { Task { await viewModel.searchNow() } })
                 if !viewModel.isSpotifyAuthorized {
                     spotifyLoginTriangle
                 }
@@ -43,7 +44,8 @@ struct MusicView: View {
                                     .foregroundStyle(.white.opacity(0.7))
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            SpotifySearchEscalationRow(query: viewModel.trimmedSearchText) {
+                            SpotifySearchResultsSections(viewModel: viewModel) { mediaType in
+                                searchResultsTab = .mediaType(mediaType)
                                 Task { await viewModel.search() }
                             }
                         }
@@ -61,14 +63,24 @@ struct MusicView: View {
         .task {
             await viewModel.refreshFavorites()
         }
-        // Typing filters the loaded library instantly and, a beat later, warms the
-        // Music Assistant search in the background — so the results sheet is already
-        // populated by the time the user asks for it.
+        // Typing filters the loaded library instantly and, a beat later, runs the
+        // Music Assistant search whose hits are listed under the library matches.
         .onChange(of: viewModel.searchText) { _, _ in
             viewModel.scheduleSearch()
         }
         .sheet(isPresented: $viewModel.isShowingSearchResults) {
-            MusicSearchResultsView(viewModel: viewModel)
+            MusicSearchResultsView(viewModel: viewModel, initialTab: searchResultsTab)
+        }
+        .sheet(item: $viewModel.browsingArtist) { artist in
+            NavigationStack {
+                MusicArtistView(viewModel: viewModel, item: artist)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Stäng") { viewModel.browsingArtist = nil }
+                                .foregroundStyle(.white)
+                        }
+                    }
+            }
         }
         .sheet(isPresented: $viewModel.isShowingSpeakerPicker) {
             SpeakerPickerSheet(viewModel: viewModel)

@@ -63,6 +63,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// The artist the user drilled into from the search results, pushed inside the
     /// results sheet. Nil while the result list is showing.
     @Published var openedArtist: MusicSearchItem?
+    /// The artist or album opened from the Spotify hits listed inline on the music
+    /// screen. Presented in its own sheet, since that screen has no results sheet
+    /// underneath to push it into.
+    @Published var browsingArtist: MusicSearchItem?
     @Published var playlistTracks: [MusicPlaylistTrack] = []
     /// The playlist `playlistTracks` was loaded for, whichever surface opened it.
     /// Lets an add-to-playlist refresh the list it is looking at without the caller
