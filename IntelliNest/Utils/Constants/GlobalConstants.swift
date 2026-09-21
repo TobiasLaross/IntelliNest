@@ -60,6 +60,26 @@ enum GlobalConstants {
         Bundle.main.object(forInfoDictionaryKey: "SPOTIFY_CLIENT_ID") as? String ?? ""
     }
 
+    /// Spotify app client secret. Only the personal read-only tokens use it — see
+    /// `SpotifyRefreshTokenProvider`; the huset login stays PKCE.
+    static var secretSpotifyClientSecret: String {
+        Bundle.main.object(forInfoDictionaryKey: "SPOTIFY_CLIENT_SECRET") as? String ?? ""
+    }
+
+    /// A person's read-only Spotify refresh token (`playlist-read-private` and
+    /// `playlist-read-collaborative`), empty when none is configured.
+    static func spotifyRefreshToken(for user: User) -> String {
+        let key = switch user {
+        case .tobias:
+            "SPOTIFY_REFRESH_TOKEN_TOBIAS"
+        case .sarah:
+            "SPOTIFY_REFRESH_TOKEN_SARAH"
+        case .guest, .unknownUser:
+            ""
+        }
+        return Bundle.main.object(forInfoDictionaryKey: key) as? String ?? ""
+    }
+
     static let musicAssistantConfigEntryID = "01JZ57QTQPB79NSC7GJ2VQPA8V"
 
     /// Music Assistant long-lived access token. MA 2.9+ requires authenticating the

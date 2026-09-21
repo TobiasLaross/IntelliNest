@@ -26,6 +26,21 @@ struct SpotifyPersonalAccount: Identifiable, Equatable {
         SpotifyPersonalAccount(userID: "tobiasc91", user: .tobias),
         SpotifyPersonalAccount(userID: "mbostroem", user: .sarah)
     ]
+
+    /// A read-only login per configured account whose build carries a refresh
+    /// token, keyed by Spotify user id. An account without one is left out and
+    /// falls back to its public profile.
+    @MainActor
+    static func configuredTokenProviders() -> [String: SpotifyTokenProviding] {
+        var providers: [String: SpotifyTokenProviding] = [:]
+        for account in configured {
+            let provider = SpotifyRefreshTokenProvider(refreshToken: GlobalConstants.spotifyRefreshToken(for: account.user))
+            if provider.isAuthorized {
+                providers[account.userID] = provider
+            }
+        }
+        return providers
+    }
 }
 
 /// The Spotify playlist operations the music UI needs. Hidden behind a protocol
@@ -41,12 +56,13 @@ protocol SpotifyPlaylistService {
     /// all pages. Each item carries its `ownerID` so the library can be split into
     /// per-person sections.
     func accountPlaylists() async -> [MusicSearchItem]
-    /// The public playlists owned by `userID`, read straight from that person's
-    /// Spotify profile rather than from the signed-in library. This is what makes
-    /// a personal playlist findable when the huset account doesn't follow it.
+    /// `userID`'s playlists, read independently of the signed-in huset library so a
+    /// personal playlist huset doesn't follow is still findable. With that person's
+    /// own read-only login this is their whole library — private and followed
+    /// playlists included; without one it is only the public ones on their profile.
     /// Returns empty when Spotify refuses the read, so callers fall back to the
     /// library-derived listing instead of showing an error.
-    func publicPlaylists(ofUser userID: String) async -> [MusicSearchItem]
+    func personalPlaylists(ofUser userID: String) async -> [MusicSearchItem]
     /// The Spotify ids of the playlists the user can edit (owned or collaborative).
     /// Used to gate the add-to-playlist picker and the remove-from-playlist action.
     func editablePlaylistIDs() async -> Set<String>
@@ -76,7 +92,7 @@ struct DisabledSpotifyPlaylistService: SpotifyPlaylistService {
     var isAuthorized: Bool { false }
     func authorize() async throws {}
     func accountPlaylists() async -> [MusicSearchItem] { [] }
-    func publicPlaylists(ofUser _: String) async -> [MusicSearchItem] { [] }
+    func personalPlaylists(ofUser _: String) async -> [MusicSearchItem] { [] }
     func editablePlaylistIDs() async -> Set<String> { [] }
     func isPlaylistSaved(playlistID _: String) async -> Bool { false }
     func savePlaylist(playlistID _: String) async -> Bool { false }

@@ -14,14 +14,14 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     /// Public playlists keyed by Spotify user id, standing in for what
     /// `/users/<id>/playlists` returns. Empty by default, which is exactly how the
     /// real service behaves when Spotify refuses the read.
-    var publicPlaylistsByUser: [String: [MusicSearchItem]]
+    var personalPlaylistsByUser: [String: [MusicSearchItem]]
     var editableIDs: Set<String>
     var savedSongTrackIDs: Set<String>
     private(set) var authorizeCallCount = 0
     private(set) var saveCallCount = 0
     private(set) var removeCallCount = 0
     private(set) var accountPlaylistsCallCount = 0
-    private(set) var publicPlaylistsCallCount = 0
+    private(set) var personalPlaylistsCallCount = 0
     private(set) var saveSongCallCount = 0
     private(set) var removeSongCallCount = 0
     private(set) var addedTracks: [(playlistID: String, trackID: String)] = []
@@ -32,7 +32,7 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
          operationSucceeds: Bool = true,
          authorizeThrows: Bool = false,
          accountPlaylistItems: [MusicSearchItem] = [],
-         publicPlaylistsByUser: [String: [MusicSearchItem]] = [:],
+         personalPlaylistsByUser: [String: [MusicSearchItem]] = [:],
          editableIDs: Set<String> = [],
          savedSongTrackIDs: Set<String> = []) {
         self.authorized = authorized
@@ -40,7 +40,7 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
         self.operationSucceeds = operationSucceeds
         self.authorizeThrows = authorizeThrows
         self.accountPlaylistItems = accountPlaylistItems
-        self.publicPlaylistsByUser = publicPlaylistsByUser
+        self.personalPlaylistsByUser = personalPlaylistsByUser
         self.editableIDs = editableIDs
         self.savedSongTrackIDs = savedSongTrackIDs
     }
@@ -60,9 +60,9 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
         return accountPlaylistItems
     }
 
-    func publicPlaylists(ofUser userID: String) async -> [MusicSearchItem] {
-        publicPlaylistsCallCount += 1
-        return publicPlaylistsByUser[userID] ?? []
+    func personalPlaylists(ofUser userID: String) async -> [MusicSearchItem] {
+        personalPlaylistsCallCount += 1
+        return personalPlaylistsByUser[userID] ?? []
     }
 
     func editablePlaylistIDs() async -> Set<String> {

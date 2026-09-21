@@ -205,7 +205,7 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
             .replacingOccurrences(of: "=", with: "")
     }
 
-    private static func formBody(_ form: [String: String]) -> Data {
+    static func formBody(_ form: [String: String]) -> Data {
         var allowed = CharacterSet.urlQueryAllowed
         allowed.remove(charactersIn: "+&=")
         let encoded = form.map { key, value in
@@ -260,6 +260,66 @@ extension SpotifyAuthService: ASWebAuthenticationPresentationContextProviding {
 }
 
 /// The token set persisted in the Keychain between launches.
+/// One person's Spotify login, used read-only to list their own playlists —
+/// private and followed ones included — in their section of the music screen.
+/// The refresh token is minted once outside the app with the client secret, so
+/// unlike the PKCE tokens above it never rotates and can ship as a build secret.
+/// The access token lives only in memory and is refreshed as it expires.
+@MainActor
+final class SpotifyRefreshTokenProvider: SpotifyTokenProviding {
+    private let refreshToken: String
+    private let clientID: String
+    private let clientSecret: String
+    private let session: URLSession
+    private let tokenEndpoint = "https://accounts.spotify.com/api/token"
+    private var accessToken: String?
+    private var expiry = Date.distantPast
+
+    init(refreshToken: String,
+         clientID: String = GlobalConstants.secretSpotifyClientID,
+         clientSecret: String = GlobalConstants.secretSpotifyClientSecret,
+         session: URLSession = .shared) {
+        self.refreshToken = refreshToken
+        self.clientID = clientID
+        self.clientSecret = clientSecret
+        self.session = session
+    }
+
+    var isAuthorized: Bool {
+        refreshToken.isNotEmpty && clientID.isNotEmpty && clientSecret.isNotEmpty
+    }
+
+    /// There is no interactive login: the token comes from the build.
+    func authorize() async throws {
+        throw SpotifyAuthError.notAuthorized
+    }
+
+    func validAccessToken() async throws -> String {
+        if let accessToken, expiry.addingTimeInterval(-60) > Date() {
+            return accessToken
+        }
+        guard isAuthorized, let url = URL(string: tokenEndpoint) else {
+            throw SpotifyAuthError.notAuthorized
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        let credentials = Data("\(clientID):\(clientSecret)".utf8).base64EncodedString()
+        request.setValue("Basic \(credentials)", forHTTPHeaderField: "Authorization")
+        request.httpBody = SpotifyAuthService.formBody(["grant_type": "refresh_token", "refresh_token": refreshToken])
+
+        let (data, response) = try await session.data(for: request)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            Log.error("Spotify personal token refresh failed: \(String(data: data, encoding: .utf8) ?? "")")
+            throw SpotifyAuthError.tokenRequestFailed
+        }
+        let decoded = try JSONDecoder().decode(SpotifyTokenResponse.self, from: data)
+        accessToken = decoded.accessToken
+        expiry = Date().addingTimeInterval(TimeInterval(decoded.expiresIn))
+        return decoded.accessToken
+    }
+}
+
 private struct SpotifyStoredTokens: Codable {
     let accessToken: String
     let refreshToken: String

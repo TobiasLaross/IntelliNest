@@ -29,6 +29,12 @@
 	<string>$(SECRET_YALE_API_URL)</string>
 	<key>SPOTIFY_CLIENT_ID</key>
 	<string>$(SPOTIFY_CLIENT_ID)</string>
+	<key>SPOTIFY_CLIENT_SECRET</key>
+	<string>$(SPOTIFY_CLIENT_SECRET)</string>
+	<key>SPOTIFY_REFRESH_TOKEN_TOBIAS</key>
+	<string>$(SPOTIFY_REFRESH_TOKEN_TOBIAS)</string>
+	<key>SPOTIFY_REFRESH_TOKEN_SARAH</key>
+	<string>$(SPOTIFY_REFRESH_TOKEN_SARAH)</string>
 	<key>MUSIC_ASSISTANT</key>
 	<string>$(MUSIC_ASSISTANT)</string>
 	<key>UIApplicationSceneManifest</key>
