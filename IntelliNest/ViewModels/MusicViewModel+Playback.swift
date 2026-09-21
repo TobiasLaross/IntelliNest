@@ -299,6 +299,7 @@ extension MusicViewModel {
         isShowingSearchResults = false
         openedPlaylist = nil
         openedArtist = nil
+        browsingArtist = nil
         browsingLibraryPlaylist = nil
         expandedLibrarySection = nil
     }

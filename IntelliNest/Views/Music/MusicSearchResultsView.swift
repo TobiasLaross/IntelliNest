@@ -40,7 +40,13 @@ enum MusicSearchTab: Hashable, Identifiable {
 /// matched. A playlist or artist drills in rather than playing immediately.
 struct MusicSearchResultsView: View {
     @ObservedObject var viewModel: MusicViewModel
-    @State private var selectedTab: MusicSearchTab = .all
+    @State private var selectedTab: MusicSearchTab
+
+    /// `initialTab` is the category whose "Visa alla" opened the sheet.
+    init(viewModel: MusicViewModel, initialTab: MusicSearchTab = .all) {
+        self.viewModel = viewModel
+        _selectedTab = State(initialValue: initialTab)
+    }
 
     var body: some View {
         NavigationStack {

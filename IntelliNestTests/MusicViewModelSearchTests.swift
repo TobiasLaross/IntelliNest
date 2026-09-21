@@ -160,6 +160,42 @@ extension MusicViewModelTests {
         XCTAssertEqual(model.searchOverviewSections.first?.items.map(\.name), ["Låt 1", "Låt 2", "Låt 3"])
     }
 
+    // MARK: - Inline results on the music screen
+
+    func testEnterSearchesStraightAwayWithoutOpeningTheSheet() async {
+        stubSearch(json: searchJSON)
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.searchText = "brynäs"
+        model.scheduleSearch()
+        let debounced = model.pendingSearchTask
+        await model.searchNow()
+
+        XCTAssertEqual(debounced?.isCancelled, true)
+        XCTAssertFalse(model.isShowingSearchResults)
+        XCTAssertEqual(model.inlineSearchSections.map(\.mediaType), [.track, .playlist])
+    }
+
+    func testInlineResultsLeaveOutPlaylistsAlreadyListedAsLibraryMatches() async {
+        stubSearch(json: searchJSON)
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.favoritePlaylists = [playlistItem(uri: "library://playlist/7", name: "Brynäs IF fanclub")]
+        model.searchText = "brynäs"
+        await model.searchNow()
+
+        XCTAssertEqual(model.inlineSearchSections.map(\.mediaType), [.track])
+    }
+
+    func testInlineResultsHideAnOlderQuerysHitsBelowTheMinimumLength() async {
+        stubSearch(json: searchJSON)
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.searchText = "brynäs"
+        await model.searchNow()
+        model.searchText = "b"
+
+        XCTAssertFalse(model.searchSections.isEmpty)
+        XCTAssertTrue(model.inlineSearchSections.isEmpty)
+    }
+
     // MARK: - Fixtures
 
     private var searchJSON: String {
