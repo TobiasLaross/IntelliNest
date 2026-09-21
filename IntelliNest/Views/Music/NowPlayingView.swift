@@ -281,7 +281,7 @@ struct VolumeSliderView: View {
 }
 
 /// A fill slider mirroring `VerticalSlider`'s look (dark track, light fill, thin
-/// border) with a round knob at the fill edge. Only a drag that starts on the knob
+/// border) with a ridged grip at the end of the fill. Only a drag that starts on the grip
 /// changes the value, and it moves by the finger's travel rather than jumping to
 /// the touch point — so brushing the track while scrolling can't blast the
 /// speakers. The change is reported live and committed on release. `axis` rotates
@@ -292,15 +292,37 @@ private struct FillSlider: View {
     let onChange: DoubleClosure
     let onCommit: MainActorVoidClosure
 
-    /// The value when the knob was grabbed; nil when no knob drag is in progress.
+    /// The value when the grip was grabbed; nil when no grip drag is in progress.
     @State private var grabbedFraction: Double?
-    /// Set when a drag started off the knob, so the rest of that drag is ignored.
+    /// Set when a drag started off the grip, so the rest of that drag is ignored.
     @State private var isDragRejected = false
 
     private let trackColor = Color(white: 57.0 / 255).opacity(0.3)
     private let fillColor = Color(white: 201.0 / 255)
-    /// Half the minimum 44pt touch target, measured along the slider from the knob centre.
-    private let knobHitRadius: CGFloat = 22
+    /// Half the minimum 44pt touch target, measured along the slider from the grip centre.
+    private let gripHitRadius: CGFloat = 22
+    /// How far the grip sits inside the end of the fill.
+    private let gripInset: CGFloat = 12
+    private let gripSpan: CGFloat = 7
+
+    /// Two short ridges across the end of the fill — the handle the drag must start on.
+    private func grip(thickness: CGFloat) -> some View {
+        let isHorizontal = axis == .horizontal
+        let ridge = Capsule()
+            .fill(Color.black.opacity(grabbedFraction == nil ? 0.35 : 0.6))
+            .frame(width: isHorizontal ? 2 : thickness * 0.45,
+                   height: isHorizontal ? thickness * 0.45 : 2)
+        return Group {
+            if isHorizontal {
+                HStack(spacing: 3) { ridge; ridge }
+            } else {
+                VStack(spacing: 3) { ridge; ridge }
+            }
+        }
+        .frame(width: isHorizontal ? gripSpan : thickness,
+               height: isHorizontal ? thickness : gripSpan)
+        .animation(.easeOut(duration: 0.15), value: grabbedFraction == nil)
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -308,38 +330,29 @@ private struct FillSlider: View {
             let height = geometry.size.height
             let isHorizontal = axis == .horizontal
             let length = isHorizontal ? width : height
-            let knobSize = isHorizontal ? height : width
-            let travel = max(length - knobSize, 1)
+            let thickness = isHorizontal ? height : width
+            let travel = max(length - 2 * gripInset, 1)
             let clamped = CGFloat(min(max(fraction, 0), 1))
-            let knobCenter = knobSize / 2 + travel * clamped
+            let gripCenter = gripInset + travel * clamped
             let radius = min(width, height) / 2.5
             ZStack(alignment: isHorizontal ? .leading : .bottom) {
-                ZStack(alignment: isHorizontal ? .leading : .bottom) {
-                    Rectangle().fill(trackColor)
-                    Rectangle().fill(fillColor)
-                        .frame(width: isHorizontal ? knobCenter : nil,
-                               height: isHorizontal ? nil : knobCenter)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: radius))
-                .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.black.opacity(0.5), lineWidth: 1))
-
-                Circle()
-                    .fill(Color.white)
-                    .overlay(Circle().stroke(Color.black.opacity(0.35), lineWidth: 1))
-                    .shadow(color: .black.opacity(0.35), radius: 2, y: 1)
-                    .scaleEffect(grabbedFraction == nil ? 1 : 1.15)
-                    .animation(.easeOut(duration: 0.15), value: grabbedFraction == nil)
-                    .frame(width: knobSize, height: knobSize)
-                    .offset(x: isHorizontal ? knobCenter - knobSize / 2 : 0,
-                            y: isHorizontal ? 0 : -(knobCenter - knobSize / 2))
+                Rectangle().fill(trackColor)
+                Rectangle().fill(fillColor)
+                    .frame(width: isHorizontal ? gripCenter + gripInset : nil,
+                           height: isHorizontal ? nil : gripCenter + gripInset)
+                grip(thickness: thickness)
+                    .offset(x: isHorizontal ? gripCenter - gripSpan / 2 : 0,
+                            y: isHorizontal ? 0 : -(gripCenter - gripSpan / 2))
             }
+            .clipShape(RoundedRectangle(cornerRadius: radius))
+            .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.black.opacity(0.5), lineWidth: 1))
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 10)
                     .onChanged { value in
                         if grabbedFraction == nil, !isDragRejected {
                             let start = isHorizontal ? value.startLocation.x : height - value.startLocation.y
-                            if abs(start - knobCenter) <= max(knobHitRadius, knobSize / 2) {
+                            if abs(start - gripCenter) <= gripHitRadius {
                                 grabbedFraction = Double(clamped)
                             } else {
                                 isDragRejected = true
