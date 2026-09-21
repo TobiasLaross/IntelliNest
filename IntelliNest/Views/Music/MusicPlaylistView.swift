@@ -14,6 +14,10 @@ import SwiftUI
 struct MusicPlaylistView: View {
     @ObservedObject var viewModel: MusicViewModel
     let playlist: MusicSearchItem
+    /// The header button whose playback request is in flight. Starting a playlist
+    /// waits on Home Assistant and Music Assistant, which can take seconds, so the
+    /// tapped button shows a spinner until the call returns.
+    @State private var startingButton: String?
 
     var body: some View {
         VStack(spacing: 16) {
@@ -77,15 +81,28 @@ struct MusicPlaylistView: View {
                                systemImage: String,
                                action: @escaping () async -> Void) -> some View {
         Button {
-            Task { await action() }
+            Task {
+                startingButton = title
+                await action()
+                startingButton = nil
+            }
         } label: {
-            Label(title, systemImage: systemImage)
-                .font(.headline)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 24)
-                .background(Color.white.opacity(0.15))
-                .clipShape(Capsule())
+            HStack(spacing: 8) {
+                if startingButton == title {
+                    ProgressView()
+                        .tint(.white)
+                } else {
+                    Image(systemName: systemImage)
+                }
+                Text(title)
+            }
+            .font(.headline)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 24)
+            .background(Color.white.opacity(0.15))
+            .clipShape(Capsule())
         }
+        .disabled(startingButton != nil)
     }
 
     @ViewBuilder private var trackList: some View {

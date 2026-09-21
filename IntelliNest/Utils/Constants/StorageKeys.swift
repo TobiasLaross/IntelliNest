@@ -17,4 +17,5 @@ enum StorageKeys: String {
     case yaleAccessToken
     case spotifyTokens
     case lastMusicSpeaker
+    case pinnedMusicPlaylists
 }

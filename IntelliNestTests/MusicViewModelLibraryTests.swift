@@ -144,6 +144,75 @@ extension MusicViewModelTests {
         XCTAssertEqual(added, ["spotify://playlist/p1"])
     }
 
+    // MARK: - Pinning
+
+    func testPinnedPlaylistsLeadTheCollapsedSectionInPinOrder() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.favoritePlaylists = numberedPlaylists(count: 7)
+        let section = model.librarySections[0]
+        model.togglePin(section.playlists[6], in: section)
+        model.togglePin(section.playlists[4], in: section)
+        XCTAssertEqual(model.collapsedPlaylists(in: section).map(\.name), ["Lista 7", "Lista 5", "Lista 1", "Lista 2"])
+        XCTAssertEqual(model.hiddenPlaylistCount(in: section), 3)
+    }
+
+    func testPinningStopsAtTheCollapsedRowCount() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.favoritePlaylists = numberedPlaylists(count: 6)
+        let section = model.librarySections[0]
+        for playlist in section.playlists.prefix(5) {
+            model.togglePin(playlist, in: section)
+        }
+        XCTAssertEqual(model.pinnedPlaylists(in: section).map(\.name), ["Lista 1", "Lista 2", "Lista 3", "Lista 4"])
+        XCTAssertFalse(model.canPin(section.playlists[5], in: section))
+
+        model.togglePin(section.playlists[1], in: section)
+        XCTAssertTrue(model.canPin(section.playlists[5], in: section))
+    }
+
+    func testUnpinningFromAFilteredSectionKeepsTheOtherPins() {
+        // The start screen's context menu passes the filtered section; the pins that
+        // don't match the search must survive the write.
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.favoritePlaylists = [playlistItem(uri: "spotify://playlist/f1", name: "Brynäs"),
+                                   playlistItem(uri: "spotify://playlist/f2", name: "Pre hockey")]
+        let full = model.librarySections[0]
+        model.togglePin(full.playlists[0], in: full)
+        model.togglePin(full.playlists[1], in: full)
+
+        model.searchText = "pre"
+        let filtered = model.librarySections[0]
+        model.togglePin(filtered.playlists[0], in: filtered)
+        XCTAssertEqual(model.pinnedPlaylistURIs["favorites"], ["spotify://playlist/f1"])
+    }
+
+    func testPinsForPlaylistsNoLongerInTheSectionAreIgnored() {
+        let store = PinnedPlaylistStore(load: { ["favorites": ["spotify://playlist/gone", "spotify://playlist/p2"]] },
+                                        save: { _ in })
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false), pinnedPlaylistStore: store)
+        model.favoritePlaylists = numberedPlaylists(count: 5)
+        let section = model.librarySections[0]
+        XCTAssertEqual(model.collapsedPlaylists(in: section).map(\.name), ["Lista 2", "Lista 1", "Lista 3", "Lista 4"])
+    }
+
+    func testPinsArePersisted() {
+        var saved: [String: [String]] = [:]
+        let store = PinnedPlaylistStore(load: { [:] }, save: { saved = $0 })
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false), pinnedPlaylistStore: store)
+        model.favoritePlaylists = numberedPlaylists(count: 2)
+        let section = model.librarySections[0]
+        model.togglePin(section.playlists[1], in: section)
+        XCTAssertEqual(saved, ["favorites": ["spotify://playlist/p2"]])
+        model.togglePin(section.playlists[1], in: section)
+        XCTAssertEqual(saved, [:])
+    }
+
+    func testRecentlyPlayedCannotBePinned() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.recentlyPlayedPlaylists = numberedPlaylists(count: 2)
+        XCTAssertFalse(model.canPinPlaylists(in: model.librarySections[0]))
+    }
+
     // MARK: - Helpers
 
     private func numberedPlaylists(count: Int) -> [MusicSearchItem] {

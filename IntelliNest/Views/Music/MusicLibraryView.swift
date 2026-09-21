@@ -27,6 +27,13 @@ struct LibraryPlaylistsSection: View {
                     playlist: playlist,
                     onOpen: { Task { await viewModel.browseLibraryPlaylist(playlist) } }
                 )
+                .contextMenu {
+                    if viewModel.canPinPlaylists(in: section), viewModel.isPinned(playlist, in: section) {
+                        Button("Lossa från musiksidan", systemImage: "pin.slash") {
+                            viewModel.togglePin(playlist, in: section)
+                        }
+                    }
+                }
             }
             if hiddenCount > 0 {
                 showAllButton
@@ -68,6 +75,9 @@ struct LibraryPlaylistsSection: View {
 struct LibraryPlaylistRow: View {
     @ObservedObject var viewModel: MusicViewModel
     let playlist: MusicSearchItem
+    /// Set only in the "Visa alla" listing, where each row gets a pin that picks
+    /// which playlists the section shows on the music start screen.
+    var pinSection: MusicLibrarySection?
     let onOpen: MainActorVoidClosure
 
     var body: some View {
@@ -88,6 +98,10 @@ struct LibraryPlaylistRow: View {
             .accessibilityLabel(playlist.name)
             .accessibilityHint("Öppna spellistan")
 
+            if let pinSection {
+                pinButton(in: pinSection)
+            }
+
             if viewModel.canFavoritePlaylist(playlist) {
                 favoriteStar
             } else {
@@ -97,6 +111,22 @@ struct LibraryPlaylistRow: View {
             }
         }
         .foregroundStyle(.white)
+    }
+
+    private func pinButton(in section: MusicLibrarySection) -> some View {
+        let pinned = viewModel.isPinned(playlist, in: section)
+        return Button {
+            viewModel.togglePin(playlist, in: section)
+        } label: {
+            Image(systemName: pinned ? "pin.fill" : "pin")
+                .foregroundStyle(pinned ? .white : .white.opacity(0.6))
+                .frame(width: 32, height: 32)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(!viewModel.canPin(playlist, in: section))
+        .opacity(viewModel.canPin(playlist, in: section) ? 1 : 0.3)
+        .accessibilityLabel(pinned ? "Lossa \(playlist.name) från musiksidan" : "Fäst \(playlist.name) på musiksidan")
     }
 
     private var favoriteStar: some View {
@@ -138,6 +168,9 @@ struct MusicLibraryListView: View {
                                onSubmit: {})
                     .padding(.horizontal)
                     .padding(.top, 12)
+                if viewModel.canPinPlaylists(in: section) {
+                    pinHint
+                }
                 content
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -168,12 +201,24 @@ struct MusicLibraryListView: View {
                 LibraryPlaylistRow(
                     viewModel: viewModel,
                     playlist: playlist,
+                    pinSection: viewModel.canPinPlaylists(in: section) ? section : nil,
                     onOpen: { Task { await open(playlist) } }
                 )
                 .musicListRow()
             }
             .musicListStyle()
         }
+    }
+
+    private var pinHint: some View {
+        let pinnedCount = viewModel.pinnedPlaylists(in: section).count
+        return Label("Fäst upp till \(MusicViewModel.collapsedLibraryRowCount) spellistor att visa på musiksidan "
+            + "(\(pinnedCount)/\(MusicViewModel.collapsedLibraryRowCount))",
+            systemImage: "pin")
+            .font(.footnote)
+            .foregroundStyle(.white.opacity(0.7))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
     }
 
     private var filtered: [MusicSearchItem] {

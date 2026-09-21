@@ -18,6 +18,23 @@ struct MusicLibrarySection: Identifiable, Equatable {
     let playlists: [MusicSearchItem]
 }
 
+/// Persists which playlists each library section pins to the music start screen,
+/// keyed by section id with the playlist URIs in the order they were pinned.
+/// Closures rather than `UserDefaults` directly so tests keep the pins in memory.
+struct PinnedPlaylistStore {
+    let load: @MainActor () -> [String: [String]]
+    let save: @MainActor ([String: [String]]) -> Void
+
+    static let userDefaults = PinnedPlaylistStore(
+        load: {
+            UserDefaults.shared.dictionary(forKey: StorageKeys.pinnedMusicPlaylists.rawValue) as? [String: [String]] ?? [:]
+        },
+        save: {
+            UserDefaults.shared.set($0, forKey: StorageKeys.pinnedMusicPlaylists.rawValue)
+        }
+    )
+}
+
 /// The start screen's library: which sections it shows, the instant filter over
 /// them, and the full listing behind "Visa alla".
 extension MusicViewModel {
@@ -31,12 +48,13 @@ extension MusicViewModel {
     static let minimumSearchLength = 2
     /// Items per media type in the results sheet's "Allt" tab.
     static let overviewRowCount = 3
+    static let recentlyPlayedSectionID = "recentlyPlayed"
 
     /// Every library section that has something in it, in display order: what was
     /// played most recently, the house favourites, then one section per person.
     var allLibrarySections: [MusicLibrarySection] {
         var sections = [
-            MusicLibrarySection(id: "recentlyPlayed", title: "Senast spelade", playlists: recentlyPlayedPlaylists),
+            MusicLibrarySection(id: Self.recentlyPlayedSectionID, title: "Senast spelade", playlists: recentlyPlayedPlaylists),
             MusicLibrarySection(id: "favorites", title: "Favoriter", playlists: favoritePlaylists)
         ]
         sections += personalPlaylistSections.map {
@@ -89,11 +107,54 @@ extension MusicViewModel {
         guard !isFilteringLibrary else {
             return section.playlists
         }
-        return Array(section.playlists.prefix(Self.collapsedLibraryRowCount))
+        let pinned = pinnedPlaylists(in: section)
+        let unpinned = section.playlists.filter { !pinned.contains($0) }
+        return Array((pinned + unpinned).prefix(Self.collapsedLibraryRowCount))
     }
 
     func hiddenPlaylistCount(in section: MusicLibrarySection) -> Int {
         section.playlists.count - collapsedPlaylists(in: section).count
+    }
+
+    // MARK: - Pinning
+
+    /// "Senast spelade" is ordered by recency; pinning rows there would fight it.
+    func canPinPlaylists(in section: MusicLibrarySection) -> Bool {
+        section.id != Self.recentlyPlayedSectionID
+    }
+
+    /// The section's pinned playlists in pin order. A pin whose playlist has left
+    /// the section (deleted, unfollowed) is skipped rather than holding a slot.
+    func pinnedPlaylists(in section: MusicLibrarySection) -> [MusicSearchItem] {
+        let pinnedURIs = pinnedPlaylistURIs[section.id] ?? []
+        return pinnedURIs.compactMap { uri in section.playlists.first { $0.uri == uri } }
+    }
+
+    func isPinned(_ playlist: MusicSearchItem, in section: MusicLibrarySection) -> Bool {
+        pinnedPlaylists(in: section).contains(playlist)
+    }
+
+    /// Pinning is capped at the rows the start screen shows, so a pin always
+    /// means "visible on the start screen".
+    func canPin(_ playlist: MusicSearchItem, in section: MusicLibrarySection) -> Bool {
+        isPinned(playlist, in: section) || pinnedPlaylists(in: section).count < Self.collapsedLibraryRowCount
+    }
+
+    func togglePin(_ playlist: MusicSearchItem, in section: MusicLibrarySection) {
+        // Resolve the unfiltered section: pruning against a filtered copy would
+        // drop every pin that doesn't match the current search.
+        let section = allLibrarySections.first { $0.id == section.id } ?? section
+        // Rebuild from the live pins so stale URIs are pruned on every write.
+        var pinnedURIs = pinnedPlaylists(in: section).map(\.uri)
+        if let index = pinnedURIs.firstIndex(of: playlist.uri) {
+            pinnedURIs.remove(at: index)
+        } else if canPin(playlist, in: section) {
+            pinnedURIs.append(playlist.uri)
+        } else {
+            return
+        }
+        pinnedPlaylistURIs[section.id] = pinnedURIs.isEmpty ? nil : pinnedURIs
+        pinnedPlaylistStore.save(pinnedPlaylistURIs)
     }
 
     /// Case- and diacritic-insensitive substring match, so "lugnt" finds "Lugnt &
