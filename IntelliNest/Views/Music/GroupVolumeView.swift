@@ -78,7 +78,7 @@ struct GroupVolumeView: View {
 /// One speaker in the expanded list. The checkmark toggles the speaker in and out
 /// of the active speaker's group (removing the primary promotes the next member);
 /// the "Primär" chip marks the leader — a tappable outline on a follower promotes
-/// it. Grouped speakers also get their own slider so the group can be balanced.
+/// it. Every speaker in play also gets its own slider so a group can be balanced.
 private struct SpeakerVolumeRow: View {
     @ObservedObject var viewModel: MusicViewModel
     let speaker: MediaPlayerEntity
@@ -95,10 +95,10 @@ private struct SpeakerVolumeRow: View {
         viewModel.pendingGroupingSpeakers.contains(speaker.entityId)
     }
 
-    // The per-speaker slider only earns its space while there's a real group to
-    // balance; alone, the top slider already controls the single active speaker.
+    // Every speaker in play gets its own slider, a lone primary included, so the
+    // expanded list looks the same whether one speaker is playing or several.
     private var showsVolume: Bool {
-        grouped && viewModel.isGroupActive
+        grouped
     }
 
     // A follower can always be tapped to join or leave; the primary can only be
