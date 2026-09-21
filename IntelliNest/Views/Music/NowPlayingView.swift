@@ -280,30 +280,35 @@ struct VolumeSliderView: View {
     }
 }
 
-/// A fill slider mirroring `VerticalSlider`'s look (dark track, light fill, thin
-/// border) whose last few points are a brighter handle. Only a drag that starts on the handle
-/// changes the value, and it moves by the finger's travel rather than jumping to
-/// the touch point — so brushing the track while scrolling can't blast the
-/// speakers. The change is reported live and committed on release. `axis` rotates
-/// it 90°: `.horizontal` fills left-to-right, `.vertical` fills bottom-to-top.
+/// A slim-track slider with a pill thumb, the shape iOS 26 system sliders and the
+/// Sonos app use for volume. Only a drag that starts on the thumb changes the
+/// value, and it moves by the finger's travel rather than jumping to the touch
+/// point — so brushing the track while scrolling can't blast the speakers. The
+/// change is reported live and committed on release. `axis` rotates it 90°:
+/// `.horizontal` fills left-to-right, `.vertical` fills bottom-to-top.
 private struct FillSlider: View {
     let fraction: Double
     var axis: Axis = .horizontal
     let onChange: DoubleClosure
     let onCommit: MainActorVoidClosure
 
-    /// The value when the handle was grabbed; nil when no handle drag is in progress.
+    /// The value when the thumb was grabbed; nil when no thumb drag is in progress.
     @State private var grabbedFraction: Double?
-    /// Set when a drag started off the handle, so the rest of that drag is ignored.
+    /// Set when a drag started off the thumb, so the rest of that drag is ignored.
     @State private var isDragRejected = false
 
-    private let trackColor = Color(white: 57.0 / 255).opacity(0.3)
-    private let fillColor = Color(white: 201.0 / 255)
-    /// Half the minimum 44pt touch target, measured along the slider from the handle centre.
-    private let handleHitRadius: CGFloat = 22
-    private let handleColor = Color.yellow
-    /// The handle is the last few points of the fill, drawn in `handleColor`.
-    private let handleWidth: CGFloat = 6
+    private let trackColor = Color.white.opacity(0.18)
+    private let fillColor = Color.white.opacity(0.85)
+    private let trackThickness: CGFloat = 6
+    /// Thumb size along and across the slider.
+    private let thumbLength: CGFloat = 34
+    private let thumbThickness: CGFloat = 22
+    /// Half the minimum 44pt touch target, measured along the slider from the thumb centre.
+    private let thumbHitRadius: CGFloat = 22
+
+    private var isGrabbed: Bool {
+        grabbedFraction != nil
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -311,33 +316,38 @@ private struct FillSlider: View {
             let height = geometry.size.height
             let isHorizontal = axis == .horizontal
             let length = isHorizontal ? width : height
-            let thickness = isHorizontal ? height : width
-            let travel = max(length - handleWidth, 1)
+            let travel = max(length - thumbLength, 1)
             let clamped = CGFloat(min(max(fraction, 0), 1))
-            let handleStart = travel * clamped
-            let handleCenter = handleStart + handleWidth / 2
-            let radius = min(width, height) / 2.5
+            let thumbCenter = thumbLength / 2 + travel * clamped
             ZStack(alignment: isHorizontal ? .leading : .bottom) {
-                Rectangle().fill(trackColor)
-                Rectangle().fill(fillColor)
-                    .frame(width: isHorizontal ? handleStart : nil,
-                           height: isHorizontal ? nil : handleStart)
-                Rectangle().fill(handleColor)
-                    .brightness(grabbedFraction == nil ? 0 : -0.1)
-                    .frame(width: isHorizontal ? handleWidth : nil,
-                           height: isHorizontal ? nil : handleWidth)
-                    .offset(x: isHorizontal ? handleStart : 0,
-                            y: isHorizontal ? 0 : -handleStart)
+                ZStack(alignment: isHorizontal ? .leading : .bottom) {
+                    Capsule().fill(trackColor)
+                    Capsule().fill(fillColor)
+                        .frame(width: isHorizontal ? thumbCenter : nil,
+                               height: isHorizontal ? nil : thumbCenter)
+                }
+                .frame(width: isHorizontal ? nil : trackThickness,
+                       height: isHorizontal ? trackThickness : nil)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: isHorizontal ? .leading : .bottom)
+
+                Capsule()
+                    .fill(Color.white)
+                    .shadow(color: .black.opacity(0.3), radius: isGrabbed ? 6 : 3, y: 1)
+                    .frame(width: isHorizontal ? thumbLength : thumbThickness,
+                           height: isHorizontal ? thumbThickness : thumbLength)
+                    .scaleEffect(isGrabbed ? 1.2 : 1)
+                    .animation(.spring(duration: 0.2), value: isGrabbed)
+                    .offset(x: isHorizontal ? thumbCenter - thumbLength / 2 : 0,
+                            y: isHorizontal ? 0 : -(thumbCenter - thumbLength / 2))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: isHorizontal ? .leading : .bottom)
             }
-            .clipShape(RoundedRectangle(cornerRadius: radius))
-            .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.black.opacity(0.5), lineWidth: 1))
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 10)
                     .onChanged { value in
                         if grabbedFraction == nil, !isDragRejected {
                             let start = isHorizontal ? value.startLocation.x : height - value.startLocation.y
-                            if abs(start - handleCenter) <= handleHitRadius {
+                            if abs(start - thumbCenter) <= thumbHitRadius {
                                 grabbedFraction = Double(clamped)
                             } else {
                                 isDragRejected = true
