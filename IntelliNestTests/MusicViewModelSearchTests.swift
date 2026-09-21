@@ -196,6 +196,17 @@ extension MusicViewModelTests {
         XCTAssertTrue(model.inlineSearchSections.isEmpty)
     }
 
+    func testInlineResultsHideAnOlderQuerysHitsUntilTheNewSearchFinishes() async {
+        stubSearch(json: searchJSON)
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.searchText = "brynäs"
+        await model.searchNow()
+        model.searchText = "victor"
+
+        XCTAssertFalse(model.searchSections.isEmpty)
+        XCTAssertTrue(model.inlineSearchSections.isEmpty)
+    }
+
     // MARK: - Fixtures
 
     private var searchJSON: String {

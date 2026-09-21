@@ -128,11 +128,11 @@ extension MusicViewModel {
     /// The Spotify hits listed under the library matches on the music screen, so a
     /// search shows everything at once instead of behind a "search Spotify" tap.
     /// Playlists already listed above as library matches are left out rather than
-    /// shown twice. Empty below the minimum query length, where `searchSections`
-    /// may still hold an older, longer query's results.
+    /// shown twice. Empty until the search for the query in the field has
+    /// finished, so an older query's hits never sit under a newer query.
     var inlineSearchSections: [MusicSearchSection] {
         let query = trimmedSearchText
-        guard query.count >= Self.minimumSearchLength else {
+        guard query.count >= Self.minimumSearchLength, lastCompletedSearchQuery == query else {
             return []
         }
         let libraryURIs = Set(librarySections.flatMap(\.playlists).map(\.uri))
