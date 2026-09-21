@@ -88,7 +88,7 @@ final class RequestRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private let matches: (URLRequest) -> Bool
     private var recorded: [URLRequest] = []
-    private var waiters: [CheckedContinuation<URLRequest, Never>] = []
+    private var waiters: [(count: Int, continuation: CheckedContinuation<[URLRequest], Never>)] = []
 
     init(where matches: @escaping (URLRequest) -> Bool) {
         self.matches = matches
@@ -111,14 +111,23 @@ final class RequestRecorder: @unchecked Sendable {
     /// the run says so, rather than a short wait expiring and letting the assertions
     /// after it pass on a lie.
     func first() async -> URLRequest {
+        await waitForRequests(count: 1)[0]
+    }
+
+    /// Suspends until `count` matching requests have arrived. A test that fires
+    /// several untracked requests awaits them all here, so a straggler can't land
+    /// after the test ends and be counted by the next test's recorder.
+    @discardableResult
+    func waitForRequests(count: Int) async -> [URLRequest] {
         await withCheckedContinuation { continuation in
             lock.lock()
-            if let existing = recorded.first {
+            if recorded.count >= count {
+                let snapshot = recorded
                 lock.unlock()
-                continuation.resume(returning: existing)
+                continuation.resume(returning: snapshot)
                 return
             }
-            waiters.append(continuation)
+            waiters.append((count, continuation))
             lock.unlock()
         }
     }
@@ -129,11 +138,12 @@ final class RequestRecorder: @unchecked Sendable {
         }
         lock.lock()
         recorded.append(request)
-        let pending = waiters
-        waiters = []
+        let snapshot = recorded
+        let ready = waiters.filter { $0.count <= snapshot.count }
+        waiters.removeAll { $0.count <= snapshot.count }
         lock.unlock()
-        for continuation in pending {
-            continuation.resume(returning: request)
+        for waiter in ready {
+            waiter.continuation.resume(returning: snapshot)
         }
     }
 }

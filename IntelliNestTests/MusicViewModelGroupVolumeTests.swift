@@ -48,6 +48,7 @@ extension MusicViewModelTests {
 
     func testSetGroupVolumeUpdatesEveryGroupedSpeakerOnly() async {
         await reloadGroupedKitchenLeader()
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/volume_set") == true }
         stubPostService(path: "/api/services/media_player/volume_set")
         viewModel.setGroupVolume(0.5)
         // Every grouped speaker is set to the new level…
@@ -56,6 +57,9 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.speakers[.mediaPlayerOutdoorTable]?.volumeLevel, 0.5)
         // …while an ungrouped speaker keeps its own volume.
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.volumeLevel, 0.3)
+        // Only the last of the three posts is tracked by `lastCommandTask`; wait for
+        // all of them so none reaches the next test's recorder.
+        await recorder.waitForRequests(count: 3)
     }
 
     // MARK: - Recently-played playlists
