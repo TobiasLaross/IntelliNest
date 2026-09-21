@@ -72,7 +72,8 @@ class Navigator: ObservableObject {
                                                  self?.repeatReload(times: times)
                                              })
     lazy var yaleApiService = YaleApiService(hassAPIService: restAPIService)
-    lazy var spotifyApiService = SpotifyApiService(tokenProvider: SpotifyAuthService())
+    lazy var spotifyApiService = SpotifyApiService(tokenProvider: SpotifyAuthService(),
+                                                   personalTokenProviders: SpotifyPersonalAccount.configuredTokenProviders())
     lazy var homeViewModel = HomeViewModel(restAPIService: restAPIService,
                                            yaleApiService: yaleApiService,
                                            urlCreator: urlCreator,

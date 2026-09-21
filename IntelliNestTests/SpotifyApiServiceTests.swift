@@ -141,6 +141,36 @@ final class SpotifyApiServiceTests: XCTestCase {
         XCTAssertTrue(playlists.isEmpty)
     }
 
+    // MARK: - personalPlaylists
+
+    func testPersonalPlaylistsReadTheirOwnLibraryWithTheirOwnLogin() async {
+        // Their own `/me/playlists` is the only listing carrying private and
+        // followed playlists — and it must be read with their token, not huset's.
+        let personal = StubSpotifyTokenProvider(token: "sarah-access-token")
+        service = SpotifyApiService(tokenProvider: tokenProvider,
+                                    personalTokenProviders: ["mbostroem": personal],
+                                    session: URLProtocolStub.createStubbedURLSession())
+        let recorder = RequestRecorder { $0.url?.path == "/v1/me/playlists" }
+        stub(url: mePlaylistsURL(offset: 0), statusCode: 200,
+             json: "{\"items\":[{\"id\":\"priv1\",\"name\":\"Hemlig\",\"owner\":{\"id\":\"mbostroem\"}}]}")
+
+        let playlists = await service.personalPlaylists(ofUser: "mbostroem")
+
+        XCTAssertEqual(playlists.map(\.name), ["Hemlig"])
+        XCTAssertEqual(recorder.requests.first?.value(forHTTPHeaderField: "Authorization"), "Bearer sarah-access-token")
+    }
+
+    func testPersonalPlaylistsFallBackToThePublicProfileWithoutTheirLogin() async {
+        let url = spotifyURL(path: "/users/tobiasc91/playlists", query: [URLQueryItem(name: "limit", value: "50"),
+                                                                         URLQueryItem(name: "offset", value: "0")])
+        stub(url: url, statusCode: 200,
+             json: "{\"items\":[{\"id\":\"pub1\",\"name\":\"Träning\",\"owner\":{\"id\":\"tobiasc91\"}}]}")
+
+        let playlists = await service.personalPlaylists(ofUser: "tobiasc91")
+
+        XCTAssertEqual(playlists.map(\.name), ["Träning"])
+    }
+
     // MARK: - isPlaylistSaved
 
     func testIsPlaylistSavedReturnsTrueWhenFollowed() async {
@@ -193,5 +223,62 @@ final class SpotifyApiServiceTests: XCTestCase {
 
         XCTAssertTrue(result)
         XCTAssertEqual(recorder.requests.count, 1)
+    }
+}
+
+@MainActor
+final class SpotifyRefreshTokenProviderTests: XCTestCase {
+    let tokenURL = URL(string: "https://accounts.spotify.com/api/token")!
+
+    override func setUp() async throws {
+        URLProtocolStub.startInterceptingRequests()
+    }
+
+    override func tearDown() async throws {
+        URLProtocolStub.stopInterceptingRequests()
+    }
+
+    func makeProvider(refreshToken: String = "tobias-refresh-token",
+                      clientSecret: String = "client-secret") -> SpotifyRefreshTokenProvider {
+        SpotifyRefreshTokenProvider(refreshToken: refreshToken,
+                                    clientID: "client-id",
+                                    clientSecret: clientSecret,
+                                    session: URLProtocolStub.createStubbedURLSession())
+    }
+
+    func stubToken(statusCode: Int = 200) {
+        let response = HTTPURLResponse(url: tokenURL, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+        let json = #"{"access_token":"fresh-access-token","token_type":"Bearer","expires_in":3600}"#
+        URLProtocolStub.setStub(for: tokenURL, data: Data(json.utf8), response: response, error: nil)
+    }
+
+    func testRefreshesWithTheClientSecretAndReusesTheAccessToken() async throws {
+        stubToken()
+        let recorder = RequestRecorder { $0.url == self.tokenURL }
+        let provider = makeProvider()
+
+        let first = try await provider.validAccessToken()
+        let second = try await provider.validAccessToken()
+
+        XCTAssertEqual([first, second], ["fresh-access-token", "fresh-access-token"])
+        XCTAssertEqual(recorder.requests.count, 1)
+        let expectedCredentials = Data("client-id:client-secret".utf8).base64EncodedString()
+        XCTAssertEqual(recorder.requests.first?.value(forHTTPHeaderField: "Authorization"), "Basic \(expectedCredentials)")
+    }
+
+    func testIsUnauthorizedWithoutATokenOrSecret() {
+        for provider in [makeProvider(refreshToken: ""), makeProvider(clientSecret: "")] {
+            XCTAssertFalse(provider.isAuthorized)
+        }
+    }
+
+    func testARefusedRefreshThrows() async {
+        stubToken(statusCode: 400)
+        do {
+            _ = try await makeProvider().validAccessToken()
+            XCTFail("Expected the refresh to throw")
+        } catch {
+            XCTAssertEqual(error as? SpotifyAuthError, .tokenRequestFailed)
+        }
     }
 }

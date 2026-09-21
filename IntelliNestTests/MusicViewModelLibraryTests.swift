@@ -93,7 +93,7 @@ extension MusicViewModelTests {
         // account never followed was previously invisible to the app.
         let stub = StubSpotifyPlaylistService(
             accountPlaylistItems: [playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")],
-            publicPlaylistsByUser: ["tobiasc91": [playlistItem(uri: "spotify://playlist/p2", name: "Pruttkorv", ownerID: "tobiasc91")]]
+            personalPlaylistsByUser: ["tobiasc91": [playlistItem(uri: "spotify://playlist/p2", name: "Pruttkorv", ownerID: "tobiasc91")]]
         )
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         await model.refreshSpotifyPlaylists()
@@ -103,7 +103,7 @@ extension MusicViewModelTests {
     func testPersonalSectionDoesNotListAPlaylistTwice() async {
         let shared = playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")
         let stub = StubSpotifyPlaylistService(accountPlaylistItems: [shared],
-                                              publicPlaylistsByUser: ["tobiasc91": [shared]])
+                                              personalPlaylistsByUser: ["tobiasc91": [shared]])
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         await model.refreshSpotifyPlaylists()
         XCTAssertEqual(model.personalPlaylistSections.first?.playlists.map(\.uri), ["spotify://playlist/p1"])
@@ -112,7 +112,7 @@ extension MusicViewModelTests {
     func testPersonalSectionAppearsFromProfileAloneWhenHusetFollowsNothingOfTheirs() async {
         let stub = StubSpotifyPlaylistService(
             accountPlaylistItems: [playlistItem(uri: "spotify://playlist/h1", name: "Husets", ownerID: "huset")],
-            publicPlaylistsByUser: ["tobiasc91": [playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")]]
+            personalPlaylistsByUser: ["tobiasc91": [playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")]]
         )
         let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
         await model.refreshSpotifyPlaylists()
@@ -135,7 +135,7 @@ extension MusicViewModelTests {
         let socket = StubMusicAssistantQueueSocket()
         let stub = StubSpotifyPlaylistService(
             accountPlaylistItems: [playlistItem(uri: "spotify://playlist/p1", name: "Träning", ownerID: "tobiasc91")],
-            publicPlaylistsByUser: ["tobiasc91": [playlistItem(uri: "spotify://playlist/p2", name: "Pruttkorv", ownerID: "tobiasc91")]]
+            personalPlaylistsByUser: ["tobiasc91": [playlistItem(uri: "spotify://playlist/p2", name: "Pruttkorv", ownerID: "tobiasc91")]]
         )
         let model = makeViewModel(spotify: stub, socket: socket, personalAccounts: [tobiasAccount])
         await model.refreshSpotifyPlaylists()

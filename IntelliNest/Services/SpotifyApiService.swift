@@ -13,13 +13,18 @@ import Foundation
 @MainActor
 final class SpotifyApiService: SpotifyPlaylistService {
     private let tokenProvider: SpotifyTokenProviding
+    /// Each person's own read-only login, keyed by Spotify user id.
+    private let personalTokenProviders: [String: SpotifyTokenProviding]
     private let session: URLSession
     private let baseURL = "https://api.spotify.com/v1"
     /// `/me` never changes within a session, so cache it after the first lookup.
     private var cachedUserID: String?
 
-    init(tokenProvider: SpotifyTokenProviding, session: URLSession = .shared) {
+    init(tokenProvider: SpotifyTokenProviding,
+         personalTokenProviders: [String: SpotifyTokenProviding] = [:],
+         session: URLSession = .shared) {
         self.tokenProvider = tokenProvider
+        self.personalTokenProviders = personalTokenProviders
         self.session = session
     }
 
@@ -35,13 +40,20 @@ final class SpotifyApiService: SpotifyPlaylistService {
         await fetchAllLibraryPlaylistItems().compactMap(\.searchItem)
     }
 
-    /// Reads `/users/<id>/playlists`, which lists that person's public playlists
-    /// without needing their login. The huset token is enough, so a playlist Tobias
-    /// or Sarah made but huset never followed still reaches the music view. A
-    /// refusal (Spotify has historically 403'd this for a development-mode app)
-    /// logs and returns empty, leaving the library-derived sections untouched.
-    func publicPlaylists(ofUser userID: String) async -> [MusicSearchItem] {
-        await fetchAllPlaylistItems(path: "/users/\(userID)/playlists", label: "publicPlaylists(\(userID))")
+    /// With the person's own read-only login, reads their `/me/playlists` — the
+    /// only way to see a private playlist or one they merely follow. Otherwise
+    /// reads `/users/<id>/playlists`, which lists their public playlists with the
+    /// huset token. A refusal (Spotify has historically 403'd the latter for a
+    /// development-mode app) logs and returns empty, leaving the library-derived
+    /// sections untouched.
+    func personalPlaylists(ofUser userID: String) async -> [MusicSearchItem] {
+        if let personalProvider = personalTokenProviders[userID] {
+            return await fetchAllPlaylistItems(path: "/me/playlists",
+                                               label: "personalPlaylists(\(userID))",
+                                               tokenProvider: personalProvider)
+                .compactMap(\.searchItem)
+        }
+        return await fetchAllPlaylistItems(path: "/users/\(userID)/playlists", label: "publicPlaylists(\(userID))")
             .compactMap(\.searchItem)
     }
 
@@ -54,7 +66,9 @@ final class SpotifyApiService: SpotifyPlaylistService {
     /// the followed personal-account playlists easily exceeds 50, and a single page
     /// would silently truncate them. `maxPages` guards against an unbounded loop. A
     /// page fetch that fails stops paging and returns what we have.
-    private func fetchAllPlaylistItems(path: String, label: String) async -> [SpotifyPlaylistItem] {
+    private func fetchAllPlaylistItems(path: String,
+                                       label: String,
+                                       tokenProvider: SpotifyTokenProviding? = nil) async -> [SpotifyPlaylistItem] {
         let pageSize = 50
         let maxPages = 10
         var items: [SpotifyPlaylistItem] = []
@@ -64,7 +78,8 @@ final class SpotifyApiService: SpotifyPlaylistService {
                     path: path,
                     method: "GET",
                     queryItems: [URLQueryItem(name: "limit", value: "\(pageSize)"),
-                                 URLQueryItem(name: "offset", value: "\(page * pageSize)")]
+                                 URLQueryItem(name: "offset", value: "\(page * pageSize)")],
+                    tokenProvider: tokenProvider
                 )
                 let (data, response) = try await session.data(for: request)
                 guard isSuccess(response) else {
@@ -225,8 +240,11 @@ final class SpotifyApiService: SpotifyPlaylistService {
         return userID
     }
 
-    private func authorizedRequest(path: String, method: String, queryItems: [URLQueryItem] = []) async throws -> URLRequest {
-        let token = try await tokenProvider.validAccessToken()
+    private func authorizedRequest(path: String,
+                                   method: String,
+                                   queryItems: [URLQueryItem] = [],
+                                   tokenProvider: SpotifyTokenProviding? = nil) async throws -> URLRequest {
+        let token = try await (tokenProvider ?? self.tokenProvider).validAccessToken()
         var components = URLComponents(string: baseURL + path)
         if queryItems.isNotEmpty {
             components?.queryItems = queryItems

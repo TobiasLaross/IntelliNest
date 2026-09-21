@@ -91,7 +91,7 @@ extension MusicViewModel {
         var sections: [PersonalPlaylistSection] = []
         for account in orderedAccounts {
             let owned = playlists.filter { $0.ownerID == account.userID }
-            let published = await spotify.publicPlaylists(ofUser: account.userID)
+            let published = await spotify.personalPlaylists(ofUser: account.userID)
             let merged = mergedPersonalPlaylists(followedByHuset: owned, publicOnProfile: published)
             guard merged.isNotEmpty else {
                 continue
