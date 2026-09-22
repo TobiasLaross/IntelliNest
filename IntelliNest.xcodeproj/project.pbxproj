@@ -106,6 +106,7 @@
 		EE000011000000000000000B /* MusicViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000011000000000000000B /* MusicViewModelTests.swift */; };
 		EE00001100000000000000C1 /* MusicViewModelGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */; };
 		EE00001100000000000000D1 /* MusicViewModelGroupingRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00001100000000000000D1 /* MusicViewModelGroupingRulesTests.swift */; };
+		EE00001200000000000000D1 /* MusicViewModelSpeakerPickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00001200000000000000D1 /* MusicViewModelSpeakerPickerTests.swift */; };
 		EE000012000000000000000C /* MusicModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000012000000000000000C /* MusicModelTests.swift */; };
 		F62CD2E0286D950A00462092 /* LightEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2DF286D950A00462092 /* LightEntity.swift */; };
 		F62CD2E328770D5500462092 /* LightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F62CD2E228770D5500462092 /* LightsViewModel.swift */; };
@@ -367,6 +368,7 @@
 		EF000011000000000000000B /* MusicViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelTests.swift; sourceTree = "<group>"; };
 		EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelGroupingTests.swift; sourceTree = "<group>"; };
 		EF00001100000000000000D1 /* MusicViewModelGroupingRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelGroupingRulesTests.swift; sourceTree = "<group>"; };
+		EF00001200000000000000D1 /* MusicViewModelSpeakerPickerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSpeakerPickerTests.swift; sourceTree = "<group>"; };
 		EF000012000000000000000C /* MusicModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicModelTests.swift; sourceTree = "<group>"; };
 		F62CD2E228770D5500462092 /* LightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModel.swift; sourceTree = "<group>"; };
 		F62CD2E428770F3B00462092 /* RestAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestAPIService.swift; sourceTree = "<group>"; };
@@ -659,6 +661,7 @@
 				EF000011000000000000000B /* MusicViewModelTests.swift */,
 				EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */,
 				EF00001100000000000000D1 /* MusicViewModelGroupingRulesTests.swift */,
+				EF00001200000000000000D1 /* MusicViewModelSpeakerPickerTests.swift */,
 				EF000012000000000000000C /* MusicModelTests.swift */,
 				EF0000150000000000000022 /* SpotifyApiServiceTests.swift */,
 				EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */,
@@ -1366,6 +1369,7 @@
 				EE000011000000000000000B /* MusicViewModelTests.swift in Sources */,
 				EE00001100000000000000C1 /* MusicViewModelGroupingTests.swift in Sources */,
 				EE00001100000000000000D1 /* MusicViewModelGroupingRulesTests.swift in Sources */,
+				EE00001200000000000000D1 /* MusicViewModelSpeakerPickerTests.swift in Sources */,
 				EE000012000000000000000C /* MusicModelTests.swift in Sources */,
 				EE0000150000000000000022 /* SpotifyApiServiceTests.swift in Sources */,
 				EE0000160000000000000023 /* MusicViewModelSpotifyTests.swift in Sources */,

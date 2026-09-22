@@ -51,6 +51,42 @@ extension MusicViewModel {
         }
     }
 
+    // MARK: - Speaker picker
+
+    /// The speaker picker's cards in display order: every synced Music Assistant
+    /// group collapsed into one entry (leader first), and every other speaker on its
+    /// own. A card sits where its first-listed speaker would, so the fixed room
+    /// order still reads top to bottom. Membership comes from the first speaker of
+    /// the group encountered, since its `group_members` names the whole group; a
+    /// group whose other members are all unavailable degrades to a single card.
+    var speakerPickerEntries: [SpeakerPickerEntry] {
+        let available = availableSpeakers
+        var placedIDs: Set<EntityId> = []
+        var entries: [SpeakerPickerEntry] = []
+        for speaker in available where !placedIDs.contains(speaker.entityId) {
+            let memberIDs = speaker.groupMembers
+            let isInGroup = memberIDs.count > 1 && memberIDs.contains(speaker.entityId)
+            let members = isInGroup
+                ? available.filter { memberIDs.contains($0.entityId) && !placedIDs.contains($0.entityId) }
+                : [speaker]
+            // Music Assistant lists the group leader first; fall back to the first
+            // shown member when the leader itself isn't reachable.
+            let leader = members.first { $0.entityId == memberIDs.first } ?? speaker
+            placedIDs.formUnion(members.map(\.entityId))
+            entries.append(SpeakerPickerEntry(leader: leader,
+                                              followers: members.filter { $0.entityId != leader.entityId }))
+        }
+        return entries
+    }
+
+    /// Sets every speaker in a picker group to the same absolute volume, like
+    /// `setGroupVolume` does for the active group.
+    func setGroupVolume(_ volume: Double, for entry: SpeakerPickerEntry) {
+        for speaker in entry.members {
+            setVolume(volume, for: speaker.entityId)
+        }
+    }
+
     // MARK: - Grouping
 
     /// Whether `speakerID` is currently grouped with the active speaker.
@@ -166,5 +202,35 @@ extension MusicViewModel {
         } else {
             setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
         }
+    }
+}
+
+/// One card in the speaker picker: a lone speaker, or a synced group shown as a
+/// single card with its members nested inside.
+struct SpeakerPickerEntry: Identifiable {
+    /// The group leader, or the lone speaker. Picking the card selects it.
+    let leader: MediaPlayerEntity
+    /// The other synced speakers, in display order. Empty for a lone speaker.
+    let followers: [MediaPlayerEntity]
+
+    var id: EntityId { leader.entityId }
+
+    /// Every speaker on the card, leader first.
+    var members: [MediaPlayerEntity] { [leader] + followers }
+
+    var isGroup: Bool { followers.isNotEmpty }
+
+    /// The card header, e.g. "Lekrummet + Köket".
+    var title: String {
+        members.map(\.friendlyName).joined(separator: " + ")
+    }
+
+    /// The average member volume, shown on the group slider.
+    var averageVolume: Double {
+        members.reduce(0.0) { $0 + $1.volumeLevel } / Double(members.count)
+    }
+
+    func contains(_ speakerID: EntityId?) -> Bool {
+        members.contains { $0.entityId == speakerID }
     }
 }
