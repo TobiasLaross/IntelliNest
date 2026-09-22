@@ -8,8 +8,8 @@
 import SwiftUI
 
 /// The speaker & volume control on the now-playing card. The top slider sets the
-/// active speaker — or the whole group when grouped — at once. The chevron expands
-/// a per-speaker list where speakers are added to or removed from the group,
+/// active speaker — or the whole group when grouped — at once. The row under it
+/// expands a per-speaker list where speakers are added to or removed from the group,
 /// promoted to primary, and balanced individually. Folding grouping in here
 /// replaces the old separate "Gruppera högtalare" card.
 struct GroupVolumeView: View {
@@ -30,39 +30,37 @@ struct GroupVolumeView: View {
         return ([primaryName].compactMap { $0 } + followerNames).joined(separator: ", ")
     }
 
+    /// `isExpanded` seeds the list's initial state so the expanded layout can be
+    /// rendered directly (screenshots, previews); the card itself starts collapsed.
+    init(viewModel: MusicViewModel, isExpanded: Bool = false) {
+        self.viewModel = viewModel
+        _isExpanded = State(initialValue: isExpanded)
+    }
+
     var body: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 10) {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() }
-                } label: {
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 16)
-                }
-                .accessibilityLabel(isExpanded ? "Dölj högtalare" : "Visa högtalare")
+            VolumeSliderView(volume: viewModel.groupVolume,
+                             onCommit: { viewModel.setGroupVolume($0) })
+                .accessibilityLabel(viewModel.isGroupActive ? "Gruppvolym" : "Volym")
 
-                VolumeSliderView(volume: viewModel.groupVolume,
-                                 onCommit: { viewModel.setGroupVolume($0) })
-                    .accessibilityLabel(viewModel.isGroupActive ? "Gruppvolym" : "Volym")
-            }
+            speakerPanel
+        }
+    }
 
-            // While collapsed, name the speaker(s) the slider controls under it — the
-            // same summary the old grouping card showed for a group, or just the
-            // single speaker's name on its own — so it's legible without expanding.
-            // Aligned with the slider (past the chevron) and kept to one line.
-            if !isExpanded, groupSummary.isNotEmpty {
-                Text(groupSummary)
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 26)
-                    .accessibilityLabel("\(viewModel.isGroupActive ? "Grupperade högtalare" : "Högtalare"): \(groupSummary)")
-            }
+    /// One rounded panel holding the expand/collapse header and, when expanded,
+    /// the per-speaker rows nested inside it, so the list reads as a subsection of
+    /// the header rather than separate cards floating below it. Collapsed, the
+    /// panel is just the header row.
+    private var speakerPanel: some View {
+        VStack(spacing: 0) {
+            expandToggle
 
             if isExpanded {
+                Rectangle()
+                    .fill(Color.white.opacity(0.15))
+                    .frame(height: 1)
+                    .padding(.horizontal, 14)
+
                 VStack(spacing: 8) {
                     ForEach(viewModel.availableSpeakers, id: \.entityId) { speaker in
                         SpeakerVolumeRow(viewModel: viewModel,
@@ -70,8 +68,48 @@ struct GroupVolumeView: View {
                                          isPrimary: speaker.entityId == viewModel.activeSpeakerID)
                     }
                 }
+                .padding(8)
             }
         }
+        .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Color.white.opacity(0.12)))
+    }
+
+    /// The header row of the speaker panel, which expands and collapses the speaker
+    /// list. Collapsed it names the speaker(s) the slider controls, so it doubles
+    /// as the summary; expanded it reads "Högtalare". The trailing "Visa"/"Dölj"
+    /// label with a chevron makes it obviously tappable.
+    private var expandToggle: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) { isExpanded.toggle() }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: viewModel.isGroupActive ? "hifispeaker.2.fill" : "hifispeaker.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.yellow)
+                    .frame(width: 22)
+                Text(isExpanded || groupSummary.isEmpty ? "Högtalare" : groupSummary)
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.9))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack(spacing: 4) {
+                    Text(isExpanded ? "Dölj" : "Visa")
+                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.yellow)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(isExpanded ? "Dölj högtalare" : "Visa högtalare")
+        .accessibilityValue(groupSummary.isEmpty
+            ? ""
+            : "\(viewModel.isGroupActive ? "Grupperade högtalare" : "Högtalare"): \(groupSummary)")
     }
 }
 
@@ -155,8 +193,9 @@ private struct SpeakerVolumeRow: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
+        // Inset 8pt inside the 22pt panel, so a 14pt radius keeps the corners concentric.
         .background(grouped ? Color.yellow.opacity(0.12) : Color.white.opacity(0.06))
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     /// The status content of the row: the grouped checkmark (or a spinner while a
