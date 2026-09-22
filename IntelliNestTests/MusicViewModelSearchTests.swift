@@ -5,6 +5,15 @@ import XCTest
 /// and how the user's own playlists are ranked into the results.
 @MainActor
 extension MusicViewModelTests {
+    func testSpotifyOwnerIsNotShownAsSubtitle() {
+        let cases: [(artist: String?, expected: String?)] = [("Spotify", nil), ("spotify", nil), ("Tobias", "Tobias"), (nil, nil)]
+        for testCase in cases {
+            let item = MusicSearchItem(uri: "spotify://playlist/37i9dQZF1DX0Ew6u9sRtTY", name: "Swedish pop",
+                                       mediaType: .playlist, imageURL: nil, artist: testCase.artist)
+            XCTAssertEqual(item.artist, testCase.expected)
+        }
+    }
+
     // MARK: - Debounced background search
 
     func testScheduledSearchFetchesWithoutOpeningTheResultsSheet() async {

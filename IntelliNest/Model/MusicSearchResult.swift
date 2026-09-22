@@ -52,7 +52,9 @@ struct MusicSearchItem: Identifiable, Equatable, Hashable {
         self.name = name
         self.mediaType = mediaType
         self.imageURL = imageURL
-        self.artist = artist
+        // Spotify's own editorial playlists are owned by "Spotify", which is
+        // true of every row on the screen and so says nothing under the title.
+        self.artist = artist?.caseInsensitiveCompare("Spotify") == .orderedSame ? nil : artist
         self.ownerID = ownerID
     }
 
