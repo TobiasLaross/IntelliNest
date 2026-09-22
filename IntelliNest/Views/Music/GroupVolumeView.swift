@@ -43,9 +43,24 @@ struct GroupVolumeView: View {
                              onCommit: { viewModel.setGroupVolume($0) })
                 .accessibilityLabel(viewModel.isGroupActive ? "Gruppvolym" : "Volym")
 
+            speakerPanel
+        }
+    }
+
+    /// One rounded panel holding the expand/collapse header and, when expanded,
+    /// the per-speaker rows nested inside it, so the list reads as a subsection of
+    /// the header rather than separate cards floating below it. Collapsed, the
+    /// panel is just the header row.
+    private var speakerPanel: some View {
+        VStack(spacing: 0) {
             expandToggle
 
             if isExpanded {
+                Rectangle()
+                    .fill(Color.white.opacity(0.15))
+                    .frame(height: 1)
+                    .padding(.horizontal, 14)
+
                 VStack(spacing: 8) {
                     ForEach(viewModel.availableSpeakers, id: \.entityId) { speaker in
                         SpeakerVolumeRow(viewModel: viewModel,
@@ -53,11 +68,13 @@ struct GroupVolumeView: View {
                                          isPrimary: speaker.entityId == viewModel.activeSpeakerID)
                     }
                 }
+                .padding(8)
             }
         }
+        .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Color.white.opacity(0.12)))
     }
 
-    /// The full-width row under the slider that expands and collapses the speaker
+    /// The header row of the speaker panel, which expands and collapses the speaker
     /// list. Collapsed it names the speaker(s) the slider controls, so it doubles
     /// as the summary; expanded it reads "Högtalare". The trailing "Visa"/"Dölj"
     /// label with a chevron makes it obviously tappable.
@@ -86,10 +103,7 @@ struct GroupVolumeView: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
             .frame(minHeight: 44)
-            // A capsule at one line that relaxes into a rounded rectangle when a
-            // large group's summary wraps, so every name stays readable.
-            .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Color.white.opacity(0.12)))
-            .contentShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(isExpanded ? "Dölj högtalare" : "Visa högtalare")
@@ -179,8 +193,9 @@ private struct SpeakerVolumeRow: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
+        // Inset 8pt inside the 22pt panel, so a 14pt radius keeps the corners concentric.
         .background(grouped ? Color.yellow.opacity(0.12) : Color.white.opacity(0.06))
-        .cornerRadius(10)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     /// The status content of the row: the grouped checkmark (or a spinner while a
