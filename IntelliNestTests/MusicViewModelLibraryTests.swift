@@ -213,6 +213,64 @@ extension MusicViewModelTests {
         XCTAssertFalse(model.canPinPlaylists(in: model.librarySections[0]))
     }
 
+    // MARK: - Recently played
+
+    func testRecentlyPlayedLeadsWithTheSessionPlaysMusicAssistantCannotList() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.maRecentlyPlayedPlaylists = [playlistItem(uri: "library://playlist/18", name: "Brynäs"),
+                                           playlistItem(uri: "library://playlist/22", name: "Lugnt & Skönt")]
+        model.sessionPlayedPlaylists = [playlistItem(uri: "spotify://playlist/s1", name: "Swedish pop"),
+                                        playlistItem(uri: "spotify://playlist/l1", name: "lugnt & skönt ")]
+        model.applyRecentlyPlayed()
+        // The Lugnt & Skönt session play is one MA already lists, so it keeps MA's
+        // position instead of showing twice.
+        XCTAssertEqual(model.recentlyPlayedPlaylists.map(\.name), ["Swedish pop", "Brynäs", "Lugnt & Skönt"])
+    }
+
+    func testThePlayingPlaylistComesFirstAndLeavesWhenCleared() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.maRecentlyPlayedPlaylists = [playlistItem(uri: "library://playlist/18", name: "Brynäs"),
+                                           playlistItem(uri: "library://playlist/22", name: "Lugnt & Skönt")]
+        model.nowPlayingSourcePlaylist = playlistItem(uri: "spotify://playlist/l1", name: "Lugnt & Skönt")
+        XCTAssertEqual(model.recentlyPlayedPlaylists.map(\.name), ["Lugnt & Skönt", "Brynäs"])
+        XCTAssertEqual(model.recentlyPlayedPlaylists.first?.uri, "spotify://playlist/l1")
+
+        model.nowPlayingSourcePlaylist = nil
+        XCTAssertEqual(model.recentlyPlayedPlaylists.map(\.name), ["Brynäs", "Lugnt & Skönt"])
+    }
+
+    // MARK: - Now playing
+
+    func testIsNowPlayingMatchesTheSourcePlaylist() {
+        let cases: [(row: MusicSearchItem, expected: Bool)] = [
+            (playlistItem(uri: "spotify://playlist/s1", name: "Swedish pop"), true),
+            (playlistItem(uri: "library://playlist/30", name: "  swedish POP"), true),
+            (playlistItem(uri: "library://playlist/18", name: "Brynäs"), false)
+        ]
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.speakers[.mediaPlayerSpa] = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "playing", friendlyName: "Spa")
+        model.selectSpeaker(.mediaPlayerSpa)
+        model.nowPlayingSourcePlaylist = playlistItem(uri: "spotify://playlist/s1", name: "Swedish pop")
+        for testCase in cases {
+            XCTAssertEqual(model.isNowPlaying(testCase.row), testCase.expected, testCase.row.uri)
+        }
+    }
+
+    func testIsNowPlayingNeedsAPlayingSpeakerAndAKnownSource() {
+        let row = playlistItem(uri: "spotify://playlist/s1", name: "Swedish pop")
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.speakers[.mediaPlayerSpa] = MediaPlayerEntity(entityId: .mediaPlayerSpa, state: "paused", friendlyName: "Spa")
+        model.selectSpeaker(.mediaPlayerSpa)
+        model.nowPlayingSourcePlaylist = row
+        XCTAssertFalse(model.isNowPlaying(row), "A paused speaker isn't playing the playlist")
+
+        model.speakers[.mediaPlayerSpa]?.state = "playing"
+        XCTAssertTrue(model.isNowPlaying(row))
+
+        model.nowPlayingSourcePlaylist = nil
+        XCTAssertFalse(model.isNowPlaying(row), "No known source, nothing to mark")
+    }
+
     // MARK: - Helpers
 
     private func numberedPlaylists(count: Int) -> [MusicSearchItem] {

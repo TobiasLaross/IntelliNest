@@ -130,13 +130,16 @@ extension MusicViewModel {
     /// Re-fetches the MA favourites (drives the star state and the unfavourite id
     /// lookup), then the Spotify listing so the per-owner sections reflect any
     /// follow change the 2-way sync propagated, then stars any Spotify-library
-    /// playlist that isn't already an MA favourite.
+    /// playlist that isn't already an MA favourite. Also re-reads "Senast
+    /// spelade", which otherwise loads once per session and misses plays started
+    /// outside the app — this runs each time the music view appears.
     func refreshFavorites() async {
         var maFavoritesLoaded = false
         if let favorites = try? await restAPIService.getFavoritePlaylists() {
             maFavorites = favorites
             maFavoritesLoaded = true
         }
+        await refreshRecentlyPlayed()
         await refreshSpotifyPlaylists()
         // Only sync once both sides are actually loaded — otherwise an empty MA
         // fetch would make every Spotify playlist look unfavourited and re-add it.

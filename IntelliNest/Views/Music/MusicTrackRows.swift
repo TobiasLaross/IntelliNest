@@ -68,6 +68,9 @@ struct MusicMediaRow: View {
     var subtitle: String?
     var imageURL: String?
     var trailingSystemImage = "play.fill"
+    /// Marks the playlist the active speaker is playing from (green title and a
+    /// sound-wave indicator), matching the library rows.
+    var isNowPlaying = false
     let onTap: MainActorVoidClosure
 
     var body: some View {
@@ -77,6 +80,7 @@ struct MusicMediaRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(name)
                         .font(.body)
+                        .foregroundStyle(isNowPlaying ? .green : .white)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
@@ -88,6 +92,9 @@ struct MusicMediaRow: View {
                     }
                 }
                 Spacer(minLength: 8)
+                if isNowPlaying {
+                    NowPlayingIndicator()
+                }
                 Image(systemName: trailingSystemImage)
                     .foregroundStyle(.white.opacity(0.6))
             }
@@ -95,5 +102,19 @@ struct MusicMediaRow: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(.white)
+        .accessibilityValue(isNowPlaying ? "Spelas nu" : "")
+    }
+}
+
+/// The green, gently animated sound-wave shown on the row of the playlist that is
+/// playing right now. The animation is skipped under Reduce Motion.
+struct NowPlayingIndicator: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Image(systemName: "speaker.wave.2.fill")
+            .foregroundStyle(.green)
+            .symbolEffect(.variableColor.iterative, options: .repeating, isActive: !reduceMotion)
+            .accessibilityHidden(true)
     }
 }

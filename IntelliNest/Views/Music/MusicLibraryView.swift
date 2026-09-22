@@ -81,21 +81,26 @@ struct LibraryPlaylistRow: View {
     let onOpen: MainActorVoidClosure
 
     var body: some View {
+        let isNowPlaying = viewModel.isNowPlaying(playlist)
         HStack(spacing: 12) {
             Button(action: onOpen) {
                 HStack(spacing: 12) {
                     AlbumArtView(urlString: playlist.imageURL, size: 48)
                     Text(playlist.name)
                         .font(.body)
+                        .foregroundStyle(isNowPlaying ? .green : .white)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 8)
+                    if isNowPlaying {
+                        NowPlayingIndicator()
+                    }
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(playlist.name)
+            .accessibilityLabel(isNowPlaying ? "\(playlist.name), spelas nu" : playlist.name)
             .accessibilityHint("Öppna spellistan")
 
             if let pinSection {
@@ -306,7 +311,8 @@ struct SpotifySearchResultsSections: View {
             MusicMediaRow(name: item.name,
                           subtitle: item.artist,
                           imageURL: item.imageURL,
-                          trailingSystemImage: "chevron.right") {
+                          trailingSystemImage: "chevron.right",
+                          isNowPlaying: viewModel.isNowPlaying(item)) {
                 Task { await viewModel.browseLibraryPlaylist(item) }
             }
         case .artist, .album:
