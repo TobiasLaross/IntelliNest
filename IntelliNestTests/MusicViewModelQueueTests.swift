@@ -12,6 +12,7 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     private(set) var movedItems: [(itemID: String, positions: Int)] = []
     private(set) var addedFavoriteURIs: [String] = []
     private(set) var removedFavorites: [String] = []
+    private(set) var addedLibraryURIs: [String] = []
 
     init(items: [MusicQueueItem] = [], deleteSucceeds: Bool = true, favoriteSucceeds: Bool = true, moveSucceeds: Bool = true) {
         self.items = items
@@ -45,6 +46,11 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
 
     func removeFavorite(mediaType: String, libraryItemID: String) async -> Bool {
         removedFavorites.append("\(mediaType):\(libraryItemID)")
+        return favoriteSucceeds
+    }
+
+    func addToLibrary(uri: String) async -> Bool {
+        addedLibraryURIs.append(uri)
         return favoriteSucceeds
     }
 }

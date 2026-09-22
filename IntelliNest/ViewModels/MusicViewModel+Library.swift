@@ -139,6 +139,38 @@ extension MusicViewModel {
         recentlyPlayedPlaylists = merged
     }
 
+    /// Adds a just-started playlist to the Music Assistant library in the
+    /// background, so MA records its plays and "Senast spelade" keeps it across
+    /// relaunches — MA's `last_played` listing only covers library playlists.
+    /// Skipped when it is already there: a `library://` uri, one MA already listed,
+    /// or a library search hit by name. A failed lookup skips the add rather than
+    /// risk a duplicate; failures are logged, never bannered, since playback itself
+    /// already succeeded.
+    func addToMusicAssistantLibraryIfNeeded(_ playlist: MusicSearchItem) {
+        let knownLibraryPlaylists = maRecentlyPlayedPlaylists + maFavorites
+        guard !playlist.uri.hasPrefix("library://"),
+              !knownLibraryPlaylists.contains(where: { isSamePlaylist($0, playlist) }) else {
+            return
+        }
+        pendingLibraryAddTask = Task { [weak self] in
+            guard let self else {
+                return
+            }
+            do {
+                let hits = try await restAPIService.searchLibraryPlaylists(name: playlist.name)
+                guard !hits.contains(where: { self.isSamePlaylist($0, playlist) }) else {
+                    return
+                }
+            } catch {
+                Log.warning("Skipped adding \(playlist.name) to the MA library, lookup failed: \(error)")
+                return
+            }
+            if await !queueSocket.addToLibrary(uri: playlist.uri) {
+                Log.warning("Failed to add \(playlist.name) to the MA library")
+            }
+        }
+    }
+
     /// Whether two rows are the same playlist. By uri first; by name as the
     /// fallback, since one playlist reaches the app under different uris — a
     /// `library://playlist/<id>` from Music Assistant, a `spotify://playlist/<id>`

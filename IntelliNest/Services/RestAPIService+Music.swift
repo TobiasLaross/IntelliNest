@@ -41,15 +41,27 @@ extension RestAPIService {
         try await getLibraryPlaylists(favorite: true, orderBy: "sort_name", limit: limit)
     }
 
+    /// Searches the Music Assistant library's playlists by name — favourited or
+    /// not — so a caller can tell whether a playlist is already in the library.
+    func searchLibraryPlaylists(name: String, limit: Int = 25) async throws -> [MusicSearchItem] {
+        try await getLibraryPlaylists(favorite: nil, orderBy: "sort_name", limit: limit, search: name)
+    }
+
     /// Shared `get_library` call for playlists (`?return_response`). `favorite`
-    /// applies the favourite filter only when non-nil.
-    private func getLibraryPlaylists(favorite: Bool?, orderBy: String, limit: Int) async throws -> [MusicSearchItem] {
+    /// and `search` apply their filters only when non-nil.
+    private func getLibraryPlaylists(favorite: Bool?,
+                                     orderBy: String,
+                                     limit: Int,
+                                     search: String? = nil) async throws -> [MusicSearchItem] {
         let path = "/api/services/\(Domain.musicAssistant.rawValue)/\(Action.getLibrary.rawValue)"
         var json = [JSONKey: Any]()
         json[.configEntryID] = GlobalConstants.musicAssistantConfigEntryID
         json[.mediaType] = MusicMediaType.playlist.rawValue
         if let favorite {
             json[.favorite] = favorite
+        }
+        if let search {
+            json[.search] = search
         }
         json[.orderBy] = orderBy
         json[.limit] = limit

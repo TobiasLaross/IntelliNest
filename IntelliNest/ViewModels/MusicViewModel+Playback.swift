@@ -140,6 +140,7 @@ extension MusicViewModel {
         sessionPlayedPlaylists = Array(([playlist] + sessionPlayedPlaylists.filter { !isSamePlaylist($0, playlist) })
             .prefix(Self.sessionPlayedLimit))
         nowPlayingSourcePlaylist = playlist
+        addToMusicAssistantLibraryIfNeeded(playlist)
         await refreshRecentlyPlayed()
     }
 
