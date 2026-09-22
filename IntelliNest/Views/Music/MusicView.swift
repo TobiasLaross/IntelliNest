@@ -11,57 +11,38 @@ struct MusicView: View {
     @ObservedObject var viewModel: MusicViewModel
     @State private var isShowingSpotifyLogin = false
     @State private var searchResultsTab: MusicSearchTab = .all
+    @State private var isSearching = false
+    @StateObject private var recentSearches = RecentMusicSearches()
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 8) {
-                MusicSearchBar(searchText: $viewModel.searchText,
-                               onSubmit: { Task { await viewModel.searchNow() } })
-                if !viewModel.isSpotifyAuthorized {
-                    spotifyLoginTriangle
-                }
-                if viewModel.displayedActiveSpeaker != nil {
-                    speakerPickerButton
-                }
+        Group {
+            if isSearching {
+                MusicSearchView(viewModel: viewModel,
+                                recentSearches: recentSearches,
+                                onShowAll: { mediaType in
+                                    recentSearches.record(viewModel.searchText)
+                                    searchResultsTab = .mediaType(mediaType)
+                                    Task { await viewModel.search() }
+                                },
+                                onClose: closeSearch)
+            } else {
+                startScreen
             }
-
-            ScrollView {
-                VStack(spacing: 16) {
-                    if let activeSpeaker = viewModel.displayedActiveSpeaker {
-                        // The now-playing card is only in the way while the user is
-                        // hunting for something to play.
-                        if !viewModel.isFilteringLibrary {
-                            NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
-                        }
-                        ForEach(viewModel.librarySections) { section in
-                            LibraryPlaylistsSection(viewModel: viewModel,
-                                                    section: section,
-                                                    onShowAll: { viewModel.expandedLibrarySection = section })
-                        }
-                        if viewModel.isFilteringLibrary {
-                            if viewModel.librarySections.isEmpty {
-                                Text("Inget i biblioteket matchar")
-                                    .foregroundStyle(.white.opacity(0.7))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-                            SpotifySearchResultsSections(viewModel: viewModel) { mediaType in
-                                searchResultsTab = .mediaType(mediaType)
-                                Task { await viewModel.search() }
-                            }
-                        }
-                    } else {
-                        SpeakerPickerView(viewModel: viewModel)
-                    }
-                }
-            }
-            .scrollDismissesKeyboard(.interactively)
         }
         .padding(.horizontal)
         .foregroundStyle(.white)
+        .toolbar(isSearching ? .hidden : .visible, for: .navigationBar)
         // Refresh the MA favourites (star state) and the Spotify listing each time
         // the view appears rather than trusting the once-per-session cache.
         .task {
             await viewModel.refreshFavorites()
+        }
+        // Returning to the music screen always starts outside the search, so a
+        // query left over from an earlier visit mustn't filter the library.
+        .onAppear {
+            if !isSearching {
+                viewModel.searchText = ""
+            }
         }
         // Typing filters the loaded library instantly and, a beat later, runs the
         // Music Assistant search whose hits are listed under the library matches.
@@ -116,20 +97,59 @@ struct MusicView: View {
         }
     }
 
-    /// Opens the speaker picker. It sits at screen level rather than inside the
-    /// now-playing card: picking a speaker (or a new group leader) is a choice
-    /// about the whole screen, not an action on the speaker currently playing.
-    private var speakerPickerButton: some View {
-        Button {
-            viewModel.isShowingSpeakerPicker = true
-        } label: {
-            Image(systemName: "hifispeaker.2.fill")
-                .font(.title3)
-                .foregroundStyle(.white)
-                .frame(width: 36, height: 36)
-                .contentShape(Rectangle())
+    private var startScreen: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 8) {
+                searchButton
+                if !viewModel.isSpotifyAuthorized {
+                    spotifyLoginTriangle
+                }
+            }
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    if let activeSpeaker = viewModel.displayedActiveSpeaker {
+                        NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
+                        ForEach(viewModel.librarySections) { section in
+                            LibraryPlaylistsSection(viewModel: viewModel,
+                                                    section: section,
+                                                    onShowAll: { viewModel.expandedLibrarySection = section })
+                        }
+                    } else {
+                        SpeakerPickerView(viewModel: viewModel)
+                    }
+                }
+            }
         }
-        .accessibilityLabel("Byt högtalare")
+    }
+
+    /// Looks like the search field but only opens the search screen, so typing
+    /// always happens where the results and the close button are.
+    private var searchButton: some View {
+        Button {
+            isSearching = true
+        } label: {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.white.opacity(0.7))
+                Text(MusicSearchBar.defaultPrompt)
+                    .foregroundStyle(.white.opacity(0.6))
+                    .lineLimit(1)
+                Spacer()
+            }
+            .padding(10)
+            .background(Color.white.opacity(0.12))
+            .cornerRadius(12)
+        }
+        .accessibilityLabel("Sök efter musik")
+    }
+
+    /// Leaves the search screen with the field emptied, so the start screen shows
+    /// the whole library again instead of a filtered slice of it.
+    private func closeSearch() {
+        recentSearches.record(viewModel.searchText)
+        viewModel.searchText = ""
+        isSearching = false
     }
 
     /// A discrete warning triangle shown next to the search bar while logged out
@@ -205,9 +225,13 @@ private struct SpotifyLoginPromptView: View {
 }
 
 struct MusicSearchBar: View {
+    static let defaultPrompt = "Sök i biblioteket eller på Spotify"
+
     @Binding var searchText: String
-    var prompt = "Sök i biblioteket eller på Spotify"
+    var prompt = Self.defaultPrompt
+    var focusesOnAppear = false
     let onSubmit: MainActorVoidClosure
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         HStack {
@@ -216,12 +240,28 @@ struct MusicSearchBar: View {
             TextField("", text: $searchText, prompt: Text(prompt).foregroundColor(.white.opacity(0.6)))
                 .foregroundStyle(.white)
                 .submitLabel(.search)
+                .focused($isFocused)
                 .onSubmit(onSubmit)
                 .accessibilityLabel("Sök efter musik")
+            if searchText.isNotEmpty {
+                Button {
+                    searchText = ""
+                    isFocused = true
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+                .accessibilityLabel("Rensa sökningen")
+            }
         }
         .padding(10)
         .background(Color.white.opacity(0.12))
         .cornerRadius(12)
+        .onAppear {
+            if focusesOnAppear {
+                isFocused = true
+            }
+        }
     }
 }
 

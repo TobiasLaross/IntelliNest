@@ -67,6 +67,7 @@
 		FE0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift */; };
 		AC02000000000000000004 /* MusicViewModelSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC01000000000000000003 /* MusicViewModelSearchTests.swift */; };
 		AC02000000000000000002 /* MusicViewModelLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC01000000000000000001 /* MusicViewModelLibraryTests.swift */; };
+		5EA2C0000000000000000006 /* RecentMusicSearchesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA2C0000000000000000005 /* RecentMusicSearchesTests.swift */; };
 		FE0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift */; };
 		FE0000000000000000FA0299 /* MusicViewModelHardwareMirrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000FA0299 /* MusicViewModelHardwareMirrorTests.swift */; };
 		FE0000000000000000000007 /* MusicQueueModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000007 /* MusicQueueModelTests.swift */; };
@@ -77,6 +78,7 @@
 		FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000004 /* MusicViewModel+Queue.swift */; };
 		AB02000000000000000008 /* MusicViewModel+Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB01000000000000000007 /* MusicViewModel+Library.swift */; };
 		AB02000000000000000006 /* MusicViewModel+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB01000000000000000005 /* MusicViewModel+Search.swift */; };
+		5EA2C0000000000000000004 /* RecentMusicSearches.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA2C0000000000000000003 /* RecentMusicSearches.swift */; };
 		FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */; };
 		FE00000000000000000000F5 /* MusicViewModel+Grouping.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD00000000000000000000F5 /* MusicViewModel+Grouping.swift */; };
 		FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */; };
@@ -102,6 +104,7 @@
 		AB02000000000000000010 /* MusicArtistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0100000000000000000F /* MusicArtistView.swift */; };
 		AB0200000000000000000E /* MusicPlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0100000000000000000D /* MusicPlaylistView.swift */; };
 		AB0200000000000000000C /* MusicLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0100000000000000000B /* MusicLibraryView.swift */; };
+		5EA2C0000000000000000002 /* MusicSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA2C0000000000000000001 /* MusicSearchView.swift */; };
 		AB0200000000000000000A /* MusicTrackRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB01000000000000000009 /* MusicTrackRows.swift */; };
 		EE000011000000000000000B /* MusicViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF000011000000000000000B /* MusicViewModelTests.swift */; };
 		EE00001100000000000000C1 /* MusicViewModelGroupingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */; };
@@ -329,6 +332,7 @@
 		FD0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelPersonalSectionsTests.swift; sourceTree = "<group>"; };
 		AC01000000000000000003 /* MusicViewModelSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSearchTests.swift; sourceTree = "<group>"; };
 		AC01000000000000000001 /* MusicViewModelLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelLibraryTests.swift; sourceTree = "<group>"; };
+		5EA2C0000000000000000005 /* RecentMusicSearchesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentMusicSearchesTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelGroupVolumeTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000FA0299 /* MusicViewModelHardwareMirrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelHardwareMirrorTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000007 /* MusicQueueModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicQueueModelTests.swift; sourceTree = "<group>"; };
@@ -339,6 +343,7 @@
 		FD0000000000000000000004 /* MusicViewModel+Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Queue.swift"; sourceTree = "<group>"; };
 		AB01000000000000000007 /* MusicViewModel+Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Library.swift"; sourceTree = "<group>"; };
 		AB01000000000000000005 /* MusicViewModel+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Search.swift"; sourceTree = "<group>"; };
+		5EA2C0000000000000000003 /* RecentMusicSearches.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentMusicSearches.swift; sourceTree = "<group>"; };
 		FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Favourites.swift"; sourceTree = "<group>"; };
 		FD00000000000000000000F5 /* MusicViewModel+Grouping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Grouping.swift"; sourceTree = "<group>"; };
 		FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+SpotifyTracks.swift"; sourceTree = "<group>"; };
@@ -364,6 +369,7 @@
 		AB0100000000000000000F /* MusicArtistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicArtistView.swift; sourceTree = "<group>"; };
 		AB0100000000000000000D /* MusicPlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlaylistView.swift; sourceTree = "<group>"; };
 		AB0100000000000000000B /* MusicLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicLibraryView.swift; sourceTree = "<group>"; };
+		5EA2C0000000000000000001 /* MusicSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSearchView.swift; sourceTree = "<group>"; };
 		AB01000000000000000009 /* MusicTrackRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicTrackRows.swift; sourceTree = "<group>"; };
 		EF000011000000000000000B /* MusicViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelTests.swift; sourceTree = "<group>"; };
 		EF00001100000000000000C1 /* MusicViewModelGroupingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelGroupingTests.swift; sourceTree = "<group>"; };
@@ -676,6 +682,7 @@
 				FD0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift */,
 				AC01000000000000000003 /* MusicViewModelSearchTests.swift */,
 				AC01000000000000000001 /* MusicViewModelLibraryTests.swift */,
+				5EA2C0000000000000000005 /* RecentMusicSearchesTests.swift */,
 				FD0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift */,
 				FD0000000000000000FA0299 /* MusicViewModelHardwareMirrorTests.swift */,
 				FD0000000000000000000007 /* MusicQueueModelTests.swift */,
@@ -716,6 +723,7 @@
 				FD0000000000000000000004 /* MusicViewModel+Queue.swift */,
 				AB01000000000000000007 /* MusicViewModel+Library.swift */,
 				AB01000000000000000005 /* MusicViewModel+Search.swift */,
+				5EA2C0000000000000000003 /* RecentMusicSearches.swift */,
 				FD000000000000000000FA01 /* MusicViewModel+Favourites.swift */,
 				FD00000000000000000000F5 /* MusicViewModel+Grouping.swift */,
 				FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */,
@@ -815,6 +823,7 @@
 				AB0100000000000000000F /* MusicArtistView.swift */,
 				AB0100000000000000000D /* MusicPlaylistView.swift */,
 				AB0100000000000000000B /* MusicLibraryView.swift */,
+				5EA2C0000000000000000001 /* MusicSearchView.swift */,
 				AB01000000000000000009 /* MusicTrackRows.swift */,
 			);
 			path = Music;
@@ -1318,6 +1327,7 @@
 				FE0000000000000000000004 /* MusicViewModel+Queue.swift in Sources */,
 				AB02000000000000000008 /* MusicViewModel+Library.swift in Sources */,
 				AB02000000000000000006 /* MusicViewModel+Search.swift in Sources */,
+				5EA2C0000000000000000004 /* RecentMusicSearches.swift in Sources */,
 				FE000000000000000000FA01 /* MusicViewModel+Favourites.swift in Sources */,
 				FE00000000000000000000F5 /* MusicViewModel+Grouping.swift in Sources */,
 				FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */,
@@ -1338,6 +1348,7 @@
 				AB02000000000000000010 /* MusicArtistView.swift in Sources */,
 				AB0200000000000000000E /* MusicPlaylistView.swift in Sources */,
 				AB0200000000000000000C /* MusicLibraryView.swift in Sources */,
+				5EA2C0000000000000000002 /* MusicSearchView.swift in Sources */,
 				AB0200000000000000000A /* MusicTrackRows.swift in Sources */,
 				CD215FD8D5AD91EE27DAAB00 /* FuelView.swift in Sources */,
 				3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */,
@@ -1384,6 +1395,7 @@
 				FE0000000000000000FA0202 /* MusicViewModelPersonalSectionsTests.swift in Sources */,
 				AC02000000000000000004 /* MusicViewModelSearchTests.swift in Sources */,
 				AC02000000000000000002 /* MusicViewModelLibraryTests.swift in Sources */,
+				5EA2C0000000000000000006 /* RecentMusicSearchesTests.swift in Sources */,
 				FE0000000000000000FA0203 /* MusicViewModelGroupVolumeTests.swift in Sources */,
 				FE0000000000000000FA0299 /* MusicViewModelHardwareMirrorTests.swift in Sources */,
 				FE0000000000000000000007 /* MusicQueueModelTests.swift in Sources */,
