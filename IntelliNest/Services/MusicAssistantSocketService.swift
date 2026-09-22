@@ -29,6 +29,11 @@ protocol MusicAssistantQueueSocket: Sendable {
     /// `library://<type>/<id>` uri). With 2-way sync on, this also unfollows it on
     /// Spotify. Returns whether the command succeeded.
     func removeFavorite(mediaType: String, libraryItemID: String) async -> Bool
+    /// Adds the media item (by uri) to the Music Assistant library without
+    /// favouriting it, so MA starts tracking its last-played time. With the Spotify
+    /// provider's library sync-back on, MA also saves it on Spotify. Returns
+    /// whether the command succeeded.
+    func addToLibrary(uri: String) async -> Bool
 }
 
 /// Talks to the Music Assistant server's WebSocket API. Each call opens a short
@@ -80,6 +85,10 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
     func removeFavorite(mediaType: String, libraryItemID: String) async -> Bool {
         await send(command: "music/favorites/remove_item",
                    args: ["media_type": mediaType, "library_item_id": libraryItemID]) != nil
+    }
+
+    func addToLibrary(uri: String) async -> Bool {
+        await send(command: "music/library/add_item", args: ["item": uri]) != nil
     }
 
     // MARK: - WebSocket plumbing
@@ -213,4 +222,5 @@ struct DisabledMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     func moveItem(queueID _: String, itemID _: String, positions _: Int) async -> Bool { false }
     func addFavorite(uri _: String) async -> Bool { false }
     func removeFavorite(mediaType _: String, libraryItemID _: String) async -> Bool { false }
+    func addToLibrary(uri _: String) async -> Bool { false }
 }

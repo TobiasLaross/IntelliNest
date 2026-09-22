@@ -175,7 +175,8 @@ struct MusicSearchResultsView: View {
             MusicMediaRow(name: item.name,
                           subtitle: item.artist,
                           imageURL: item.imageURL,
-                          trailingSystemImage: "chevron.right") {
+                          trailingSystemImage: "chevron.right",
+                          isNowPlaying: viewModel.isNowPlaying(item)) {
                 Task { await viewModel.openPlaylist(item) }
             }
             .musicListRow()

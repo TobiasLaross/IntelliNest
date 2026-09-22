@@ -28,7 +28,8 @@ extension MusicViewModel {
             return
         }
         hasLoadedLibrary = true
-        recentlyPlayedPlaylists = recents
+        maRecentlyPlayedPlaylists = recents
+        applyRecentlyPlayed()
     }
 
     /// Loads the huset Spotify account's playlists into the favourites section
@@ -121,12 +122,26 @@ extension MusicViewModel {
         return merged
     }
 
-    /// Re-fetches the recently-played list after a playlist launch so the new
-    /// play bubbles to the top. Silent on failure.
-    private func refreshRecentlyPlayed() async {
+    /// Re-fetches Music Assistant's recently-played list, bypassing the load
+    /// latch, so plays started elsewhere (another phone, the MA UI) show up too.
+    /// Silent on failure: the previous listing stays.
+    func refreshRecentlyPlayed() async {
         if let recents = try? await restAPIService.getRecentlyPlayedPlaylists() {
-            recentlyPlayedPlaylists = recents
+            maRecentlyPlayedPlaylists = recents
+            applyRecentlyPlayed()
         }
+    }
+
+    /// Records an in-app playlist launch: it becomes the now-playing source and is
+    /// remembered for the session, so it reaches the top of "Senast spelade" right
+    /// away — MA's `last_played` lags the play and never lists a non-library
+    /// playlist at all — then re-reads MA for everything else.
+    private func didStartPlaylist(_ playlist: MusicSearchItem) async {
+        sessionPlayedPlaylists = Array(([playlist] + sessionPlayedPlaylists.filter { !isSamePlaylist($0, playlist) })
+            .prefix(Self.sessionPlayedLimit))
+        nowPlayingSourcePlaylist = playlist
+        addToMusicAssistantLibraryIfNeeded(playlist)
+        await refreshRecentlyPlayed()
     }
 
     /// Opens a favourite/recents playlist for browsing in its own sheet on the
@@ -248,9 +263,8 @@ extension MusicViewModel {
     /// Plays the whole playlist from the start on the active speaker.
     func playPlaylist(_ playlist: MusicSearchItem) async {
         if await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) {
-            nowPlayingSourcePlaylist = playlist
             closeSearchResults()
-            await refreshRecentlyPlayed()
+            await didStartPlaylist(playlist)
         }
     }
 
@@ -261,13 +275,12 @@ extension MusicViewModel {
         guard await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) else {
             return
         }
-        nowPlayingSourcePlaylist = playlist
         if let activeSpeaker, let targetID = playbackTargetID {
             speakers[activeSpeaker.entityId]?.shuffle = true
             restAPIService.setShuffle(entityID: targetID, shuffle: true)
         }
         closeSearchResults()
-        await refreshRecentlyPlayed()
+        await didStartPlaylist(playlist)
     }
 
     /// Plays the chosen track now, then queues the rest of the playlist after it,
@@ -276,12 +289,11 @@ extension MusicViewModel {
         guard await startPlayback(uri: track.uri, mediaType: .track, title: track.title, artist: nil) else {
             return
         }
-        nowPlayingSourcePlaylist = playlist
         if let targetID = playbackTargetID {
             await restAPIService.playMedia(on: targetID, mediaID: playlist.uri, mediaType: .playlist, enqueue: "add")
         }
         closeSearchResults()
-        await refreshRecentlyPlayed()
+        await didStartPlaylist(playlist)
     }
 
     /// Opens the playlist the current track is playing from, reusing the main

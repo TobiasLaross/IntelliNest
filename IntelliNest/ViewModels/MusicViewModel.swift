@@ -78,9 +78,14 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Music Assistant favourite not yet mirrored into that library, so a freshly
     /// starred playlist appears here at once. Loaded on the first reload.
     @Published var favoritePlaylists: [MusicSearchItem] = []
-    /// The most recently played playlists (Music Assistant `last_played` order),
-    /// shown above the favourites. Refreshed whenever a playlist is launched.
+    /// "Senast spelade": playing now, unlisted session plays, then MA's `last_played`.
     @Published var recentlyPlayedPlaylists: [MusicSearchItem] = []
+    /// MA's `last_played_desc` listing as last fetched — MA *library* playlists only.
+    var maRecentlyPlayedPlaylists: [MusicSearchItem] = []
+    /// Playlists started from the app this session, newest first; resets on relaunch.
+    var sessionPlayedPlaylists: [MusicSearchItem] = []
+    /// The fire-and-forget MA library add after a playlist launch; tests await it.
+    var pendingLibraryAddTask: Task<Void, Never>?
     /// A library playlist the user opened to browse from the main view (favourites
     /// or recents), presented in its own sheet. Nil when no browse sheet is shown.
     @Published var browsingLibraryPlaylist: MusicSearchItem?
@@ -94,9 +99,12 @@ class MusicViewModel: ObservableObject, Reloadable {
     @Published var isSpotifyAuthorized = false
     /// The playlist the current track is playing from, when playback was started
     /// from a playlist within the app this session. Drives the now-playing card's
-    /// jump-to-playlist tap. Nil when the source is unknown (started elsewhere, a
-    /// single track played, or after relaunch), which hides the affordance.
-    @Published var nowPlayingSourcePlaylist: MusicSearchItem?
+    /// jump-to-playlist tap and leads "Senast spelade". Nil when the source is
+    /// unknown (started elsewhere, a single track, or after relaunch).
+    @Published var nowPlayingSourcePlaylist: MusicSearchItem? {
+        didSet { applyRecentlyPlayed() }
+    }
+
     /// URIs of tracks currently in the user's Spotify Liked Songs, driving the
     /// song favourite star wherever a track is shown. Loaded on demand per view.
     @Published var savedSongURIs: Set<String> = []

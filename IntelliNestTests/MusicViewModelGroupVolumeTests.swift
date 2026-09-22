@@ -105,6 +105,81 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.recentlyPlayedPlaylists.map(\.name), ["Bastumusik"])
     }
 
+    func testPlayingAPlaylistMusicAssistantDoesNotListPutsItFirst() async {
+        // The reported bug: MA's `last_played` only covers its library, so a
+        // Spotify playlist played by uri never reached "Senast spelade".
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        stubRecents(json: "{\"service_response\":{\"items\":[" +
+            "{\"uri\":\"library://playlist/26\",\"name\":\"Victor Leksell/Miriam Bryant/Molly Sandén\"}," +
+            "{\"uri\":\"library://playlist/22\",\"name\":\"Lugnt & Skönt\"}]}}")
+        let swedishPop = MusicSearchItem(uri: "spotify://playlist/5bKqWc9JtqJ7mT2QXe4Rn8", name: "Swedish pop",
+                                         mediaType: .playlist, imageURL: nil, artist: nil)
+        await viewModel.playPlaylist(swedishPop)
+        XCTAssertEqual(viewModel.recentlyPlayedPlaylists.map(\.name),
+                       ["Swedish pop", "Victor Leksell/Miriam Bryant/Molly Sandén", "Lugnt & Skönt"])
+        XCTAssertTrue(viewModel.isNowPlaying(swedishPop))
+    }
+
+    func testReplayingALibraryPlaylistKeepsOneRow() async {
+        // The Spotify uri and MA's library uri name the same playlist, so it moves
+        // to the top rather than showing twice.
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        stubRecents(json: "{\"service_response\":{\"items\":[" +
+            "{\"uri\":\"library://playlist/18\",\"name\":\"Brynäs\"}," +
+            "{\"uri\":\"library://playlist/22\",\"name\":\"Lugnt & Skönt\"}]}}")
+        let lugnt = MusicSearchItem(uri: "spotify://playlist/37i9dQZF1DXcBWIGoYBM5M", name: "Lugnt & Skönt",
+                                    mediaType: .playlist, imageURL: nil, artist: nil)
+        await viewModel.playPlaylist(lugnt)
+        XCTAssertEqual(viewModel.recentlyPlayedPlaylists.map(\.name), ["Lugnt & Skönt", "Brynäs"])
+    }
+
+    func testStartedPlaylistIsAddedToTheMusicAssistantLibraryOnlyWhenMissing() async {
+        // get_library serves both the recents and the library-name lookup here, so
+        // "in the library" means the stubbed listing carries the playlist.
+        struct Case {
+            let playlist: MusicSearchItem
+            let recentsJSON: String
+            let expectedAdds: [String]
+        }
+        let cases = [
+            Case(playlist: playlistItem(uri: "spotify://playlist/5bKqWc9JtqJ7mT2QXe4Rn8", name: "Swedish pop"),
+                 recentsJSON: "{\"service_response\":{\"items\":[{\"uri\":\"library://playlist/18\",\"name\":\"Brynäs\"}]}}",
+                 expectedAdds: ["spotify://playlist/5bKqWc9JtqJ7mT2QXe4Rn8"]),
+            Case(playlist: playlistItem(uri: "spotify://playlist/37i9dQZF1DXcBWIGoYBM5M", name: "Lugnt & Skönt"),
+                 recentsJSON: "{\"service_response\":{\"items\":[{\"uri\":\"library://playlist/22\",\"name\":\"Lugnt & Skönt\"}]}}",
+                 expectedAdds: []),
+            Case(playlist: playlistItem(uri: "library://playlist/18", name: "Brynäs"),
+                 recentsJSON: "{\"service_response\":{\"items\":[]}}",
+                 expectedAdds: [])
+        ]
+        for testCase in cases {
+            let socket = StubMusicAssistantQueueSocket()
+            let model = makeViewModel(socket: socket)
+            model.selectSpeaker(.mediaPlayerKitchen)
+            stubPlayMedia(statusCode: 200)
+            stubRecents(json: testCase.recentsJSON)
+            await model.playPlaylist(testCase.playlist)
+            await model.pendingLibraryAddTask?.value
+            let added = await socket.addedLibraryURIs
+            XCTAssertEqual(added, testCase.expectedAdds, testCase.playlist.name)
+        }
+    }
+
+    func testFailedLibraryLookupSkipsTheAddWithoutABanner() async {
+        let socket = StubMusicAssistantQueueSocket()
+        let model = makeViewModel(socket: socket)
+        model.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        stubRecents(json: "{}", statusCode: 500)
+        await model.playPlaylist(playlistItem(uri: "spotify://playlist/5bKqWc9JtqJ7mT2QXe4Rn8", name: "Swedish pop"))
+        await model.pendingLibraryAddTask?.value
+        let added = await socket.addedLibraryURIs
+        XCTAssertTrue(added.isEmpty)
+        XCTAssertTrue(bannerTitles.isEmpty)
+    }
+
     func testBrowseLibraryPlaylistOpensSheetAndLoadsTracks() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         stubBrowse(json: "{\"service_response\":{\"media_player.kitchen\":{\"children\":" +

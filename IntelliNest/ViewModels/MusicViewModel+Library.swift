@@ -116,6 +116,80 @@ extension MusicViewModel {
         section.playlists.count - collapsedPlaylists(in: section).count
     }
 
+    // MARK: - Recently played and now playing
+
+    /// In-app plays remembered per session; more than a section's worth would
+    /// only push Music Assistant's own history out of "Visa alla".
+    static let sessionPlayedLimit = 5
+
+    /// Rebuilds "Senast spelade": the playlist playing now first, then this
+    /// session's in-app plays MA doesn't list, then MA's `last_played` order —
+    /// deduped, so a playlist MA does know keeps a single row. Session plays MA
+    /// already lists defer to MA's position, which also reflects plays started
+    /// elsewhere after them.
+    func applyRecentlyPlayed() {
+        let unlistedSessionPlays = sessionPlayedPlaylists.filter { played in
+            !maRecentlyPlayedPlaylists.contains { isSamePlaylist($0, played) }
+        }
+        var merged: [MusicSearchItem] = []
+        for playlist in [nowPlayingSourcePlaylist].compactMap(\.self) + unlistedSessionPlays + maRecentlyPlayedPlaylists
+            where !merged.contains(where: { isSamePlaylist($0, playlist) }) {
+            merged.append(playlist)
+        }
+        recentlyPlayedPlaylists = merged
+    }
+
+    /// Adds a just-started playlist to the Music Assistant library in the
+    /// background, so MA records its plays and "Senast spelade" keeps it across
+    /// relaunches — MA's `last_played` listing only covers library playlists.
+    /// Skipped when it is already there: a `library://` uri, one MA already listed,
+    /// or a library search hit by name. A failed lookup skips the add rather than
+    /// risk a duplicate; failures are logged, never bannered, since playback itself
+    /// already succeeded.
+    func addToMusicAssistantLibraryIfNeeded(_ playlist: MusicSearchItem) {
+        let knownLibraryPlaylists = maRecentlyPlayedPlaylists + maFavorites
+        guard !playlist.uri.hasPrefix("library://"),
+              !knownLibraryPlaylists.contains(where: { isSamePlaylist($0, playlist) }) else {
+            return
+        }
+        pendingLibraryAddTask = Task { [weak self] in
+            guard let self else {
+                return
+            }
+            do {
+                let hits = try await restAPIService.searchLibraryPlaylists(name: playlist.name)
+                guard !hits.contains(where: { self.isSamePlaylist($0, playlist) }) else {
+                    return
+                }
+            } catch {
+                Log.warning("Skipped adding \(playlist.name) to the MA library, lookup failed: \(error)")
+                return
+            }
+            if await !queueSocket.addToLibrary(uri: playlist.uri) {
+                Log.warning("Failed to add \(playlist.name) to the MA library")
+            }
+        }
+    }
+
+    /// Whether two rows are the same playlist. By uri first; by name as the
+    /// fallback, since one playlist reaches the app under different uris — a
+    /// `library://playlist/<id>` from Music Assistant, a `spotify://playlist/<id>`
+    /// from the Spotify listing.
+    func isSamePlaylist(_ lhs: MusicSearchItem, _ rhs: MusicSearchItem) -> Bool {
+        lhs.uri == rhs.uri || normalizedName(lhs.name) == normalizedName(rhs.name)
+    }
+
+    /// Whether `playlist` is what the active speaker is playing from right now,
+    /// which marks its row in every library list. Only a playing speaker counts:
+    /// a paused or idle one leaves the "Spelas från" breadcrumb but isn't playing
+    /// anything to point at.
+    func isNowPlaying(_ playlist: MusicSearchItem) -> Bool {
+        guard let source = nowPlayingSourcePlaylist, activeSpeaker?.isPlaying == true else {
+            return false
+        }
+        return isSamePlaylist(source, playlist)
+    }
+
     // MARK: - Pinning
 
     /// "Senast spelade" is ordered by recency; pinning rows there would fight it.
