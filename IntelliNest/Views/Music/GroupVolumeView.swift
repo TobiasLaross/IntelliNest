@@ -173,7 +173,7 @@ private struct SpeakerVolumeRow: View {
                         .accessibilityLabel(toggleAccessibilityLabel)
                 }
 
-                if grouped, !isPrimary {
+                if grouped, !isPrimary, viewModel.showsPrimary {
                     Button {
                         viewModel.makePrimary(speaker.entityId)
                     } label: {
@@ -226,7 +226,7 @@ private struct SpeakerVolumeRow: View {
                     .accessibilityLabel("Spelar nu")
             }
             Spacer(minLength: 8)
-            if isPrimary {
+            if isPrimary, viewModel.showsPrimary {
                 primaryChip(filled: true)
             }
         }
