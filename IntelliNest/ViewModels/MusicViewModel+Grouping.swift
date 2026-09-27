@@ -19,7 +19,7 @@ extension MusicViewModel {
         guard let activeSpeaker else {
             return []
         }
-        let memberIDs = activeSpeaker.groupMembers
+        let memberIDs = nativeGroupMemberIDs ?? activeSpeaker.groupMembers
         guard memberIDs.count > 1 else {
             return [activeSpeaker]
         }
@@ -94,7 +94,7 @@ extension MusicViewModel {
         guard let activeSpeaker, speakerID != activeSpeaker.entityId else {
             return false
         }
-        return activeSpeaker.groupMembers.contains(speakerID)
+        return (nativeGroupMemberIDs ?? activeSpeaker.groupMembers).contains(speakerID)
     }
 
     /// Toggles `speakerID` into or out of the active speaker's group. The active
@@ -104,6 +104,10 @@ extension MusicViewModel {
     /// and the confirming reload settle, so its row shows a spinner.
     func toggleGroupMember(_ speakerID: EntityId) async {
         guard let activeSpeakerID, speakerID != activeSpeakerID else {
+            return
+        }
+        if isActiveOnNativeSource {
+            await toggleNativeGroupMember(speakerID)
             return
         }
         let speakerName = speakers[speakerID]?.friendlyName ?? speakerID.rawValue
@@ -170,7 +174,7 @@ extension MusicViewModel {
     /// group leader (`playbackTargetID`), so switching the primary never interrupts
     /// what's playing. No-op for a speaker that isn't grouped with the active one.
     func makePrimary(_ speakerID: EntityId) {
-        guard speakerID != activeSpeakerID, isGrouped(speakerID) else {
+        guard showsPrimary, speakerID != activeSpeakerID, isGrouped(speakerID) else {
             return
         }
         selectSpeaker(speakerID)
@@ -184,6 +188,10 @@ extension MusicViewModel {
     /// active speaker isn't grouped with anyone.
     func removeActiveSpeakerFromGroup() async {
         guard let activeSpeakerID, let activeSpeaker else {
+            return
+        }
+        if isActiveOnNativeSource {
+            await leaveNativeGroup(activeSpeakerID)
             return
         }
         let remaining = Self.speakerIDs.filter { activeSpeaker.groupMembers.contains($0) && $0 != activeSpeakerID }

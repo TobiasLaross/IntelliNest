@@ -128,7 +128,7 @@ dedicated `return_response` request path rather than the fire-and-forget POST us
 ### Music: Music Assistant + Sonos hardware twins
 
 The music controller drives speakers through **Music Assistant** `media_player.*` queue entities
-(e.g. `media_player.vardagsrummet`). All control — play/pause, transport, volume, grouping — routes through the
+(e.g. `media_player.vardagsrummet`). Control — play/pause, transport, volume, grouping — normally routes through the
 MA entity, even when the speaker is a Sonos. The four Sonos rooms *also* expose a **native Sonos hardware entity**
 ("hardware twin", e.g. `media_player.arc`), mapped to its MA entity in `MusicViewModel.hardwareTwinIDs`.
 
@@ -147,6 +147,11 @@ flow-only twin is ignored so it can't clobber the real MA title with `"Music Ass
 share no comparable content id (MA exposes a Spotify URI, the Sonos a stream URL), so track identity is matched on
 title+artist via `isSameTrack`. The queue screen (`get_queue`, a `return_response` call) reads the real track
 directly and bypasses the mirror entirely, so it stays correct regardless of which entity the card trusts.
+
+**Control follows the same split.** MA rejects commands for a stream it doesn't own (HA answers 500,
+`PlayerCommandFailed`). So while the active speaker's twin plays a native source, transport goes to the twin
+(`transportTargetID`), grouping joins/unjoins the Sonos twins on the coordinator (`MusicViewModel+NativeGrouping`,
+Sonos rooms only), and the "Primär" chip is hidden since there is no MA leader to pick.
 
 ### Models
 
