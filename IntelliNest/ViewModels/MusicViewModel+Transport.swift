@@ -12,12 +12,11 @@ import Foundation
 /// and under the line-length limit.
 extension MusicViewModel {
     func togglePlayPause() {
-        guard let activeSpeaker, let targetID = playbackTargetID else {
+        guard let activeSpeaker, let targetID = transportTargetID else {
             return
         }
         // Decide from the mirrored state the card actually shows (the hardware
-        // twin's when it diverges), so the button does what its icon implies. The
-        // command still routes to the Music Assistant group leader.
+        // twin's when it diverges), so the button does what its icon implies.
         let isPlaying = displayedActiveSpeaker?.isPlaying ?? activeSpeaker.isPlaying
         let action: Action = isPlaying ? .mediaPause : .mediaPlay
         if isPlaying {
@@ -41,7 +40,7 @@ extension MusicViewModel {
     }
 
     func nextTrack() {
-        guard let targetID = playbackTargetID else {
+        guard let targetID = transportTargetID else {
             return
         }
         // A new track resets position, so a seek/pause hold no longer applies.
@@ -50,7 +49,7 @@ extension MusicViewModel {
     }
 
     func previousTrack() {
-        guard let targetID = playbackTargetID else {
+        guard let targetID = transportTargetID else {
             return
         }
         positionHold = nil

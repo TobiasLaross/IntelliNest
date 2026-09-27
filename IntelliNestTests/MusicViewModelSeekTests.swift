@@ -270,22 +270,3 @@ final class PlaybackTimeFormatTests: XCTestCase {
         }
     }
 }
-
-private extension URLRequest {
-    /// `URLProtocol` strips `httpBody` into a stream for POSTs, so read it back out.
-    func httpBodyStreamData() -> Data? {
-        guard let stream = httpBodyStream else { return nil }
-        stream.open()
-        defer { stream.close() }
-        var data = Data()
-        let bufferSize = 1024
-        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-        defer { buffer.deallocate() }
-        while stream.hasBytesAvailable {
-            let read = stream.read(buffer, maxLength: bufferSize)
-            if read <= 0 { break }
-            data.append(buffer, count: read)
-        }
-        return data.isEmpty ? nil : data
-    }
-}
