@@ -34,6 +34,17 @@ extension MusicViewModel {
         return speaker.mirroring(liveTwin(for: speaker))
     }
 
+    /// Where play/pause and skip commands for the active speaker must go. When a
+    /// hardware twin is driving a native source (AirPlay, Spotify Connect, TV),
+    /// Music Assistant doesn't own that stream and rejects transport commands with
+    /// a 500, so they go to the Sonos twin itself. Otherwise the MA group leader.
+    var transportTargetID: EntityId? {
+        if let activeSpeaker, let twin = liveTwin(for: activeSpeaker) {
+            return twin.entityId
+        }
+        return playbackTargetID
+    }
+
     /// The hardware twin that reflects what this speaker is actually playing: its
     /// own twin first, then — when it has none playing — a grouped member's twin.
     /// The fallback covers an AirPlay leader synced with a Sonos: the leader has no

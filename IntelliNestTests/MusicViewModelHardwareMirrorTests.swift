@@ -300,4 +300,50 @@ extension MusicViewModelTests {
         await viewModel.reload()
         XCTAssertEqual(viewModel.nowPlayingSourcePlaylist?.uri, playlist.uri)
     }
+
+    // MARK: - Transport routing
+
+    /// Fires one transport command and returns the `entity_id` it was posted to.
+    private func transportEntityID(path: String, action: () -> Void) async -> String? {
+        var capturedBody: [String: Any]?
+        URLProtocolStub.observerRequests { request in
+            if request.httpMethod == "POST", request.url?.path == path {
+                let data = request.httpBodyStreamData() ?? request.httpBody
+                capturedBody = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+            }
+        }
+        stubPostService(path: path)
+        action()
+        await restAPIService.lastCommandTask?.value
+        return capturedBody?["entity_id"] as? String
+    }
+
+    func testTransportRoutesToTwinWhenItPlaysANativeSource() async {
+        // The kitchen Sonos is paused on an AirPlay stream Music Assistant doesn't
+        // own; MA rejects transport for it with a 500, so it must hit the twin.
+        let cases: [(twinContentID: String, expected: EntityId)] = [
+            ("x-sonos-vli:RINCON_38420B10EC2801400:1,airplay:9d126e4e", .mediaPlayerKitchenSonos),
+            ("http://192.168.1.205:8097/flow/session/kitchen.flac", .mediaPlayerKitchen)
+        ]
+        for testCase in cases {
+            stubAllSpeakers()
+            stubTwin(for: .mediaPlayerKitchen,
+                     state: "paused",
+                     title: "Ho Hey",
+                     artist: "The Lumineers",
+                     contentID: testCase.twinContentID)
+            await viewModel.reload()
+            viewModel.selectSpeaker(.mediaPlayerKitchen)
+
+            let commands: [(path: String, action: () -> Void)] = [
+                ("/api/services/media_player/media_play", viewModel.togglePlayPause),
+                ("/api/services/media_player/media_next_track", viewModel.nextTrack),
+                ("/api/services/media_player/media_previous_track", viewModel.previousTrack)
+            ]
+            for command in commands {
+                let entityID = await transportEntityID(path: command.path, action: command.action)
+                XCTAssertEqual(entityID, testCase.expected.rawValue, "\(command.path) \(testCase.twinContentID)")
+            }
+        }
+    }
 }
