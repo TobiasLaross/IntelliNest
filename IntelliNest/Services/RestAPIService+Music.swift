@@ -187,6 +187,24 @@ extension RestAPIService {
         update(entityID: entityID, domain: .mediaPlayer, action: action, reloadTimes: reloadTimes)
     }
 
+    /// Sends the same transport command to several players at once. Each POST is
+    /// fire-and-forget: a forced pause deliberately hits entities that may not
+    /// own the stream, and the one that rejects it must not raise an error banner.
+    func mediaTransport(entityIDs: [EntityId], action: Action, reloadTimes: Int = 3) {
+        lastCommandTask = Task {
+            await withTaskGroup(of: Void.self) { group in
+                for entityID in entityIDs {
+                    group.addTask {
+                        var json = [JSONKey: Any]()
+                        json[.entityID] = entityID.rawValue
+                        await self.sendPostRequest(json: json, domain: .mediaPlayer, action: action, fireAndForget: true)
+                    }
+                }
+            }
+            triggerRepeatReload(times: reloadTimes)
+        }
+    }
+
     func setVolume(entityID: EntityId, volume: Double, reloadTimes: Int = 1) {
         update(entityID: entityID,
                domain: .mediaPlayer,

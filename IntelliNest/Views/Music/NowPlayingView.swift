@@ -181,6 +181,15 @@ private struct TransportControlsView: View {
                     .frame(width: 54, height: 54)
             }
             .accessibilityLabel(speaker.isPlaying ? "Pausa" : "Spela")
+            .contextMenu {
+                // Long-press escape hatch for when the shown state is wrong (Music
+                // Assistant and the Sonos disagree), so a plain tap can't pause.
+                Button {
+                    viewModel.forcePause()
+                } label: {
+                    Label("Tvinga paus", systemImage: "pause.fill")
+                }
+            }
 
             Button {
                 viewModel.nextTrack()
