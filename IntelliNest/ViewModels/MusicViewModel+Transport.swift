@@ -18,11 +18,39 @@ extension MusicViewModel {
         // Decide from the mirrored state the card actually shows (the hardware
         // twin's when it diverges), so the button does what its icon implies.
         let isPlaying = displayedActiveSpeaker?.isPlaying ?? activeSpeaker.isPlaying
-        let action: Action = isPlaying ? .mediaPause : .mediaPlay
-        if isPlaying {
-            // Pausing: pin the scrubber to the live position. A pausing player can
-            // briefly report no position (or 0) while it transitions, which would
-            // snap the scrubber to 0; hold the frozen spot until HA reports it back.
+        applyOptimisticPlayback(pausing: isPlaying)
+        restAPIService.mediaTransport(entityID: targetID, action: isPlaying ? .mediaPause : .mediaPlay)
+        // Confirm the new state/position quickly so the hold releases promptly.
+        restAPIService.triggerRepeatReload(times: 3)
+    }
+
+    /// Pauses regardless of what the card shows, for when Music Assistant and the
+    /// Sonos disagree about whether anything is playing. The pause goes to every
+    /// entity that could own the stream — the MA leader and the Sonos twins behind
+    /// it — since there's no telling which one is right.
+    func forcePause() {
+        guard activeSpeaker != nil else {
+            return
+        }
+        let candidateIDs = [playbackTargetID, transportTargetID].compactMap { $0 }
+        let twinIDs = candidateIDs.compactMap { Self.hardwareTwinIDs[$0] }
+        var targetIDs: [EntityId] = []
+        for entityID in candidateIDs + twinIDs where !targetIDs.contains(entityID) {
+            targetIDs.append(entityID)
+        }
+        applyOptimisticPlayback(pausing: true)
+        restAPIService.mediaTransport(entityIDs: targetIDs, action: .mediaPause)
+    }
+
+    /// Flips the active speaker's state at once so the button doesn't wait a reload
+    /// cycle. Pausing pins the scrubber to the live position: a pausing player can
+    /// briefly report no position (or 0) while it transitions, which would snap the
+    /// scrubber to 0, so the frozen spot is held until HA reports it back.
+    private func applyOptimisticPlayback(pausing: Bool) {
+        guard let activeSpeaker else {
+            return
+        }
+        if pausing {
             // Read the elapsed time before flipping the state, while it still extrapolates.
             let now = Date()
             let frozen = (displayedActiveSpeaker ?? activeSpeaker).currentElapsed(asOf: now) ?? 0
@@ -33,10 +61,7 @@ extension MusicViewModel {
             // Resuming: drop any hold so the live position advances freely again.
             positionHold = nil
         }
-        speakers[activeSpeaker.entityId]?.state = isPlaying ? "paused" : "playing"
-        restAPIService.mediaTransport(entityID: targetID, action: action)
-        // Confirm the new state/position quickly so the hold releases promptly.
-        restAPIService.triggerRepeatReload(times: 3)
+        speakers[activeSpeaker.entityId]?.state = pausing ? "paused" : "playing"
     }
 
     func nextTrack() {
