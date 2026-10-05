@@ -21,6 +21,11 @@ enum GlobalConstants {
     /// IntelliNest-API: relays Home Assistant notifications and Live Activity updates to APNs.
     static let intelliNestAPIURLString = "http://192.168.1.203:3000"
 
+    /// Shared secret the relay's Live Activity routes require. Injected from the `INTELLINEST_API_SECRET` xcconfig key.
+    static var intelliNestAPISecret: String {
+        Bundle.main.object(forInfoDictionaryKey: "INTELLINEST_API_SECRET") as? String ?? ""
+    }
+
     static var baseExternalUrlString: String {
         if let externalUrl = Bundle.main.object(forInfoDictionaryKey: "EXTERNAL_URL") as? String {
             return "https://\(externalUrl)"

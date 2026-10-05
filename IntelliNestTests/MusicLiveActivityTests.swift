@@ -155,12 +155,15 @@ extension MusicViewModelTests {
         let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)
         URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
         let recorder = RequestRecorder { $0.url == url }
-        let relay = MusicActivityRelay(baseURLString: relayURLString, session: URLProtocolStub.createStubbedURLSession())
+        let relay = MusicActivityRelay(baseURLString: relayURLString,
+                                       secret: "4f1d9c2a7b3e8f60",
+                                       session: URLProtocolStub.createStubbedURLSession())
         let state = activityState()
 
         await relay.register(pushToken: "8a1f3c", deviceToken: "5b2e7d", state: state)
 
         let request = try XCTUnwrap(recorder.requests.first)
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer 4f1d9c2a7b3e8f60")
         let body = try XCTUnwrap((request.httpBodyStreamData() ?? request.httpBody)
             .flatMap { try JSONSerialization.jsonObject(with: $0) as? [String: Any] })
         XCTAssertEqual(body["push_token"] as? String, "8a1f3c")

@@ -12,6 +12,7 @@ import Foundation
 /// follows the music while the app is closed.
 struct MusicActivityRelay {
     var baseURLString = GlobalConstants.intelliNestAPIURLString
+    var secret = GlobalConstants.intelliNestAPISecret
     var session: URLSession = .shared
 
     private struct Registration: Encodable {
@@ -52,6 +53,7 @@ struct MusicActivityRelay {
         var request = URLRequest(url: url, timeoutInterval: 5)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(secret)", forHTTPHeaderField: "Authorization")
         do {
             request.httpBody = try JSONEncoder().encode(body)
             _ = try await session.data(for: request)
