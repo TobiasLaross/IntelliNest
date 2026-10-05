@@ -18,6 +18,7 @@
 		LA0000000000000000B00005 /* Navigator+MusicLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0005 /* Navigator+MusicLiveActivity.swift */; };
 		LA0000000000000000B00006 /* MusicLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0006 /* MusicLiveActivity.swift */; };
 		LA0000000000000000B00007 /* MusicLiveActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0007 /* MusicLiveActivityTests.swift */; };
+		LA0000000000000000B00008 /* VolumeButtonPressDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0008 /* VolumeButtonPressDetectorTests.swift */; };
 		3BE58BE3D740734914B1C7DD /* HomeLocationEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */; };
 		3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DC1A4298196BF77982508A /* PurifierView.swift */; };
 		40D2B2C064DFFA29F5082543 /* PurifierEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171E57CCB554528320B69CFA /* PurifierEntity.swift */; };
@@ -107,6 +108,7 @@
 		EE0000000000000000000A04 /* SeekBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000000000000000000A04 /* SeekBarView.swift */; };
 		EE0000000000000000000A05 /* LyricsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000000000000000000A05 /* LyricsViews.swift */; };
 		4D41525100000000000000B1 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D41525100000000000000A1 /* MarqueeText.swift */; };
+		4D415251000000000000B0C1 /* HardwareVolumeButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D415251000000000000A0C1 /* HardwareVolumeButtons.swift */; };
 		4D41525100000000000000B2 /* MarqueeScrollTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D41525100000000000000A2 /* MarqueeScrollTests.swift */; };
 		FE0000000000000000000B01 /* LyricsTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B01 /* LyricsTimelineTests.swift */; };
 		FE0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */; };
@@ -295,6 +297,7 @@
 		LA00000000000000000F0005 /* Navigator+MusicLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Navigator+MusicLiveActivity.swift"; sourceTree = "<group>"; };
 		LA00000000000000000F0006 /* MusicLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLiveActivity.swift"; sourceTree = "<group>"; };
 		LA00000000000000000F0007 /* MusicLiveActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLiveActivityTests.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0008 /* VolumeButtonPressDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeButtonPressDetectorTests.swift; sourceTree = "<group>"; };
 		171E57CCB554528320B69CFA /* PurifierEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PurifierEntity.swift; sourceTree = "<group>"; };
 		1F941237969DF91783B00BE7 /* FuelView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FuelView.swift; sourceTree = "<group>"; };
 		2EAEED7651CD21D72BA8AC79 /* INText.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = INText.swift; sourceTree = "<group>"; };
@@ -388,6 +391,7 @@
 		EF0000000000000000000A04 /* SeekBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekBarView.swift; sourceTree = "<group>"; };
 		EF0000000000000000000A05 /* LyricsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsViews.swift; sourceTree = "<group>"; };
 		4D41525100000000000000A1 /* MarqueeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeText.swift; sourceTree = "<group>"; };
+		4D415251000000000000A0C1 /* HardwareVolumeButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardwareVolumeButtons.swift; sourceTree = "<group>"; };
 		4D41525100000000000000A2 /* MarqueeScrollTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeScrollTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000B01 /* LyricsTimelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsTimelineTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerEntityLyricsTests.swift; sourceTree = "<group>"; };
@@ -690,6 +694,7 @@
 			isa = PBXGroup;
 			children = (
 				LA00000000000000000F0007 /* MusicLiveActivityTests.swift */,
+				LA00000000000000000F0008 /* VolumeButtonPressDetectorTests.swift */,
 				F679BDA92BEA18F4007364C6 /* IntelliNest.xctestplan */,
 				F679BDAA2BEA1BA7007364C6 /* IntelliNest-github.xctestplan */,
 				F664BA7129B48AF80092CB2E /* EntityTest.swift */,
@@ -870,6 +875,7 @@
 				EF0000000000000000000A04 /* SeekBarView.swift */,
 				EF0000000000000000000A05 /* LyricsViews.swift */,
 				4D41525100000000000000A1 /* MarqueeText.swift */,
+				4D415251000000000000A0C1 /* HardwareVolumeButtons.swift */,
 				EF0000070000000000000007 /* AlbumArtView.swift */,
 				EF0000080000000000000008 /* SpeakerPickerView.swift */,
 				C0FFEE0000000000000000B2 /* MusicShortcutGrid.swift */,
@@ -1406,6 +1412,7 @@
 				EE0000000000000000000A04 /* SeekBarView.swift in Sources */,
 				EE0000000000000000000A05 /* LyricsViews.swift in Sources */,
 				4D41525100000000000000B1 /* MarqueeText.swift in Sources */,
+				4D415251000000000000B0C1 /* HardwareVolumeButtons.swift in Sources */,
 				EE0000070000000000000007 /* AlbumArtView.swift in Sources */,
 				EE0000080000000000000008 /* SpeakerPickerView.swift in Sources */,
 				C0FFEE0000000000000000A2 /* MusicShortcutGrid.swift in Sources */,
@@ -1435,6 +1442,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				LA0000000000000000B00007 /* MusicLiveActivityTests.swift in Sources */,
+				LA0000000000000000B00008 /* VolumeButtonPressDetectorTests.swift in Sources */,
 				F664BA7229B48AF80092CB2E /* EntityTest.swift in Sources */,
 				F664BA7629B48F860092CB2E /* InputNumberEntityTest.swift in Sources */,
 				F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */,
