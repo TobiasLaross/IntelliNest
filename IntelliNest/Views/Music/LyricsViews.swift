@@ -207,13 +207,20 @@ struct LyricsFullView: View {
         }
     }
 
+    /// Says up front that these lyrics carry no timing, so the missing highlight
+    /// reads as the song's lyrics lacking it rather than the follow being broken.
     private func plainView(_ text: String) -> some View {
         ScrollView {
-            Text(text)
-                .font(.title3)
-                .foregroundStyle(.white.opacity(0.8))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(24)
+            VStack(alignment: .leading, spacing: 16) {
+                Label("Inte synkad med låten", systemImage: "clock.badge.xmark")
+                    .font(.footnote)
+                    .foregroundStyle(.white.opacity(0.55))
+                Text(text)
+                    .font(.title3)
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(24)
         }
     }
 
