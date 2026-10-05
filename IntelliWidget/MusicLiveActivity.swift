@@ -16,6 +16,7 @@ struct MusicLiveActivity: Widget {
             MusicLockScreenView(state: context.state)
                 .activityBackgroundTint(Color.black.opacity(0.45))
                 .activitySystemActionForegroundColor(.white)
+                .widgetURL(MusicActivityLink.nowPlayingURL)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -41,6 +42,7 @@ struct MusicLiveActivity: Widget {
             } minimal: {
                 MusicArtworkView(fileName: context.state.artworkFileName, side: 24)
             }
+            .widgetURL(MusicActivityLink.nowPlayingURL)
         }
     }
 }

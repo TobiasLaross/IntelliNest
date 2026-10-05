@@ -171,4 +171,22 @@ extension MusicViewModelTests {
         let stateData = try JSONSerialization.data(withJSONObject: XCTUnwrap(body["content_state"]))
         XCTAssertEqual(try JSONDecoder().decode(MusicActivityAttributes.ContentState.self, from: stateData), state)
     }
+
+    // MARK: - Tap link
+
+    func testLiveActivityLinkOnlyMatchesTheNowPlayingURL() throws {
+        let nowPlayingURL = try XCTUnwrap(MusicActivityLink.nowPlayingURL)
+        XCTAssertTrue(MusicActivityLink.isNowPlaying(nowPlayingURL))
+
+        let cases: [(url: String, matches: Bool)] = [
+            ("intellinest://now-playing", true),
+            ("IntelliNest://start-car-heater", false),
+            ("IntelliNest://snoozeWashingMachine", false),
+            ("https://now-playing", false)
+        ]
+        for testCase in cases {
+            let url = try XCTUnwrap(URL(string: testCase.url))
+            XCTAssertEqual(MusicActivityLink.isNowPlaying(url), testCase.matches, testCase.url)
+        }
+    }
 }

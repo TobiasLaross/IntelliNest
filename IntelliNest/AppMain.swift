@@ -97,7 +97,11 @@ struct AppMain: App {
                 } + [.cancel()])
             }
             .onOpenURL { url in
-                if url.scheme == "IntelliNest", let path = url.host {
+                if MusicActivityLink.isNowPlaying(url) {
+                    Task {
+                        await navigator.openNowPlaying()
+                    }
+                } else if url.scheme == "IntelliNest", let path = url.host {
                     if path == NotificationActionIdentifier.startCarHeater.rawValue {
                         navigator.navigationPath = [.lynk]
                         navigator.showLynkHeaterOptions()

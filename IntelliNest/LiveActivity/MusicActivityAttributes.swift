@@ -78,6 +78,17 @@ extension MusicActivityAttributes.ContentState {
     }
 }
 
+/// The link the Live Activity opens when tapped. The app answers it by showing the full-screen player.
+enum MusicActivityLink {
+    static let scheme = "IntelliNest"
+    static let nowPlayingHost = "now-playing"
+    static let nowPlayingURL = URL(string: "\(scheme)://\(nowPlayingHost)")
+
+    static func isNowPlaying(_ url: URL) -> Bool {
+        url.scheme?.caseInsensitiveCompare(scheme) == .orderedSame && url.host == nowPlayingHost
+    }
+}
+
 enum MusicActivityArtwork {
     static let appGroupID = "group.se.laross.intellinest.shared"
 
