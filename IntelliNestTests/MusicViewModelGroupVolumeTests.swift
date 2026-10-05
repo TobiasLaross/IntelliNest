@@ -62,6 +62,20 @@ extension MusicViewModelTests {
         await recorder.waitForRequests(count: 3)
     }
 
+    func testStepGroupVolumeMovesTheWholeGroupOneStep() async {
+        await reloadGroupedKitchenLeader()
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/volume_set") == true }
+        stubPostService(path: "/api/services/media_player/volume_set")
+        // From the 0.12 average, one step up and two down.
+        viewModel.stepGroupVolume(raising: true)
+        XCTAssertEqual(viewModel.groupVolume, 0.17, accuracy: 0.0001)
+        viewModel.stepGroupVolume(raising: false)
+        viewModel.stepGroupVolume(raising: false)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.volumeLevel ?? 0, 0.07, accuracy: 0.0001)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerOutdoorTable]?.volumeLevel ?? 0, 0.07, accuracy: 0.0001)
+        await recorder.waitForRequests(count: 9)
+    }
+
     // MARK: - Recently-played playlists
 
     private func recentsURL() -> URL {

@@ -51,6 +51,13 @@ extension MusicViewModel {
         }
     }
 
+    /// One press of the phone's volume buttons: the group moves by the same step as the Live Activity buttons.
+    func stepGroupVolume(raising: Bool) {
+        let step = MusicActivityAttributes.ContentState.volumeStep
+        let target = groupVolume + (raising ? step : -step)
+        setGroupVolume((min(max(target, 0), 1) * 100).rounded() / 100)
+    }
+
     // MARK: - Speaker picker
 
     /// The speaker picker's cards in display order: every synced Music Assistant
