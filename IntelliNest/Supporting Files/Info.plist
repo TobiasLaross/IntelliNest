@@ -37,6 +37,8 @@
 	<string>$(SPOTIFY_REFRESH_TOKEN_SARAH)</string>
 	<key>MUSIC_ASSISTANT</key>
 	<string>$(MUSIC_ASSISTANT)</string>
+	<key>INTELLINEST_API_SECRET</key>
+	<string>$(INTELLINEST_API_SECRET)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -55,6 +57,8 @@
 			<string>CarHeater</string>
 		</dict>
 	</array>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

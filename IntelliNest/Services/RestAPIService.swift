@@ -272,7 +272,7 @@ class RestAPIService: URLRequestBuilder {
         json[.osName] = "iOS"
         json[.osVersion] = "1.0"
         json[.supportsEncryption] = false
-        let appData = [JSONKey.pushToken: apnsToken, .pushURL: "http://192.168.1.203:3000/notify"]
+        let appData = [JSONKey.pushToken: apnsToken, .pushURL: "\(GlobalConstants.intelliNestAPIURLString)/notify"]
         json[.appData] = appData
         let capturedJSON = json
         Task {

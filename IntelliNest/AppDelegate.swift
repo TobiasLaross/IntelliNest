@@ -36,6 +36,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     func application(_: UIApplication,
                      didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Registered before anything else: a Live Activity button press can be what launched the app.
+        MusicLiveActivityController.shared.registerCommandHandler()
         Task {
             UNUserNotificationCenter.current().delegate = self
             let action = UNNotificationAction(identifier: NotificationActionIdentifier.snoozeWashingMachine.rawValue,
@@ -84,9 +86,21 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
+        UserDefaults.standard.set(token, forKey: StorageKeys.apnsDeviceToken.rawValue)
         NotificationCenter.default.post(name: Notification.Name("UpdatedAPNSToken"),
                                         object: nil,
                                         userInfo: ["apnsToken": token])
+    }
+
+    /// The Live Activity relay sends this when the track changed while the app was closed: the new album art can
+    /// only be fetched by the app.
+    func application(_: UIApplication,
+                     didReceiveRemoteNotification userInfo: [AnyHashable: Any]) async -> UIBackgroundFetchResult {
+        guard userInfo["intellinest"] as? String == "live-activity-refresh" else {
+            return .noData
+        }
+        await MusicLiveActivityController.shared.refreshTrack()
+        return .newData
     }
 
     func application(_: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {

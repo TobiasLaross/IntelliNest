@@ -60,6 +60,7 @@ extension Navigator {
     }
 
     func lockAfterExitingHome(generation: Int) async {
+        await MusicLiveActivityController.shared.end()
         guard let currentUserAwayEntityID = UserManager.currentUserAwayEntityID else {
             Log.warning("Geofence utan användare: \(UserManager.currentUser)")
             return
@@ -124,7 +125,7 @@ extension Navigator {
     }
 }
 
-private extension UserManager {
+extension UserManager {
     @MainActor
     static var currentUserAwayEntityID: EntityId? {
         switch currentUser {

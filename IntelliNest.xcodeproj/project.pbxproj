@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		LA0000000000000000B00100 /* MusicActivityRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0100 /* MusicActivityRelay.swift */; };
+		LA0000000000000000B00000 /* MusicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0000 /* MusicActivityAttributes.swift */; };
+		LA0000000000000000B10000 /* MusicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0000 /* MusicActivityAttributes.swift */; };
+		LA0000000000000000B00001 /* MusicActivityIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0001 /* MusicActivityIntents.swift */; };
+		LA0000000000000000B10001 /* MusicActivityIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0001 /* MusicActivityIntents.swift */; };
+		LA0000000000000000B00002 /* MusicActivityCommandSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0002 /* MusicActivityCommandSender.swift */; };
+		LA0000000000000000B00003 /* MusicLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0003 /* MusicLiveActivityController.swift */; };
+		LA0000000000000000B00004 /* MusicViewModel+LiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0004 /* MusicViewModel+LiveActivity.swift */; };
+		LA0000000000000000B00005 /* Navigator+MusicLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0005 /* Navigator+MusicLiveActivity.swift */; };
+		LA0000000000000000B00006 /* MusicLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0006 /* MusicLiveActivity.swift */; };
+		LA0000000000000000B00007 /* MusicLiveActivityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0007 /* MusicLiveActivityTests.swift */; };
 		3BE58BE3D740734914B1C7DD /* HomeLocationEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B126D511CCFBA5E7EF7F80F9 /* HomeLocationEntity.swift */; };
 		3D1653ABAE6D49DB4CCAC158 /* PurifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DC1A4298196BF77982508A /* PurifierView.swift */; };
 		40D2B2C064DFFA29F5082543 /* PurifierEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171E57CCB554528320B69CFA /* PurifierEntity.swift */; };
@@ -271,6 +282,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		LA00000000000000000F0100 /* MusicActivityRelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityRelay.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0000 /* MusicActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityAttributes.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0001 /* MusicActivityIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityIntents.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0002 /* MusicActivityCommandSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityCommandSender.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0003 /* MusicLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLiveActivityController.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0004 /* MusicViewModel+LiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+LiveActivity.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0005 /* Navigator+MusicLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Navigator+MusicLiveActivity.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0006 /* MusicLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLiveActivity.swift"; sourceTree = "<group>"; };
+		LA00000000000000000F0007 /* MusicLiveActivityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicLiveActivityTests.swift"; sourceTree = "<group>"; };
 		171E57CCB554528320B69CFA /* PurifierEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PurifierEntity.swift; sourceTree = "<group>"; };
 		1F941237969DF91783B00BE7 /* FuelView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FuelView.swift; sourceTree = "<group>"; };
 		2EAEED7651CD21D72BA8AC79 /* INText.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = INText.swift; sourceTree = "<group>"; };
@@ -541,6 +561,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		LA0000000000000000000G01 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				LA00000000000000000F0100 /* MusicActivityRelay.swift */,
+				LA00000000000000000F0000 /* MusicActivityAttributes.swift */,
+				LA00000000000000000F0001 /* MusicActivityIntents.swift */,
+				LA00000000000000000F0002 /* MusicActivityCommandSender.swift */,
+				LA00000000000000000F0003 /* MusicLiveActivityController.swift */,
+			);
+			path = LiveActivity;
+			sourceTree = "<group>";
+		};
 		F60345C227A933C500212D04 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -649,6 +681,7 @@
 		F6260EF5283280D200B87614 /* IntelliNestTests */ = {
 			isa = PBXGroup;
 			children = (
+				LA00000000000000000F0007 /* MusicLiveActivityTests.swift */,
 				F679BDA92BEA18F4007364C6 /* IntelliNest.xctestplan */,
 				F679BDAA2BEA1BA7007364C6 /* IntelliNest-github.xctestplan */,
 				F664BA7129B48AF80092CB2E /* EntityTest.swift */,
@@ -701,6 +734,7 @@
 		F62750AD2A01119000C1253F /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				LA00000000000000000F0005 /* Navigator+MusicLiveActivity.swift */,
 				F62750AA2A00EE8800C1253F /* ToolbarBackButton.swift */,
 				F627509E29FD120F00C1253F /* Navigator.swift */,
 				FD0000000000000000000C02 /* Navigator+Geofence.swift */,
@@ -714,6 +748,7 @@
 		F62CD2E128770D4900462092 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				LA00000000000000000F0004 /* MusicViewModel+LiveActivity.swift */,
 				F68DA61528B0D12B00601726 /* HomeViewModel.swift */,
 				F62CD2E228770D5500462092 /* LightsViewModel.swift */,
 				F6F94B5D28B60DED006B1F12 /* LynkViewModel.swift */,
@@ -864,6 +899,7 @@
 		F67023F927A177320070FFBB /* IntelliNest */ = {
 			isa = PBXGroup;
 			children = (
+				LA0000000000000000000G01 /* LiveActivity */,
 				F62750AD2A01119000C1253F /* Navigation */,
 				F62CD2E6287713F900462092 /* Errors */,
 				F62CD2E128770D4900462092 /* ViewModels */,
@@ -890,6 +926,7 @@
 		F67D771C2B5130CA00F52EB0 /* IntelliWidget */ = {
 			isa = PBXGroup;
 			children = (
+				LA00000000000000000F0006 /* MusicLiveActivity.swift */,
 				F658F3DE2B5A6EF900F7940D /* Extensions */,
 				F658F3DB2B5A6D3500F7940D /* IntelliWidgetExtension.entitlements */,
 				F67D771D2B5130CA00F52EB0 /* IntelliWidgetBundle.swift */,
@@ -1196,6 +1233,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				LA0000000000000000B00100 /* MusicActivityRelay.swift in Sources */,
+				LA0000000000000000B00000 /* MusicActivityAttributes.swift in Sources */,
+				LA0000000000000000B00001 /* MusicActivityIntents.swift in Sources */,
+				LA0000000000000000B00002 /* MusicActivityCommandSender.swift in Sources */,
+				LA0000000000000000B00003 /* MusicLiveActivityController.swift in Sources */,
+				LA0000000000000000B00004 /* MusicViewModel+LiveActivity.swift in Sources */,
+				LA0000000000000000B00005 /* Navigator+MusicLiveActivity.swift in Sources */,
 				F6FDBE2F2A1CD7980081BC3D /* LockServiceProtocol.swift in Sources */,
 				F64A38832B1085B600BA9FAC /* SSIDUtil.swift in Sources */,
 				F60663492B33267200575FE4 /* FlowIndicatorView.swift in Sources */,
@@ -1376,6 +1420,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				LA0000000000000000B00007 /* MusicLiveActivityTests.swift in Sources */,
 				F664BA7229B48AF80092CB2E /* EntityTest.swift in Sources */,
 				F664BA7629B48F860092CB2E /* InputNumberEntityTest.swift in Sources */,
 				F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */,
@@ -1426,6 +1471,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				LA0000000000000000B10000 /* MusicActivityAttributes.swift in Sources */,
+				LA0000000000000000B10001 /* MusicActivityIntents.swift in Sources */,
+				LA0000000000000000B00006 /* MusicLiveActivity.swift in Sources */,
 				F67D771E2B5130CA00F52EB0 /* IntelliWidgetBundle.swift in Sources */,
 				F646EB142B5C30DD002DBD98 /* HomeWidget.swift in Sources */,
 				F67D77222B5130CA00F52EB0 /* CarHeaterWidget.swift in Sources */,
