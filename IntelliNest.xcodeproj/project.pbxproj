@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		LA0000000000000000B00100 /* MusicActivityRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0100 /* MusicActivityRelay.swift */; };
 		LA0000000000000000B00000 /* MusicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0000 /* MusicActivityAttributes.swift */; };
 		LA0000000000000000B10000 /* MusicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0000 /* MusicActivityAttributes.swift */; };
 		LA0000000000000000B00001 /* MusicActivityIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0001 /* MusicActivityIntents.swift */; };
@@ -281,6 +282,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		LA00000000000000000F0100 /* MusicActivityRelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityRelay.swift"; sourceTree = "<group>"; };
 		LA00000000000000000F0000 /* MusicActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityAttributes.swift"; sourceTree = "<group>"; };
 		LA00000000000000000F0001 /* MusicActivityIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityIntents.swift"; sourceTree = "<group>"; };
 		LA00000000000000000F0002 /* MusicActivityCommandSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityCommandSender.swift"; sourceTree = "<group>"; };
@@ -562,6 +564,7 @@
 		LA0000000000000000000G01 /* LiveActivity */ = {
 			isa = PBXGroup;
 			children = (
+				LA00000000000000000F0100 /* MusicActivityRelay.swift */,
 				LA00000000000000000F0000 /* MusicActivityAttributes.swift */,
 				LA00000000000000000F0001 /* MusicActivityIntents.swift */,
 				LA00000000000000000F0002 /* MusicActivityCommandSender.swift */,
@@ -1230,6 +1233,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				LA0000000000000000B00100 /* MusicActivityRelay.swift in Sources */,
 				LA0000000000000000B00000 /* MusicActivityAttributes.swift in Sources */,
 				LA0000000000000000B00001 /* MusicActivityIntents.swift in Sources */,
 				LA0000000000000000B00002 /* MusicActivityCommandSender.swift in Sources */,

@@ -3,9 +3,9 @@ import XCTest
 
 @MainActor
 extension MusicViewModelTests {
-    private func activityState(isPlaying: Bool = true,
-                               position: Double? = 30,
-                               groupVolume: Double = 0.4) -> MusicActivityAttributes.ContentState {
+    func activityState(isPlaying: Bool = true,
+                       position: Double? = 30,
+                       groupVolume: Double = 0.4) -> MusicActivityAttributes.ContentState {
         MusicActivityAttributes.ContentState(title: "Ha dig igen",
                                              artist: "Victor Leksell",
                                              roomName: "Köket +2",
@@ -144,5 +144,28 @@ extension MusicViewModelTests {
             XCTAssertEqual(postedBodies(recorder.requests).compactMap { $0["entity_id"] as? String },
                            [EntityId.mediaPlayerKitchen.rawValue], "\(testCase)")
         }
+    }
+}
+
+@MainActor
+extension MusicViewModelTests {
+    func testRelayRegistrationCarriesTheTokensAndState() async throws {
+        let relayURLString = "http://192.168.1.203:3000"
+        let url = try XCTUnwrap(URL(string: relayURLString + "/live-activity/register"))
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)
+        URLProtocolStub.setStub(for: url, data: Data(), response: response, error: nil)
+        let recorder = RequestRecorder { $0.url == url }
+        let relay = MusicActivityRelay(baseURLString: relayURLString, session: URLProtocolStub.createStubbedURLSession())
+        let state = activityState()
+
+        await relay.register(pushToken: "8a1f3c", deviceToken: "5b2e7d", state: state)
+
+        let request = try XCTUnwrap(recorder.requests.first)
+        let body = try XCTUnwrap((request.httpBodyStreamData() ?? request.httpBody)
+            .flatMap { try JSONSerialization.jsonObject(with: $0) as? [String: Any] })
+        XCTAssertEqual(body["push_token"] as? String, "8a1f3c")
+        XCTAssertEqual(body["device_token"] as? String, "5b2e7d")
+        let stateData = try JSONSerialization.data(withJSONObject: XCTUnwrap(body["content_state"]))
+        XCTAssertEqual(try JSONDecoder().decode(MusicActivityAttributes.ContentState.self, from: stateData), state)
     }
 }

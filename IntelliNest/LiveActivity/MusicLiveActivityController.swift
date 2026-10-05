@@ -29,6 +29,9 @@ final class MusicLiveActivityController {
                                                      setErrorBannerText: { _, _ in },
                                                      repeatReloadAction: { _ in })
     private var cachedArtwork: (path: String, fileName: String)?
+    private let relay = MusicActivityRelay()
+    /// The running activity's ActivityKit push token, which the relay needs to update it while the app is closed.
+    private var activityPushToken: String?
 
     /// `Activity` isn't `Sendable`, so it never leaves these nonisolated helpers: only its state crosses over.
     private nonisolated static var currentState: MusicActivityAttributes.ContentState? {
@@ -37,6 +40,24 @@ final class MusicLiveActivityController {
 
     private nonisolated static func update(to state: MusicActivityAttributes.ContentState) async {
         await Activity<MusicActivityAttributes>.activities.first?.update(ActivityContent(state: state, staleDate: nil))
+    }
+
+    private nonisolated static func start(with state: MusicActivityAttributes.ContentState) throws {
+        let activity = try Activity.request(attributes: MusicActivityAttributes(),
+                                            content: ActivityContent(state: state, staleDate: nil),
+                                            pushType: .token)
+        Task {
+            for await tokenData in activity.pushTokenUpdates {
+                let token = tokenData.map { String(format: "%02x", $0) }.joined()
+                await MusicLiveActivityController.shared.didReceivePushToken(token)
+            }
+        }
+    }
+
+    private nonisolated static func endAll() async {
+        for activity in Activity<MusicActivityAttributes>.activities {
+            await activity.end(nil, dismissalPolicy: .immediate)
+        }
     }
 
     func registerCommandHandler() {
@@ -58,21 +79,46 @@ final class MusicLiveActivityController {
             guard currentState != state else {
                 return
             }
-            await Self.update(to: state)
+            await apply(state)
         } else if ActivityAuthorizationInfo().areActivitiesEnabled {
             do {
-                _ = try Activity.request(attributes: MusicActivityAttributes(),
-                                         content: ActivityContent(state: state, staleDate: nil))
+                try Self.start(with: state)
             } catch {
                 Log.warning("Kunde inte starta musikens Live Activity: \(error)")
             }
         }
     }
 
-    nonisolated func end() async {
-        for activity in Activity<MusicActivityAttributes>.activities {
-            await activity.end(nil, dismissalPolicy: .immediate)
+    func end() async {
+        guard Self.currentState != nil else {
+            return
         }
+        await Self.endAll()
+        if let activityPushToken {
+            self.activityPushToken = nil
+            await relay.unregister(pushToken: activityPushToken)
+        }
+    }
+
+    /// Shows `state` and hands it to the relay, which builds its pushes on top of the last state it was given.
+    private func apply(_ state: MusicActivityAttributes.ContentState) async {
+        await Self.update(to: state)
+        await registerWithRelay(state)
+    }
+
+    private func didReceivePushToken(_ token: String) async {
+        activityPushToken = token
+        if let state = Self.currentState {
+            await registerWithRelay(state)
+        }
+    }
+
+    private func registerWithRelay(_ state: MusicActivityAttributes.ContentState) async {
+        guard let activityPushToken else {
+            return
+        }
+        let deviceToken = UserDefaults.standard.string(forKey: StorageKeys.apnsDeviceToken.rawValue)
+        await relay.register(pushToken: activityPushToken, deviceToken: deviceToken, state: state)
     }
 
     private func perform(_ command: MusicActivityCommand) async {
@@ -81,22 +127,27 @@ final class MusicLiveActivityController {
         }
         let optimistic = MusicActivityCommandSender.optimisticState(after: command, from: state, asOf: Date())
         if optimistic != state {
-            await Self.update(to: optimistic)
+            await apply(optimistic)
         }
         if urlCreator.connectionState == .unset {
             await urlCreator.updateConnectionState()
         }
         await MusicActivityCommandSender(restAPIService: restAPIService).send(command, for: state)
         if command == .nextTrack || command == .previousTrack {
-            await refreshTrack()
+            await refreshTrack(afterSkip: true)
         }
     }
 
-    /// Pulls in the new track after a skip. The app may be in the background with no reload loop running, so
-    /// without this the activity would keep showing the old title until the app is next opened.
-    private func refreshTrack() async {
-        // Music Assistant reports the new track a beat after the skip is accepted.
-        try? await Task.sleep(for: .seconds(1.5))
+    /// Re-reads the playing track, with its album art, into the activity: after a skip, and when the relay's
+    /// background push says the track changed. The app may be in the background with no reload loop running.
+    func refreshTrack(afterSkip: Bool = false) async {
+        if afterSkip {
+            // Music Assistant reports the new track a beat after the skip is accepted.
+            try? await Task.sleep(for: .seconds(1.5))
+        }
+        if urlCreator.connectionState == .unset {
+            await urlCreator.updateConnectionState()
+        }
         guard let state = Self.currentState,
               let targetID = EntityId(rawValue: state.transportTargetID),
               let player = try? await restAPIService.reload(entityId: targetID, entityType: MediaPlayerEntity.self),
@@ -112,7 +163,7 @@ final class MusicLiveActivityController {
         refreshed.positionDate = player.mediaPositionUpdatedAt
         refreshed.duration = player.mediaDuration
         refreshed.artworkFileName = await artworkFileName(for: player.entityPicture)
-        await Self.update(to: refreshed)
+        await apply(refreshed)
     }
 
     /// Downloads and shrinks the album art into the shared container, returning the file name the widget reads.

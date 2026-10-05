@@ -19,4 +19,5 @@ enum StorageKeys: String {
     case lastMusicSpeaker
     case pinnedMusicPlaylists
     case recentMusicSearches
+    case apnsDeviceToken
 }
