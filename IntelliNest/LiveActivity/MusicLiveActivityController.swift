@@ -32,6 +32,9 @@ final class MusicLiveActivityController {
     private let relay = MusicActivityRelay()
     /// The running activity's ActivityKit push token, which the relay needs to update it while the app is closed.
     private var activityPushToken: String?
+    /// The press being handled. Presses run one after another, so two quick volume steps build on each other and
+    /// their POSTs can't land out of order.
+    private var commandTask: Task<Void, Never>?
 
     /// `Activity` isn't `Sendable`, so it never leaves these nonisolated helpers: only its state crosses over.
     private nonisolated static var currentState: MusicActivityAttributes.ContentState? {
@@ -122,6 +125,16 @@ final class MusicLiveActivityController {
     }
 
     private func perform(_ command: MusicActivityCommand) async {
+        let previous = commandTask
+        let task = Task {
+            await previous?.value
+            await self.run(command)
+        }
+        commandTask = task
+        await task.value
+    }
+
+    private func run(_ command: MusicActivityCommand) async {
         guard let state = Self.currentState else {
             return
         }
@@ -183,12 +196,17 @@ final class MusicLiveActivityController {
         let digest = SHA256.hash(data: Data(path.utf8)).map { String(format: "%02x", $0) }.joined()
         let fileName = "\(digest.prefix(16)).jpg"
         do {
-            try? FileManager.default.removeItem(at: directoryURL)
             try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
             try jpeg.write(to: directoryURL.appendingPathComponent(fileName))
         } catch {
             Log.warning("Kunde inte spara skivomslaget för Live Activity: \(error)")
             return nil
+        }
+        // The activity still shows the old art until it's updated with the new name, so that file stays.
+        let keptFileNames = Set([fileName, Self.currentState?.artworkFileName].compactMap(\.self))
+        let storedFileNames = (try? FileManager.default.contentsOfDirectory(atPath: directoryURL.path)) ?? []
+        for staleFileName in storedFileNames where !keptFileNames.contains(staleFileName) {
+            try? FileManager.default.removeItem(at: directoryURL.appendingPathComponent(staleFileName))
         }
         cachedArtwork = (path, fileName)
         return fileName
