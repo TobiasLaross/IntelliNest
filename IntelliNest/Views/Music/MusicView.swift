@@ -24,8 +24,9 @@ struct MusicView: View {
         .padding(.horizontal)
         .foregroundStyle(.white)
         .toolbar(isSearching ? .hidden : .visible, for: .navigationBar)
-        // Covers the full-screen player too, since its sheet is presented from here.
-        .hardwareVolumeButtons { viewModel.stepGroupVolume(raising: $0) }
+        // Covers the full-screen player too, since its sheet is presented from here. Without a speaker to move,
+        // the buttons stay with the phone's own volume.
+        .hardwareVolumeButtons(isEnabled: viewModel.activeSpeakerID != nil) { viewModel.stepGroupVolume(raising: $0) }
         // Refresh the MA favourites (star state) and the Spotify listing each time
         // the view appears rather than trusting the once-per-session cache.
         .task {

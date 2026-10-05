@@ -14,10 +14,12 @@ import SwiftUI
 /// volume ends up roughly where it was.
 struct VolumeButtonPressDetector {
     private static let tolerance: Float = 0.001
+    let startingVolume: Float
     let restingVolume: Float
 
     /// Starts from the phone's current volume, moved in from the ends so there is room to press both ways.
     init(startingVolume: Float) {
+        self.startingVolume = startingVolume
         restingVolume = min(max(startingVolume, 0.1), 0.9)
     }
 
@@ -30,9 +32,10 @@ struct VolumeButtonPressDetector {
     }
 }
 
-/// While on screen, turns the volume buttons into speaker volume steps instead of changing the phone's volume.
+/// While on screen and enabled, turns the volume buttons into speaker volume steps instead of changing the phone's volume.
 /// The `MPVolumeView` it hosts keeps the system volume HUD away and is how the phone volume is reset after a press.
 struct HardwareVolumeButtons: UIViewRepresentable {
+    let isEnabled: Bool
     let onPress: @MainActor (_ raising: Bool) -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -44,13 +47,16 @@ struct HardwareVolumeButtons: UIViewRepresentable {
         // A hidden volume view no longer suppresses the HUD; a near-transparent one does.
         volumeView.alpha = 0.01
         volumeView.isUserInteractionEnabled = false
-        context.coordinator.onPress = onPress
-        context.coordinator.start(volumeView: volumeView)
         return volumeView
     }
 
     func updateUIView(_ uiView: MPVolumeView, context: Context) {
         context.coordinator.onPress = onPress
+        if isEnabled {
+            context.coordinator.start(volumeView: uiView)
+        } else {
+            context.coordinator.stop()
+        }
     }
 
     static func dismantleUIView(_ uiView: MPVolumeView, coordinator: Coordinator) {
@@ -65,6 +71,9 @@ struct HardwareVolumeButtons: UIViewRepresentable {
         private var observation: NSKeyValueObservation?
 
         func start(volumeView: MPVolumeView) {
+            guard observation == nil else {
+                return
+            }
             self.volumeView = volumeView
             let session = AVAudioSession.sharedInstance()
             do {
@@ -89,8 +98,16 @@ struct HardwareVolumeButtons: UIViewRepresentable {
         }
 
         func stop() {
-            observation?.invalidate()
-            observation = nil
+            guard let observation else {
+                return
+            }
+            observation.invalidate()
+            self.observation = nil
+            // Hand the phone back at the volume it had, so a muted phone isn't left at the nudged-in resting level.
+            if let detector {
+                setPhoneVolume(detector.startingVolume)
+            }
+            detector = nil
             try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
         }
 
@@ -113,8 +130,8 @@ struct HardwareVolumeButtons: UIViewRepresentable {
 }
 
 extension View {
-    /// Lets the phone's volume buttons step the speaker volume while this view is on screen.
-    func hardwareVolumeButtons(onPress: @escaping @MainActor (_ raising: Bool) -> Void) -> some View {
-        background(HardwareVolumeButtons(onPress: onPress).frame(width: 1, height: 1))
+    /// Lets the phone's volume buttons step the speaker volume while this view is on screen and `isEnabled`.
+    func hardwareVolumeButtons(isEnabled: Bool, onPress: @escaping @MainActor (_ raising: Bool) -> Void) -> some View {
+        background(HardwareVolumeButtons(isEnabled: isEnabled, onPress: onPress).frame(width: 1, height: 1))
     }
 }
