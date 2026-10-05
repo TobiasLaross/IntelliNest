@@ -46,10 +46,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// MA queue entity has gone stale (playback started outside the app's queue).
     @Published var hardwareTwins: [EntityId: MediaPlayerEntity] = [:]
     @Published var activeSpeakerID: EntityId?
-    /// Drives the speaker-picker sheet, opened from the screen-level speaker
-    /// button. The picker only replaces the screen content inline while no
-    /// speaker is active yet.
+    /// Drives the room sheet; the rooms show inline instead while none is active.
     @Published var isShowingSpeakerPicker = false
+    /// Drives the full-screen player opened from the mini player.
+    @Published var isShowingNowPlaying = false
     @Published var searchText = ""
     @Published var searchSections: [MusicSearchSection] = []
     @Published var hasSearched = false
@@ -97,11 +97,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Whether the user is logged into Spotify. Drives the login warning triangle
     /// and its prompt — shown only while logged out.
     @Published var isSpotifyAuthorized = false
-    /// The playlist the current track is playing from, when playback was started
-    /// from a playlist within the app this session. Drives the now-playing card's
-    /// jump-to-playlist tap and leads "Senast spelade". Nil when the source is
-    /// unknown (started elsewhere, a single track, or after relaunch).
-    @Published var nowPlayingSourcePlaylist: MusicSearchItem? {
+    /// The playlist each room is playing from, keyed by the speaker it was started
+    /// on, so two rooms playing different things each keep their own source. Read
+    /// through `nowPlayingSourcePlaylist` in `MusicViewModel+Rooms`.
+    @Published var sourcePlaylistsBySpeaker: [EntityId: MusicSearchItem] = [:] {
         didSet { applyRecentlyPlayed() }
     }
 

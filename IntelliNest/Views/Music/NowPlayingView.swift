@@ -7,62 +7,64 @@
 
 import SwiftUI
 
+/// The full-screen player, opened from the mini player: art first, then the
+/// track, scrubber, transport and volume, with the room, lyrics and queue along
+/// the bottom like Spotify. The room pill is the way into the room sheet, where
+/// control moves to another room without stopping this one.
 struct NowPlayingView: View {
     let speaker: MediaPlayerEntity
     @ObservedObject var viewModel: MusicViewModel
+    let onClose: MainActorVoidClosure
 
     var body: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                speakerNameButton
-                Spacer(minLength: 4)
-                // Each action gets a full 44×44 hit target so the controls are
-                // comfortably tappable and evenly spaced.
-                HStack(spacing: 4) {
-                    headerButton("quote.bubble",
-                                 label: "Visa sångtext",
-                                 isActive: viewModel.isLyricsExpanded) {
-                        viewModel.toggleLyricsExpanded()
+        ScrollView {
+            VStack(spacing: 20) {
+                header
+
+                // Square art as wide as the screen allows.
+                GeometryReader { geometry in
+                    AlbumArtView(urlString: speaker.entityPicture, size: geometry.size.width)
+                }
+                .aspectRatio(1, contentMode: .fit)
+                .accessibilityHidden(true)
+
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        // Long titles and artists scroll (or wrap, with Reduce Motion)
+                        // so the whole name can be read instead of being cut off.
+                        MarqueeText(text: speaker.mediaTitle ?? "Inget spelas")
+                            .font(.title3.bold())
+                        if let artist = speaker.mediaArtist {
+                            MarqueeText(text: artist)
+                                .font(.body)
+                                .foregroundStyle(.white.opacity(0.7))
+                        }
                     }
-                    headerButton("list.bullet", label: "Visa kö") {
-                        Task { await viewModel.openQueue() }
+                    Spacer(minLength: 8)
+                    if let uri = speaker.mediaContentID, viewModel.canFavoriteSong(uri: uri) {
+                        SongFavoriteButton(viewModel: viewModel, uri: uri)
+                            .font(.title2)
                     }
                 }
-                // Pull the row of icons to the card's edge so the 44pt hit targets
-                // don't add visible padding beyond the card's own inset.
-                .padding(.trailing, -10)
-            }
 
-            HStack(spacing: 12) {
-                nowPlayingMetadata
-                Spacer(minLength: 8)
-                if let uri = speaker.mediaContentID, viewModel.canFavoriteSong(uri: uri) {
-                    SongFavoriteButton(viewModel: viewModel, uri: uri)
-                        .font(.title3)
+                SeekBarView(speaker: speaker, viewModel: viewModel)
+
+                TransportControlsView(speaker: speaker, viewModel: viewModel)
+
+                VolumeSliderView(volume: viewModel.groupVolume,
+                                 onCommit: { viewModel.setGroupVolume($0) })
+                    .accessibilityLabel(viewModel.isGroupActive ? "Gruppvolym" : "Volym")
+
+                if viewModel.isLyricsExpanded {
+                    LyricsStripView(speaker: speaker, viewModel: viewModel)
                 }
+
+                bottomRow
             }
-
-            SeekBarView(speaker: speaker, viewModel: viewModel)
-
-            TransportControlsView(speaker: speaker, viewModel: viewModel)
-
-            if viewModel.isLyricsExpanded {
-                LyricsStripView(speaker: speaker, viewModel: viewModel)
-            }
-
-            GroupVolumeView(viewModel: viewModel)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
         }
-        .padding()
-        .background(Color.white.opacity(0.08))
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.yellow.opacity(0.7), lineWidth: 2)
-        )
-        // Keep the now-playing Liked-Songs heart in sync with the live track.
-        .task(id: speaker.mediaContentID) {
-            await viewModel.loadSavedSongStates(uris: [speaker.mediaContentID].compactMap { $0 })
-        }
+        .scrollBounceBehavior(.basedOnSize)
         // Prefetch lyrics whenever the track changes so they're ready the moment the
         // user opens the panel, rather than starting the lookup on that tap.
         .task(id: viewModel.currentLyricsTrackKey) {
@@ -70,34 +72,87 @@ struct NowPlayingView: View {
         }
     }
 
-    /// A header action rendered with a full 44×44 hit target (Apple's minimum), so
-    /// the now-playing controls are easy to tap and evenly spaced. `isActive`
-    /// tints the icon yellow to show a toggled-on state (used by the lyrics toggle).
-    /// The speaker name doubles as the way to switch speaker — the same picker as
-    /// the button beside the search field, where a thumb already rests on the card.
-    private var speakerNameButton: some View {
-        Button {
-            viewModel.isShowingSpeakerPicker = true
-        } label: {
-            HStack(spacing: 8) {
-                Image(systemName: "hifispeaker.fill")
-                Text(speaker.friendlyName)
-                    .font(.headline)
-                    .lineLimit(1)
+    /// A close chevron, and the playlist the track is playing from when it is
+    /// known. Tapping the playlist opens it, without stopping playback.
+    private var header: some View {
+        HStack(spacing: 8) {
+            Button(action: onClose) {
                 Image(systemName: "chevron.down")
-                    .font(.caption.weight(.semibold))
+                    .font(.title3.weight(.semibold))
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
             }
-            .foregroundStyle(.yellow)
-            .contentShape(Rectangle())
+            .accessibilityLabel("Stäng spelaren")
+
+            Spacer(minLength: 0)
+            sourceLabel
+            Spacer(minLength: 0)
+
+            // Balances the chevron so the title stays centred.
+            Color.clear.frame(width: 44, height: 44)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(speaker.friendlyName), byt högtalare")
+        .foregroundStyle(.white)
     }
 
-    private func headerButton(_ systemName: String,
-                              label: String,
-                              isActive: Bool = false,
-                              action: @escaping () -> Void) -> some View {
+    @ViewBuilder private var sourceLabel: some View {
+        if let source = viewModel.nowPlayingSourcePlaylist {
+            Button {
+                Task { await viewModel.openNowPlayingPlaylist() }
+            } label: {
+                VStack(spacing: 2) {
+                    Text("Spelar från spellista")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.7))
+                    MarqueeText(text: source.name)
+                        .font(.subheadline.weight(.semibold))
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Öppna spellistan som spelas")
+        } else {
+            Text(viewModel.controlledRoomTitle)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+        }
+    }
+
+    /// The room pill on the left, lyrics and queue on the right.
+    private var bottomRow: some View {
+        HStack(spacing: 4) {
+            Button {
+                viewModel.isShowingSpeakerPicker = true
+            } label: {
+                Label(viewModel.controlledRoomTitle,
+                      systemImage: viewModel.isGroupActive ? "hifispeaker.2.fill" : "hifispeaker.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .foregroundStyle(.black)
+                    .background(Capsule().fill(.yellow))
+                    .contentShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Spelar i \(viewModel.controlledRoomTitle)")
+            .accessibilityHint("Byt rum eller gruppera högtalare")
+
+            Spacer(minLength: 8)
+
+            iconButton("quote.bubble", label: "Visa sångtext", isActive: viewModel.isLyricsExpanded) {
+                viewModel.toggleLyricsExpanded()
+            }
+            iconButton("list.bullet", label: "Visa kö") {
+                Task { await viewModel.openQueue() }
+            }
+        }
+    }
+
+    /// An icon with a full 44×44 hit target. `isActive` tints it yellow to show a
+    /// toggled-on state (the lyrics toggle).
+    private func iconButton(_ systemName: String,
+                            label: String,
+                            isActive: Bool = false,
+                            action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.title3)
@@ -106,48 +161,6 @@ struct NowPlayingView: View {
                 .contentShape(Rectangle())
         }
         .accessibilityLabel(label)
-    }
-
-    /// The album art and track metadata. Tapping it opens the playlist the track
-    /// is playing from, when that source is known; otherwise it is inert (no
-    /// dead-end). The transport and volume controls below stay separate, so the
-    /// jump tap never swallows a play/pause or volume change.
-    @ViewBuilder private var nowPlayingMetadata: some View {
-        if viewModel.nowPlayingSourcePlaylist != nil {
-            Button {
-                Task { await viewModel.openNowPlayingPlaylist() }
-            } label: {
-                metadataLabel
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint("Öppna spellistan som spelas")
-        } else {
-            metadataLabel
-        }
-    }
-
-    private var metadataLabel: some View {
-        HStack(spacing: 12) {
-            AlbumArtView(urlString: speaker.entityPicture, size: 64)
-            VStack(alignment: .leading, spacing: 2) {
-                if let source = viewModel.nowPlayingSourcePlaylist {
-                    Text("Spelas från \(source.name)")
-                        .font(.caption2)
-                        .foregroundStyle(.yellow.opacity(0.8))
-                        .lineLimit(1)
-                }
-                // Long titles and artists scroll (or wrap, with Reduce Motion) so
-                // the whole name can be read instead of being cut off.
-                MarqueeText(text: speaker.mediaTitle ?? "Inget spelas")
-                    .font(.headline)
-                if let artist = speaker.mediaArtist {
-                    MarqueeText(text: artist)
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.7))
-                }
-            }
-        }
-        .contentShape(Rectangle())
     }
 }
 
