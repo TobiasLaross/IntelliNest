@@ -104,6 +104,8 @@
 		EE0000000000000000000A03 /* MusicViewModel+Lyrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000000000000000000A03 /* MusicViewModel+Lyrics.swift */; };
 		EE0000000000000000000A04 /* SeekBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000000000000000000A04 /* SeekBarView.swift */; };
 		EE0000000000000000000A05 /* LyricsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000000000000000000A05 /* LyricsViews.swift */; };
+		4D41525100000000000000B1 /* MarqueeText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D41525100000000000000A1 /* MarqueeText.swift */; };
+		4D41525100000000000000B2 /* MarqueeScrollTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D41525100000000000000A2 /* MarqueeScrollTests.swift */; };
 		FE0000000000000000000B01 /* LyricsTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B01 /* LyricsTimelineTests.swift */; };
 		FE0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */; };
 		FE0000000000000000000B03 /* LyricsApiServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000B03 /* LyricsApiServiceTests.swift */; };
@@ -381,6 +383,8 @@
 		EF0000000000000000000A03 /* MusicViewModel+Lyrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+Lyrics.swift"; sourceTree = "<group>"; };
 		EF0000000000000000000A04 /* SeekBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekBarView.swift; sourceTree = "<group>"; };
 		EF0000000000000000000A05 /* LyricsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsViews.swift; sourceTree = "<group>"; };
+		4D41525100000000000000A1 /* MarqueeText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeText.swift; sourceTree = "<group>"; };
+		4D41525100000000000000A2 /* MarqueeScrollTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarqueeScrollTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000B01 /* LyricsTimelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsTimelineTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerEntityLyricsTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000B03 /* LyricsApiServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsApiServiceTests.swift; sourceTree = "<group>"; };
@@ -714,6 +718,7 @@
 				FD0000000000000000000008 /* MusicViewModelQueueTests.swift */,
 				FD0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift */,
 				FD0000000000000000000B01 /* LyricsTimelineTests.swift */,
+				4D41525100000000000000A2 /* MarqueeScrollTests.swift */,
 				FD0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift */,
 				FD0000000000000000000B03 /* LyricsApiServiceTests.swift */,
 				FD0000000000000000000B04 /* MusicViewModelSeekTests.swift */,
@@ -858,6 +863,7 @@
 				EF0000060000000000000006 /* NowPlayingView.swift */,
 				EF0000000000000000000A04 /* SeekBarView.swift */,
 				EF0000000000000000000A05 /* LyricsViews.swift */,
+				4D41525100000000000000A1 /* MarqueeText.swift */,
 				EF0000070000000000000007 /* AlbumArtView.swift */,
 				EF0000080000000000000008 /* SpeakerPickerView.swift */,
 				EF0000090000000000000009 /* GroupVolumeView.swift */,
@@ -1393,6 +1399,7 @@
 				EE0000000000000000000A03 /* MusicViewModel+Lyrics.swift in Sources */,
 				EE0000000000000000000A04 /* SeekBarView.swift in Sources */,
 				EE0000000000000000000A05 /* LyricsViews.swift in Sources */,
+				4D41525100000000000000B1 /* MarqueeText.swift in Sources */,
 				EE0000070000000000000007 /* AlbumArtView.swift in Sources */,
 				EE0000080000000000000008 /* SpeakerPickerView.swift in Sources */,
 				EE0000090000000000000009 /* GroupVolumeView.swift in Sources */,
@@ -1443,6 +1450,7 @@
 				FE0000000000000000000008 /* MusicViewModelQueueTests.swift in Sources */,
 				FE0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift in Sources */,
 				FE0000000000000000000B01 /* LyricsTimelineTests.swift in Sources */,
+				4D41525100000000000000B2 /* MarqueeScrollTests.swift in Sources */,
 				FE0000000000000000000B02 /* MediaPlayerEntityLyricsTests.swift in Sources */,
 				FE0000000000000000000B03 /* LyricsApiServiceTests.swift in Sources */,
 				FE0000000000000000000B04 /* MusicViewModelSeekTests.swift in Sources */,

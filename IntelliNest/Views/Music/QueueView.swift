@@ -63,7 +63,7 @@ struct QueueView: View {
         List {
             Section {
                 if let current = viewModel.queue.currentItem {
-                    QueueRow(viewModel: viewModel, item: current)
+                    QueueRow(viewModel: viewModel, item: current, wrapsText: true)
                 } else {
                     Text("Inget spelas")
                         .foregroundStyle(.white.opacity(0.6))
@@ -148,6 +148,10 @@ private struct QueueRow: View {
     @ObservedObject var viewModel: MusicViewModel
     let item: MusicQueueItem
     var showsDragHandle = false
+    /// Lets title and artist wrap onto more lines instead of truncating. Used for
+    /// the "Spelas nu" row, where the whole name of the playing track matters;
+    /// upcoming rows stay one line so the list stays scannable.
+    var wrapsText = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -155,12 +159,12 @@ private struct QueueRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title)
                     .font(.body)
-                    .lineLimit(1)
+                    .lineLimit(wrapsText ? nil : 1)
                 if let artist = item.artist {
                     Text(artist)
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.6))
-                        .lineLimit(1)
+                        .lineLimit(wrapsText ? nil : 1)
                 }
             }
             Spacer()

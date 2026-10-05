@@ -136,14 +136,14 @@ struct NowPlayingView: View {
                         .foregroundStyle(.yellow.opacity(0.8))
                         .lineLimit(1)
                 }
-                Text(speaker.mediaTitle ?? "Inget spelas")
+                // Long titles and artists scroll (or wrap, with Reduce Motion) so
+                // the whole name can be read instead of being cut off.
+                MarqueeText(text: speaker.mediaTitle ?? "Inget spelas")
                     .font(.headline)
-                    .lineLimit(1)
                 if let artist = speaker.mediaArtist {
-                    Text(artist)
+                    MarqueeText(text: artist)
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.7))
-                        .lineLimit(1)
                 }
             }
         }
