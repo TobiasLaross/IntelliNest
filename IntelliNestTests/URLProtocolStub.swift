@@ -188,11 +188,7 @@ class URLProtocolStub: URLProtocol {
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
-        stubLock.lock()
-        let observer = requestObserver
-        stubLock.unlock()
-        observer?(request)
-        return true
+        true
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
@@ -200,6 +196,12 @@ class URLProtocolStub: URLProtocol {
     }
 
     override func startLoading() {
+        // Observed here rather than in `canInit`, which URLSession may call more than once for the same request
+        // and so made a recorder occasionally count one POST twice.
+        URLProtocolStub.stubLock.lock()
+        let observer = URLProtocolStub.requestObserver
+        URLProtocolStub.stubLock.unlock()
+        observer?(request)
         guard let url = request.url else {
             client?.urlProtocol(self, didFailWithError: URLError(.notConnectedToInternet))
             return
