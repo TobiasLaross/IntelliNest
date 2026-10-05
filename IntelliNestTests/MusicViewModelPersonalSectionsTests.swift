@@ -133,4 +133,54 @@ extension MusicViewModelTests {
         XCTAssertEqual(model.personalPlaylistSections.map(\.title), ["Sarahs spellistor", "Tobias spellistor"])
         XCTAssertEqual(model.personalPlaylistSections.first?.account.userID, "sarahtest42")
     }
+
+    // MARK: - Library cache
+
+    func testCachedLibraryIsShownBeforeAnyFetch() {
+        let cache = InMemoryMusicLibraryCache(CachedMusicLibrary(
+            favorites: [playlistItem(uri: "spotify://playlist/h1", name: "Husets")],
+            recentlyPlayed: [playlistItem(uri: "library://playlist/7", name: "Pre hockey")],
+            personalPlaylistsByUserID: ["tobiasc91": tobiasLibrary()]
+        ))
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(), personalAccounts: [tobiasAccount],
+                                  libraryCache: cache.store)
+        XCTAssertEqual(model.allLibrarySections.map(\.title), ["Senast spelade", "Favoriter", "Tobias spellistor"])
+    }
+
+    func testCachedPersonalSectionsWaitForSpotifyLogin() {
+        let cache = InMemoryMusicLibraryCache(CachedMusicLibrary(favorites: [], recentlyPlayed: [],
+                                                                 personalPlaylistsByUserID: ["tobiasc91": tobiasLibrary()]))
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false), personalAccounts: [tobiasAccount],
+                                  libraryCache: cache.store)
+        XCTAssertTrue(model.personalPlaylistSections.isEmpty)
+    }
+
+    func testFetchedLibraryReplacesAndRewritesTheCache() async {
+        let cache = InMemoryMusicLibraryCache(CachedMusicLibrary(
+            favorites: [playlistItem(uri: "spotify://playlist/old", name: "Borttagen")],
+            recentlyPlayed: [],
+            personalPlaylistsByUserID: [:]
+        ))
+        let library = [playlistItem(uri: "spotify://playlist/h1", name: "Husets", ownerID: "huset")] + tobiasLibrary()
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(accountPlaylistItems: library),
+                                  personalAccounts: [tobiasAccount], libraryCache: cache.store)
+        await model.refreshSpotifyPlaylists()
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Husets"])
+        XCTAssertEqual(cache.stored?.favorites.map(\.name), ["Husets"])
+        XCTAssertEqual(cache.stored?.personalPlaylistsByUserID["tobiasc91"]?.map(\.name), ["Träning"])
+    }
+}
+
+/// Holds the cached library in memory so tests never touch the shared defaults.
+@MainActor
+final class InMemoryMusicLibraryCache {
+    var stored: CachedMusicLibrary?
+
+    init(_ stored: CachedMusicLibrary? = nil) {
+        self.stored = stored
+    }
+
+    var store: MusicLibraryCache {
+        MusicLibraryCache(load: { [unowned self] in stored }, save: { [unowned self] in stored = $0 })
+    }
 }

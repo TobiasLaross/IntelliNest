@@ -7,17 +7,6 @@
 
 import Foundation
 
-/// A personal account's section of playlists, ready to render. The `title` is
-/// the owner's name ("Tobias spellistor", "Sarahs spellistor"), so it's stored
-/// rather than derived from the account.
-struct PersonalPlaylistSection: Identifiable, Equatable {
-    let account: SpotifyPersonalAccount
-    let title: String
-    let playlists: [MusicSearchItem]
-
-    var id: String { account.id }
-}
-
 @MainActor
 class MusicViewModel: ObservableObject, Reloadable {
     /// The six controllable Music Assistant speakers, in display order.
@@ -206,6 +195,8 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// order. Managed by `MusicViewModel+Library`.
     @Published var pinnedPlaylistURIs: [String: [String]] = [:]
     let pinnedPlaylistStore: PinnedPlaylistStore
+    /// The library as last loaded, drawn at launch so the network fetch only refreshes it.
+    let libraryCache: MusicLibraryCache
 
     /// Injected dependencies — internal (not private) so the playback/playlist
     /// methods extracted into `MusicViewModel+Playback` can reach them.
@@ -277,6 +268,7 @@ class MusicViewModel: ObservableObject, Reloadable {
          personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
          currentUser: @escaping @MainActor () -> User = { UserManager.currentUser },
          pinnedPlaylistStore: PinnedPlaylistStore = .userDefaults,
+         libraryCache: MusicLibraryCache = .disabled,
          loadLastSpeaker: @escaping @MainActor () -> EntityId? = {
              UserDefaults.shared.string(forKey: StorageKeys.lastMusicSpeaker.rawValue).flatMap { EntityId(rawValue: $0) }
          },
@@ -298,6 +290,7 @@ class MusicViewModel: ObservableObject, Reloadable {
         self.currentUser = currentUser
         self.pinnedPlaylistStore = pinnedPlaylistStore
         pinnedPlaylistURIs = pinnedPlaylistStore.load()
+        self.libraryCache = libraryCache
         self.loadLastSpeaker = loadLastSpeaker
         self.saveLastSpeaker = saveLastSpeaker
         self.searchDebounce = searchDebounce
@@ -308,6 +301,7 @@ class MusicViewModel: ObservableObject, Reloadable {
             initialSpeakers[speakerID] = MediaPlayerEntity(entityId: speakerID)
         }
         speakers = initialSpeakers
+        restoreCachedLibrary()
     }
 
     func reload() async {

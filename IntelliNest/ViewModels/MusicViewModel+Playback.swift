@@ -30,6 +30,7 @@ extension MusicViewModel {
         hasLoadedLibrary = true
         maRecentlyPlayedPlaylists = recents
         applyRecentlyPlayed()
+        saveLibraryCache()
     }
 
     /// Loads the huset Spotify account's playlists into the favourites section
@@ -84,13 +85,9 @@ extension MusicViewModel {
         let spotifyLibraryNames = Set(playlists.map { normalizedName($0.name) })
         let starredOnlyInMA = maFavorites.filter { !spotifyLibraryNames.contains(normalizedName($0.name)) }
         favoritePlaylists = spotifyFavorites + starredOnlyInMA
-        // Show the viewer's own section first; the rest keep configured order.
         // Every section is titled by its owner's name (e.g. "Tobias spellistor").
-        let viewer = currentUser()
-        let orderedAccounts = personalAccounts.filter { $0.user == viewer }
-            + personalAccounts.filter { $0.user != viewer }
         var sections: [PersonalPlaylistSection] = []
-        for account in orderedAccounts {
+        for account in orderedPersonalAccounts() {
             let owned = playlists.filter { $0.ownerID == account.userID }
             let published = await spotify.personalPlaylists(ofUser: account.userID)
             let merged = mergedPersonalPlaylists(followedByHuset: owned, publicOnProfile: published)
@@ -103,6 +100,7 @@ extension MusicViewModel {
         }
         personalPlaylistSections = sections
         hasLoadedSpotifyPlaylists = true
+        saveLibraryCache()
         editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()
     }
 
@@ -129,6 +127,7 @@ extension MusicViewModel {
         if let recents = try? await restAPIService.getRecentlyPlayedPlaylists() {
             maRecentlyPlayedPlaylists = recents
             applyRecentlyPlayed()
+            saveLibraryCache()
         }
     }
 

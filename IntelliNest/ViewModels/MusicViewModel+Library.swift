@@ -35,6 +35,53 @@ struct PinnedPlaylistStore {
     )
 }
 
+/// A personal account's section of playlists, ready to render. The `title` is
+/// the owner's name ("Tobias spellistor", "Sarahs spellistor"), so it's stored
+/// rather than derived from the account.
+struct PersonalPlaylistSection: Identifiable, Equatable {
+    let account: SpotifyPersonalAccount
+    let title: String
+    let playlists: [MusicSearchItem]
+
+    var id: String { account.id }
+}
+
+/// The library playlists as last loaded. Personal sections are keyed by Spotify
+/// user id rather than stored whole, so the titles and order are rebuilt from
+/// the configured accounts and the viewer at launch.
+struct CachedMusicLibrary: Codable, Equatable {
+    var favorites: [MusicSearchItem]
+    var recentlyPlayed: [MusicSearchItem]
+    var personalPlaylistsByUserID: [String: [MusicSearchItem]]
+}
+
+/// Keeps the library on the device so the start screen draws it at launch while
+/// Spotify and Music Assistant are still answering; the fetch only refreshes it.
+/// Closures for the same reason as `PinnedPlaylistStore`.
+struct MusicLibraryCache {
+    let load: @MainActor () -> CachedMusicLibrary?
+    let save: @MainActor (CachedMusicLibrary) -> Void
+
+    /// Previews and tests start from an empty library, as before the cache.
+    static let disabled = MusicLibraryCache(load: { nil }, save: { _ in })
+
+    static let userDefaults = MusicLibraryCache(
+        load: {
+            guard let data = UserDefaults.shared.data(forKey: StorageKeys.cachedMusicLibrary.rawValue) else {
+                return nil
+            }
+            // A cache written by an older shape just reloads from the network.
+            return try? JSONDecoder().decode(CachedMusicLibrary.self, from: data)
+        },
+        save: { library in
+            guard let data = try? JSONEncoder().encode(library) else {
+                return
+            }
+            UserDefaults.shared.set(data, forKey: StorageKeys.cachedMusicLibrary.rawValue)
+        }
+    )
+}
+
 /// The start screen's library: which sections it shows, the instant filter over
 /// them, and the full listing behind "Visa alla".
 extension MusicViewModel {
@@ -119,6 +166,43 @@ extension MusicViewModel {
 
     func hiddenPlaylistCount(in section: MusicLibrarySection) -> Int {
         section.playlists.count - collapsedPlaylists(in: section).count
+    }
+
+    // MARK: - Cache
+
+    /// Draws the cached library until the first fetch replaces it. The load
+    /// latches stay open, so the fetch still runs on the first reload. Personal
+    /// sections wait for a Spotify login, as the fetched ones do.
+    func restoreCachedLibrary() {
+        guard let cached = libraryCache.load() else {
+            return
+        }
+        favoritePlaylists = cached.favorites
+        maRecentlyPlayedPlaylists = cached.recentlyPlayed
+        applyRecentlyPlayed()
+        guard spotify.isAuthorized else {
+            return
+        }
+        personalPlaylistSections = orderedPersonalAccounts().compactMap { account in
+            guard let playlists = cached.personalPlaylistsByUserID[account.userID], playlists.isNotEmpty else {
+                return nil
+            }
+            return PersonalPlaylistSection(account: account, title: account.user.playlistSectionTitle, playlists: playlists)
+        }
+    }
+
+    func saveLibraryCache() {
+        let personal = Dictionary(personalPlaylistSections.map { ($0.account.userID, $0.playlists) },
+                                  uniquingKeysWith: { first, _ in first })
+        libraryCache.save(CachedMusicLibrary(favorites: favoritePlaylists,
+                                             recentlyPlayed: maRecentlyPlayedPlaylists,
+                                             personalPlaylistsByUserID: personal))
+    }
+
+    /// The viewer's own account first; the rest keep configured order.
+    func orderedPersonalAccounts() -> [SpotifyPersonalAccount] {
+        let viewer = currentUser()
+        return personalAccounts.filter { $0.user == viewer } + personalAccounts.filter { $0.user != viewer }
     }
 
     // MARK: - Recently played and now playing
