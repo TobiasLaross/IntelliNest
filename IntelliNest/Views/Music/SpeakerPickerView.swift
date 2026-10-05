@@ -174,7 +174,7 @@ private struct RoomCard: View {
 }
 
 /// A member of a synced group: its name, its own volume, and — in the controlled
-/// room's group — a button that takes it out of the group.
+/// room's group — which member is primary and a button that takes it out of the group.
 private struct RoomMemberRow: View {
     @ObservedObject var viewModel: MusicViewModel
     let speaker: MediaPlayerEntity
@@ -193,6 +193,9 @@ private struct RoomMemberRow: View {
                         .accessibilityLabel("Spelar nu")
                 }
                 Spacer(minLength: 8)
+                if canUnlink, viewModel.showsPrimary {
+                    primaryControl
+                }
                 if canUnlink {
                     Button {
                         Task { await unlink() }
@@ -203,7 +206,7 @@ private struct RoomMemberRow: View {
                                     .controlSize(.mini)
                                     .tint(.yellow)
                             } else {
-                                Image(systemName: "link.badge.minus")
+                                Image(systemName: "minus.circle")
                                     .foregroundStyle(.white.opacity(0.7))
                             }
                         }
@@ -223,6 +226,34 @@ private struct RoomMemberRow: View {
         .padding(.horizontal, 10)
         .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    /// A badge on the primary member; a button that promotes any other member.
+    /// Control moves to the promoted member while the music keeps playing.
+    @ViewBuilder private var primaryControl: some View {
+        if speaker.entityId == viewModel.activeSpeakerID {
+            Text("Primär")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.black)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Capsule().fill(.yellow))
+        } else {
+            Button {
+                viewModel.makePrimary(speaker.entityId)
+            } label: {
+                Text("Gör primär")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.yellow)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .overlay(Capsule().stroke(.yellow.opacity(0.7), lineWidth: 1))
+                    .frame(minHeight: 32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Gör \(speaker.friendlyName) primär")
+        }
     }
 
     /// The controlled speaker leaving its group hands control to the next member,
