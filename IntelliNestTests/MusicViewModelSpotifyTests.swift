@@ -139,7 +139,7 @@ extension MusicViewModelTests {
     func makeViewModel(spotify: SpotifyPlaylistService,
                        socket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
                        personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
-                       currentUser: @escaping @MainActor () -> User = { .tobias },
+                       currentUser: @escaping @MainActor @Sendable () -> User = { .tobias },
                        pinnedPlaylistStore: PinnedPlaylistStore = PinnedPlaylistStore(load: { [:] }, save: { _ in }),
                        libraryCache: MusicLibraryCache = .disabled) -> MusicViewModel {
         MusicViewModel(restAPIService: restAPIService,
