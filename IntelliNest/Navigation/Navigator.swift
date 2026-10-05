@@ -110,7 +110,8 @@ class Navigator: ObservableObject {
                                              },
                                              spotify: spotifyApiService,
                                              queueSocket: MusicAssistantSocketService(),
-                                             lyricsService: LyricsApiService())
+                                             lyricsService: LyricsApiService(),
+                                             libraryCache: .userDefaults)
 
     init() {
         WidgetCenter.shared.reloadAllTimelines()

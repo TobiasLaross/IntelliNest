@@ -8,7 +8,7 @@
 import Foundation
 
 /// The four media types Music Assistant search returns, in display order.
-enum MusicMediaType: String, CaseIterable, Decodable {
+enum MusicMediaType: String, CaseIterable, Codable {
     case track
     case album
     case artist
@@ -31,7 +31,7 @@ enum MusicMediaType: String, CaseIterable, Decodable {
 
 /// A single Music Assistant search result item. `uri` is the playable media id
 /// (e.g. `spotify://track/3SjXx3rbNGk8nCho8YEoz5`).
-struct MusicSearchItem: Identifiable, Equatable, Hashable {
+struct MusicSearchItem: Identifiable, Equatable, Hashable, Codable {
     let uri: String
     let name: String
     let mediaType: MusicMediaType

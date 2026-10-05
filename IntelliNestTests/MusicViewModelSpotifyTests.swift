@@ -140,7 +140,8 @@ extension MusicViewModelTests {
                        socket: MusicAssistantQueueSocket = DisabledMusicAssistantQueueSocket(),
                        personalAccounts: [SpotifyPersonalAccount] = SpotifyPersonalAccount.configured,
                        currentUser: @escaping @MainActor () -> User = { .tobias },
-                       pinnedPlaylistStore: PinnedPlaylistStore = PinnedPlaylistStore(load: { [:] }, save: { _ in })) -> MusicViewModel {
+                       pinnedPlaylistStore: PinnedPlaylistStore = PinnedPlaylistStore(load: { [:] }, save: { _ in }),
+                       libraryCache: MusicLibraryCache = .disabled) -> MusicViewModel {
         MusicViewModel(restAPIService: restAPIService,
                        setErrorBannerText: { [weak self] title, _ in self?.bannerTitles.append(title) },
                        spotify: spotify,
@@ -148,6 +149,7 @@ extension MusicViewModelTests {
                        personalAccounts: personalAccounts,
                        currentUser: currentUser,
                        pinnedPlaylistStore: pinnedPlaylistStore,
+                       libraryCache: libraryCache,
                        // No wall-clock wait in tests: a scheduled search runs as soon
                        // as its task is awaited.
                        searchDebounce: {})
