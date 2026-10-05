@@ -9,8 +9,7 @@ import SwiftUI
 
 /// The results for the query in the search field, as one mixed list: the house's
 /// matching playlists (badged "Bibliotek") and the Spotify hits, each row saying
-/// what it is. Filter buttons above narrow it to one type in full, which replaces
-/// the separate per-category results sheet the old screen opened.
+/// what it is. Filter buttons above narrow it to one type in full.
 struct MusicSearchResultsView: View {
     @ObservedObject var viewModel: MusicViewModel
     /// Called with every hit the user taps, so the search screen can remember it.

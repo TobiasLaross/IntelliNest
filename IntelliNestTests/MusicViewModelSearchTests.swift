@@ -16,16 +16,13 @@ extension MusicViewModelTests {
 
     // MARK: - Debounced background search
 
-    func testScheduledSearchFetchesWithoutOpeningTheResultsSheet() async {
-        // Typing is usually a library filter. The results are warmed in the
-        // background so Enter is instant, but the sheet must stay shut.
+    func testScheduledSearchFetchesTheResults() async {
         stubSearch(json: searchJSON)
         let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
         model.searchText = "brynäs"
         model.scheduleSearch()
         await model.pendingSearchTask?.value
 
-        XCTAssertFalse(model.isShowingSearchResults)
         XCTAssertEqual(model.searchSections.map(\.mediaType), [.track, .playlist])
     }
 
@@ -55,7 +52,7 @@ extension MusicViewModelTests {
         XCTAssertEqual(model.lastCompletedSearchQuery, "brynäs")
     }
 
-    func testABackgroundFailureDoesNotBannerOrCloseAnything() async {
+    func testABackgroundFailureDoesNotBanner() async {
         // A banner thrown mid-keystroke is noise the user can't act on.
         stubSearch(json: "", statusCode: 500)
         let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
@@ -64,36 +61,7 @@ extension MusicViewModelTests {
         await model.pendingSearchTask?.value
 
         XCTAssertTrue(bannerTitles.isEmpty)
-        XCTAssertFalse(model.isShowingSearchResults)
-    }
-
-    // MARK: - Explicit search
-
-    func testExplicitSearchOpensTheSheetAndReportsFailures() async {
-        stubSearch(json: "", statusCode: 500)
-        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
-        model.searchText = "brynäs"
-        await model.search()
-
-        XCTAssertEqual(bannerTitles, ["Sökningen misslyckades"])
-        XCTAssertFalse(model.isShowingSearchResults)
-    }
-
-    func testExplicitSearchReusesResultsTheBackgroundSearchAlreadyFetched() async {
-        stubSearch(json: searchJSON)
-        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
-        model.searchText = "brynäs"
-        model.scheduleSearch()
-        await model.pendingSearchTask?.value
-
-        // A failing stub proves the second call never reached the network: the
-        // warmed results survive it.
-        stubSearch(json: "", statusCode: 500)
-        await model.search()
-
-        XCTAssertTrue(model.isShowingSearchResults)
-        XCTAssertTrue(bannerTitles.isEmpty)
-        XCTAssertEqual(model.searchSections.map(\.mediaType), [.track, .playlist])
+        XCTAssertFalse(model.hasNoResults)
     }
 
     func testSearchClearsWhenTheQueryIsEmptied() async {
@@ -228,7 +196,7 @@ extension MusicViewModelTests {
 
     // MARK: - Inline results on the music screen
 
-    func testEnterSearchesStraightAwayWithoutOpeningTheSheet() async {
+    func testEnterSearchesStraightAway() async {
         stubSearch(json: searchJSON)
         let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
         model.searchText = "brynäs"
@@ -237,7 +205,6 @@ extension MusicViewModelTests {
         await model.searchNow()
 
         XCTAssertEqual(debounced?.isCancelled, true)
-        XCTAssertFalse(model.isShowingSearchResults)
         XCTAssertEqual(model.inlineSearchSections.map(\.mediaType), [.track, .playlist])
     }
 

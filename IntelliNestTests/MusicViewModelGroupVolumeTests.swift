@@ -92,16 +92,16 @@ extension MusicViewModelTests {
 
     func testPlayPlaylistRefreshesRecents() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
-        viewModel.isShowingSearchResults = true
         stubPlayMedia(statusCode: 200)
         stubRecents(json: "{\"service_response\":{\"items\":[" +
             "{\"uri\":\"spotify://playlist/1\",\"name\":\"Bastumusik\"}]}}")
         let playlist = MusicSearchItem(uri: "spotify://playlist/1", name: "Bastumusik",
                                        mediaType: .playlist, imageURL: nil, artist: nil)
+        viewModel.browsingLibraryPlaylist = playlist
         await viewModel.playPlaylist(playlist)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
         // Playing closes the sheet and the post-play refresh repopulated recents.
-        XCTAssertFalse(viewModel.isShowingSearchResults)
+        XCTAssertNil(viewModel.browsingLibraryPlaylist)
         XCTAssertEqual(viewModel.recentlyPlayedPlaylists.map(\.name), ["Bastumusik"])
     }
 
@@ -190,7 +190,7 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.browsingLibraryPlaylist, favorite)
         XCTAssertEqual(viewModel.playlistTracks.first?.uri, "spotify://track/a")
         // Closing clears the browse sheet.
-        viewModel.closeSearchResults()
+        viewModel.dismissBrowseSheets()
         XCTAssertNil(viewModel.browsingLibraryPlaylist)
     }
 }
