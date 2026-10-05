@@ -36,6 +36,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     func application(_: UIApplication,
                      didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Registered before anything else: a Live Activity button press can be what launched the app.
+        MusicLiveActivityController.shared.registerCommandHandler()
         Task {
             UNUserNotificationCenter.current().delegate = self
             let action = UNNotificationAction(identifier: NotificationActionIdentifier.snoozeWashingMachine.rawValue,

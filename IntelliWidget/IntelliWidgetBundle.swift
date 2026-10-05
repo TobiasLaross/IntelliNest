@@ -13,5 +13,6 @@ struct IntelliWidgetBundle: WidgetBundle {
     var body: some Widget {
         HomeWidget()
         CarHeaterWidget()
+        MusicLiveActivity()
     }
 }

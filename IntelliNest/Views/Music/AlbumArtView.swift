@@ -39,6 +39,10 @@ struct AlbumArtView: View {
     }
 
     private var resolvedURL: URL? {
+        Self.resolvedURL(for: urlString)
+    }
+
+    static func resolvedURL(for urlString: String?) -> URL? {
         guard let urlString, urlString.isNotEmpty else {
             return nil
         }

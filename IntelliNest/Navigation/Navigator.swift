@@ -177,6 +177,7 @@ class Navigator: ObservableObject {
             await reloadConnection()
             await reload(for: currentDestination)
             restartContinousReloadTask()
+            await syncMusicLiveActivity()
             if currentDestination != .electricity {
                 await reload(for: .electricity)
             }
@@ -271,6 +272,7 @@ private extension Navigator {
                     }
 
                     shouldSkipContinousReload = false
+                    await syncMusicLiveActivity()
                 }
             } catch {
                 // Cancelled

@@ -39,10 +39,18 @@ extension MusicViewModel {
     /// Music Assistant doesn't own that stream and rejects transport commands with
     /// a 500, so they go to the Sonos twin itself. Otherwise the MA group leader.
     var transportTargetID: EntityId? {
-        if let activeSpeaker, let twin = liveTwin(for: activeSpeaker) {
-            return twin.entityId
+        guard let activeSpeakerID else {
+            return nil
         }
-        return playbackTargetID
+        return transportTargetID(for: activeSpeakerID) ?? playbackTargetID
+    }
+
+    /// `transportTargetID` for any speaker, not just the active one.
+    func transportTargetID(for speakerID: EntityId) -> EntityId? {
+        guard let speaker = speakers[speakerID] else {
+            return nil
+        }
+        return liveTwin(for: speaker)?.entityId ?? speaker.playbackTargetID
     }
 
     /// The hardware twin that reflects what this speaker is actually playing: its
