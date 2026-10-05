@@ -63,31 +63,16 @@ struct MusicView: View {
                     }
             }
         }
-        .sheet(isPresented: $viewModel.isShowingSpeakerPicker) {
+        // The rooms and playlist sheets can also open from inside the full-screen
+        // player, which presents them itself while it is up.
+        .sheet(isPresented: viewModel.presentation(\.isShowingSpeakerPicker, inPlayer: false)) {
             SpeakerPickerSheet(viewModel: viewModel)
         }
-        .sheet(isPresented: $viewModel.isShowingQueue) {
-            QueueView(viewModel: viewModel)
+        .sheet(item: viewModel.presentation(\.browsingLibraryPlaylist, inPlayer: false)) { playlist in
+            MusicPlaylistBrowseSheet(viewModel: viewModel, playlist: playlist)
         }
-        .sheet(isPresented: $viewModel.isShowingFullLyrics) {
-            if let activeSpeaker = viewModel.displayedActiveSpeaker {
-                LyricsFullView(speaker: activeSpeaker, viewModel: viewModel)
-            } else {
-                // The speaker dropped out while the sheet was open — don't strand an
-                // empty modal; dismiss it.
-                Color.clear.onAppear { viewModel.isShowingFullLyrics = false }
-            }
-        }
-        .sheet(item: $viewModel.browsingLibraryPlaylist) { playlist in
-            NavigationStack {
-                MusicPlaylistView(viewModel: viewModel, playlist: playlist)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Stäng") { viewModel.browsingLibraryPlaylist = nil }
-                                .foregroundStyle(.white)
-                        }
-                    }
-            }
+        .sheet(isPresented: $viewModel.isShowingNowPlaying) {
+            NowPlayingSheet(viewModel: viewModel)
         }
         .sheet(isPresented: $isShowingSpotifyLogin) {
             SpotifyLoginPromptView(viewModel: viewModel)
@@ -107,18 +92,29 @@ struct MusicView: View {
             }
 
             ScrollView {
-                VStack(spacing: 16) {
-                    if let activeSpeaker = viewModel.displayedActiveSpeaker {
-                        NowPlayingView(speaker: activeSpeaker, viewModel: viewModel)
-                        ForEach(viewModel.librarySections) { section in
-                            LibraryPlaylistsSection(viewModel: viewModel,
-                                                    section: section,
-                                                    onShowAll: { viewModel.expandedLibrarySection = section })
-                        }
-                    } else {
+                VStack(spacing: 20) {
+                    if viewModel.activeSpeakerID == nil {
                         SpeakerPickerView(viewModel: viewModel)
                     }
+                    if viewModel.shortcutPlaylists.isNotEmpty {
+                        MusicShortcutGrid(viewModel: viewModel,
+                                          onShowAll: { viewModel.expandedLibrarySection = viewModel.recentlyPlayedSection })
+                    }
+                    ForEach(viewModel.homeLibrarySections) { section in
+                        LibraryPlaylistsSection(viewModel: viewModel,
+                                                section: section,
+                                                onShowAll: { viewModel.expandedLibrarySection = section })
+                    }
                 }
+                .padding(.bottom, 8)
+            }
+        }
+        // Playback lives in the mini player pinned above the bottom edge, so the
+        // library owns the screen and stays reachable while music plays.
+        .safeAreaInset(edge: .bottom) {
+            if viewModel.miniPlayerRooms.isNotEmpty {
+                MiniPlayerView(viewModel: viewModel)
+                    .padding(.bottom, 4)
             }
         }
     }

@@ -231,6 +231,7 @@ extension MusicViewModelTests {
         let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
         model.maRecentlyPlayedPlaylists = [playlistItem(uri: "library://playlist/18", name: "Brynäs"),
                                            playlistItem(uri: "library://playlist/22", name: "Lugnt & Skönt")]
+        model.selectSpeaker(.mediaPlayerKitchen)
         model.nowPlayingSourcePlaylist = playlistItem(uri: "spotify://playlist/l1", name: "Lugnt & Skönt")
         XCTAssertEqual(model.recentlyPlayedPlaylists.map(\.name), ["Lugnt & Skönt", "Brynäs"])
         XCTAssertEqual(model.recentlyPlayedPlaylists.first?.uri, "spotify://playlist/l1")

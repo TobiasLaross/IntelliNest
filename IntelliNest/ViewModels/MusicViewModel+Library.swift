@@ -69,15 +69,20 @@ extension MusicViewModel {
     }
 
     /// The sections as rendered: everything while the field is empty, only the
-    /// matching playlists while it isn't. A section with no match drops out rather
-    /// than leaving an empty heading behind.
+    /// matching playlists while it isn't. A playlist found in several sections is
+    /// listed only under the first, so one hit doesn't fill the screen three times.
+    /// A section with no match drops out rather than leaving an empty heading behind.
     var librarySections: [MusicLibrarySection] {
         guard isFilteringLibrary else {
             return allLibrarySections
         }
         let query = trimmedSearchText
+        var listed: [MusicSearchItem] = []
         return allLibrarySections.compactMap { section in
-            let matches = section.playlists.filter { matchesLibrarySearch($0.name, query: query) }
+            let matches = section.playlists.filter { playlist in
+                matchesLibrarySearch(playlist.name, query: query) && !listed.contains { isSamePlaylist($0, playlist) }
+            }
+            listed += matches
             guard matches.isNotEmpty else {
                 return nil
             }
@@ -122,7 +127,8 @@ extension MusicViewModel {
     /// only push Music Assistant's own history out of "Visa alla".
     static let sessionPlayedLimit = 5
 
-    /// Rebuilds "Senast spelade": the playlist playing now first, then this
+    /// Rebuilds "Senast spelade": the playlists the rooms are playing now first
+    /// (the controlled room's leading), then this
     /// session's in-app plays MA doesn't list, then MA's `last_played` order —
     /// deduped, so a playlist MA does know keeps a single row. Session plays MA
     /// already lists defer to MA's position, which also reflects plays started
@@ -132,7 +138,8 @@ extension MusicViewModel {
             !maRecentlyPlayedPlaylists.contains { isSamePlaylist($0, played) }
         }
         var merged: [MusicSearchItem] = []
-        for playlist in [nowPlayingSourcePlaylist].compactMap(\.self) + unlistedSessionPlays + maRecentlyPlayedPlaylists
+        let roomSources = Self.speakerIDs.compactMap { sourcePlaylistsBySpeaker[$0] }
+        for playlist in [nowPlayingSourcePlaylist].compactMap(\.self) + roomSources + unlistedSessionPlays + maRecentlyPlayedPlaylists
             where !merged.contains(where: { isSamePlaylist($0, playlist) }) {
             merged.append(playlist)
         }
