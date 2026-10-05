@@ -220,7 +220,6 @@
 		F68DA61E28B4C11600601726 /* Heater.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61D28B4C11600601726 /* Heater.swift */; };
 		F68DA62028B4C13000601726 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F68DA61F28B4C13000601726 /* Domain.swift */; };
 		F6A7B6922B6A4B2600699D50 /* ErrorBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A7B6912B6A4B2600699D50 /* ErrorBannerView.swift */; };
-		F6BA4F5D2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */; };
 		F6BD968F2B32DD3D00A46C8F /* ElectricityFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BD968E2B32DD3D00A46C8F /* ElectricityFlowView.swift */; };
 		F6C2BF3E283BF134002EE9F9 /* LockEntityTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C2BF3D283BF134002EE9F9 /* LockEntityTest.swift */; };
 		F6C4CA8D2B5E72DE0037B777 /* GeofenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6C4CA8C2B5E72DE0037B777 /* GeofenceManager.swift */; };
@@ -501,7 +500,6 @@
 		F68DA61D28B4C11600601726 /* Heater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Heater.swift; sourceTree = "<group>"; };
 		F68DA61F28B4C13000601726 /* Domain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
 		F6A7B6912B6A4B2600699D50 /* ErrorBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorBannerView.swift; sourceTree = "<group>"; };
-		F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = AppIntentVocabulary.plist; sourceTree = "<group>"; };
 		F6BD968E2B32DD3D00A46C8F /* ElectricityFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityFlowView.swift; sourceTree = "<group>"; };
 		F6C2BF32283968F8002EE9F9 /* IntelliNest-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "IntelliNest-Info.xcconfig"; sourceTree = "<group>"; };
 		F6C2BF3C283A34E9002EE9F9 /* Github-Info.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Github-Info.xcconfig"; sourceTree = "<group>"; };
@@ -994,7 +992,6 @@
 				F617062527C3CA9100183250 /* Info.plist */,
 				F6591BFF2B020DD600D5785E /* IntelliNest.entitlements */,
 				F67023FE27A177330070FFBB /* Assets.xcassets */,
-				F6BA4F5C2B18DA09006817DB /* AppIntentVocabulary.plist */,
 			);
 			path = "Supporting Files";
 			sourceTree = "<group>";
@@ -1171,7 +1168,6 @@
 			files = (
 				F670240227A177330070FFBB /* Preview Assets.xcassets in Resources */,
 				F67023FF27A177330070FFBB /* Assets.xcassets in Resources */,
-				F6BA4F5D2B18DA09006817DB /* AppIntentVocabulary.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
