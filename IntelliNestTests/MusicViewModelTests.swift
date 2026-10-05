@@ -252,14 +252,11 @@ class MusicViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.searchSections.isEmpty)
     }
 
-    func testSearchFailureShowsBanner() async {
+    func testSearchFailureIsNotShownAsAnEmptyResult() async {
         stubSearch(json: "boom", statusCode: 500)
         viewModel.searchText = trackName
         await viewModel.search()
         XCTAssertTrue(viewModel.searchSections.isEmpty)
-        XCTAssertTrue(bannerTitles.contains("Sökningen misslyckades"))
-        // A failure must not look like an empty result, and it closes the sheet.
         XCTAssertFalse(viewModel.hasNoResults)
-        XCTAssertFalse(viewModel.isShowingSearchResults)
     }
 }

@@ -182,7 +182,7 @@ extension MusicViewModel {
             // A single search result isn't played from a playlist, so the
             // now-playing card has no playlist to jump to.
             nowPlayingSourcePlaylist = nil
-            closeSearchResults()
+            dismissBrowseSheets()
         }
     }
 
@@ -233,16 +233,8 @@ extension MusicViewModel {
 
     // MARK: - Playlists
 
-    /// Opens a playlist for browsing in the search-results sheet instead of
-    /// playing it: records the opened playlist (which drills the sheet into the
-    /// detail view) and loads its tracks. Browsing never changes playback.
-    func openPlaylist(_ playlist: MusicSearchItem) async {
-        openedPlaylist = playlist
-        await loadPlaylistTracks(playlist)
-    }
-
     /// Loads a playlist's tracks into `playlistTracks`, toggling the loading
-    /// flag. Shared by the search-sheet drill-in and the main-view browse sheet.
+    /// flag. Shared by the main-view browse sheet and the "Visa alla" listing.
     func loadPlaylistTracks(_ playlist: MusicSearchItem) async {
         lastBrowsedPlaylist = playlist
         playlistTracks = []
@@ -262,7 +254,7 @@ extension MusicViewModel {
     /// Plays the whole playlist from the start on the active speaker.
     func playPlaylist(_ playlist: MusicSearchItem) async {
         if await startPlayback(uri: playlist.uri, mediaType: .playlist, title: playlist.name, artist: nil) {
-            closeSearchResults()
+            dismissBrowseSheets()
             await didStartPlaylist(playlist)
         }
     }
@@ -278,7 +270,7 @@ extension MusicViewModel {
             speakers[activeSpeaker.entityId]?.shuffle = true
             restAPIService.setShuffle(entityID: targetID, shuffle: true)
         }
-        closeSearchResults()
+        dismissBrowseSheets()
         await didStartPlaylist(playlist)
     }
 
@@ -291,7 +283,7 @@ extension MusicViewModel {
         if let targetID = playbackTargetID {
             await restAPIService.playMedia(on: targetID, mediaID: playlist.uri, mediaType: .playlist, enqueue: "add")
         }
-        closeSearchResults()
+        dismissBrowseSheets()
         await didStartPlaylist(playlist)
     }
 
@@ -304,12 +296,9 @@ extension MusicViewModel {
         await browseLibraryPlaylist(playlist)
     }
 
-    /// Dismisses any playlist presentation: the search-results sheet, its
-    /// drill-in, and the main-view browse sheet.
-    func closeSearchResults() {
-        isShowingSearchResults = false
-        openedPlaylist = nil
-        openedArtist = nil
+    /// Dismisses every browse sheet — artist, playlist, and the "Visa alla"
+    /// listing — so starting playback from one lands back on the music screen.
+    func dismissBrowseSheets() {
         browsingArtist = nil
         browsingLibraryPlaylist = nil
         expandedLibrarySection = nil

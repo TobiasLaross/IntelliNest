@@ -21,9 +21,6 @@ extension MusicViewModel {
 
     /// Queues a background search for the current query, replacing any still-pending
     /// one so only the pause the user actually stopped at reaches Home Assistant.
-    /// The results land in `searchSections` without opening the results sheet —
-    /// typing on the music screen is usually a library filter, and a sheet jumping
-    /// up mid-keystroke would bury what the user was reading.
     func scheduleSearch() {
         pendingSearchTask?.cancel()
         guard trimmedSearchText.count >= Self.minimumSearchLength else {
@@ -35,13 +32,12 @@ extension MusicViewModel {
             guard !Task.isCancelled else {
                 return
             }
-            await self?.search(presentResults: false)
+            await self?.search()
         }
     }
 
-    /// Runs the search for the current query straight away, skipping the debounce.
-    /// Enter on the music screen: the hits are already listed inline under the
-    /// library, so Enter only makes them arrive sooner rather than opening a sheet.
+    /// Runs the search for the current query straight away, skipping the debounce —
+    /// Enter on the search screen, which only makes the hits arrive sooner.
     func searchNow() async {
         pendingSearchTask?.cancel()
         pendingSearchTask = nil
@@ -49,31 +45,19 @@ extension MusicViewModel {
               lastCompletedSearchQuery != trimmedSearchText || isSearching else {
             return
         }
-        await search(presentResults: false)
+        await search()
     }
 
-    /// Runs the Music Assistant search. `presentResults` distinguishes the two
-    /// callers: an explicit search (Enter in the results sheet, or "Visa alla" on
-    /// an inline category) opens the results sheet and reports failures, while the
-    /// background search only fills `searchSections`.
-    func search(presentResults: Bool = true) async {
+    /// Runs the Music Assistant search and fills `searchSections`. A failure is
+    /// quiet: the search runs while the user types, and a banner thrown
+    /// mid-keystroke is noise they can't act on. The library matches still show.
+    func search() async {
         let query = trimmedSearchText
         guard query.isNotEmpty else {
             searchSections = []
             hasSearched = false
             lastCompletedSearchQuery = nil
             return
-        }
-
-        if presentResults {
-            openedPlaylist = nil
-            openedArtist = nil
-            isShowingSearchResults = true
-            // The background search may already have fetched this exact query while
-            // the user was typing — show those results instead of refetching them.
-            if lastCompletedSearchQuery == query, !isSearching {
-                return
-            }
         }
 
         searchRequestToken += 1
@@ -95,12 +79,6 @@ extension MusicViewModel {
             searchSections = []
             hasSearched = false
             lastCompletedSearchQuery = nil
-            // A background search fails quietly: the user hasn't asked for results
-            // yet, and a banner thrown mid-keystroke is noise they can't act on.
-            if presentResults {
-                isShowingSearchResults = false
-                setErrorBannerText("Sökningen misslyckades", "Kunde inte söka efter musik")
-            }
         }
         if token == searchRequestToken {
             isSearching = false

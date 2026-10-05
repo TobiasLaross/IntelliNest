@@ -93,8 +93,6 @@ extension MusicViewModel {
     /// Characters needed before typing reaches Home Assistant. The library filter
     /// itself runs from the first character; only the network call waits.
     static let minimumSearchLength = 2
-    /// Items per media type in the results sheet's "Allt" tab.
-    static let overviewRowCount = 3
     static let recentlyPlayedSectionID = "recentlyPlayed"
 
     /// Every library section that has something in it, in display order: what was

@@ -43,18 +43,8 @@ class MusicViewModel: ObservableObject, Reloadable {
     @Published var searchSections: [MusicSearchSection] = []
     @Published var hasSearched = false
     @Published var isSearching = false
-    /// Drives the search-results sheet, which presents the grouped results in a
-    /// separate view with a tab per media-type category.
-    @Published var isShowingSearchResults = false
-    /// The playlist the user drilled into (nil = showing the result list). Tapping
-    /// a playlist opens it here instead of playing it immediately.
-    @Published var openedPlaylist: MusicSearchItem?
-    /// The artist the user drilled into from the search results, pushed inside the
-    /// results sheet. Nil while the result list is showing.
-    @Published var openedArtist: MusicSearchItem?
-    /// The artist or album opened from the Spotify hits listed inline on the music
-    /// screen. Presented in its own sheet, since that screen has no results sheet
-    /// underneath to push it into.
+    /// The artist or album opened from the search results, presented in its own
+    /// sheet over the music screen.
     @Published var browsingArtist: MusicSearchItem?
     @Published var playlistTracks: [MusicPlaylistTrack] = []
     /// The playlist `playlistTracks` was loaded for, whichever surface opened it.
