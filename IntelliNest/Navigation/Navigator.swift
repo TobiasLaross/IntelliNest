@@ -15,6 +15,9 @@ class Navigator: ObservableObject {
     @ObservedObject var urlCreator = URLCreator()
     @Published var navigationPath = [Destination]() {
         didSet {
+            if currentDestination != .music {
+                isNowPlayingRequested = false
+            }
             if navigationPath.isEmpty {
                 Task {
                     await homeViewModel.reload()
@@ -50,6 +53,8 @@ class Navigator: ObservableObject {
         navigationPath.last ?? .home
     }
 
+    /// Set when the Live Activity was tapped before the speakers had loaded; the next music reload opens the player.
+    var isNowPlayingRequested = false
     private var homeCoordinates: Coordinates?
     /// Bumped on every geofence crossing. Entry and exit each run slow Yale writes, so a delayed entry
     /// could otherwise land after a later exit and leave the doors unlocked and the user marked home.
@@ -168,6 +173,7 @@ class Navigator: ObservableObject {
             await lightsViewModel.reload()
         case .music:
             await musicViewModel.reload()
+            presentRequestedNowPlaying()
         }
     }
 

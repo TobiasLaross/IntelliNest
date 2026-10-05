@@ -38,3 +38,30 @@ extension Navigator {
         }
     }
 }
+
+extension Navigator {
+    /// Answers a tap on the Live Activity: the music screen with the full-screen player over it.
+    func openNowPlaying() async {
+        if currentDestination != .music {
+            navigationPath = [.music]
+        }
+        isNowPlayingRequested = true
+        // After a cold launch the speakers aren't loaded yet, and the player has nothing to show without one.
+        if musicViewModel.displayedActiveSpeaker == nil {
+            await reload(for: .music)
+        } else {
+            presentRequestedNowPlaying()
+        }
+    }
+
+    /// Opens the player for a pending Live Activity tap once there is a speaker to show. A reload can be skipped
+    /// while another is in flight, so the request waits for the first one that finds a speaker; leaving the music
+    /// screen drops it, so the player can't pop up later out of nowhere.
+    func presentRequestedNowPlaying() {
+        guard isNowPlayingRequested, musicViewModel.displayedActiveSpeaker != nil else {
+            return
+        }
+        isNowPlayingRequested = false
+        musicViewModel.isShowingNowPlaying = true
+    }
+}
