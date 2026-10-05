@@ -18,15 +18,26 @@ extension MusicViewModel {
     /// The playlist the controlled room is playing from, when it was started from a
     /// playlist in the app this session. Drives the player's "Spelas från" jump and
     /// leads "Senast spelade". Nil when the source is unknown (started elsewhere, a
-    /// single track, or after relaunch). Setting it records it for the active room
-    /// only, so another room's source is left alone.
+    /// single track, or after relaunch). Setting it records it against the active
+    /// room's group leader, which is what `sourcePlaylist(for:)` reads first;
+    /// clearing it clears the whole group so no member keeps a stale source.
+    /// Other rooms are left alone.
     var nowPlayingSourcePlaylist: MusicSearchItem? {
         get { sourcePlaylist(for: activeSpeakerID) }
         set {
-            guard let activeSpeakerID else {
+            guard let activeSpeakerID, let speaker = speakers[activeSpeakerID] else {
                 return
             }
-            sourcePlaylistsBySpeaker[activeSpeakerID] = newValue
+            var sources = sourcePlaylistsBySpeaker
+            if let newValue {
+                sources[speaker.playbackTargetID] = newValue
+            } else {
+                for memberID in [speaker.playbackTargetID, activeSpeakerID] + speaker.groupMembers {
+                    sources[memberID] = nil
+                }
+            }
+            // One assignment, so "Senast spelade" is rebuilt once.
+            sourcePlaylistsBySpeaker = sources
         }
     }
 

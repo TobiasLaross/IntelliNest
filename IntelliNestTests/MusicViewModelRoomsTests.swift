@@ -41,6 +41,26 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.sourcePlaylist(for: .mediaPlayerKitchen)?.uri, leaderPlaylist.uri)
     }
 
+    func testAFollowerInControlRecordsAndClearsTheGroupsSource() {
+        let started = MusicSearchItem(uri: "spotify://playlist/n1", name: "Morgonkaffe",
+                                      mediaType: .playlist, imageURL: nil, artist: nil)
+        let stale = MusicSearchItem(uri: "spotify://playlist/s1", name: "Brynäs",
+                                    mediaType: .playlist, imageURL: nil, artist: nil)
+        let group = [EntityId.mediaPlayerGuestRoom, .mediaPlayerKitchen]
+        viewModel.speakers[.mediaPlayerKitchen]?.groupMembers = group
+        viewModel.speakers[.mediaPlayerGuestRoom]?.groupMembers = group
+        viewModel.sourcePlaylistsBySpeaker = [.mediaPlayerGuestRoom: stale]
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+
+        viewModel.nowPlayingSourcePlaylist = started
+        XCTAssertEqual(viewModel.nowPlayingSourcePlaylist?.uri, started.uri,
+                       "A follower starting a playlist must replace the leader's stale source")
+
+        viewModel.nowPlayingSourcePlaylist = nil
+        XCTAssertNil(viewModel.nowPlayingSourcePlaylist)
+        XCTAssertNil(viewModel.sourcePlaylist(for: .mediaPlayerGuestRoom))
+    }
+
     func testMiniPlayerPagesThroughPlayingRoomsAndTheControlledOne() async {
         struct Case {
             let playing: Set<EntityId>
