@@ -27,6 +27,21 @@ enum MusicMediaType: String, CaseIterable, Codable {
             "Spellistor"
         }
     }
+
+    /// Swedish name for one item of this type, shown in front of the artist on a
+    /// search hit ("Låt · Victor Leksell") so a mixed list says what each row is.
+    var swedishSingular: String {
+        switch self {
+        case .track:
+            "Låt"
+        case .album:
+            "Album"
+        case .artist:
+            "Artist"
+        case .playlist:
+            "Spellista"
+        }
+    }
 }
 
 /// A single Music Assistant search result item. `uri` is the playable media id
@@ -59,6 +74,15 @@ struct MusicSearchItem: Identifiable, Equatable, Hashable, Codable {
     }
 
     var id: String { uri }
+}
+
+/// One row of the search screen's mixed results list. `isInLibrary` marks the
+/// house's own playlists, which carry a badge so they stand out from Spotify's.
+struct MusicSearchHit: Identifiable, Equatable {
+    let item: MusicSearchItem
+    let isInLibrary: Bool
+
+    var id: String { item.uri }
 }
 
 /// Results for one media type, used to render grouped sections.

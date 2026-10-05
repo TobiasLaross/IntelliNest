@@ -13,6 +13,8 @@ import SwiftUI
 struct AlbumArtView: View {
     let urlString: String?
     let size: CGFloat
+    /// Artists get a round picture, as in Spotify, so they read apart from albums.
+    var isCircular = false
 
     var body: some View {
         Group {
@@ -27,7 +29,7 @@ struct AlbumArtView: View {
             }
         }
         .frame(width: size, height: size)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(isCircular ? AnyShape(Circle()) : AnyShape(RoundedRectangle(cornerRadius: 8)))
     }
 
     private var placeholder: some View {

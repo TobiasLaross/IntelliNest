@@ -149,12 +149,66 @@ extension MusicViewModel {
         hasSearched && !isSearching && searchSections.isEmpty
     }
 
-    /// The sections shown in the results sheet's "Allt" tab: the first few of each
-    /// media type under its own heading, so a playlist hunt doesn't start by
-    /// noticing the category picker and tapping across to Spellistor.
-    var searchOverviewSections: [MusicSearchSection] {
-        searchSections.map { section in
-            MusicSearchSection(mediaType: section.mediaType, items: Array(section.items.prefix(Self.overviewRowCount)))
+    /// The search screen's results as one mixed list: the user's own matching
+    /// playlists and the Spotify hits, each row labelled with its type. Under
+    /// "Allt" (`filter` nil) the types are taken in turns — the best artist, the
+    /// best library playlist, the best track, the best album, the best playlist,
+    /// then everyone's second best — so the top of the list holds the strongest
+    /// hit of every kind without trying to rank an artist against a song, which
+    /// Music Assistant's per-type relevance can't do. A filter lists that one type
+    /// in full, with library playlists leading Spellistor.
+    func searchHits(filter: MusicMediaType?) -> [MusicSearchHit] {
+        let library = isFilteringLibrary ? matchingLibraryPlaylists(query: trimmedSearchText) : []
+        let sections = inlineSearchSections
+        let remote = { (mediaType: MusicMediaType) in
+            (sections.first { $0.mediaType == mediaType }?.items ?? [])
+                .map { MusicSearchHit(item: $0, isInLibrary: false) }
+        }
+        var columns = [
+            remote(.artist),
+            library.map { MusicSearchHit(item: $0, isInLibrary: true) },
+            remote(.track),
+            remote(.album),
+            remote(.playlist)
+        ]
+        if let filter {
+            columns = columns.map { column in column.filter { $0.item.mediaType == filter } }
+        }
+        let interleaved = filter == nil ? Self.interleave(columns) : columns.flatMap(\.self)
+        // Music Assistant can return one artist or track twice — once from its own
+        // library, once from Spotify — under different uris, so a hit is a repeat
+        // when its type, name and artist all match one already listed.
+        var seen: Set<String> = []
+        return interleaved.filter { hit in
+            let item = hit.item
+            let key = [item.mediaType.rawValue, normalizedName(item.name), normalizedName(item.artist ?? "")]
+            return seen.insert(key.joined(separator: "|")).inserted && seen.insert(item.uri).inserted
+        }
+    }
+
+    /// The filter buttons worth showing: only the types the current results hold.
+    var searchFilters: [MusicMediaType] {
+        let available = Set(searchHits(filter: nil).map(\.item.mediaType))
+        return MusicMediaType.allCases.filter { available.contains($0) }
+    }
+
+    /// What tapping a search hit does. A track plays; anything else opens its own
+    /// screen, so a stray tap on an artist or playlist can't replace the queue.
+    func open(_ item: MusicSearchItem) async {
+        switch item.mediaType {
+        case .track:
+            await play(item: item)
+        case .playlist:
+            await browseLibraryPlaylist(item)
+        case .artist, .album:
+            browsingArtist = item
+        }
+    }
+
+    private static func interleave(_ columns: [[MusicSearchHit]]) -> [MusicSearchHit] {
+        let depth = columns.map(\.count).max() ?? 0
+        return (0 ..< depth).flatMap { rank in
+            columns.compactMap { column in rank < column.count ? column[rank] : nil }
         }
     }
 
