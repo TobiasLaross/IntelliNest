@@ -7,42 +7,43 @@
 
 import Foundation
 
-/// The queries listed on the search screen before the user starts typing, newest
-/// first. Held apart from `MusicViewModel` because it is purely a device-local
+/// The items the user picked from search results, newest first, listed on the
+/// search screen before anything is typed so one tap plays or opens them again.
+/// Held apart from `MusicViewModel` because it is purely a device-local
 /// convenience and never touches Home Assistant.
 @MainActor
 final class RecentMusicSearches: ObservableObject {
     static let maximumCount = 10
 
-    @Published private(set) var queries: [String]
+    @Published private(set) var items: [MusicSearchItem]
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .shared) {
         self.defaults = defaults
-        queries = defaults.stringArray(forKey: StorageKeys.recentMusicSearches.rawValue) ?? []
+        let stored = defaults.data(forKey: StorageKeys.recentMusicPicks.rawValue)
+        items = stored.flatMap { try? JSONDecoder().decode([MusicSearchItem].self, from: $0) } ?? []
     }
 
-    /// Moves the query to the top, dropping an earlier copy that differs only in
-    /// case so "brynäs" and "Brynäs" don't sit side by side.
-    func record(_ query: String) {
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.count >= MusicViewModel.minimumSearchLength else {
-            return
-        }
-        let remaining = queries.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
-        save(Array(([trimmed] + remaining).prefix(Self.maximumCount)))
+    /// Moves the item to the top, dropping an earlier copy of it.
+    func record(_ item: MusicSearchItem) {
+        let remaining = items.filter { $0.uri != item.uri }
+        save(Array(([item] + remaining).prefix(Self.maximumCount)))
     }
 
-    func remove(_ query: String) {
-        save(queries.filter { $0 != query })
+    func remove(_ item: MusicSearchItem) {
+        save(items.filter { $0.uri != item.uri })
     }
 
     func clear() {
         save([])
     }
 
-    private func save(_ newQueries: [String]) {
-        queries = newQueries
-        defaults.set(newQueries, forKey: StorageKeys.recentMusicSearches.rawValue)
+    private func save(_ newItems: [MusicSearchItem]) {
+        items = newItems
+        guard let data = try? JSONEncoder().encode(newItems) else {
+            Log.error("Could not encode the recent music picks")
+            return
+        }
+        defaults.set(data, forKey: StorageKeys.recentMusicPicks.rawValue)
     }
 }

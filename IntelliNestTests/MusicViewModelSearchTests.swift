@@ -156,17 +156,74 @@ extension MusicViewModelTests {
         XCTAssertEqual(playlists?.map(\.name), ["Brynäs IF fanclub"])
     }
 
-    // MARK: - Overview tab
+    // MARK: - Mixed results list
 
-    func testOverviewShowsOnlyTheTopFewOfEachCategory() async {
-        stubSearch(json: manyTracksJSON)
+    func testAlltTakesTheTypesInTurnsWithLibraryPlaylistsBadged() async {
+        stubSearch(json: mixedJSON)
         let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.favoritePlaylists = [playlistItem(uri: "spotify://playlist/mine", name: "Brynäs på soffan")]
         model.searchText = "brynäs"
-        await model.search()
+        await model.searchNow()
 
-        XCTAssertEqual(model.searchSections.first?.items.count, 5)
-        XCTAssertEqual(model.searchOverviewSections.first?.items.count, 3)
-        XCTAssertEqual(model.searchOverviewSections.first?.items.map(\.name), ["Låt 1", "Låt 2", "Låt 3"])
+        let hits = model.searchHits(filter: nil)
+        XCTAssertEqual(hits.map(\.item.uri), [
+            "spotify://artist/a1", "spotify://playlist/mine", "spotify://track/t1", "spotify://album/b1",
+            "spotify://playlist/remote", "spotify://track/t2"
+        ])
+        XCTAssertEqual(hits.filter(\.isInLibrary).map(\.item.uri), ["spotify://playlist/mine"])
+        XCTAssertEqual(model.searchFilters, [.track, .album, .artist, .playlist])
+    }
+
+    func testFilterListsOneTypeInFullWithLibraryPlaylistsFirst() async {
+        stubSearch(json: mixedJSON)
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.favoritePlaylists = [playlistItem(uri: "spotify://playlist/mine", name: "Brynäs på soffan")]
+        model.searchText = "brynäs"
+        await model.searchNow()
+
+        let cases: [(filter: MusicMediaType, expected: [String])] = [
+            (.track, ["spotify://track/t1", "spotify://track/t2"]),
+            (.playlist, ["spotify://playlist/mine", "spotify://playlist/remote"]),
+            (.artist, ["spotify://artist/a1"])
+        ]
+        for testCase in cases {
+            XCTAssertEqual(model.searchHits(filter: testCase.filter).map(\.item.uri), testCase.expected,
+                           "filter \(testCase.filter)")
+        }
+    }
+
+    func testTheSameArtistFromTwoProvidersIsListedOnce() async {
+        stubSearch(json: """
+        {"service_response":{"artists":[
+          {"uri":"spotify://artist/a1","name":"Victor Leksell"},
+          {"uri":"library://artist/9","name":"victor leksell"},
+          {"uri":"spotify://artist/a2","name":"Viktor Norén"}
+        ]}}
+        """)
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.searchText = "victor"
+        await model.searchNow()
+
+        XCTAssertEqual(model.searchHits(filter: nil).map(\.item.uri), ["spotify://artist/a1", "spotify://artist/a2"])
+    }
+
+    func testLibraryMatchesShowBeforeTheSpotifySearchHasRun() {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        model.favoritePlaylists = [playlistItem(uri: "spotify://playlist/mine", name: "Brynäs på soffan")]
+        model.searchText = "brynäs"
+
+        XCTAssertEqual(model.searchHits(filter: nil).map(\.item.uri), ["spotify://playlist/mine"])
+        XCTAssertEqual(model.searchFilters, [.playlist])
+    }
+
+    func testOpeningAnArtistOrAlbumBrowsesInsteadOfPlaying() async {
+        let model = makeViewModel(spotify: StubSpotifyPlaylistService(authorized: false))
+        for mediaType in [MusicMediaType.artist, .album] {
+            let item = MusicSearchItem(uri: "spotify://\(mediaType.rawValue)/x1", name: "Victor",
+                                       mediaType: mediaType, imageURL: nil, artist: nil)
+            await model.open(item)
+            XCTAssertEqual(model.browsingArtist, item)
+        }
     }
 
     // MARK: - Inline results on the music screen
@@ -227,8 +284,14 @@ extension MusicViewModelTests {
         """
     }
 
-    private var manyTracksJSON: String {
-        let tracks = (1 ... 5).map { #"{"uri":"spotify://track/t\#($0)","name":"Låt \#($0)"}"# }
-        return #"{"service_response":{"tracks":[\#(tracks.joined(separator: ","))]}}"#
+    private var mixedJSON: String {
+        """
+        {"service_response":{
+          "tracks":[{"uri":"spotify://track/t1","name":"Vi är Brynäs"},{"uri":"spotify://track/t2","name":"Brynäs forever"}],
+          "albums":[{"uri":"spotify://album/b1","name":"Brynäs"}],
+          "artists":[{"uri":"spotify://artist/a1","name":"Brynäskören"}],
+          "playlists":[{"uri":"spotify://playlist/remote","name":"Brynäs IF fanclub"}]
+        }}
+        """
     }
 }

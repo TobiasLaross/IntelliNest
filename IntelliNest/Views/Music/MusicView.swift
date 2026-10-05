@@ -10,21 +10,13 @@ import SwiftUI
 struct MusicView: View {
     @ObservedObject var viewModel: MusicViewModel
     @State private var isShowingSpotifyLogin = false
-    @State private var searchResultsTab: MusicSearchTab = .all
     @State private var isSearching = false
     @StateObject private var recentSearches = RecentMusicSearches()
 
     var body: some View {
         Group {
             if isSearching {
-                MusicSearchView(viewModel: viewModel,
-                                recentSearches: recentSearches,
-                                onShowAll: { mediaType in
-                                    recentSearches.record(viewModel.searchText)
-                                    searchResultsTab = .mediaType(mediaType)
-                                    Task { await viewModel.search() }
-                                },
-                                onClose: closeSearch)
+                MusicSearchView(viewModel: viewModel, recentSearches: recentSearches, onClose: closeSearch)
             } else {
                 startScreen
             }
@@ -48,9 +40,6 @@ struct MusicView: View {
         // Music Assistant search whose hits are listed under the library matches.
         .onChange(of: viewModel.searchText) { _, _ in
             viewModel.scheduleSearch()
-        }
-        .sheet(isPresented: $viewModel.isShowingSearchResults) {
-            MusicSearchResultsView(viewModel: viewModel, initialTab: searchResultsTab)
         }
         .sheet(item: $viewModel.browsingArtist) { artist in
             NavigationStack {
@@ -143,7 +132,6 @@ struct MusicView: View {
     /// Leaves the search screen with the field emptied, so the start screen shows
     /// the whole library again instead of a filtered slice of it.
     private func closeSearch() {
-        recentSearches.record(viewModel.searchText)
         viewModel.searchText = ""
         isSearching = false
     }

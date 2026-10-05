@@ -8,131 +8,98 @@
 import SwiftUI
 
 /// The search screen the music start screen's search bar opens. It takes over the
-/// whole screen — navigation bar included — so the only way out is the close
-/// button, and the back arrow can no longer throw the user off the music screen
-/// mid-search. Before a query is typed it lists the recent searches.
+/// whole screen — navigation bar included — so the only way out is "Avbryt", and
+/// the back arrow can no longer throw the user off the music screen mid-search.
+/// The field sits at the bottom, on top of the keyboard, where the thumb already
+/// is. Before a query is typed it lists the items recently picked from the
+/// results, newest nearest the field.
 struct MusicSearchView: View {
     @ObservedObject var viewModel: MusicViewModel
     @ObservedObject var recentSearches: RecentMusicSearches
-    let onShowAll: (MusicMediaType) -> Void
     let onClose: MainActorVoidClosure
 
     var body: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 8) {
-                MusicSearchBar(searchText: $viewModel.searchText,
-                               focusesOnAppear: true,
-                               onSubmit: submit)
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 36, height: 36)
-                        .contentShape(Rectangle())
+        VStack(spacing: 0) {
+            Group {
+                if viewModel.isFilteringLibrary {
+                    MusicSearchResultsView(viewModel: viewModel, onPick: recentSearches.record)
+                } else {
+                    RecentMusicPicksView(viewModel: viewModel, recentSearches: recentSearches)
                 }
-                .accessibilityLabel("Stäng sökningen")
-            }
-            .padding(.top, 8)
-
-            ScrollView {
-                MusicSearchContent(viewModel: viewModel, recentSearches: recentSearches, onShowAll: onShowAll)
             }
             .scrollDismissesKeyboard(.interactively)
-        }
-    }
+            .frame(maxHeight: .infinity)
 
-    private func submit() {
-        recentSearches.record(viewModel.searchText)
-        Task { await viewModel.searchNow() }
+            HStack(spacing: 12) {
+                MusicSearchBar(searchText: $viewModel.searchText,
+                               prompt: "Sök musik",
+                               focusesOnAppear: true,
+                               onSubmit: { Task { await viewModel.searchNow() } })
+                Button("Avbryt", action: onClose)
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(.white)
+                    .accessibilityLabel("Stäng sökningen")
+            }
+            .padding(.vertical, 8)
+        }
     }
 }
 
-/// What sits under the search field: the recent searches while it is empty, the
-/// library matches and Spotify hits once something is typed.
-struct MusicSearchContent: View {
+/// The recent picks, stacked upward from the search field so the newest one sits
+/// closest to the thumb. Tapping one does what tapping it in the results did.
+struct RecentMusicPicksView: View {
     @ObservedObject var viewModel: MusicViewModel
     @ObservedObject var recentSearches: RecentMusicSearches
-    let onShowAll: (MusicMediaType) -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            if viewModel.isFilteringLibrary {
-                results
-            } else {
-                recents
+        GeometryReader { proxy in
+            ScrollView {
+                content
+                    .frame(maxWidth: .infinity, minHeight: proxy.size.height, alignment: .bottom)
             }
+            .defaultScrollAnchor(.bottom)
         }
     }
 
-    @ViewBuilder private var results: some View {
-        ForEach(viewModel.librarySections) { section in
-            LibraryPlaylistsSection(viewModel: viewModel,
-                                    section: section,
-                                    onShowAll: { viewModel.expandedLibrarySection = section })
-        }
-        if viewModel.librarySections.isEmpty {
-            Text("Inget i biblioteket matchar")
-                .foregroundStyle(.white.opacity(0.7))
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        SpotifySearchResultsSections(viewModel: viewModel, onShowAll: onShowAll)
-    }
-
-    @ViewBuilder private var recents: some View {
-        if recentSearches.queries.isEmpty {
+    @ViewBuilder private var content: some View {
+        if recentSearches.items.isEmpty {
             Text("Sök efter låtar, album, artister och spellistor")
                 .foregroundStyle(.white.opacity(0.7))
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 8)
         } else {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text("Senaste sökningar")
-                        .font(.headline)
+                    Text("Senaste")
+                        .musicSearchSectionLabel()
                     Spacer()
                     Button("Rensa") { recentSearches.clear() }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.white)
+                        .accessibilityLabel("Rensa senaste")
                 }
-                .padding(.bottom, 4)
-                ForEach(recentSearches.queries, id: \.self) { query in
-                    recentRow(query)
+                MusicSearchHitList(items: Array(recentSearches.items.reversed())) { item in
+                    MusicSearchHitRow(item: item, showsTrailingImage: false) {
+                        recentSearches.record(item)
+                        Task { await viewModel.open(item) }
+                    }
+                    removeButton(item)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(Color.white.opacity(0.05))
-            .cornerRadius(16)
         }
     }
 
-    private func recentRow(_ query: String) -> some View {
-        HStack(spacing: 12) {
-            Button {
-                viewModel.searchText = query
-                recentSearches.record(query)
-            } label: {
-                HStack(spacing: 12) {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .foregroundStyle(.white.opacity(0.6))
-                    Text(query)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
-                    Spacer()
-                }
-                .padding(.vertical, 8)
+    private func removeButton(_ item: MusicSearchItem) -> some View {
+        Button {
+            recentSearches.remove(item)
+        } label: {
+            Image(systemName: "xmark")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.6))
+                .frame(width: 32, height: 32)
                 .contentShape(Rectangle())
-            }
-            Button {
-                recentSearches.remove(query)
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .frame(width: 32, height: 32)
-                    .contentShape(Rectangle())
-            }
-            .accessibilityLabel("Ta bort \(query) från senaste sökningar")
         }
-        .foregroundStyle(.white)
+        .buttonStyle(.plain)
+        .accessibilityLabel("Ta bort \(item.name) från senaste")
     }
 }
