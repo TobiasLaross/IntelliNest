@@ -71,6 +71,18 @@ extension MusicViewModelTests {
         XCTAssertNil(viewModel.liveActivitySnapshot())
     }
 
+    func testLiveActivitySnapshotIsNilWhileTheAppleTVIsOn() async {
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        stubTwin(for: .mediaPlayerLivingRoom,
+                 state: "playing",
+                 title: "TV",
+                 contentID: "x-sonos-htastream:RINCON_F0F6C1705FFD01400:spdif")
+        await viewModel.reload()
+        viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle = "Ha dig igen"
+
+        XCTAssertNil(viewModel.liveActivitySnapshot())
+    }
+
     // MARK: - Content state
 
     func testVolumeStepStaysWithinRange() {
