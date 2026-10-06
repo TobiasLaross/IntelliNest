@@ -85,7 +85,7 @@ struct MediaPlayerEntity: EntityProtocol, Decodable {
     /// Whether this Sonos is playing its HDMI/optical TV input, i.e. the Apple TV is on. Sonos reports that input as
     /// an `x-sonos-htastream:` content id.
     var isPlayingTVInput: Bool {
-        hasLiveAudio && mediaContentID?.hasPrefix("x-sonos-htastream:") == true
+        isPlaying && mediaContentID?.hasPrefix("x-sonos-htastream:") == true
     }
 
     /// Whether this hardware twin carries a now-playing worth mirroring onto its
