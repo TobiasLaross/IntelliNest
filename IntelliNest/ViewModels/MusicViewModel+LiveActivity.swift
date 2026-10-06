@@ -17,9 +17,11 @@ extension MusicViewModel {
         return availableSpeakers.first { $0.isPlaying }?.entityId
     }
 
-    /// What the activity should show, or nil when nothing is playing or paused on a track.
+    /// What the activity should show, or nil when nothing is playing or paused on a track. Also nil while the Apple
+    /// TV is on: only one Live Activity shows on the lock screen, and the Apple TV's own is the richer one.
     func liveActivitySnapshot() -> MusicNowPlayingSnapshot? {
-        guard let speakerID = liveActivitySpeakerID,
+        guard !hardwareTwins.values.contains(where: \.isPlayingTVInput),
+              let speakerID = liveActivitySpeakerID,
               let speaker = speakers[speakerID],
               let shown = displayedSpeaker(speakerID),
               shown.hasLiveAudio,
