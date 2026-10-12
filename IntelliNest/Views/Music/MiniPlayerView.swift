@@ -28,8 +28,8 @@ enum MiniPlayerSwipe: Equatable {
 
 /// The bar pinned to the bottom of the music screen for the controlled room (or,
 /// with none controlled, the first room playing). Tapping it opens the full-screen
-/// player, swiping it sideways skips tracks, and the speaker button opens the room
-/// sheet where control and volume move between rooms.
+/// player, swiping it sideways skips tracks, its slider sets the room's volume, and
+/// the speaker button opens the room sheet where control moves between rooms.
 struct MiniPlayerView: View {
     @ObservedObject var viewModel: MusicViewModel
 
@@ -48,8 +48,9 @@ struct MiniPlayerView: View {
     }
 }
 
-/// The room's page in the mini player: art, track, the room in yellow, the room
-/// picker and play/pause. A thin line along the bottom shows the progress.
+/// The room's mini player: art, track, the room in yellow, the room picker and
+/// play/pause, with the room's volume underneath. A thin line along the bottom
+/// shows the progress.
 private struct MiniPlayerBar: View {
     @ObservedObject var viewModel: MusicViewModel
     let entry: SpeakerPickerEntry
@@ -58,6 +59,34 @@ private struct MiniPlayerBar: View {
     var body: some View {
         let speakerID = viewModel.controlledSpeakerID(in: entry)
         let speaker = viewModel.displayedSpeaker(speakerID)
+        VStack(spacing: 0) {
+            trackRow(speakerID: speakerID, speaker: speaker)
+                .frame(height: 56)
+                // Only the track row swipes, so dragging the volume slider never skips a track.
+                .contentShape(Rectangle())
+                .gesture(trackSwipe)
+
+            VolumeSliderView(volume: entry.averageVolume,
+                             onCommit: { viewModel.setGroupVolume($0, for: entry) })
+                .accessibilityLabel(entry.isGroup ? "Gruppvolym \(entry.title)" : "Volym \(entry.title)")
+                .padding(.trailing, 8)
+                .padding(.bottom, 10)
+        }
+        .foregroundStyle(.white)
+        .padding(.leading, 8)
+        .padding(.trailing, 4)
+        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color(red: 0.16, green: 0.24, blue: 0.25)))
+        .overlay(alignment: .bottom) {
+            if let speaker {
+                MiniProgressLine(speaker: speaker)
+                    .padding(.horizontal, 10)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+    }
+
+    private func trackRow(speakerID: EntityId, speaker: MediaPlayerEntity?) -> some View {
         HStack(spacing: 10) {
             Button {
                 viewModel.selectRoom(entry)
@@ -91,43 +120,36 @@ private struct MiniPlayerBar: View {
                     .frame(width: 36, height: 44)
             }
 
-            Button {
-                viewModel.selectRoom(entry)
-                viewModel.isShowingSpeakerPicker = true
-            } label: {
-                Image(systemName: "hifispeaker.2")
-                    .font(.title3)
-                    .frame(width: 40, height: 44)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Välj högtalare och volym")
+            speakerButton
+            playPauseButton(speakerID: speakerID, isPlaying: speaker?.isPlaying == true)
+        }
+    }
 
-            Button {
-                viewModel.togglePlayPause(for: speakerID)
-            } label: {
-                Image(systemName: speaker?.isPlaying == true ? "pause.fill" : "play.fill")
-                    .font(.title2)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(speaker?.isPlaying == true ? "Pausa \(entry.title)" : "Spela \(entry.title)")
+    private var speakerButton: some View {
+        Button {
+            viewModel.selectRoom(entry)
+            viewModel.isShowingSpeakerPicker = true
+        } label: {
+            Image(systemName: "hifispeaker.2")
+                .font(.title3)
+                .frame(width: 40, height: 44)
+                .contentShape(Rectangle())
         }
-        .foregroundStyle(.white)
-        .padding(.leading, 8)
-        .padding(.trailing, 4)
-        .frame(height: 56)
-        .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color(red: 0.16, green: 0.24, blue: 0.25)))
-        .overlay(alignment: .bottom) {
-            if let speaker {
-                MiniProgressLine(speaker: speaker)
-                    .padding(.horizontal, 10)
-            }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Välj högtalare")
+    }
+
+    private func playPauseButton(speakerID: EntityId, isPlaying: Bool) -> some View {
+        Button {
+            viewModel.togglePlayPause(for: speakerID)
+        } label: {
+            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                .font(.title2)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
-        .gesture(trackSwipe)
+        .buttonStyle(.plain)
+        .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
     }
 
     /// The track slides with the finger, then skips once the swipe passes the
