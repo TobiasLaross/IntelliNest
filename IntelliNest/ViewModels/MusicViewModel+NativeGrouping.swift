@@ -76,8 +76,8 @@ extension MusicViewModel {
         }
     }
 
-    /// Takes `speakerID` out of its Sonos group and reports whether Sonos accepted
-    /// it. Picking who to control afterwards is up to the caller.
+    /// Takes `speakerID` out of its Sonos group and reports whether its twin is
+    /// confirmed alone afterwards. Picking who to control afterwards is up to the caller.
     func leaveNativeGroup(_ speakerID: EntityId) async -> Bool {
         guard let twinID = Self.hardwareTwinIDs[speakerID] else {
             return false
@@ -85,12 +85,26 @@ extension MusicViewModel {
         let speakerName = speakers[speakerID]?.friendlyName ?? speakerID.rawValue
         pendingGroupingSpeakers.insert(speakerID)
         defer { pendingGroupingSpeakers.remove(speakerID) }
-        guard await restAPIService.unjoinSpeaker(memberID: twinID) else {
+        guard await restAPIService.unjoinSpeaker(memberID: twinID), await confirmLeftNativeGroup(twinID) else {
             setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
             return false
         }
-        await reloadHardwareTwins()
         return true
+    }
+
+    /// Reloads the twins until `twinID` is no longer grouped with another Sonos,
+    /// for the same reason as `confirmNativeGroupChange`.
+    private func confirmLeftNativeGroup(_ twinID: EntityId, attempts: Int = 3) async -> Bool {
+        for attempt in 1 ... attempts {
+            await reloadHardwareTwins()
+            if (hardwareTwins[twinID]?.groupMembers.count ?? 0) <= 1 {
+                return true
+            }
+            if attempt < attempts {
+                await waitBeforeGroupRecheck()
+            }
+        }
+        return false
     }
 
     /// Reloads the twins until `speakerID`'s membership in the active Sonos group

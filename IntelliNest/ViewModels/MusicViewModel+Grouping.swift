@@ -209,12 +209,13 @@ extension MusicViewModel {
         } else {
             pendingGroupingSpeakers.insert(activeSpeakerID)
             defer { pendingGroupingSpeakers.remove(activeSpeakerID) }
-            guard await restAPIService.unjoinSpeaker(memberID: activeSpeakerID) else {
+            // Read the split from a remaining member, since the leaving speaker may have been the group leader.
+            guard await restAPIService.unjoinSpeaker(memberID: activeSpeakerID),
+                  await confirmGroupChange(activeSpeakerID, with: firstRemaining, shouldBeGrouped: false) else {
                 setErrorBannerText("Kunde inte dela upp högtalare",
                                    "Det gick inte att ta bort \(activeSpeaker.friendlyName) från gruppen")
                 return
             }
-            await reloadSpeakers()
         }
         // Route through selectSpeaker so the new speaker is also persisted as the
         // last-used one, like any other manual selection.
