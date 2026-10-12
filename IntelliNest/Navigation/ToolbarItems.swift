@@ -75,3 +75,20 @@ struct ToolbarReloadButtonView: View {
         }
     }
 }
+
+/// Takes the reload button's place on the music screen: shows the controlled room's
+/// speaker and opens the room sheet, where control and volume move between rooms.
+struct ToolbarSpeakerButtonView: View {
+    @ObservedObject var viewModel: MusicViewModel
+
+    var body: some View {
+        Button {
+            viewModel.isShowingSpeakerPicker = true
+        } label: {
+            Image(systemName: viewModel.isGroupActive ? "hifispeaker.2.fill" : "hifispeaker.fill")
+                .foregroundColor(.white)
+        }
+        .accessibilityLabel("Välj högtalare och volym")
+        .accessibilityValue(viewModel.controlledRoomTitle)
+    }
+}

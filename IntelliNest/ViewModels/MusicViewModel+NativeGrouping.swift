@@ -76,21 +76,21 @@ extension MusicViewModel {
         }
     }
 
-    /// Takes the active speaker out of its Sonos group. The native stream stays
-    /// with the Sonos coordinator, so the selection is left alone: if the active
-    /// speaker was the coordinator it keeps playing and the others fall silent.
-    func leaveNativeGroup(_ speakerID: EntityId) async {
+    /// Takes `speakerID` out of its Sonos group and reports whether Sonos accepted
+    /// it. Picking who to control afterwards is up to the caller.
+    func leaveNativeGroup(_ speakerID: EntityId) async -> Bool {
         guard let twinID = Self.hardwareTwinIDs[speakerID] else {
-            return
+            return false
         }
         let speakerName = speakers[speakerID]?.friendlyName ?? speakerID.rawValue
         pendingGroupingSpeakers.insert(speakerID)
         defer { pendingGroupingSpeakers.remove(speakerID) }
         guard await restAPIService.unjoinSpeaker(memberID: twinID) else {
             setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
-            return
+            return false
         }
         await reloadHardwareTwins()
+        return true
     }
 
     /// Reloads the twins until `speakerID`'s membership in the active Sonos group

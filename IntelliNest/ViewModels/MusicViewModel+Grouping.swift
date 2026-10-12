@@ -187,36 +187,39 @@ extension MusicViewModel {
         selectSpeaker(speakerID)
     }
 
-    /// Removes the active (primary) speaker from its group and promotes the next
-    /// grouped speaker to active, so playback control follows the speakers that
-    /// keep playing. Music Assistant re-elects the real group leader on its own;
-    /// the new `activeSpeakerID` only needs to be a remaining member, since
-    /// playback commands are routed through the live group leader. No-op when the
+    /// Removes the active (primary) speaker from its group and hands control to a
+    /// speaker left in the group, so control follows the music that keeps playing:
+    /// a remaining member that is still playing after the change, otherwise the
+    /// first remaining one in display order. Music Assistant re-elects the real
+    /// group leader on its own, and a Sonos group keeps its native stream, so the
+    /// new `activeSpeakerID` only needs to be a remaining member. No-op when the
     /// active speaker isn't grouped with anyone.
     func removeActiveSpeakerFromGroup() async {
         guard let activeSpeakerID, let activeSpeaker else {
             return
         }
+        let remaining = groupedSpeakers.map(\.entityId).filter { $0 != activeSpeakerID }
+        guard let firstRemaining = remaining.first else {
+            return
+        }
         if isActiveOnNativeSource {
-            await leaveNativeGroup(activeSpeakerID)
-            return
-        }
-        let remaining = Self.speakerIDs.filter { activeSpeaker.groupMembers.contains($0) && $0 != activeSpeakerID }
-        guard let newActiveID = remaining.first else {
-            return
-        }
-        pendingGroupingSpeakers.insert(activeSpeakerID)
-        defer { pendingGroupingSpeakers.remove(activeSpeakerID) }
-        let speakerName = activeSpeaker.friendlyName
-        let success = await restAPIService.unjoinSpeaker(memberID: activeSpeakerID)
-        if success {
-            await reloadSpeakers()
-            // Route through selectSpeaker so the promoted speaker is also persisted
-            // as the last-used one, like any other manual selection.
-            selectSpeaker(newActiveID)
+            guard await leaveNativeGroup(activeSpeakerID) else {
+                return
+            }
         } else {
-            setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speakerName) från gruppen")
+            pendingGroupingSpeakers.insert(activeSpeakerID)
+            defer { pendingGroupingSpeakers.remove(activeSpeakerID) }
+            guard await restAPIService.unjoinSpeaker(memberID: activeSpeakerID) else {
+                setErrorBannerText("Kunde inte dela upp högtalare",
+                                   "Det gick inte att ta bort \(activeSpeaker.friendlyName) från gruppen")
+                return
+            }
+            await reloadSpeakers()
         }
+        // Route through selectSpeaker so the new speaker is also persisted as the
+        // last-used one, like any other manual selection.
+        let stillPlaying = remaining.first { displayedSpeaker($0)?.isPlaying == true }
+        selectSpeaker(stillPlaying ?? firstRemaining)
     }
 }
 

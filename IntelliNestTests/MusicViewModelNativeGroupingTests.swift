@@ -87,6 +87,22 @@ extension MusicViewModelTests {
         XCTAssertTrue(bannerTitles.isEmpty)
     }
 
+    func testLeavingNativeGroupHandsControlToRemainingSpeaker() async {
+        stubAllSpeakers()
+        stubKitchenOnAirPlay(twinGroup: [.mediaPlayerKitchenSonos, .mediaPlayerLivingRoomSonos])
+        await viewModel.reload()
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+
+        let body = capturePost(path: "/api/services/media_player/unjoin")
+        stubPostService(path: "/api/services/media_player/unjoin")
+        stubKitchenOnAirPlay()
+        await viewModel.removeActiveSpeakerFromGroup()
+
+        XCTAssertEqual(body()?["entity_id"] as? String, EntityId.mediaPlayerKitchenSonos.rawValue)
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerLivingRoom)
+        XCTAssertTrue(bannerTitles.isEmpty)
+    }
+
     func testNativeSourceRejectsNonSonosSpeaker() async {
         stubAllSpeakers()
         stubKitchenOnAirPlay()

@@ -177,6 +177,24 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerPlayroom)
     }
 
+    func testRemoveActiveSpeakerFromGroupHandsControlToSpeakerStillPlaying() async {
+        await reloadGroupedKitchenLeader()
+        stubPostService(path: "/api/services/media_player/unjoin")
+        // After the split only Matbord-ute keeps the music, so it takes control over
+        // Lekrummet even though Lekrummet comes first in display order.
+        let remaining = [EntityId.mediaPlayerPlayroom.rawValue, EntityId.mediaPlayerOutdoorTable.rawValue]
+        stubSpeaker(.mediaPlayerKitchen,
+                    data: speakerJSON(entityID: .mediaPlayerKitchen, state: "idle", friendlyName: "Köket"))
+        stubSpeaker(.mediaPlayerPlayroom,
+                    data: speakerJSON(entityID: .mediaPlayerPlayroom, state: "idle",
+                                      friendlyName: "Lekrummet", groupMembers: remaining))
+        stubSpeaker(.mediaPlayerOutdoorTable,
+                    data: speakerJSON(entityID: .mediaPlayerOutdoorTable, state: "playing",
+                                      friendlyName: "Matbord-ute", groupMembers: remaining))
+        await viewModel.removeActiveSpeakerFromGroup()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerOutdoorTable)
+    }
+
     func testMakePrimaryPromotesGroupedSpeaker() async {
         await reloadGroupedKitchenLeader()
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)

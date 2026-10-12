@@ -17,4 +17,16 @@ final class VolumeButtonPressDetectorTests: XCTestCase {
             XCTAssertEqual(detector.isRaising(newVolume: testCase.volume), testCase.raising, "volume \(testCase.volume)")
         }
     }
+
+    func testMiniPlayerSwipeDirection() {
+        let cases: [(translation: CGSize, swipe: MiniPlayerSwipe?)] = [
+            (CGSize(width: -80, height: 5), .next),
+            (CGSize(width: 80, height: -5), .previous),
+            (CGSize(width: -40, height: 0), nil),
+            (CGSize(width: 70, height: 120), nil)
+        ]
+        for testCase in cases {
+            XCTAssertEqual(MiniPlayerSwipe(translation: testCase.translation), testCase.swipe, "\(testCase.translation)")
+        }
+    }
 }
