@@ -69,6 +69,7 @@ struct HardwareVolumeButtons: UIViewRepresentable {
         private weak var volumeView: MPVolumeView?
         private var detector: VolumeButtonPressDetector?
         private var observation: NSKeyValueObservation?
+        private var foregroundObserver: NSObjectProtocol?
 
         func start(volumeView: MPVolumeView) {
             guard observation == nil else {
@@ -77,8 +78,9 @@ struct HardwareVolumeButtons: UIViewRepresentable {
             self.volumeView = volumeView
             let session = AVAudioSession.sharedInstance()
             do {
-                // Ambient mixes with whatever else plays, so listening for the buttons never pauses other audio.
-                try session.setCategory(.ambient)
+                // Only a playback session makes the buttons move the media volume this observes; with ambient
+                // they change the ringer instead while nothing plays. Mixing keeps it from pausing other audio.
+                try session.setCategory(.playback, options: [.mixWithOthers])
                 try session.setActive(true)
             } catch {
                 Log.error("Failed to activate audio session for volume buttons: \(error)")
@@ -95,6 +97,14 @@ struct HardwareVolumeButtons: UIViewRepresentable {
                     self?.handle(volume)
                 }
             }
+            // iOS deactivates the session while the app is in the background, and an inactive session hears no presses.
+            foregroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification,
+                                                                        object: nil,
+                                                                        queue: .main) { [weak self] _ in
+                Task { @MainActor in
+                    self?.reactivate()
+                }
+            }
         }
 
         func stop() {
@@ -103,12 +113,29 @@ struct HardwareVolumeButtons: UIViewRepresentable {
             }
             observation.invalidate()
             self.observation = nil
+            if let foregroundObserver {
+                NotificationCenter.default.removeObserver(foregroundObserver)
+            }
+            foregroundObserver = nil
             // Hand the phone back at the volume it had, so a muted phone isn't left at the nudged-in resting level.
             if let detector {
                 setPhoneVolume(detector.startingVolume)
             }
             detector = nil
             try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        }
+
+        private func reactivate() {
+            guard observation != nil, let detector else {
+                return
+            }
+            do {
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                Log.error("Failed to reactivate audio session for volume buttons: \(error)")
+                return
+            }
+            setPhoneVolume(detector.restingVolume)
         }
 
         private func handle(_ volume: Float) {

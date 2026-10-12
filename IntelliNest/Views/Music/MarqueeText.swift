@@ -98,8 +98,12 @@ struct MarqueeText: View {
                     }
             }
             .overlay(alignment: .leading) {
+                // The scrolling copies are drawn far past the frame and only clipped visually, so without this
+                // they take taps meant for whatever sits beside the marquee (the player's close chevron).
                 visibleText
+                    .allowsHitTesting(false)
             }
+            .contentShape(Rectangle())
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(text)
             .onChange(of: text) {

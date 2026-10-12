@@ -7,28 +7,38 @@
 
 import SwiftUI
 
-/// The bar pinned to the bottom of the music screen, one page per room that is
-/// playing. Swiping to another page moves control to that room and leaves the
-/// rest playing, so the kitchen and the bedroom can each run their own music.
-/// Tapping a page opens the full-screen player for that room.
+/// Which way a horizontal swipe across the mini player moves through the queue,
+/// like Spotify's: left for the next track, right for the previous one. Kept apart
+/// from the view so the thresholds can be tested without a gesture.
+enum MiniPlayerSwipe: Equatable {
+    case next
+    case previous
+
+    static let threshold: CGFloat = 60
+
+    /// Nil for a drag that is too short, or more vertical than horizontal, so a
+    /// tap or a scroll of the library never skips a track.
+    init?(translation: CGSize) {
+        guard abs(translation.width) >= Self.threshold, abs(translation.width) > abs(translation.height) else {
+            return nil
+        }
+        self = translation.width < 0 ? .next : .previous
+    }
+}
+
+/// The bar pinned to the bottom of the music screen for the controlled room (or,
+/// with none controlled, the first room playing). Tapping it opens the full-screen
+/// player, swiping it sideways skips tracks, its slider sets the room's volume, and
+/// the speaker button opens the room sheet where control moves between rooms.
 struct MiniPlayerView: View {
     @ObservedObject var viewModel: MusicViewModel
 
     var body: some View {
         let rooms = viewModel.miniPlayerRooms
-        VStack(spacing: 6) {
-            TabView(selection: selection(in: rooms)) {
-                ForEach(rooms) { entry in
-                    MiniPlayerBar(viewModel: viewModel, entry: entry)
-                        .padding(.horizontal, 2)
-                        .tag(Optional(entry.id))
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(height: 60)
-
-            if rooms.count > 1 {
-                pageDots(rooms)
+        Group {
+            if let entry = rooms.first(where: { $0.contains(viewModel.activeSpeakerID) }) ?? rooms.first {
+                MiniPlayerBar(viewModel: viewModel, entry: entry)
+                    .padding(.horizontal, 2)
             }
         }
         // Keep the Liked-Songs heart in sync with the controlled room's track.
@@ -36,87 +46,35 @@ struct MiniPlayerView: View {
             await viewModel.loadSavedSongStates(uris: [viewModel.displayedActiveSpeaker?.mediaContentID].compactMap { $0 })
         }
     }
-
-    /// The page shown is always the controlled room; swiping selects the new one.
-    private func selection(in rooms: [SpeakerPickerEntry]) -> Binding<EntityId?> {
-        Binding(
-            get: { rooms.first { $0.contains(viewModel.activeSpeakerID) }?.id },
-            set: { newID in
-                if let entry = rooms.first(where: { $0.id == newID }) {
-                    viewModel.selectRoom(entry)
-                }
-            }
-        )
-    }
-
-    private func pageDots(_ rooms: [SpeakerPickerEntry]) -> some View {
-        HStack(spacing: 6) {
-            ForEach(rooms) { entry in
-                Circle()
-                    .fill(entry.contains(viewModel.activeSpeakerID) ? Color.white : Color.white.opacity(0.35))
-                    .frame(width: 6, height: 6)
-            }
-        }
-        .accessibilityElement()
-        .accessibilityLabel("\(rooms.count) rum spelar. Svep för att byta rum")
-    }
 }
 
-/// One room's page in the mini player: art, track, the room in yellow, and
-/// play/pause for that room. A thin line along the bottom shows the progress.
+/// The room's mini player: art, track, the room in yellow, the room picker and
+/// play/pause, with the room's volume underneath. A thin line along the bottom
+/// shows the progress.
 private struct MiniPlayerBar: View {
     @ObservedObject var viewModel: MusicViewModel
     let entry: SpeakerPickerEntry
+    @State private var dragOffset: CGFloat = 0
 
     var body: some View {
         let speakerID = viewModel.controlledSpeakerID(in: entry)
         let speaker = viewModel.displayedSpeaker(speakerID)
-        HStack(spacing: 10) {
-            Button {
-                viewModel.selectRoom(entry)
-                viewModel.isShowingNowPlaying = true
-            } label: {
-                HStack(spacing: 10) {
-                    AlbumArtView(urlString: speaker?.entityPicture, size: 40)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(speaker?.mediaTitle ?? "Inget spelas")
-                            .font(.subheadline.weight(.semibold))
-                            .lineLimit(1)
-                        Label(entry.title, systemImage: entry.isGroup ? "hifispeaker.2.fill" : "hifispeaker.fill")
-                            .font(.caption)
-                            .foregroundStyle(.yellow)
-                            .lineLimit(1)
-                    }
-                    Spacer(minLength: 4)
-                }
+        VStack(spacing: 0) {
+            trackRow(speakerID: speakerID, speaker: speaker)
+                .frame(height: 56)
+                // Only the track row swipes, so dragging the volume slider never skips a track.
                 .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("\(speaker?.mediaTitle ?? "Inget spelas"), \(entry.title)")
-            .accessibilityHint("Öppna spelaren")
+                .gesture(trackSwipe)
 
-            if speakerID == viewModel.activeSpeakerID,
-               let uri = speaker?.mediaContentID, viewModel.canFavoriteSong(uri: uri) {
-                SongFavoriteButton(viewModel: viewModel, uri: uri)
-                    .font(.title3)
-                    .frame(width: 36, height: 44)
-            }
-
-            Button {
-                viewModel.togglePlayPause(for: speakerID)
-            } label: {
-                Image(systemName: speaker?.isPlaying == true ? "pause.fill" : "play.fill")
-                    .font(.title2)
-                    .frame(width: 44, height: 44)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(speaker?.isPlaying == true ? "Pausa \(entry.title)" : "Spela \(entry.title)")
+            VolumeSliderView(volume: entry.averageVolume,
+                             onCommit: { viewModel.setGroupVolume($0, for: entry) })
+                .accessibilityLabel(entry.isGroup ? "Gruppvolym \(entry.title)" : "Volym \(entry.title)")
+                .padding(.trailing, 8)
+                .padding(.bottom, 10)
         }
         .foregroundStyle(.white)
         .padding(.leading, 8)
         .padding(.trailing, 4)
-        .frame(height: 56)
         .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Color(red: 0.16, green: 0.24, blue: 0.25)))
         .overlay(alignment: .bottom) {
             if let speaker {
@@ -126,6 +84,101 @@ private struct MiniPlayerBar: View {
         }
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.35), radius: 8, y: 4)
+    }
+
+    private func trackRow(speakerID: EntityId, speaker: MediaPlayerEntity?) -> some View {
+        HStack(spacing: 10) {
+            Button {
+                viewModel.selectRoom(entry)
+                viewModel.isShowingNowPlaying = true
+            } label: {
+                HStack(spacing: 10) {
+                    AlbumArtView(urlString: speaker?.entityPicture, size: 40)
+                    VStack(alignment: .leading, spacing: 2) {
+                        MarqueeText(text: speaker?.mediaTitle ?? "Inget spelas")
+                            .font(.subheadline.weight(.semibold))
+                        Label(entry.title, systemImage: entry.isGroup ? "hifispeaker.2.fill" : "hifispeaker.fill")
+                            .font(.caption)
+                            .foregroundStyle(.yellow)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 4)
+                }
+                .offset(x: dragOffset)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(speaker?.mediaTitle ?? "Inget spelas"), \(entry.title)")
+            .accessibilityHint("Öppna spelaren")
+            .accessibilityAction(named: "Nästa låt") { skip(.next) }
+            .accessibilityAction(named: "Föregående låt") { skip(.previous) }
+
+            if speakerID == viewModel.activeSpeakerID,
+               let uri = speaker?.mediaContentID, viewModel.canFavoriteSong(uri: uri) {
+                SongFavoriteButton(viewModel: viewModel, uri: uri)
+                    .font(.title3)
+                    .frame(width: 36, height: 44)
+            }
+
+            speakerButton
+            playPauseButton(speakerID: speakerID, isPlaying: speaker?.isPlaying == true)
+        }
+    }
+
+    private var speakerButton: some View {
+        Button {
+            viewModel.selectRoom(entry)
+            viewModel.isShowingSpeakerPicker = true
+        } label: {
+            Image(systemName: "hifispeaker.2")
+                .font(.title3)
+                .frame(width: 40, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Välj högtalare")
+    }
+
+    private func playPauseButton(speakerID: EntityId, isPlaying: Bool) -> some View {
+        Button {
+            viewModel.togglePlayPause(for: speakerID)
+        } label: {
+            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                .font(.title2)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
+    }
+
+    /// The track slides with the finger, then skips once the swipe passes the
+    /// threshold and springs back either way.
+    private var trackSwipe: some Gesture {
+        DragGesture(minimumDistance: 20)
+            .onChanged { value in
+                if abs(value.translation.width) > abs(value.translation.height) {
+                    dragOffset = value.translation.width / 2
+                }
+            }
+            .onEnded { value in
+                if let swipe = MiniPlayerSwipe(translation: value.translation) {
+                    skip(swipe)
+                }
+                withAnimation(.spring(duration: 0.3)) {
+                    dragOffset = 0
+                }
+            }
+    }
+
+    private func skip(_ swipe: MiniPlayerSwipe) {
+        viewModel.selectRoom(entry)
+        switch swipe {
+        case .next:
+            viewModel.nextTrack()
+        case .previous:
+            viewModel.previousTrack()
+        }
     }
 }
 

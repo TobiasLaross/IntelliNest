@@ -41,7 +41,11 @@ struct AppMain: App {
                                     ToolBarConnectionStateView(urlCreator: navigator.urlCreator)
                                 }
                                 ToolbarItem(placement: .navigationBarTrailing) {
-                                    ToolbarReloadButtonView(destination: destination, reloadAction: navigator.toolbarReload)
+                                    if destination == .music {
+                                        ToolbarSpeakerButtonView(viewModel: navigator.musicViewModel)
+                                    } else {
+                                        ToolbarReloadButtonView(destination: destination, reloadAction: navigator.toolbarReload)
+                                    }
                                 }
                             }
                             .navigationBarBackButtonHidden(true)

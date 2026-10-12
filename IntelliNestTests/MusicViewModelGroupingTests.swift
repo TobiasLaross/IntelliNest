@@ -171,10 +171,41 @@ extension MusicViewModelTests {
 
         let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_player/unjoin") == true }
         stubPostService(path: "/api/services/media_player/unjoin")
+        let remaining = [EntityId.mediaPlayerPlayroom.rawValue, EntityId.mediaPlayerOutdoorTable.rawValue]
+        stubSpeaker(.mediaPlayerPlayroom,
+                    data: speakerJSON(entityID: .mediaPlayerPlayroom, state: "playing",
+                                      friendlyName: "Lekrummet", groupMembers: remaining))
         await viewModel.removeActiveSpeakerFromGroup()
         XCTAssertEqual(recorder.requests.count, 1)
         // The next remaining member in display order takes over as active.
         XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerPlayroom)
+    }
+
+    func testRemoveActiveSpeakerFromGroupHandsControlToSpeakerStillPlaying() async {
+        await reloadGroupedKitchenLeader()
+        stubPostService(path: "/api/services/media_player/unjoin")
+        // After the split only Matbord-ute keeps the music, so it takes control over
+        // Lekrummet even though Lekrummet comes first in display order.
+        let remaining = [EntityId.mediaPlayerPlayroom.rawValue, EntityId.mediaPlayerOutdoorTable.rawValue]
+        stubSpeaker(.mediaPlayerKitchen,
+                    data: speakerJSON(entityID: .mediaPlayerKitchen, state: "idle", friendlyName: "Köket"))
+        stubSpeaker(.mediaPlayerPlayroom,
+                    data: speakerJSON(entityID: .mediaPlayerPlayroom, state: "idle",
+                                      friendlyName: "Lekrummet", groupMembers: remaining))
+        stubSpeaker(.mediaPlayerOutdoorTable,
+                    data: speakerJSON(entityID: .mediaPlayerOutdoorTable, state: "playing",
+                                      friendlyName: "Matbord-ute", groupMembers: remaining))
+        await viewModel.removeActiveSpeakerFromGroup()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerOutdoorTable)
+    }
+
+    func testRemoveActiveSpeakerKeepsControlWhenSplitIsNeverConfirmed() async {
+        await reloadGroupedKitchenLeader()
+        stubPostService(path: "/api/services/media_player/unjoin")
+        // HA accepts the unjoin but the group never changes on the confirming reloads.
+        await viewModel.removeActiveSpeakerFromGroup()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+        XCTAssertTrue(bannerTitles.contains("Kunde inte dela upp högtalare"))
     }
 
     func testMakePrimaryPromotesGroupedSpeaker() async {
