@@ -315,6 +315,7 @@ extension MusicViewModelTests {
         stubPostService(path: path)
         action()
         await restAPIService.lastCommandTask?.value
+        await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
         return capturedBody?["entity_id"] as? String
     }
 

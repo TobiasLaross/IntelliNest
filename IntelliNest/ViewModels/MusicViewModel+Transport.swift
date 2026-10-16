@@ -11,17 +11,78 @@ import Foundation
 /// active speaker, split out of `MusicViewModel+Playback` to keep each file focused
 /// and under the line-length limit.
 extension MusicViewModel {
+    /// How many times a play/pause is sent before giving up, and how many
+    /// one-second rechecks each send gets to show up in Home Assistant.
+    static let playbackAttempts = 3
+    static let playbackRechecks = 3
+
     func togglePlayPause() {
-        guard let activeSpeaker, let targetID = transportTargetID else {
+        guard let activeSpeaker, let targetID = transportTargetID,
+              !pendingPlaybackSpeakers.contains(activeSpeaker.entityId) else {
             return
         }
         // Decide from the mirrored state the card actually shows (the hardware
         // twin's when it diverges), so the button does what its icon implies.
         let isPlaying = displayedActiveSpeaker?.isPlaying ?? activeSpeaker.isPlaying
         applyOptimisticPlayback(pausing: isPlaying)
-        restAPIService.mediaTransport(entityID: targetID, action: isPlaying ? .mediaPause : .mediaPlay)
-        // Confirm the new state/position quickly so the hold releases promptly.
-        restAPIService.triggerRepeatReload(times: 3)
+        sendConfirmedPlayback(speakerID: activeSpeaker.entityId, targetID: targetID, pausing: isPlaying)
+    }
+
+    /// Sends play/pause and keeps the speaker pending until Home Assistant reports
+    /// the new state. Music Assistant can take several seconds to start a group
+    /// from idle, and sometimes drops the first `media_play` altogether, so the
+    /// command is re-sent when the state hasn't moved after a few rechecks.
+    func sendConfirmedPlayback(speakerID: EntityId, targetID: EntityId, pausing: Bool) {
+        pendingPlaybackSpeakers.insert(speakerID)
+        let action: Action = pausing ? .mediaPause : .mediaPlay
+        pendingPlaybackTasks[speakerID] = Task {
+            var landed = false
+            attempts: for _ in 1 ... Self.playbackAttempts {
+                // Sent from its own task so a force pause's cancel can't abort the POST
+                // mid-flight, which the service would then retry on the external URL.
+                let send = Task {
+                    _ = await restAPIService.setState(for: targetID, in: .mediaPlayer, using: action, reloadTimes: 0)
+                }
+                playbackSendTasks[speakerID] = send
+                await send.value
+                for _ in 1 ... Self.playbackRechecks {
+                    await waitBeforePlaybackRecheck()
+                    // A force pause took over; it owns the speaker's state now, so
+                    // neither re-send nor clear a newer request's spinner.
+                    if Task.isCancelled {
+                        return
+                    }
+                    let hasLanded = await hasPlaybackLanded(on: targetID, playing: !pausing)
+                    if Task.isCancelled {
+                        return
+                    }
+                    if hasLanded {
+                        landed = true
+                        break attempts
+                    }
+                }
+            }
+            pendingPlaybackSpeakers.remove(speakerID)
+            await reloadSpeakers()
+            if !landed {
+                setErrorBannerText(pausing ? "Kunde inte pausa" : "Kunde inte spela", "Högtalaren svarade inte")
+            }
+        }
+    }
+
+    private func hasPlaybackLanded(on targetID: EntityId, playing: Bool) async -> Bool {
+        let fresh = try? await restAPIService.reload(entityId: targetID, entityType: MediaPlayerEntity.self)
+        return fresh?.isPlaying == playing
+    }
+
+    /// Applies the optimistic play/pause and position to a freshly reloaded
+    /// speaker, so neither flips back before Home Assistant has caught up.
+    func reconcileOptimisticState(speakerID: EntityId, fresh: MediaPlayerEntity) -> MediaPlayerEntity {
+        var entity = reconcilePositionHold(speakerID: speakerID, fresh: fresh)
+        if pendingPlaybackSpeakers.contains(speakerID), let requestedState = speakers[speakerID]?.state {
+            entity.state = requestedState
+        }
+        return entity
     }
 
     /// Pauses regardless of what the card shows, for when Music Assistant and the
@@ -29,9 +90,12 @@ extension MusicViewModel {
     /// entity that could own the stream — the MA leader and the Sonos twins behind
     /// it — since there's no telling which one is right.
     func forcePause() {
-        guard activeSpeaker != nil else {
+        guard let activeSpeakerID, activeSpeaker != nil else {
             return
         }
+        // Stop a play/pause still being retried, or it would undo this pause.
+        pendingPlaybackTasks[activeSpeakerID]?.cancel()
+        pendingPlaybackSpeakers.remove(activeSpeakerID)
         let candidateIDs = [playbackTargetID, transportTargetID].compactMap { $0 }
         let twinIDs = candidateIDs.compactMap { Self.hardwareTwinIDs[$0] }
         var targetIDs: [EntityId] = []
@@ -39,7 +103,16 @@ extension MusicViewModel {
             targetIDs.append(entityID)
         }
         applyOptimisticPlayback(pausing: true)
-        restAPIService.mediaTransport(entityIDs: targetIDs, action: .mediaPause)
+        // A play still in flight could reach Home Assistant after this pause and
+        // restart the music, so the pause waits it out.
+        guard let inFlightSend = playbackSendTasks[activeSpeakerID] else {
+            restAPIService.mediaTransport(entityIDs: targetIDs, action: .mediaPause)
+            return
+        }
+        pendingPlaybackTasks[activeSpeakerID] = Task {
+            await inFlightSend.value
+            restAPIService.mediaTransport(entityIDs: targetIDs, action: .mediaPause)
+        }
     }
 
     /// Flips the active speaker's state at once so the button doesn't wait a reload

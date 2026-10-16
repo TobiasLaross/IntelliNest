@@ -173,7 +173,7 @@ extension MusicViewModel {
             // Route through the position hold so a refresh fired right after a seek
             // (to resolve the group leader) doesn't overwrite the optimistic position
             // with HA's still-stale pre-seek one.
-            speakers[speakerID] = reconcilePositionHold(speakerID: speakerID, fresh: fresh)
+            speakers[speakerID] = reconcileOptimisticState(speakerID: speakerID, fresh: fresh)
         }
     }
 

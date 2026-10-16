@@ -131,18 +131,27 @@ private struct RoomCard: View {
 
     private var playPauseButton: some View {
         let isPlaying = shown?.isPlaying == true
+        let isPending = viewModel.pendingPlaybackSpeakers.contains(speakerID)
         return Button {
             viewModel.togglePlayPause(for: speakerID)
         } label: {
-            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                .font(.body.weight(.semibold))
-                .foregroundStyle(.black)
-                .frame(width: 38, height: 38)
-                .background(Circle().fill(.white))
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
+            Group {
+                if isPending {
+                    ProgressView()
+                        .tint(.black)
+                } else {
+                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.black)
+                }
+            }
+            .frame(width: 38, height: 38)
+            .background(Circle().fill(.white))
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .disabled(isPending)
         .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
     }
 

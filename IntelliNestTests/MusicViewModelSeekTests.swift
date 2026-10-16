@@ -67,7 +67,7 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.state, "paused")
         XCTAssertEqual(viewModel.positionHold?.target ?? -1, 30, accuracy: 0.5)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.mediaPosition ?? -1, 30, accuracy: 0.5)
-        await restAPIService.lastCommandTask?.value
+        await viewModel.pendingPlaybackTasks[.mediaPlayerSpa]?.value
     }
 
     func testResumeClearsThePositionHold() async {
@@ -82,7 +82,7 @@ extension MusicViewModelTests {
 
         XCTAssertEqual(viewModel.speakers[.mediaPlayerSpa]?.state, "playing")
         XCTAssertNil(viewModel.positionHold, "resuming must let the live position advance freely")
-        await restAPIService.lastCommandTask?.value
+        await viewModel.pendingPlaybackTasks[.mediaPlayerSpa]?.value
     }
 
     func testReconcileDropsHoldWhenReloadConfirmsThePosition() {

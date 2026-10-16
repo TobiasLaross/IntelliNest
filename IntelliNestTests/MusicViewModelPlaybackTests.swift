@@ -54,7 +54,8 @@ extension MusicViewModelTests {
         stubPostService(path: "/api/services/media_player/media_pause")
         viewModel.togglePlayPause()
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "paused")
-        await restAPIService.lastCommandTask?.value
+        stubSpeaker(.mediaPlayerKitchen, data: speakerJSON(entityID: .mediaPlayerKitchen, state: "paused", friendlyName: "Köket"))
+        await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
         XCTAssertEqual(recorder.requests.count, 1)
     }
 
@@ -63,9 +64,10 @@ extension MusicViewModelTests {
         viewModel.speakers[.mediaPlayerKitchen]?.state = "paused"
         let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_play") == true }
         stubPostService(path: "/api/services/media_player/media_play")
+        stubSpeaker(.mediaPlayerKitchen, data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing", friendlyName: "Köket"))
         viewModel.togglePlayPause()
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
-        await restAPIService.lastCommandTask?.value
+        await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
         XCTAssertEqual(recorder.requests.count, 1)
     }
 
@@ -145,6 +147,110 @@ extension MusicViewModelTests {
     }
 
     // MARK: - Helpers
+
+    // MARK: - Confirmed play/pause
+
+    func stubKitchen(state: String) {
+        stubSpeaker(.mediaPlayerKitchen, data: speakerJSON(entityID: .mediaPlayerKitchen, state: state, friendlyName: "Köket"))
+    }
+
+    func testPlayHoldsPlayingAndIgnoresTapsUntilTheSpeakerStarts() async {
+        stubAllSpeakers()
+        await viewModel.reload()
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_") == true }
+        let gate = StubGate()
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/media_player/media_play"
+        let playURL = components.url!
+        let response = HTTPURLResponse(url: playURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: playURL, data: Data(), response: response, error: nil, gate: gate)
+
+        viewModel.togglePlayPause()
+        await gate.waitForRequests(count: 1)
+        // Music Assistant hasn't started yet: a reload still reads idle.
+        await viewModel.reloadSpeakers()
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
+        XCTAssertTrue(viewModel.pendingPlaybackSpeakers.contains(.mediaPlayerKitchen))
+        // A second tap while the spinner shows must not send a pause.
+        viewModel.togglePlayPause()
+
+        stubKitchen(state: "playing")
+        gate.open()
+        await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
+
+        XCTAssertEqual(recorder.requests.map { $0.url?.path }, ["/api/services/media_player/media_play"])
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
+        XCTAssertTrue(viewModel.pendingPlaybackSpeakers.isEmpty)
+        XCTAssertTrue(bannerTitles.isEmpty)
+    }
+
+    func testPlayIsResentUntilTheSpeakerStartsOrGivesUp() async {
+        struct Case {
+            let startsAfterRecheck: Int?
+            let expectedSends: Int
+            let expectedState: String
+            let expectedBanner: [String]
+        }
+        let cases = [
+            Case(startsAfterRecheck: 1, expectedSends: 1, expectedState: "playing", expectedBanner: []),
+            Case(startsAfterRecheck: MusicViewModel.playbackRechecks + 1, expectedSends: 2, expectedState: "playing",
+                 expectedBanner: []),
+            Case(startsAfterRecheck: nil, expectedSends: MusicViewModel.playbackAttempts, expectedState: "idle",
+                 expectedBanner: ["Kunde inte spela"])
+        ]
+        for testCase in cases {
+            bannerTitles = []
+            stubAllSpeakers()
+            await viewModel.reload()
+            viewModel.selectSpeaker(.mediaPlayerKitchen)
+            let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path == "/api/services/media_player/media_play" }
+            stubPostService(path: "/api/services/media_player/media_play")
+            var rechecks = 0
+            onPlaybackRecheckWait = { [weak self] in
+                rechecks += 1
+                if rechecks == testCase.startsAfterRecheck {
+                    self?.stubKitchen(state: "playing")
+                }
+            }
+
+            viewModel.togglePlayPause()
+            await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
+
+            let label = "starts after recheck \(String(describing: testCase.startsAfterRecheck))"
+            XCTAssertEqual(recorder.requests.count, testCase.expectedSends, label)
+            XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, testCase.expectedState, label)
+            XCTAssertEqual(bannerTitles, testCase.expectedBanner, label)
+            XCTAssertTrue(viewModel.pendingPlaybackSpeakers.isEmpty, label)
+        }
+    }
+
+    func testForcePauseStopsAPlayStillBeingRetriedAndLandsAfterIt() async {
+        stubAllSpeakers()
+        await viewModel.reload()
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.hasPrefix("/api/services/media_player/media_") == true }
+        let gate = StubGate()
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/media_player/media_play"
+        let playURL = components.url!
+        let response = HTTPURLResponse(url: playURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: playURL, data: Data(), response: response, error: nil, gate: gate)
+        stubPostService(path: "/api/services/media_player/media_pause")
+
+        viewModel.togglePlayPause()
+        await gate.waitForRequests(count: 1)
+        viewModel.forcePause()
+        gate.open()
+        await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
+        await restAPIService.lastCommandTask?.value
+
+        let paths = recorder.requests.compactMap { $0.url?.lastPathComponent }
+        XCTAssertEqual(paths, ["media_play", "media_pause", "media_pause"],
+                       "the play is not re-sent, and the pause reaches HA after it")
+        XCTAssertTrue(viewModel.pendingPlaybackSpeakers.isEmpty)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "paused")
+    }
 
     func stubPostService(path: String, statusCode: Int = 200) {
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
