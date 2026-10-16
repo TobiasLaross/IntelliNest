@@ -178,9 +178,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// routing the command, so this is what a test awaits to know the command has
     /// reached `RestAPIService` — whose `lastCommandTask` then covers the POST.
     var pendingSeekTask: Task<Void, Never>?
-    /// The in-flight confirm-and-retry loop of a play/pause, per speaker, so a test
-    /// can await it.
+    /// Per speaker: the confirm-and-retry loop of a play/pause (awaited by tests),
+    /// and its POST in flight, which a force pause waits out so the pause lands last.
     var pendingPlaybackTasks: [EntityId: Task<Void, Never>] = [:]
+    var playbackSendTasks: [EntityId: Task<Void, Never>] = [:]
     /// URIs of the playlists the huset Spotify library carries. A personal playlist
     /// found on its owner's public profile is deliberately absent, which keeps the
     /// MA auto-favourite sync from following somebody's whole public catalogue.

@@ -40,16 +40,23 @@ extension MusicViewModel {
             attempts: for _ in 1 ... Self.playbackAttempts {
                 // Sent from its own task so a force pause's cancel can't abort the POST
                 // mid-flight, which the service would then retry on the external URL.
-                await Task {
-                    await restAPIService.setState(for: targetID, in: .mediaPlayer, using: action, reloadTimes: 0)
-                }.value
+                let send = Task {
+                    _ = await restAPIService.setState(for: targetID, in: .mediaPlayer, using: action, reloadTimes: 0)
+                }
+                playbackSendTasks[speakerID] = send
+                await send.value
                 for _ in 1 ... Self.playbackRechecks {
                     await waitBeforePlaybackRecheck()
-                    // A force pause took over; it owns the speaker's state now.
+                    // A force pause took over; it owns the speaker's state now, so
+                    // neither re-send nor clear a newer request's spinner.
                     if Task.isCancelled {
                         return
                     }
-                    if await hasPlaybackLanded(on: targetID, playing: !pausing) {
+                    let hasLanded = await hasPlaybackLanded(on: targetID, playing: !pausing)
+                    if Task.isCancelled {
+                        return
+                    }
+                    if hasLanded {
                         landed = true
                         break attempts
                     }
@@ -96,7 +103,16 @@ extension MusicViewModel {
             targetIDs.append(entityID)
         }
         applyOptimisticPlayback(pausing: true)
-        restAPIService.mediaTransport(entityIDs: targetIDs, action: .mediaPause)
+        // A play still in flight could reach Home Assistant after this pause and
+        // restart the music, so the pause waits it out.
+        guard let inFlightSend = playbackSendTasks[activeSpeakerID] else {
+            restAPIService.mediaTransport(entityIDs: targetIDs, action: .mediaPause)
+            return
+        }
+        pendingPlaybackTasks[activeSpeakerID] = Task {
+            await inFlightSend.value
+            restAPIService.mediaTransport(entityIDs: targetIDs, action: .mediaPause)
+        }
     }
 
     /// Flips the active speaker's state at once so the button doesn't wait a reload

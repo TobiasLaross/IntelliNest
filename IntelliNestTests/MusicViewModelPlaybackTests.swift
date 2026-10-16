@@ -225,11 +225,11 @@ extension MusicViewModelTests {
         }
     }
 
-    func testForcePauseStopsAPlayStillBeingRetried() async {
+    func testForcePauseStopsAPlayStillBeingRetriedAndLandsAfterIt() async {
         stubAllSpeakers()
         await viewModel.reload()
         viewModel.selectSpeaker(.mediaPlayerKitchen)
-        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path == "/api/services/media_player/media_play" }
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.hasPrefix("/api/services/media_player/media_") == true }
         let gate = StubGate()
         var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
         components.path = "/api/services/media_player/media_play"
@@ -241,11 +241,13 @@ extension MusicViewModelTests {
         viewModel.togglePlayPause()
         await gate.waitForRequests(count: 1)
         viewModel.forcePause()
-        await restAPIService.lastCommandTask?.value
         gate.open()
         await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
+        await restAPIService.lastCommandTask?.value
 
-        XCTAssertEqual(recorder.requests.count, 1, "a cancelled play must not be re-sent")
+        let paths = recorder.requests.compactMap { $0.url?.lastPathComponent }
+        XCTAssertEqual(paths, ["media_play", "media_pause", "media_pause"],
+                       "the play is not re-sent, and the pause reaches HA after it")
         XCTAssertTrue(viewModel.pendingPlaybackSpeakers.isEmpty)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "paused")
     }
