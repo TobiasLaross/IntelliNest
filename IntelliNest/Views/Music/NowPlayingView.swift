@@ -189,9 +189,15 @@ private struct TransportControlsView: View {
             Button {
                 viewModel.togglePlayPause()
             } label: {
-                Image(systemName: speaker.isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                    .resizable()
-                    .frame(width: 54, height: 54)
+                if viewModel.pendingPlaybackSpeakers.contains(speaker.entityId) {
+                    ProgressView()
+                        .controlSize(.large)
+                        .frame(width: 54, height: 54)
+                } else {
+                    Image(systemName: speaker.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                        .resizable()
+                        .frame(width: 54, height: 54)
+                }
             }
             .accessibilityLabel(speaker.isPlaying ? "Pausa" : "Spela")
             .contextMenu {

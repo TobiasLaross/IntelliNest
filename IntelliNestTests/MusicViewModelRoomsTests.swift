@@ -101,7 +101,11 @@ extension MusicViewModelTests {
         let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path == path }
         stubPostService(path: path)
         viewModel.togglePlayPause(for: .mediaPlayerKitchen)
-        await restAPIService.lastCommandTask?.value
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "paused")
+        stubSpeaker(.mediaPlayerKitchen, data: speakerJSON(entityID: .mediaPlayerKitchen, state: "paused",
+                                                           friendlyName: EntityId.mediaPlayerKitchen.rawValue,
+                                                           activeQueue: "queue"))
+        await viewModel.pendingPlaybackTasks[.mediaPlayerKitchen]?.value
         let postedIDs = recorder.requests.compactMap { request -> String? in
             let data = request.httpBodyStreamData() ?? request.httpBody
             let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]

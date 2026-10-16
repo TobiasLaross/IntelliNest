@@ -120,6 +120,10 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// and the refreshed membership. Mutated by the grouping calls in
     /// `MusicViewModel+Grouping`.
     @Published var pendingGroupingSpeakers: Set<EntityId> = []
+    /// Speakers with a play/pause Home Assistant hasn't confirmed yet. Their play
+    /// button shows a spinner, and reloads keep the requested state instead of
+    /// flipping it back while Music Assistant is still starting the stream.
+    @Published var pendingPlaybackSpeakers: Set<EntityId> = []
     /// Drives the inline lyrics peek inside the now-playing card.
     @Published var isLyricsExpanded = false
     /// Drives the full-screen lyrics sheet opened from the peek.
@@ -174,6 +178,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// routing the command, so this is what a test awaits to know the command has
     /// reached `RestAPIService` — whose `lastCommandTask` then covers the POST.
     var pendingSeekTask: Task<Void, Never>?
+    /// The in-flight confirm-and-retry loop of a play/pause, per speaker, so a test
+    /// can await it.
+    var pendingPlaybackTasks: [EntityId: Task<Void, Never>] = [:]
     /// URIs of the playlists the huset Spotify library carries. A personal playlist
     /// found on its owner's public profile is deliberately absent, which keeps the
     /// MA auto-favourite sync from following somebody's whole public catalogue.
@@ -221,6 +228,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// applies the membership a beat after the service call returns, so it has to be
     /// re-read rather than trusted once. Injected so tests confirm without wall time.
     let waitBeforeGroupRecheck: @MainActor () async -> Void
+    /// Pauses between the reads that confirm a play/pause landed. Injected for the
+    /// same reason as `waitBeforeGroupRecheck`.
+    let waitBeforePlaybackRecheck: @MainActor () async -> Void
 
     /// Reads/writes the last speaker the user controlled, so it can be
     /// pre-selected when the music view next opens. Injected as closures so tests
@@ -270,6 +280,9 @@ class MusicViewModel: ObservableObject, Reloadable {
          },
          waitBeforeGroupRecheck: @escaping @MainActor () async -> Void = {
              try? await Task.sleep(for: .seconds(1))
+         },
+         waitBeforePlaybackRecheck: @escaping @MainActor () async -> Void = {
+             try? await Task.sleep(for: .seconds(1))
          }) {
         self.restAPIService = restAPIService
         self.setErrorBannerText = setErrorBannerText
@@ -285,6 +298,7 @@ class MusicViewModel: ObservableObject, Reloadable {
         self.saveLastSpeaker = saveLastSpeaker
         self.searchDebounce = searchDebounce
         self.waitBeforeGroupRecheck = waitBeforeGroupRecheck
+        self.waitBeforePlaybackRecheck = waitBeforePlaybackRecheck
         isSpotifyAuthorized = spotify.isAuthorized
         var initialSpeakers: [EntityId: MediaPlayerEntity] = [:]
         for speakerID in Self.speakerIDs {
@@ -326,7 +340,7 @@ class MusicViewModel: ObservableObject, Reloadable {
 
             for await result in group {
                 if let (speakerID, speaker) = result {
-                    self.speakers[speakerID] = reconcilePositionHold(speakerID: speakerID, fresh: speaker)
+                    self.speakers[speakerID] = reconcileOptimisticState(speakerID: speakerID, fresh: speaker)
                 }
             }
         }

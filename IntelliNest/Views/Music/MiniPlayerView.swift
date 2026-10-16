@@ -143,12 +143,19 @@ private struct MiniPlayerBar: View {
         Button {
             viewModel.togglePlayPause(for: speakerID)
         } label: {
-            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                .font(.title2)
-                .frame(width: 44, height: 44)
-                .contentShape(Rectangle())
+            Group {
+                if viewModel.pendingPlaybackSpeakers.contains(speakerID) {
+                    ProgressView()
+                } else {
+                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                        .font(.title2)
+                }
+            }
+            .frame(width: 44, height: 44)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .disabled(viewModel.pendingPlaybackSpeakers.contains(speakerID))
         .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
     }
 

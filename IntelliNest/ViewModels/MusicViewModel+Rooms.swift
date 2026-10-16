@@ -98,13 +98,14 @@ extension MusicViewModel {
             togglePlayPause()
             return
         }
-        guard let shown = displayedSpeaker(speakerID), let targetID = transportTargetID(for: speakerID) else {
+        guard !pendingPlaybackSpeakers.contains(speakerID),
+              let shown = displayedSpeaker(speakerID),
+              let targetID = transportTargetID(for: speakerID) else {
             return
         }
         let isPlaying = shown.isPlaying
         speakers[speakerID]?.state = isPlaying ? "paused" : "playing"
-        restAPIService.mediaTransport(entityID: targetID, action: isPlaying ? .mediaPause : .mediaPlay)
-        restAPIService.triggerRepeatReload(times: 3)
+        sendConfirmedPlayback(speakerID: speakerID, targetID: targetID, pausing: isPlaying)
     }
 
     /// The shortcut grid at the top of the start screen: the most recently played

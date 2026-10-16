@@ -11,6 +11,8 @@ class MusicViewModelTests: XCTestCase {
     /// Runs when the view model pauses between confirmation reloads, so a test can
     /// change the world mid-flight (re-stub speakers, select another speaker).
     var onGroupRecheckWait: (() -> Void)?
+    /// Runs when the view model pauses between the reads that confirm a play/pause.
+    var onPlaybackRecheckWait: (() -> Void)?
     /// In-memory backing for the last-used-speaker persistence so tests stay
     /// deterministic instead of touching shared `UserDefaults`.
     var storedLastSpeaker: EntityId?
@@ -24,6 +26,7 @@ class MusicViewModelTests: XCTestCase {
         bannerTitles = []
         bannerMessages = []
         onGroupRecheckWait = nil
+        onPlaybackRecheckWait = nil
         storedLastSpeaker = nil
         URLProtocolStub.startInterceptingRequests()
         let stubbedSession = URLProtocolStub.createStubbedURLSession()
@@ -42,10 +45,16 @@ class MusicViewModelTests: XCTestCase {
                                    },
                                    loadLastSpeaker: { [weak self] in self?.storedLastSpeaker },
                                    saveLastSpeaker: { [weak self] in self?.storedLastSpeaker = $0 },
-                                   waitBeforeGroupRecheck: { [weak self] in self?.onGroupRecheckWait?() })
+                                   waitBeforeGroupRecheck: { [weak self] in self?.onGroupRecheckWait?() },
+                                   waitBeforePlaybackRecheck: { [weak self] in self?.onPlaybackRecheckWait?() })
     }
 
     override func tearDown() async throws {
+        // A play/pause still retrying would post into the next test's stubs.
+        for task in viewModel.pendingPlaybackTasks.values {
+            task.cancel()
+            await task.value
+        }
         URLProtocolStub.stopInterceptingRequests()
         viewModel = nil
         restAPIService = nil
