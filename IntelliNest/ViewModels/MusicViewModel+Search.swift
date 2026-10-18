@@ -199,13 +199,20 @@ extension MusicViewModel {
             guard let artist = item.artist, let playingArtist = speaker.mediaArtist else {
                 return true
             }
-            // One side may list every featured artist and the other only the first.
-            let hitArtist = normalizedName(artist)
-            let speakerArtist = normalizedName(playingArtist)
-            return hitArtist.contains(speakerArtist) || speakerArtist.contains(hitArtist)
+            // One side may list every featured artist and the other only the first,
+            // so any shared artist counts. Whole names only: "Queen" isn't "Queens".
+            return !artistNames(artist).isDisjoint(with: artistNames(playingArtist))
         case .artist, .album:
             return false
         }
+    }
+
+    private func artistNames(_ artists: String) -> Set<String> {
+        let separators = [", ", " & ", " feat. ", " ft. ", " och ", " and "]
+        let split = separators.reduce([artists.lowercased()]) { names, separator in
+            names.flatMap { $0.components(separatedBy: separator) }
+        }
+        return Set(split.map(normalizedName).filter(\.isNotEmpty))
     }
 
     private static func interleave(_ columns: [[MusicSearchHit]]) -> [MusicSearchHit] {

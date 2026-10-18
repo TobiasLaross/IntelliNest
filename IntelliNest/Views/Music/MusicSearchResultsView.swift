@@ -194,6 +194,8 @@ struct MusicSearchHitRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // A second tap mid-start would replay the track and drop the spinner early.
+        .disabled(isStarting)
         .foregroundStyle(.white)
         .accessibilityLabel(isInLibrary ? "\(item.name), \(subtitle), i biblioteket" : "\(item.name), \(subtitle)")
         .accessibilityValue(isNowPlaying ? "Spelas nu" : "")
