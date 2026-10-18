@@ -78,7 +78,9 @@ struct MusicView: View {
         VStack(spacing: 16) {
             HStack(spacing: 8) {
                 searchButton
-                if !viewModel.isSpotifyAuthorized {
+                if viewModel.isSpotifyAuthorized {
+                    spotifyAccountMenu
+                } else {
                     spotifyLoginTriangle
                 }
             }
@@ -152,6 +154,23 @@ struct MusicView: View {
                 .contentShape(Rectangle())
         }
         .accessibilityLabel("Anslut Spotify")
+    }
+
+    /// Takes the triangle's place while logged in. Logging out is the only way to
+    /// switch Spotify account, since the login is kept in the keychain.
+    private var spotifyAccountMenu: some View {
+        Menu {
+            Button("Logga ut från Spotify", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
+                viewModel.disconnectSpotify()
+            }
+        } label: {
+            Image(systemName: "person.crop.circle")
+                .font(.title3)
+                .foregroundStyle(.white.opacity(0.7))
+                .frame(width: 36, height: 36)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel("Spotify-konto")
     }
 }
 

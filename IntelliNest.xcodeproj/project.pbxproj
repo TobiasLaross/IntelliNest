@@ -73,6 +73,8 @@
 		FE0000000000000000000002 /* MusicAssistantSocketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000002 /* MusicAssistantSocketService.swift */; };
 		EE0000150000000000000022 /* SpotifyApiServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000150000000000000022 /* SpotifyApiServiceTests.swift */; };
 		EE0000160000000000000023 /* MusicViewModelSpotifyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */; };
+		EE0000180000000000000025 /* MusicViewModelSpotifySignOutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000180000000000000025 /* MusicViewModelSpotifySignOutTests.swift */; };
+		EE0000170000000000000024 /* StubSpotifyPlaylistService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000170000000000000024 /* StubSpotifyPlaylistService.swift */; };
 		FE0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */; };
 		FE0000000000000000000008 /* MusicViewModelQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000008 /* MusicViewModelQueueTests.swift */; };
 		FE0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift */; };
@@ -356,6 +358,8 @@
 		FD0000000000000000000002 /* MusicAssistantSocketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicAssistantSocketService.swift; sourceTree = "<group>"; };
 		EF0000150000000000000022 /* SpotifyApiServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyApiServiceTests.swift; sourceTree = "<group>"; };
 		EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSpotifyTests.swift; sourceTree = "<group>"; };
+		EF0000180000000000000025 /* MusicViewModelSpotifySignOutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSpotifySignOutTests.swift; sourceTree = "<group>"; };
+		EF0000170000000000000024 /* StubSpotifyPlaylistService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubSpotifyPlaylistService.swift; sourceTree = "<group>"; };
 		FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelSongFavoriteTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000000008 /* MusicViewModelQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelQueueTests.swift; sourceTree = "<group>"; };
 		FD0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicViewModelPlaybackTests.swift; sourceTree = "<group>"; };
@@ -723,6 +727,8 @@
 				EF000012000000000000000C /* MusicModelTests.swift */,
 				EF0000150000000000000022 /* SpotifyApiServiceTests.swift */,
 				EF0000160000000000000023 /* MusicViewModelSpotifyTests.swift */,
+				EF0000180000000000000025 /* MusicViewModelSpotifySignOutTests.swift */,
+				EF0000170000000000000024 /* StubSpotifyPlaylistService.swift */,
 				FD0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift */,
 				FD0000000000000000000008 /* MusicViewModelQueueTests.swift */,
 				FD0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift */,
@@ -1461,6 +1467,8 @@
 				EE000012000000000000000C /* MusicModelTests.swift in Sources */,
 				EE0000150000000000000022 /* SpotifyApiServiceTests.swift in Sources */,
 				EE0000160000000000000023 /* MusicViewModelSpotifyTests.swift in Sources */,
+				EE0000180000000000000025 /* MusicViewModelSpotifySignOutTests.swift in Sources */,
+				EE0000170000000000000024 /* StubSpotifyPlaylistService.swift in Sources */,
 				FE0000000000000000000009 /* MusicViewModelSongFavoriteTests.swift in Sources */,
 				FE0000000000000000000008 /* MusicViewModelQueueTests.swift in Sources */,
 				FE0000000000000000FA0201 /* MusicViewModelPlaybackTests.swift in Sources */,

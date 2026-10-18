@@ -52,6 +52,9 @@ protocol SpotifyPlaylistService {
     var isAuthorized: Bool { get }
     /// Runs the interactive Spotify login.
     func authorize() async throws
+    /// Logs out of the huset login, so the next login can use another account.
+    /// Returns false when the stored login could not be removed.
+    func signOut() -> Bool
     /// The playlists in the signed-in account's library (owned + followed), across
     /// all pages. Each item carries its `ownerID` so the library can be split into
     /// per-person sections.
@@ -91,6 +94,7 @@ protocol SpotifyPlaylistService {
 struct DisabledSpotifyPlaylistService: SpotifyPlaylistService {
     var isAuthorized: Bool { false }
     func authorize() async throws {}
+    func signOut() -> Bool { true }
     func accountPlaylists() async -> [MusicSearchItem] { [] }
     func personalPlaylists(ofUser _: String) async -> [MusicSearchItem] { [] }
     func editablePlaylistIDs() async -> Set<String> { [] }
