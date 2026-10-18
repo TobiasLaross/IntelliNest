@@ -50,6 +50,8 @@ struct MusicSearchView: View {
 struct RecentMusicPicksView: View {
     @ObservedObject var viewModel: MusicViewModel
     @ObservedObject var recentSearches: RecentMusicSearches
+    /// The pick whose tap is still being carried out, so its row shows a spinner.
+    @State private var startingURI: String?
 
     var body: some View {
         GeometryReader { proxy in
@@ -79,9 +81,19 @@ struct RecentMusicPicksView: View {
                         .accessibilityLabel("Rensa senaste")
                 }
                 MusicSearchHitList(items: Array(recentSearches.items.reversed())) { item in
-                    MusicSearchHitRow(item: item, showsTrailingImage: false) {
+                    MusicSearchHitRow(item: item,
+                                      isNowPlaying: viewModel.isNowPlayingHit(item),
+                                      isStarting: startingURI == item.uri,
+                                      showsTrailingImage: false) {
                         recentSearches.record(item)
-                        Task { await viewModel.open(item) }
+                        Task {
+                            startingURI = item.uri
+                            await viewModel.open(item)
+                            // A later tap may have taken over the spinner meanwhile.
+                            if startingURI == item.uri {
+                                startingURI = nil
+                            }
+                        }
                     }
                     removeButton(item)
                 }

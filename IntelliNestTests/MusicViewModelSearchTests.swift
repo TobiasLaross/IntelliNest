@@ -194,6 +194,40 @@ extension MusicViewModelTests {
         }
     }
 
+    func testPlayingATrackHitMarksOnlyThatHitAsNowPlaying() async {
+        // Two hits share the title "Städa"; only the tapped artist's turns green.
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let tapped = MusicSearchItem(uri: "spotify://track/4uLU6hMCjMI75M1A2tKUQC", name: "Städa",
+                                     mediaType: .track, imageURL: nil, artist: "Magiska Skogen")
+        let sameTitle = MusicSearchItem(uri: "spotify://track/7GhIk7Il098yCjg4BQjzvb", name: "Städa",
+                                        mediaType: .track, imageURL: nil, artist: "Bravad")
+        XCTAssertFalse(viewModel.isNowPlayingHit(tapped))
+
+        await viewModel.open(tapped)
+
+        XCTAssertTrue(viewModel.isNowPlayingHit(tapped))
+        XCTAssertFalse(viewModel.isNowPlayingHit(sameTitle))
+    }
+
+    func testATrackHitMatchesThePlayingArtistByWholeName() {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        viewModel.speakers[.mediaPlayerKitchen]?.state = "playing"
+        viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle = "Städa"
+        // Hit artist → playing artist → whether the hit counts as playing.
+        let cases: [(artists: (hit: String, playing: String), matches: Bool)] = [
+            (("Queen", "Queens of the Stone Age"), false),
+            (("Magiska Skogen", "Magiska Skogen feat. Bravad"), true),
+            (("Bravad, Magiska Skogen", "Magiska Skogen"), true)
+        ]
+        for testCase in cases {
+            viewModel.speakers[.mediaPlayerKitchen]?.mediaArtist = testCase.artists.playing
+            let hit = MusicSearchItem(uri: "spotify://track/4uLU6hMCjMI75M1A2tKUQC", name: "Städa",
+                                      mediaType: .track, imageURL: nil, artist: testCase.artists.hit)
+            XCTAssertEqual(viewModel.isNowPlayingHit(hit), testCase.matches, testCase.artists.hit)
+        }
+    }
+
     // MARK: - Inline results on the music screen
 
     func testEnterSearchesStraightAway() async {

@@ -15,6 +15,8 @@ struct MusicSearchResultsView: View {
     /// Called with every hit the user taps, so the search screen can remember it.
     let onPick: (MusicSearchItem) -> Void
     @State private var filter: MusicMediaType?
+    /// The hit whose tap is still being carried out, so its row shows a spinner.
+    @State private var startingURI: String?
 
     /// `filter` is seeded only by previews and render tests; the app always opens
     /// the results on "Allt".
@@ -78,9 +80,17 @@ struct MusicSearchResultsView: View {
     @ViewBuilder private func row(_ item: MusicSearchItem, isInLibrary: Bool) -> some View {
         let hitRow = MusicSearchHitRow(item: item,
                                        isInLibrary: isInLibrary,
-                                       isNowPlaying: item.mediaType == .playlist && viewModel.isNowPlaying(item)) {
+                                       isNowPlaying: viewModel.isNowPlayingHit(item),
+                                       isStarting: startingURI == item.uri) {
             onPick(item)
-            Task { await viewModel.open(item) }
+            Task {
+                startingURI = item.uri
+                await viewModel.open(item)
+                // A later tap may have taken over the spinner meanwhile.
+                if startingURI == item.uri {
+                    startingURI = nil
+                }
+            }
         }
         if item.mediaType == .track {
             hitRow.contextMenu {
@@ -137,6 +147,8 @@ struct MusicSearchHitRow: View {
     let item: MusicSearchItem
     var isInLibrary = false
     var isNowPlaying = false
+    /// Replaces the trailing image with a spinner while the tap is in flight.
+    var isStarting = false
     /// Play for a track, a chevron for anything that opens a screen.
     var showsTrailingImage = true
     let onTap: MainActorVoidClosure
@@ -170,7 +182,10 @@ struct MusicSearchHitRow: View {
                 if isNowPlaying {
                     NowPlayingIndicator()
                 }
-                if showsTrailingImage {
+                if isStarting {
+                    ProgressView()
+                        .tint(.white)
+                } else if showsTrailingImage {
                     Image(systemName: item.mediaType == .track ? "play.fill" : "chevron.right")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.5))
@@ -179,6 +194,8 @@ struct MusicSearchHitRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        // A second tap mid-start would replay the track and drop the spinner early.
+        .disabled(isStarting)
         .foregroundStyle(.white)
         .accessibilityLabel(isInLibrary ? "\(item.name), \(subtitle), i biblioteket" : "\(item.name), \(subtitle)")
         .accessibilityValue(isNowPlaying ? "Spelas nu" : "")
