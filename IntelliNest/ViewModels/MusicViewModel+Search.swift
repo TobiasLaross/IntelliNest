@@ -183,6 +183,31 @@ extension MusicViewModel {
         }
     }
 
+    /// Whether a search hit or recent pick is what the active speaker is playing,
+    /// so its row turns green once a tap has started it. A track is matched on
+    /// title and artist: the hit carries a Spotify uri while the speaker reports
+    /// Music Assistant's content id, so the ids never compare equal.
+    func isNowPlayingHit(_ item: MusicSearchItem) -> Bool {
+        switch item.mediaType {
+        case .playlist:
+            return isNowPlaying(item)
+        case .track:
+            guard let speaker = displayedActiveSpeaker, speaker.isPlaying,
+                  let title = speaker.mediaTitle, normalizedName(title) == normalizedName(item.name) else {
+                return false
+            }
+            guard let artist = item.artist, let playingArtist = speaker.mediaArtist else {
+                return true
+            }
+            // One side may list every featured artist and the other only the first.
+            let hitArtist = normalizedName(artist)
+            let speakerArtist = normalizedName(playingArtist)
+            return hitArtist.contains(speakerArtist) || speakerArtist.contains(hitArtist)
+        case .artist, .album:
+            return false
+        }
+    }
+
     private static func interleave(_ columns: [[MusicSearchHit]]) -> [MusicSearchHit] {
         let depth = columns.map(\.count).max() ?? 0
         return (0 ..< depth).flatMap { rank in

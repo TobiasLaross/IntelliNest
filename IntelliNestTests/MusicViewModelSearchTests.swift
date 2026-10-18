@@ -194,6 +194,22 @@ extension MusicViewModelTests {
         }
     }
 
+    func testPlayingATrackHitMarksOnlyThatHitAsNowPlaying() async {
+        // Two hits share the title "Städa"; only the tapped artist's turns green.
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        let tapped = MusicSearchItem(uri: "spotify://track/4uLU6hMCjMI75M1A2tKUQC", name: "Städa",
+                                     mediaType: .track, imageURL: nil, artist: "Magiska Skogen")
+        let sameTitle = MusicSearchItem(uri: "spotify://track/7GhIk7Il098yCjg4BQjzvb", name: "Städa",
+                                        mediaType: .track, imageURL: nil, artist: "Bravad")
+        XCTAssertFalse(viewModel.isNowPlayingHit(tapped))
+
+        await viewModel.open(tapped)
+
+        XCTAssertTrue(viewModel.isNowPlayingHit(tapped))
+        XCTAssertFalse(viewModel.isNowPlayingHit(sameTitle))
+    }
+
     // MARK: - Inline results on the music screen
 
     func testEnterSearchesStraightAway() async {
