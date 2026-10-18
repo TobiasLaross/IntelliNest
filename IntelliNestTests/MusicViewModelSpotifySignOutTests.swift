@@ -47,4 +47,29 @@ extension MusicViewModelTests {
         XCTAssertFalse(model.isSpotifyAuthorized)
         XCTAssertTrue(model.favoritePlaylists.isEmpty)
     }
+
+    func testSignOutDuringRefreshKeepsThePreviousAccountsPlaylistsOut() async {
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [spotifyPlaylist()] + tobiasLibrary())
+        let model = makeViewModel(spotify: stub, personalAccounts: [tobiasAccount])
+        stub.duringAccountFetch = { model.disconnectSpotify() }
+
+        await model.refreshSpotifyPlaylists()
+
+        XCTAssertFalse(model.isSpotifyAuthorized)
+        XCTAssertTrue(model.favoritePlaylists.isEmpty)
+        XCTAssertTrue(model.personalPlaylistSections.isEmpty)
+    }
+
+    func testFailedSignOutBannersAndStaysLoggedIn() async {
+        let stub = StubSpotifyPlaylistService(accountPlaylistItems: [spotifyPlaylist()])
+        stub.signOutSucceeds = false
+        let model = makeViewModel(spotify: stub)
+        await model.refreshSpotifyPlaylists()
+
+        model.disconnectSpotify()
+
+        XCTAssertTrue(model.isSpotifyAuthorized)
+        XCTAssertEqual(model.favoritePlaylists.map(\.name), ["Lugnt & Skönt"])
+        XCTAssertTrue(bannerTitles.contains("Spotify-utloggning misslyckades"))
+    }
 }

@@ -36,9 +36,9 @@ final class SpotifyApiService: SpotifyPlaylistService {
         try await tokenProvider.authorize()
     }
 
-    func signOut() {
-        tokenProvider.signOut()
+    func signOut() -> Bool {
         cachedUserID = nil
+        return tokenProvider.signOut()
     }
 
     func accountPlaylists() async -> [MusicSearchItem] {

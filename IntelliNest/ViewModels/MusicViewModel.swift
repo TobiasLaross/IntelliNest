@@ -164,6 +164,8 @@ class MusicViewModel: ObservableObject, Reloadable {
     /// Guards the one-time Spotify-library → MA-favourite sync so it runs once per
     /// session and can't re-add a playlist the user just unstarred.
     var hasSyncedSpotifyFavorites = false
+    /// Bumped on sign-out so a mid-fetch playlist refresh can't restore the old account.
+    var spotifySignOutCount = 0
     /// Increments on every search so a slow, older response can't overwrite the
     /// results of a newer query. Internal so `MusicViewModel+Search` can bump it.
     var searchRequestToken = 0

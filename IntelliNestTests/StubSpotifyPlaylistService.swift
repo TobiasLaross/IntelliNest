@@ -18,6 +18,9 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
     var editableIDs: Set<String>
     /// Makes the next account fetch log the user out, as a rejected refresh token does.
     var revokesOnFetch = false
+    /// Runs inside the account fetch, standing in for a tap that lands while it awaits.
+    var duringAccountFetch: (() -> Void)?
+    var signOutSucceeds = true
     var savedSongTrackIDs: Set<String>
     private(set) var authorizeCallCount = 0
     private(set) var signOutCallCount = 0
@@ -58,9 +61,13 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
         authorized = true
     }
 
-    func signOut() {
+    func signOut() -> Bool {
         signOutCallCount += 1
+        guard signOutSucceeds else {
+            return false
+        }
         authorized = false
+        return true
     }
 
     func accountPlaylists() async -> [MusicSearchItem] {
@@ -68,6 +75,7 @@ final class StubSpotifyPlaylistService: SpotifyPlaylistService {
         if revokesOnFetch {
             authorized = false
         }
+        duringAccountFetch?()
         return accountPlaylistItems
     }
 

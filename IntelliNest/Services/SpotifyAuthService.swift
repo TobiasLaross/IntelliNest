@@ -23,7 +23,9 @@ protocol SpotifyTokenProviding {
     /// Returns a non-expired access token, refreshing it first when needed.
     func validAccessToken() async throws -> String
     /// Forgets the stored login so the next `authorize()` can pick another account.
-    func signOut()
+    /// Returns false when the login could not be removed and is still stored.
+    @discardableResult
+    func signOut() -> Bool
 }
 
 enum SpotifyAuthError: Error {
@@ -57,6 +59,9 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
     private let tokenEndpoint = "https://accounts.spotify.com/api/token"
 
     private var webAuthSession: ASWebAuthenticationSession?
+    /// Bumped on every sign-out. A refresh that was awaiting the token endpoint
+    /// compares it before storing, so it can't write the old login back.
+    private var signOutCount = 0
 
     init(session: URLSession = .shared) {
         self.session = session
@@ -84,13 +89,17 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
         }
     }
 
-    func signOut() {
+    @discardableResult
+    func signOut() -> Bool {
+        signOutCount += 1
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                     kSecAttrAccount as String: StorageKeys.spotifyTokens.rawValue]
         let status = SecItemDelete(query as CFDictionary)
-        if status != errSecSuccess, status != errSecItemNotFound {
+        guard status == errSecSuccess || status == errSecItemNotFound else {
             Log.error("Failed to delete Spotify tokens from keychain: \(status)")
+            return false
         }
+        return true
     }
 
     // MARK: - Interactive login
@@ -170,12 +179,16 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
     }
 
     private func refreshTokens(refreshToken: String) async throws -> SpotifyStoredTokens {
+        let signOutCountAtStart = signOutCount
         // Spotify may omit a new refresh token on refresh; keep the existing one.
         let tokens = try await requestTokens(form: [
             "grant_type": "refresh_token",
             "refresh_token": refreshToken,
             "client_id": clientID
         ], fallbackRefreshToken: refreshToken)
+        guard signOutCount == signOutCountAtStart else {
+            throw SpotifyAuthError.notAuthorized
+        }
         store(tokens)
         return tokens
     }
@@ -195,7 +208,8 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
             Log.error("Spotify token request failed: \(body)")
             // `invalid_grant` on a refresh means the token itself is dead; any other
             // failure (network, 5xx) is transient and must not log the user out.
-            if fallbackRefreshToken != nil, body.contains("invalid_grant") {
+            let oauthError = try? JSONDecoder().decode(SpotifyTokenErrorResponse.self, from: data)
+            if fallbackRefreshToken != nil, oauthError?.error == "invalid_grant" {
                 throw SpotifyAuthError.refreshTokenRejected
             }
             throw SpotifyAuthError.tokenRequestFailed
@@ -321,7 +335,8 @@ final class SpotifyRefreshTokenProvider: SpotifyTokenProviding {
     }
 
     /// The build-time token can't be forgotten; only the huset login signs out.
-    func signOut() {}
+    @discardableResult
+    func signOut() -> Bool { true }
 
     func validAccessToken() async throws -> String {
         if let accessToken, expiry.addingTimeInterval(-60) > Date() {
@@ -353,6 +368,11 @@ private struct SpotifyStoredTokens: Codable {
     let accessToken: String
     let refreshToken: String
     let expiry: Date
+}
+
+/// The OAuth error body of a failed token request (RFC 6749 §5.2).
+private struct SpotifyTokenErrorResponse: Decodable {
+    let error: String
 }
 
 /// Decodes the `accounts.spotify.com/api/token` response.

@@ -63,7 +63,11 @@ extension MusicViewModel {
             personalPlaylistSections = []
             return
         }
+        let signOutCountAtStart = spotifySignOutCount
         let playlists = await spotify.accountPlaylists()
+        guard spotifySignOutCount == signOutCountAtStart else {
+            return
+        }
         guard spotify.isAuthorized else {
             // Spotify rejected the stored login mid-fetch; bring the prompt back.
             disconnectSpotify()
@@ -103,10 +107,17 @@ extension MusicViewModel {
                                                     title: account.user.playlistSectionTitle,
                                                     playlists: merged))
         }
+        guard spotifySignOutCount == signOutCountAtStart else {
+            return
+        }
         personalPlaylistSections = sections
         hasLoadedSpotifyPlaylists = true
         saveLibraryCache()
-        editablePlaylistSpotifyIDs = await spotify.editablePlaylistIDs()
+        let editableIDs = await spotify.editablePlaylistIDs()
+        guard spotifySignOutCount == signOutCountAtStart else {
+            return
+        }
+        editablePlaylistSpotifyIDs = editableIDs
     }
 
     /// Unions the person's playlists huset already follows with the public ones read
@@ -328,7 +339,11 @@ extension MusicViewModel {
     /// Logs out of Spotify and drops everything the login brought in, so the
     /// warning triangle returns and the next login can use a different account.
     func disconnectSpotify() {
-        spotify.signOut()
+        guard spotify.signOut() else {
+            setErrorBannerText("Spotify-utloggning misslyckades", "Kunde inte logga ut från Spotify")
+            return
+        }
+        spotifySignOutCount += 1
         isSpotifyAuthorized = false
         favoritePlaylists = []
         personalPlaylistSections = []
