@@ -36,6 +36,11 @@ final class SpotifyApiService: SpotifyPlaylistService {
         try await tokenProvider.authorize()
     }
 
+    func signOut() {
+        tokenProvider.signOut()
+        cachedUserID = nil
+    }
+
     func accountPlaylists() async -> [MusicSearchItem] {
         await fetchAllLibraryPlaylistItems().compactMap(\.searchItem)
     }

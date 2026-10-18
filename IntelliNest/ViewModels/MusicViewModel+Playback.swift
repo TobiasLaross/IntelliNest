@@ -64,6 +64,11 @@ extension MusicViewModel {
             return
         }
         let playlists = await spotify.accountPlaylists()
+        guard spotify.isAuthorized else {
+            // Spotify rejected the stored login mid-fetch; bring the prompt back.
+            disconnectSpotify()
+            return
+        }
         guard playlists.isNotEmpty else {
             return
         }
@@ -318,5 +323,20 @@ extension MusicViewModel {
             Log.error("Spotify login failed: \(error)")
             setErrorBannerText("Spotify-inloggning misslyckades", "Kunde inte logga in på Spotify")
         }
+    }
+
+    /// Logs out of Spotify and drops everything the login brought in, so the
+    /// warning triangle returns and the next login can use a different account.
+    func disconnectSpotify() {
+        spotify.signOut()
+        isSpotifyAuthorized = false
+        favoritePlaylists = []
+        personalPlaylistSections = []
+        husetLibraryPlaylistURIs = []
+        editablePlaylistSpotifyIDs = []
+        savedSongURIs = []
+        hasLoadedSpotifyPlaylists = false
+        hasSyncedSpotifyFavorites = false
+        saveLibraryCache()
     }
 }

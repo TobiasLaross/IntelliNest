@@ -22,6 +22,8 @@ protocol SpotifyTokenProviding {
     func authorize() async throws
     /// Returns a non-expired access token, refreshing it first when needed.
     func validAccessToken() async throws -> String
+    /// Forgets the stored login so the next `authorize()` can pick another account.
+    func signOut()
 }
 
 enum SpotifyAuthError: Error {
@@ -29,6 +31,9 @@ enum SpotifyAuthError: Error {
     case notAuthorized
     case invalidCallback
     case tokenRequestFailed
+    /// Spotify rejected the stored refresh token (revoked access, or the login
+    /// was for an account the app may no longer use).
+    case refreshTokenRejected
 }
 
 /// Spotify Authorization Code + PKCE auth. Stores the token set in the Keychain
@@ -69,7 +74,23 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
         if tokens.expiry.addingTimeInterval(-60) > Date() {
             return tokens.accessToken
         }
-        return try await refreshTokens(refreshToken: tokens.refreshToken).accessToken
+        do {
+            return try await refreshTokens(refreshToken: tokens.refreshToken).accessToken
+        } catch SpotifyAuthError.refreshTokenRejected {
+            // A dead refresh token would otherwise keep `isAuthorized` true forever,
+            // so the login prompt never came back. Dropping it surfaces the prompt.
+            signOut()
+            throw SpotifyAuthError.notAuthorized
+        }
+    }
+
+    func signOut() {
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+                                    kSecAttrAccount as String: StorageKeys.spotifyTokens.rawValue]
+        let status = SecItemDelete(query as CFDictionary)
+        if status != errSecSuccess, status != errSecItemNotFound {
+            Log.error("Failed to delete Spotify tokens from keychain: \(status)")
+        }
     }
 
     // MARK: - Interactive login
@@ -172,6 +193,11 @@ final class SpotifyAuthService: NSObject, SpotifyTokenProviding {
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             let body = String(data: data, encoding: .utf8) ?? ""
             Log.error("Spotify token request failed: \(body)")
+            // `invalid_grant` on a refresh means the token itself is dead; any other
+            // failure (network, 5xx) is transient and must not log the user out.
+            if fallbackRefreshToken != nil, body.contains("invalid_grant") {
+                throw SpotifyAuthError.refreshTokenRejected
+            }
             throw SpotifyAuthError.tokenRequestFailed
         }
         let decoded = try JSONDecoder().decode(SpotifyTokenResponse.self, from: data)
@@ -293,6 +319,9 @@ final class SpotifyRefreshTokenProvider: SpotifyTokenProviding {
     func authorize() async throws {
         throw SpotifyAuthError.notAuthorized
     }
+
+    /// The build-time token can't be forgotten; only the huset login signs out.
+    func signOut() {}
 
     func validAccessToken() async throws -> String {
         if let accessToken, expiry.addingTimeInterval(-60) > Date() {

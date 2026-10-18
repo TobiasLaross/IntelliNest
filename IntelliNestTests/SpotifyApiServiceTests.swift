@@ -31,6 +31,10 @@ final class StubSpotifyTokenProvider: SpotifyTokenProviding {
         authorized = true
     }
 
+    func signOut() {
+        authorized = false
+    }
+
     func validAccessToken() async throws -> String {
         if tokenThrows {
             throw SpotifyAuthError.notAuthorized
