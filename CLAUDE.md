@@ -203,6 +203,18 @@ error** and fails the build. Fix all violations before committing — there is n
 The config (`.swiftlint`) sets a line-length warning at 140 chars and error at 160; `file_length` uses the
 default 400-line limit, so split files that grow past it rather than letting the warning ride.
 
+## Review Swift before opening a PR
+
+Before opening a PR whose diff touches `.swift` files, run the review skills on the branch diff and
+resolve what they find: `/swiftui-pro`, `/swift-concurrency-pro`, `/swift-safety` (on every diff),
+and, when a SwiftUI view changed, `/swift-accessibility-skill`. Then open the PR with a
+`REVIEWS_DONE=1` prefix (`REVIEWS_DONE=1 gh pr create …`).
+
+A `PreToolUse` hook (`.claude/hooks/require-skill-reviews.sh`) enforces this: `gh pr create` is denied
+with this checklist until it carries the token, judging the diff of the directory the command `cd`s
+into. A PR with no Swift passes straight through. The token means the reviews ran. Don't add it to
+skip them. `.claude/hooks/test-review-gate.sh` tests the gate.
+
 ## Screenshots for UI changes
 
 Any change that affects what a user sees on screen — a new view or sheet, a restyle, a layout or
