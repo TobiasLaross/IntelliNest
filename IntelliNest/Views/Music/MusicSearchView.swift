@@ -11,8 +11,9 @@ import SwiftUI
 /// whole screen — navigation bar included — so the only way out is "Avbryt", and
 /// the back arrow can no longer throw the user off the music screen mid-search.
 /// The field sits at the bottom, on top of the keyboard, where the thumb already
-/// is. Before a query is typed it lists the items recently picked from the
-/// results, newest nearest the field.
+/// is, with the controlled room's mini player under it so the music can be sent
+/// to another room without leaving the search. Before a query is typed it lists
+/// the items recently picked from the results, newest nearest the field.
 struct MusicSearchView: View {
     @ObservedObject var viewModel: MusicViewModel
     @ObservedObject var recentSearches: RecentMusicSearches
@@ -41,6 +42,27 @@ struct MusicSearchView: View {
                     .accessibilityLabel("Stäng sökningen")
             }
             .padding(.vertical, 8)
+
+            speakerSelection
+                .padding(.bottom, 4)
+        }
+    }
+
+    @ViewBuilder private var speakerSelection: some View {
+        if viewModel.miniPlayerRooms.isNotEmpty {
+            MiniPlayerView(viewModel: viewModel)
+        } else {
+            // Nothing is playing and no room is controlled yet, so there is no
+            // player to show; offer the room picker on its own.
+            Button {
+                viewModel.isShowingSpeakerPicker = true
+            } label: {
+                Label("Välj rum", systemImage: "hifispeaker.2")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .buttonStyle(.plain)
         }
     }
 }
@@ -95,6 +117,7 @@ struct RecentMusicPicksView: View {
                             }
                         }
                     }
+                    .trackActionsMenu(for: item, viewModel: viewModel)
                     removeButton(item)
                 }
             }
