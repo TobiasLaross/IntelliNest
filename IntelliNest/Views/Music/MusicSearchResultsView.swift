@@ -77,7 +77,7 @@ struct MusicSearchResultsView: View {
         .accessibilityAddTraits(isActive ? .isSelected : [])
     }
 
-    @ViewBuilder private func row(_ item: MusicSearchItem, isInLibrary: Bool) -> some View {
+    private func row(_ item: MusicSearchItem, isInLibrary: Bool) -> some View {
         let hitRow = MusicSearchHitRow(item: item,
                                        isInLibrary: isInLibrary,
                                        isNowPlaying: viewModel.isNowPlayingHit(item),
@@ -92,17 +92,7 @@ struct MusicSearchResultsView: View {
                 }
             }
         }
-        if item.mediaType == .track {
-            hitRow.contextMenu {
-                TrackActionButtons(viewModel: viewModel,
-                                   uri: item.uri,
-                                   title: item.name,
-                                   artist: item.artist,
-                                   imageURL: item.imageURL)
-            }
-        } else {
-            hitRow
-        }
+        return hitRow.trackActionsMenu(for: item, viewModel: viewModel)
     }
 
     @ViewBuilder private func status(isEmpty: Bool) -> some View {
@@ -203,6 +193,25 @@ struct MusicSearchHitRow: View {
 
     private var subtitle: String {
         [item.mediaType.swedishSingular, item.artist].compactMap(\.self).joined(separator: " · ")
+    }
+}
+
+extension View {
+    /// Long-pressing a track hit opens the track's queue and playlist actions;
+    /// other hit types open a screen, so they get no menu.
+    @ViewBuilder
+    func trackActionsMenu(for item: MusicSearchItem, viewModel: MusicViewModel) -> some View {
+        if item.mediaType == .track {
+            contextMenu {
+                TrackActionButtons(viewModel: viewModel,
+                                   uri: item.uri,
+                                   title: item.name,
+                                   artist: item.artist,
+                                   imageURL: item.imageURL)
+            }
+        } else {
+            self
+        }
     }
 }
 
