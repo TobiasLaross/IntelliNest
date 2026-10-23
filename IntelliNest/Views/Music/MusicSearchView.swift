@@ -20,8 +20,9 @@ struct MusicSearchView: View {
     @ObservedObject var viewModel: MusicViewModel
     @ObservedObject var recentSearches: RecentMusicSearches
     let onClose: MainActorVoidClosure
-    /// Starts true because the field focuses on appear, so the player doesn't flash in first.
-    @State private var isKeyboardVisible = true
+    /// Starts false even though the field focuses on appear: with a hardware keyboard
+    /// no notification arrives, and the player must not stay hidden.
+    @State private var isKeyboardVisible = false
 
     var body: some View {
         VStack(spacing: 0) {
