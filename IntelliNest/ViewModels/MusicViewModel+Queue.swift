@@ -260,7 +260,7 @@ extension MusicViewModel {
     /// synthetic id first; once an add has been reconciled, the live item carries
     /// the real server id instead, so fall back to removing one row with the same
     /// uri — otherwise the stale placeholder would linger in the offline fallback.
-    private func removeSessionRow(matching item: MusicQueueItem) {
+    func removeSessionRow(matching item: MusicQueueItem) {
         if let index = sessionEnqueuedItems.firstIndex(where: { $0.id == item.id }) {
             sessionEnqueuedItems.remove(at: index)
         } else if let uri = item.uri, let index = sessionEnqueuedItems.firstIndex(where: { $0.uri == uri }) {

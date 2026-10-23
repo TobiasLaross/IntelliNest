@@ -8,8 +8,10 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     var deleteSucceeds: Bool
     var favoriteSucceeds: Bool
     var moveSucceeds: Bool
+    var playSucceeds = true
     private(set) var deletedItemIDs: [String] = []
     private(set) var movedItems: [(itemID: String, positions: Int)] = []
+    private(set) var playedItemIDs: [String] = []
     private(set) var addedFavoriteURIs: [String] = []
     private(set) var removedFavorites: [String] = []
     private(set) var addedLibraryURIs: [String] = []
@@ -37,6 +39,15 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     func moveItem(queueID _: String, itemID: String, positions: Int) async -> Bool {
         movedItems.append((itemID, positions))
         return moveSucceeds
+    }
+
+    func setPlaySucceeds(_ succeeds: Bool) {
+        playSucceeds = succeeds
+    }
+
+    func playItem(queueID _: String, itemID: String) async -> Bool {
+        playedItemIDs.append(itemID)
+        return playSucceeds
     }
 
     func addFavorite(uri: String) async -> Bool {
@@ -75,15 +86,6 @@ extension MusicViewModelTests {
         let url = components.url!
         let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
         URLProtocolStub.setStub(for: url, data: Data(json.utf8), response: response, error: nil)
-    }
-
-    private func queueItem(_ id: String, uri: String? = nil, title: String = "Song") -> MusicQueueItem {
-        MusicQueueItem(queueItemID: id, uri: uri, title: title, artist: nil, imageURL: nil)
-    }
-
-    private var getQueueJSON: String {
-        // queue_id present plus a current item; the socket supplies the full list.
-        #"{"service_response":{"queue_id":"kitchen","current_item":{"queue_item_id":"cur","media_item":{"name":"Now"}}}}"#
     }
 
     // MARK: - Load

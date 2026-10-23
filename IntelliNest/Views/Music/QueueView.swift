@@ -9,8 +9,8 @@ import SwiftUI
 
 /// The play queue for the active speaker, presented as a sheet from the
 /// now-playing area. Shows the current track ("Spelas nu") and the upcoming
-/// tracks ("Näst på tur"); upcoming tracks can be swiped away. Each Spotify
-/// track carries the Liked-Songs heart.
+/// tracks ("Näst på tur"); upcoming tracks can be tapped to jump to them or
+/// swiped away. Each Spotify track carries the Liked-Songs heart.
 struct QueueView: View {
     @ObservedObject var viewModel: MusicViewModel
 
@@ -120,6 +120,7 @@ struct QueueView: View {
         ForEach(items) { item in
             QueueRow(viewModel: viewModel, item: item, showsDragHandle: true)
                 .listRowBackground(Color.clear)
+                .modifier(PlayOnTap(viewModel: viewModel, item: item))
                 .swipeActions(edge: .trailing) {
                     Button(role: .destructive) {
                         Task { await viewModel.removeFromQueue(item) }
@@ -180,5 +181,28 @@ private struct QueueRow: View {
         }
         .listRowBackground(Color.clear)
         .foregroundStyle(.white)
+    }
+}
+
+/// Tapping an upcoming row jumps playback to it. A tap gesture rather than a
+/// `Button`, so the row's own heart button keeps its tap and the long-press
+/// drag still works. Session-fallback rows can't be jumped to and stay inert.
+private struct PlayOnTap: ViewModifier {
+    @ObservedObject var viewModel: MusicViewModel
+    let item: MusicQueueItem
+
+    func body(content: Content) -> some View {
+        if viewModel.canPlayQueueItem(item) {
+            content
+                .contentShape(Rectangle())
+                .onTapGesture { play() }
+                .accessibilityAction(named: "Spela nu") { play() }
+        } else {
+            content
+        }
+    }
+
+    private func play() {
+        Task { await viewModel.playQueueItem(item) }
     }
 }
