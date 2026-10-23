@@ -21,6 +21,9 @@ protocol MusicAssistantQueueSocket: Sendable {
     /// it later (towards the end), a negative value earlier. Returns whether the
     /// command succeeded.
     func moveItem(queueID: String, itemID: String, positions: Int) async -> Bool
+    /// Jumps playback to the item, skipping everything queued before it. Returns
+    /// whether the command succeeded.
+    func playItem(queueID: String, itemID: String) async -> Bool
     /// Adds the media item (by uri, e.g. `spotify://playlist/<id>`) to the Music
     /// Assistant library favourites. With MA's Spotify 2-way sync on, this also
     /// follows the playlist on Spotify. Returns whether the command succeeded.
@@ -76,6 +79,12 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
     func moveItem(queueID: String, itemID: String, positions: Int) async -> Bool {
         await send(command: "player_queues/move_item",
                    args: ["queue_id": queueID, "queue_item_id": itemID, "pos_shift": positions]) != nil
+    }
+
+    func playItem(queueID: String, itemID: String) async -> Bool {
+        // `index` accepts either a position or a queue item id; the id stays
+        // correct even if the queue shifted since it was read.
+        await send(command: "player_queues/play_index", args: ["queue_id": queueID, "index": itemID]) != nil
     }
 
     func addFavorite(uri: String) async -> Bool {
@@ -220,6 +229,7 @@ struct DisabledMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     func queueItems(queueID _: String) async -> [MusicQueueItem] { [] }
     func deleteItem(queueID _: String, itemID _: String) async -> Bool { false }
     func moveItem(queueID _: String, itemID _: String, positions _: Int) async -> Bool { false }
+    func playItem(queueID _: String, itemID _: String) async -> Bool { false }
     func addFavorite(uri _: String) async -> Bool { false }
     func removeFavorite(mediaType _: String, libraryItemID _: String) async -> Bool { false }
     func addToLibrary(uri _: String) async -> Bool { false }
