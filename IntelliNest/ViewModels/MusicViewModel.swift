@@ -65,9 +65,9 @@ class MusicViewModel: ObservableObject, Reloadable {
     var sessionPlayedPlaylists: [MusicSearchItem] = []
     /// The fire-and-forget MA library add after a playlist launch; tests await it.
     var pendingLibraryAddTask: Task<Void, Never>?
-    /// A library playlist the user opened to browse from the main view (favourites
-    /// or recents), presented in its own sheet. Nil when no browse sheet is shown.
+    /// A library playlist opened to browse from the music screen, in its own sheet.
     @Published var browsingLibraryPlaylist: MusicSearchItem?
+    @Published var playerBrowsingPlaylist: MusicSearchItem? // Opened by the player's "Spelar från" link.
     /// The playlists favourited in Music Assistant (`library://playlist/<id>`
     /// items). Drives the favourite-star fill (matched by name) and carries the
     /// library id needed to unfavourite over the socket. With MA's Spotify 2-way

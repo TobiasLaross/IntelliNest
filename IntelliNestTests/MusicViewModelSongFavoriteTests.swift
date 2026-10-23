@@ -162,12 +162,80 @@ extension MusicViewModelTests {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         viewModel.nowPlayingSourcePlaylist = spotifyPlaylist()
         await viewModel.openNowPlayingPlaylist()
-        XCTAssertEqual(viewModel.browsingLibraryPlaylist?.uri, spotifyPlaylist().uri)
+        XCTAssertEqual(viewModel.playerBrowsingPlaylist?.uri, spotifyPlaylist().uri)
     }
 
     func testOpenNowPlayingPlaylistNoOpWhenSourceUnknown() async {
         viewModel.nowPlayingSourcePlaylist = nil
         await viewModel.openNowPlayingPlaylist()
+        XCTAssertNil(viewModel.playerBrowsingPlaylist)
+    }
+
+    // MARK: - Sheet hosts
+
+    func testPlayerAndRoomsOpenOverTheTopmostLayer() {
+        let section = MusicLibrarySection(id: "recent", title: "Senast spelade", playlists: [])
+        struct Case {
+            let name: String
+            let setUp: (MusicViewModel) -> Void
+            let playerHost: MusicSheetHost
+        }
+        let cases = [
+            Case(name: "music screen", setUp: { _ in }, playerHost: .musicScreen),
+            Case(name: "Visa alla", setUp: { $0.expandedLibrarySection = section }, playerHost: .browseSheet),
+            Case(name: "artist", setUp: { $0.browsingArtist = self.spotifyPlaylist() }, playerHost: .browseSheet),
+            Case(name: "library playlist", setUp: { $0.browsingLibraryPlaylist = self.spotifyPlaylist() }, playerHost: .browseSheet)
+        ]
+        for testCase in cases {
+            let model = makeViewModel(spotify: StubSpotifyPlaylistService())
+            testCase.setUp(model)
+            model.isShowingSpeakerPicker = true
+            for host in [MusicSheetHost.musicScreen, .browseSheet, .player] {
+                XCTAssertEqual(model.presentation(\.isShowingSpeakerPicker, from: host).wrappedValue,
+                               host == testCase.playerHost, "rooms from \(host) over \(testCase.name)")
+            }
+
+            model.isShowingNowPlaying = true
+            for host in [MusicSheetHost.musicScreen, .browseSheet] {
+                XCTAssertEqual(model.nowPlayingPresentation(from: host).wrappedValue,
+                               host == testCase.playerHost, "player from \(host) over \(testCase.name)")
+            }
+            XCTAssertTrue(model.presentation(\.isShowingSpeakerPicker, from: .player).wrappedValue, testCase.name)
+        }
+    }
+
+    func testPlayerLinkOverALibraryPlaylistSheetKeepsBothOpen() async {
+        let browsed = MusicSearchItem(uri: "spotify://playlist/37i9dQZF1DXcBWIGoYBM5M", name: "Today's Top Hits",
+                                      mediaType: .playlist, imageURL: nil, artist: nil)
+        await viewModel.browseLibraryPlaylist(browsed)
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        viewModel.isShowingNowPlaying = true
+        viewModel.nowPlayingSourcePlaylist = spotifyPlaylist()
+
+        await viewModel.openNowPlayingPlaylist()
+
+        XCTAssertEqual(viewModel.browsingLibraryPlaylist?.uri, browsed.uri)
+        XCTAssertEqual(viewModel.playerBrowsingPlaylist?.uri, spotifyPlaylist().uri)
+        XCTAssertTrue(viewModel.nowPlayingPresentation(from: .browseSheet).wrappedValue)
+        XCTAssertFalse(viewModel.nowPlayingPresentation(from: .musicScreen).wrappedValue)
+    }
+
+    func testPlayerPresentsThePlaylistItsLinkOpened() async {
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        viewModel.nowPlayingSourcePlaylist = spotifyPlaylist()
+        viewModel.isShowingNowPlaying = true
+        await viewModel.openNowPlayingPlaylist()
+        XCTAssertEqual(viewModel.playerBrowsingPlaylist?.uri, spotifyPlaylist().uri)
         XCTAssertNil(viewModel.browsingLibraryPlaylist)
+        XCTAssertFalse(viewModel.isShowingBrowseSheet)
+        XCTAssertTrue(viewModel.nowPlayingPresentation(from: .musicScreen).wrappedValue)
+    }
+
+    func testDismissBrowseSheetsClosesThePlayersPlaylistToo() {
+        viewModel.browsingLibraryPlaylist = spotifyPlaylist()
+        viewModel.playerBrowsingPlaylist = spotifyPlaylist()
+        viewModel.dismissBrowseSheets()
+        XCTAssertNil(viewModel.browsingLibraryPlaylist)
+        XCTAssertNil(viewModel.playerBrowsingPlaylist)
     }
 }

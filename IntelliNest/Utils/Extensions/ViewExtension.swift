@@ -22,4 +22,15 @@ extension View {
             .edgesIgnoringSafeArea(.all)
         )
     }
+
+    /// Keeps `isVisible` in step with the on-screen keyboard, for chrome that has
+    /// to make room for it.
+    func tracksKeyboardVisibility(_ isVisible: Binding<Bool>) -> some View {
+        onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            withAnimation(.easeOut(duration: 0.2)) { isVisible.wrappedValue = true }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation(.easeOut(duration: 0.2)) { isVisible.wrappedValue = false }
+        }
+    }
 }

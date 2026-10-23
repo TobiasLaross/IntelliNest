@@ -214,8 +214,7 @@ private struct MiniProgressLine: View {
 
 /// The full-screen player as presented from the mini player. It owns the sheets
 /// opened from inside it (rooms, queue, lyrics, the playing playlist), since
-/// SwiftUI can only present from the topmost view; `MusicView` presents the
-/// rooms and playlist sheets only while the player is closed.
+/// SwiftUI can only present from the topmost view; see `MusicSheetHost`.
 struct NowPlayingSheet: View {
     @ObservedObject var viewModel: MusicViewModel
 
@@ -233,7 +232,12 @@ struct NowPlayingSheet: View {
         .backgroundModifier()
         .foregroundStyle(.white)
         .presentationDragIndicator(.visible)
-        .sheet(isPresented: viewModel.presentation(\.isShowingSpeakerPicker, inPlayer: true)) {
+        // A playlist opened from the player closes with it; left set, it would pop
+        // up again the next time the player opens.
+        .onDisappear {
+            viewModel.playerBrowsingPlaylist = nil
+        }
+        .sheet(isPresented: viewModel.presentation(\.isShowingSpeakerPicker, from: .player)) {
             SpeakerPickerSheet(viewModel: viewModel)
         }
         .sheet(isPresented: $viewModel.isShowingQueue) {
@@ -246,8 +250,9 @@ struct NowPlayingSheet: View {
                 Color.clear.onAppear { viewModel.isShowingFullLyrics = false }
             }
         }
-        .sheet(item: viewModel.presentation(\.browsingLibraryPlaylist, inPlayer: true)) { playlist in
-            MusicPlaylistBrowseSheet(viewModel: viewModel, playlist: playlist)
+        .sheet(item: $viewModel.playerBrowsingPlaylist) { playlist in
+            // The player sits right underneath, so a mini player here would only repeat it.
+            MusicPlaylistBrowseSheet(viewModel: viewModel, playlist: playlist, docksMiniPlayer: false)
         }
     }
 }
@@ -257,37 +262,97 @@ struct NowPlayingSheet: View {
 struct MusicPlaylistBrowseSheet: View {
     @ObservedObject var viewModel: MusicViewModel
     let playlist: MusicSearchItem
+    var docksMiniPlayer = true
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             MusicPlaylistView(viewModel: viewModel, playlist: playlist)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Stäng") { viewModel.browsingLibraryPlaylist = nil }
+                        Button("Stäng") { dismiss() }
                             .foregroundStyle(.white)
                     }
                 }
         }
+        .browseSheetMiniPlayer(viewModel, isEnabled: docksMiniPlayer)
     }
 }
 
+/// The layers of the music screen that present sheets of their own. SwiftUI only
+/// presents from the topmost view, so each shared sheet is live on one layer at a time.
+enum MusicSheetHost {
+    /// The music start screen and its search.
+    case musicScreen
+    /// A browse sheet over the music screen — "Visa alla", an artist or a library
+    /// playlist — whose docked mini player opens the player and the rooms over it.
+    case browseSheet
+    /// The full-screen player.
+    case player
+}
+
 extension MusicViewModel {
-    /// A sheet binding that is live only on one side of the full-screen player, so
-    /// a sheet both the start screen and the player can open is presented by
-    /// whichever is on top: `inPlayer: true` for the player, false for the screen
-    /// underneath.
-    func presentation(_ keyPath: ReferenceWritableKeyPath<MusicViewModel, Bool>, inPlayer: Bool) -> Binding<Bool> {
+    /// Whether a browse sheet covers the music screen. A playlist opened from the
+    /// player sits over the player instead, so it doesn't count.
+    var isShowingBrowseSheet: Bool {
+        expandedLibrarySection != nil || browsingArtist != nil
+            || browsingLibraryPlaylist != nil
+    }
+
+    /// Where the full-screen player opens from: over a browse sheet when one is up,
+    /// so opening the player never closes the list the user was in.
+    private var playerHost: MusicSheetHost {
+        isShowingBrowseSheet ? .browseSheet : .musicScreen
+    }
+
+    private var topSheetHost: MusicSheetHost {
+        isShowingNowPlaying ? .player : playerHost
+    }
+
+    /// A sheet binding that is live only while `host` is the topmost layer.
+    func presentation(_ keyPath: ReferenceWritableKeyPath<MusicViewModel, Bool>, from host: MusicSheetHost) -> Binding<Bool> {
         Binding(
-            get: { self[keyPath: keyPath] && self.isShowingNowPlaying == inPlayer },
+            get: { self[keyPath: keyPath] && self.topSheetHost == host },
             set: { self[keyPath: keyPath] = $0 }
         )
     }
 
-    func presentation<Item>(_ keyPath: ReferenceWritableKeyPath<MusicViewModel, Item?>,
-                            inPlayer: Bool) -> Binding<Item?> {
+    func nowPlayingPresentation(from host: MusicSheetHost) -> Binding<Bool> {
         Binding(
-            get: { self.isShowingNowPlaying == inPlayer ? self[keyPath: keyPath] : nil },
-            set: { self[keyPath: keyPath] = $0 }
+            get: { self.isShowingNowPlaying && self.playerHost == host },
+            set: { self.isShowingNowPlaying = $0 }
         )
+    }
+}
+
+extension View {
+    /// Docks the mini player under a browse sheet while the keyboard is down, and
+    /// presents the player and the rooms from the sheet so they open over it.
+    func browseSheetMiniPlayer(_ viewModel: MusicViewModel, isEnabled: Bool = true) -> some View {
+        modifier(BrowseSheetMiniPlayer(viewModel: viewModel, isEnabled: isEnabled))
+    }
+}
+
+private struct BrowseSheetMiniPlayer: ViewModifier {
+    @ObservedObject var viewModel: MusicViewModel
+    let isEnabled: Bool
+    @State private var isKeyboardVisible = false
+
+    func body(content: Content) -> some View {
+        content
+            .safeAreaInset(edge: .bottom) {
+                if isEnabled, !isKeyboardVisible, viewModel.miniPlayerRooms.isNotEmpty {
+                    MiniPlayerView(viewModel: viewModel)
+                        .padding(.horizontal)
+                        .padding(.bottom, 4)
+                }
+            }
+            .tracksKeyboardVisibility($isKeyboardVisible)
+            .sheet(isPresented: isEnabled ? viewModel.presentation(\.isShowingSpeakerPicker, from: .browseSheet) : .constant(false)) {
+                SpeakerPickerSheet(viewModel: viewModel)
+            }
+            .sheet(isPresented: isEnabled ? viewModel.nowPlayingPresentation(from: .browseSheet) : .constant(false)) {
+                NowPlayingSheet(viewModel: viewModel)
+            }
     }
 }

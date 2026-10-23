@@ -12,12 +12,17 @@ import SwiftUI
 /// the back arrow can no longer throw the user off the music screen mid-search.
 /// The field sits at the bottom, on top of the keyboard, where the thumb already
 /// is, with the controlled room's mini player under it so the music can be sent
-/// to another room without leaving the search. Before a query is typed it lists
-/// the items recently picked from the results, newest nearest the field.
+/// to another room without leaving the search. The player steps aside while the
+/// keyboard is up, so the field sits right on the keys and the list keeps its
+/// room. Before a query is typed it lists the items recently picked from the
+/// results, newest nearest the field.
 struct MusicSearchView: View {
     @ObservedObject var viewModel: MusicViewModel
     @ObservedObject var recentSearches: RecentMusicSearches
     let onClose: MainActorVoidClosure
+    /// Starts false even though the field focuses on appear: with a hardware keyboard
+    /// no notification arrives, and the player must not stay hidden.
+    @State private var isKeyboardVisible = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -43,9 +48,12 @@ struct MusicSearchView: View {
             }
             .padding(.vertical, 8)
 
-            speakerSelection
-                .padding(.bottom, 4)
+            if !isKeyboardVisible {
+                speakerSelection
+                    .padding(.bottom, 4)
+            }
         }
+        .tracksKeyboardVisibility($isKeyboardVisible)
     }
 
     @ViewBuilder private var speakerSelection: some View {
