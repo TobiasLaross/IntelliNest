@@ -193,6 +193,7 @@ struct MusicLibraryListView: View {
                 MusicPlaylistView(viewModel: viewModel, playlist: playlist)
             }
         }
+        .browseSheetMiniPlayer(viewModel)
     }
 
     @ViewBuilder private var content: some View {
@@ -212,6 +213,8 @@ struct MusicLibraryListView: View {
                 .musicListRow()
             }
             .musicListStyle()
+            // Scrolling drops the keyboard, which brings the docked mini player back.
+            .scrollDismissesKeyboard(.interactively)
         }
     }
 

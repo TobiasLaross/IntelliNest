@@ -162,8 +162,12 @@ extension MusicViewModel {
     /// Opens a favourite/recents playlist for browsing in its own sheet on the
     /// main view, loading its tracks. The detail's play button starts playback;
     /// opening it never changes what's playing.
-    func browseLibraryPlaylist(_ playlist: MusicSearchItem) async {
-        browsingLibraryPlaylist = playlist
+    func browseLibraryPlaylist(_ playlist: MusicSearchItem, fromPlayer: Bool = false) async {
+        if fromPlayer {
+            playerBrowsingPlaylist = playlist
+        } else {
+            browsingLibraryPlaylist = playlist
+        }
         await loadPlaylistTracks(playlist)
     }
 
@@ -309,7 +313,7 @@ extension MusicViewModel {
         guard let playlist = nowPlayingSourcePlaylist else {
             return
         }
-        await browseLibraryPlaylist(playlist)
+        await browseLibraryPlaylist(playlist, fromPlayer: true)
     }
 
     /// Dismisses every browse sheet — artist, playlist, and the "Visa alla"
@@ -317,6 +321,7 @@ extension MusicViewModel {
     func dismissBrowseSheets() {
         browsingArtist = nil
         browsingLibraryPlaylist = nil
+        playerBrowsingPlaylist = nil
         expandedLibrarySection = nil
     }
 

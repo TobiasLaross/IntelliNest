@@ -54,16 +54,17 @@ struct MusicView: View {
                         }
                     }
             }
+            .browseSheetMiniPlayer(viewModel)
         }
-        // The rooms and playlist sheets can also open from inside the full-screen
-        // player, which presents them itself while it is up.
-        .sheet(isPresented: viewModel.presentation(\.isShowingSpeakerPicker, inPlayer: false)) {
+        // The rooms, playlist and player sheets can also open from a browse sheet or
+        // the full-screen player, which present them themselves while they are up.
+        .sheet(isPresented: viewModel.presentation(\.isShowingSpeakerPicker, from: .musicScreen)) {
             SpeakerPickerSheet(viewModel: viewModel)
         }
-        .sheet(item: viewModel.presentation(\.browsingLibraryPlaylist, inPlayer: false)) { playlist in
+        .sheet(item: $viewModel.browsingLibraryPlaylist) { playlist in
             MusicPlaylistBrowseSheet(viewModel: viewModel, playlist: playlist)
         }
-        .sheet(isPresented: $viewModel.isShowingNowPlaying) {
+        .sheet(isPresented: viewModel.nowPlayingPresentation(from: .musicScreen)) {
             NowPlayingSheet(viewModel: viewModel)
         }
         .sheet(isPresented: $isShowingSpotifyLogin) {
