@@ -25,27 +25,38 @@ extension MusicViewModel {
         }
         let previousQueue = queue
         let previousManualIDs = manualQueueItemIDs
-        let previousSession = sessionEnqueuedItems
-        let skipped = queue.upcomingItems[..<index]
+        let passed = queue.upcomingItems[...index]
 
-        manualQueueItemIDs.subtract(skipped.map(\.id))
-        manualQueueItemIDs.remove(item.id)
-        queue = MusicQueue(queueID: queueID,
-                           currentItem: item,
-                           upcomingItems: Array(queue.upcomingItems[(index + 1)...]),
-                           manualItemIDs: manualQueueItemIDs)
-        // Skipped and now-playing tracks are no longer upcoming, so their session
-        // fallback rows must not resurface on an offline reload.
-        for passed in skipped + [item] {
-            removeSessionRow(matching: passed)
-        }
+        manualQueueItemIDs.subtract(passed.map(\.id))
+        let optimisticQueue = MusicQueue(queueID: queueID,
+                                         currentItem: item,
+                                         upcomingItems: Array(queue.upcomingItems[(index + 1)...]),
+                                         manualItemIDs: manualQueueItemIDs)
+        queue = optimisticQueue
 
         let success = await queueSocket.playItem(queueID: queueID, itemID: item.queueItemID)
-        if !success {
-            manualQueueItemIDs = previousManualIDs
-            sessionEnqueuedItems = previousSession
-            queue = previousQueue
+        guard success else {
+            // Put back only the ids the jump dropped, so a track queued while the
+            // command was in flight keeps its "I kö" grouping.
+            manualQueueItemIDs.formUnion(previousManualIDs.intersection(passed.map(\.id)))
+            if queue == optimisticQueue {
+                queue = MusicQueue(queueID: previousQueue.queueID,
+                                   currentItem: previousQueue.currentItem,
+                                   upcomingItems: previousQueue.upcomingItems,
+                                   manualItemIDs: manualQueueItemIDs)
+            } else {
+                // Something else changed the queue meanwhile; restoring the snapshot
+                // would discard that, so re-read the live queue instead.
+                await loadQueue()
+            }
             setErrorBannerText("Kunde inte spela låten", "Det gick inte att hoppa till låten i kön")
+            return
+        }
+        // Passed manual tracks are no longer upcoming, so their session fallback
+        // rows must not resurface on an offline reload. Only manual ones: a context
+        // track sharing a uri with a later session add must not take that row.
+        for passedItem in passed where previousManualIDs.contains(passedItem.id) {
+            removeSessionRow(matching: passedItem)
         }
     }
 }
