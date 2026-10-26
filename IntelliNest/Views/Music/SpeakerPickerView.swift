@@ -21,7 +21,7 @@ struct SpeakerPickerView: View {
     var showsTitle = true
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             if showsTitle {
                 Text("Välj rum")
                     .font(.headline)
@@ -58,10 +58,24 @@ private struct RoomCard: View {
         viewModel.activeSpeakerID != nil && !isControlled && !entry.isGroup
     }
 
+    /// Art only while the room is audible and there is a picture to show; a
+    /// placeholder note would just make every silent card taller.
+    private var artworkURL: String? {
+        guard shown?.hasLiveAudio == true,
+              let picture = shown?.entityPicture,
+              AlbumArtView.resolvedURL(for: picture) != nil else {
+            return nil
+        }
+        return picture
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 4) {
                 selectButton
+                if canLink {
+                    linkButton
+                }
                 if shown?.hasLiveAudio == true {
                     playPauseButton
                 }
@@ -76,12 +90,9 @@ private struct RoomCard: View {
                     RoomMemberRow(viewModel: viewModel, speaker: member, canUnlink: isControlled)
                 }
             }
-
-            if canLink {
-                linkButton
-            }
         }
-        .padding(12)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .background(Color.white.opacity(0.08))
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(
@@ -95,15 +106,18 @@ private struct RoomCard: View {
             viewModel.selectRoom(entry)
             onSelect()
         } label: {
-            HStack(spacing: 12) {
-                AlbumArtView(urlString: shown?.hasLiveAudio == true ? shown?.entityPicture : nil, size: 48)
-                VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 10) {
+                if let artworkURL {
+                    AlbumArtView(urlString: artworkURL, size: 40)
+                }
+                VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(entry.title)
                             .font(.headline)
                             .foregroundStyle(isControlled ? .yellow : .white)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
                         if isControlled {
                             Text("Styrs nu")
                                 .font(.caption2.weight(.semibold))
@@ -113,14 +127,17 @@ private struct RoomCard: View {
                                 .background(Capsule().fill(.yellow))
                         }
                     }
-                    Text(shown?.roomStatusText ?? "Tyst")
-                        .font(.caption)
-                        .foregroundStyle(shown?.isPlaying == true ? .white.opacity(0.85) : .white.opacity(0.55))
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
+                    if let status = shown?.roomStatusText {
+                        Text(status)
+                            .font(.caption)
+                            .foregroundStyle(shown?.isPlaying == true ? .white.opacity(0.85) : .white.opacity(0.55))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
                 }
                 Spacer(minLength: 4)
             }
+            .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -155,25 +172,24 @@ private struct RoomCard: View {
         .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
     }
 
+    /// The counterpart of a group member's minus button: adds this room to the
+    /// controlled room's group.
     private var linkButton: some View {
         let isPending = viewModel.pendingGroupingSpeakers.contains(entry.leader.entityId)
         return Button {
             Task { await viewModel.toggleGroupMember(entry.leader.entityId) }
         } label: {
-            HStack(spacing: 6) {
+            Group {
                 if isPending {
                     ProgressView()
                         .controlSize(.mini)
                         .tint(.yellow)
                 } else {
-                    Image(systemName: "link")
+                    Image(systemName: "plus.circle")
+                        .foregroundStyle(.white.opacity(0.7))
                 }
-                Text("Spela samma som \(viewModel.controlledRoomTitle)")
-                    .lineLimit(1)
             }
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.yellow)
-            .frame(minHeight: 32)
+            .frame(width: 44, height: 44)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -191,7 +207,7 @@ private struct RoomMemberRow: View {
 
     var body: some View {
         let isPending = viewModel.pendingGroupingSpeakers.contains(speaker.entityId)
-        VStack(spacing: 6) {
+        VStack(spacing: 2) {
             HStack(spacing: 8) {
                 Text(speaker.friendlyName)
                     .font(.subheadline)
@@ -231,7 +247,7 @@ private struct RoomMemberRow: View {
                              onCommit: { viewModel.setVolume($0, for: speaker.entityId) })
                 .accessibilityLabel("Volym \(speaker.friendlyName)")
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 4)
         .padding(.horizontal, 10)
         .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
