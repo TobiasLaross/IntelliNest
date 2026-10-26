@@ -144,14 +144,14 @@ extension MusicViewModelTests {
             var title: String?
             var artist: String?
             var queue: String? = "queue"
-            let expected: String
+            let expected: String?
         }
         let cases = [
             Case(state: "playing", title: "Black Car", artist: "Miriam Bryant", expected: "Black Car · Miriam Bryant"),
             Case(state: "playing", expected: "Spelar"),
             Case(state: "paused", title: "Black Car", expected: "Pausad · Black Car"),
             Case(state: "playing", title: "TV", queue: nil, expected: "Annan app · TV"),
-            Case(state: "idle", title: "Black Car", expected: "Tyst")
+            Case(state: "idle", title: "Black Car", expected: nil)
         ]
         for testCase in cases {
             var speaker = MediaPlayerEntity(entityId: .mediaPlayerKitchen, state: testCase.state, friendlyName: "Köket")

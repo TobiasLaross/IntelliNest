@@ -130,8 +130,9 @@ extension MediaPlayerEntity {
     /// One line saying what a room is doing, for its card in the room sheet:
     /// the track while playing, "Pausad" with the track while paused, and "Annan
     /// app" when the sound comes from AirPlay, Spotify Connect or the TV, which the
-    /// app can see but not control through Music Assistant.
-    var roomStatusText: String {
+    /// app can see but not control through Music Assistant. Nil for a silent room,
+    /// whose card then shows just its name.
+    var roomStatusText: String? {
         let track = [mediaTitle, mediaArtist].compactMap { $0?.isNotEmpty == true ? $0 : nil }.joined(separator: " · ")
         if isPlayingExternalSource {
             return track.isEmpty ? "Annan app" : "Annan app · \(track)"
@@ -142,6 +143,6 @@ extension MediaPlayerEntity {
         if state == "paused" {
             return track.isEmpty ? "Pausad" : "Pausad · \(track)"
         }
-        return "Tyst"
+        return nil
     }
 }
