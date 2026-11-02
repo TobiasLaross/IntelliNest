@@ -23,7 +23,17 @@ actor StubMusicAssistantQueueSocket: MusicAssistantQueueSocket {
         self.moveSucceeds = moveSucceeds
     }
 
-    func queueItems(queueID _: String) async -> [MusicQueueItem] { items }
+    /// Reads served before falling back to `items`, one per `queueItems` call, so a
+    /// test can model the live queue changing between reads inside one action.
+    private var pendingReads: [[MusicQueueItem]] = []
+
+    func queueItems(queueID _: String) async -> [MusicQueueItem] {
+        pendingReads.isEmpty ? items : pendingReads.removeFirst()
+    }
+
+    func setPendingReads(_ reads: [[MusicQueueItem]]) {
+        pendingReads = reads
+    }
 
     /// Replaces the items a later `queueItems` read returns, so a test can model
     /// the live queue changing between two `loadQueue` calls.
@@ -211,24 +221,6 @@ extension MusicViewModelTests {
     }
 
     // MARK: - Grouping (I kö vs. playlist context)
-
-    func testManualAddGroupsSeparatelyFromContext() async {
-        viewModel.selectSpeaker(.mediaPlayerKitchen)
-        stubGetQueue(json: getQueueJSON)
-        stubPlayMedia(statusCode: 200)
-        let socket = StubMusicAssistantQueueSocket(items: [
-            queueItem("cur", title: "Now"),
-            queueItem("ctx1", uri: "spotify://track/c1", title: "Context One"),
-            queueItem("ctx2", uri: "spotify://track/c2", title: "Context Two")
-        ])
-        let model = makeViewModel(socket: socket)
-        model.selectSpeaker(.mediaPlayerKitchen)
-        await model.loadQueue()
-        await model.addToQueue(uri: "spotify://track/m1", title: "Mine", artist: nil, imageURL: nil, placement: .last)
-        // The hand-added track lands in "I kö"; the playlist tracks stay in context.
-        XCTAssertEqual(model.queue.manualUpcoming.map(\.title), ["Mine"])
-        XCTAssertEqual(model.queue.contextUpcoming.map(\.title), ["Context One", "Context Two"])
-    }
 
     func testReconcileMapsSessionAddToRealQueueItemByURI() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)

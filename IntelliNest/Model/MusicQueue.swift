@@ -41,6 +41,12 @@ struct MusicQueue: Equatable {
         upcomingItems.filter { manualItemIDs.contains($0.id) }
     }
 
+    /// The upcoming index just past the last hand-queued track: where a track
+    /// added "last" goes, after "I kö" and before the rest of the context.
+    var manualQueueEndIndex: Int {
+        upcomingItems.lastIndex { manualItemIDs.contains($0.id) }.map { $0 + 1 } ?? 0
+    }
+
     /// Upcoming tracks coming from the playing context — the rest of the playlist
     /// or album ("Nästa från: …").
     var contextUpcoming: [MusicQueueItem] {
