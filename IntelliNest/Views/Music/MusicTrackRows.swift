@@ -45,11 +45,13 @@ extension View {
 
     /// The dark-gradient list styling every music list shares: no system list
     /// chrome, no separators, transparent rows so `backgroundModifier` shows
-    /// through. Applied to the `List` itself.
+    /// through. Applied to the `List` itself. The bottom margin lets the last row
+    /// scroll clear of the docked mini player, so it can be long-pressed.
     func musicListStyle() -> some View {
         listStyle(.plain)
             .scrollContentBackground(.hidden)
             .scrollDismissesKeyboard(.interactively)
+            .contentMargins(.bottom, 80, for: .scrollContent)
     }
 
     /// The per-row half of `musicListStyle`.

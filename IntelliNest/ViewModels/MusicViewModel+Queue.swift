@@ -7,19 +7,13 @@
 
 import Foundation
 
-/// Where a newly-added track lands in the queue, mapped to Music Assistant's
-/// `enqueue` modes: `.next` plays it right after the current track, `.last`
-/// appends it to the end.
+/// Where a newly-added track lands in the queue, the way Spotify places it:
+/// `.next` plays it right after the current track, `.last` puts it after the
+/// tracks the user already queued ("I kö") but still ahead of the rest of the
+/// playing playlist or album.
 enum QueuePlacement {
     case next
     case last
-
-    var enqueueMode: String {
-        switch self {
-        case .next: "next"
-        case .last: "add"
-        }
-    }
 }
 
 /// One of the two reorderable upcoming groups on the Queue screen. Drag-reorder
@@ -180,16 +174,28 @@ extension MusicViewModel {
     }
 
     /// Adds a track to the active speaker's queue, either right after the current
-    /// track (`.next`) or at the end (`.last`). Optimistically inserts it into
-    /// "Näst på tur" and the session fallback; banners on failure. This goes over
-    /// REST (`play_media`), so it works away from home too — unlike reading the
-    /// full upcoming list, which needs the LAN-only socket.
+    /// track (`.next`) or at the end of the user's own queue (`.last`), ahead of the
+    /// rest of the playing context either way. Music Assistant's `add` would append
+    /// after the whole playlist, so both go in with `next` and a `.last` add is then
+    /// moved down past the earlier hand-queued tracks. Optimistically inserts it into
+    /// "Näst på tur" and the session fallback; banners on failure. The add goes over
+    /// REST (`play_media`), so it works away from home too; the move needs the
+    /// LAN-only socket, so offline a `.last` add lands first in "I kö" instead.
     func addToQueue(uri: String, title: String, artist: String?, imageURL: String?, placement: QueuePlacement = .last) async {
         guard let targetID = queueTargetID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du lägger till i kön")
             return
         }
-        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: .track, enqueue: placement.enqueueMode)
+        let insertIndex: Int
+        switch placement {
+        case .next:
+            insertIndex = 0
+        case .last:
+            // Read the live queue first, so the hand-queued tracks it counts are current.
+            await loadQueue()
+            insertIndex = queue.manualQueueEndIndex
+        }
+        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: .track, enqueue: "next")
         guard success else {
             setErrorBannerText("Kunde inte lägga till i kön", "Det gick inte att lägga till låten i kön")
             return
@@ -209,16 +215,37 @@ extension MusicViewModel {
         switch placement {
         case .next:
             sessionEnqueuedItems.insert(sessionItem, at: 0)
-            queue = MusicQueue(queueID: queue.queueID,
-                               currentItem: queue.currentItem,
-                               upcomingItems: [sessionItem] + queue.upcomingItems,
-                               manualItemIDs: manualQueueItemIDs)
         case .last:
             sessionEnqueuedItems.append(sessionItem)
-            queue = MusicQueue(queueID: queue.queueID,
-                               currentItem: queue.currentItem,
-                               upcomingItems: queue.upcomingItems + [sessionItem],
-                               manualItemIDs: manualQueueItemIDs)
+        }
+        var upcoming = queue.upcomingItems
+        upcoming.insert(sessionItem, at: min(insertIndex, upcoming.count))
+        queue = MusicQueue(queueID: queue.queueID,
+                           currentItem: queue.currentItem,
+                           upcomingItems: upcoming,
+                           manualItemIDs: manualQueueItemIDs)
+        if insertIndex > 0 {
+            await moveJustQueuedTrack(uri: uri, by: insertIndex)
+        }
+    }
+
+    /// Moves the track `play_media` just put right after the current one down by
+    /// `positions`, to the end of "I kö". Only moves the item when it is the one
+    /// just added (matched by uri), so a queue that changed meanwhile is left alone.
+    private func moveJustQueuedTrack(uri: String, by positions: Int) async {
+        guard let queueID = queue.queueID, let currentID = queue.currentItem?.queueItemID else {
+            return
+        }
+        let items = await queueSocket.queueItems(queueID: queueID)
+        guard let currentIndex = items.firstIndex(where: { $0.queueItemID == currentID }),
+              items.indices.contains(currentIndex + 1),
+              items[currentIndex + 1].uri == uri else {
+            Log.warning("Queued track not found after the current one; left it first in the queue")
+            return
+        }
+        let success = await queueSocket.moveItem(queueID: queueID, itemID: items[currentIndex + 1].queueItemID, positions: positions)
+        if !success {
+            setErrorBannerText("Kunde inte flytta låten", "Låten hamnade först i kön")
         }
     }
 

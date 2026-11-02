@@ -54,9 +54,13 @@ final class MusicQueueModelTests: XCTestCase {
         XCTAssertEqual(result.nextItem?.artist, "Band")
     }
 
-    func testQueuePlacementMapsToEnqueueMode() {
-        XCTAssertEqual(QueuePlacement.next.enqueueMode, "next")
-        XCTAssertEqual(QueuePlacement.last.enqueueMode, "add")
+    func testManualQueueEndIndexSitsAfterLastManualItem() {
+        let items = ["m1", "m2", "c1", "c2"].map { MusicQueueItem(queueItemID: $0, uri: nil, title: $0, artist: nil, imageURL: nil) }
+        let cases: [(manual: Set<String>, expected: Int)] = [([], 0), (["m1"], 1), (["m1", "m2"], 2)]
+        for testCase in cases {
+            let queue = MusicQueue(queueID: "q", currentItem: nil, upcomingItems: items, manualItemIDs: testCase.manual)
+            XCTAssertEqual(queue.manualQueueEndIndex, testCase.expected, "manual: \(testCase.manual)")
+        }
     }
 
     func testGetQueueParsesCurrentItemWithStringImage() {
