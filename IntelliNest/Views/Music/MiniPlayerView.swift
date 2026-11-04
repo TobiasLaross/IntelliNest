@@ -138,8 +138,9 @@ private struct MiniPlayerBar: View {
                 slideIn()
             }
         }
+        // Leaving mid-skip would otherwise strand the row off screen and invisible.
         .onDisappear {
-            slideInFallback?.cancel()
+            slideIn()
         }
     }
 
