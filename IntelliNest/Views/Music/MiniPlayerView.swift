@@ -54,7 +54,18 @@ struct MiniPlayerView: View {
 private struct MiniPlayerBar: View {
     @ObservedObject var viewModel: MusicViewModel
     let entry: SpeakerPickerEntry
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var dragOffset: CGFloat = 0
+    @State private var trackOpacity: Double = 1
+    /// The title shown when a swipe skipped, while the row waits off screen for the
+    /// next one to load. Nil when no skip is in flight.
+    @State private var titleAtSkip: String??
+    /// The row has flown out and waits on the far side for the next track.
+    @State private var isParked = false
+    @State private var slideInFallback: Task<Void, Never>?
+
+    /// Far enough to carry the art and title past the bar's clipped edge.
+    private static let flyDistance: CGFloat = 360
 
     var body: some View {
         let speakerID = viewModel.controlledSpeakerID(in: entry)
@@ -98,6 +109,7 @@ private struct MiniPlayerBar: View {
                 Spacer(minLength: 4)
             }
             .offset(x: dragOffset)
+            .opacity(trackOpacity)
             .contentShape(Rectangle())
             // Not a Button: a Button claims the touch, so a swipe that starts on the
             // title never reached a drag gesture on the row. Here the swipe is tried
@@ -120,6 +132,15 @@ private struct MiniPlayerBar: View {
 
             speakerButton
             playPauseButton(speakerID: speakerID, isPlaying: speaker?.isPlaying == true)
+        }
+        .onChange(of: speaker?.mediaTitle) { _, title in
+            if isParked, let titleAtSkip, title != titleAtSkip {
+                slideIn()
+            }
+        }
+        // Leaving mid-skip would otherwise strand the row off screen and invisible.
+        .onDisappear {
+            slideIn()
         }
     }
 
@@ -157,24 +178,70 @@ private struct MiniPlayerBar: View {
         .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
     }
 
-    /// The art and title slide with the finger, then skip once the swipe passes the
-    /// threshold and spring back either way. Only they swipe, so dragging the volume
-    /// slider or the buttons beside them never skips a track.
+    /// The art and title slide with the finger. A swipe past the threshold skips and
+    /// carries them off that way; the next track then slides in from the other side
+    /// once it loads. A shorter drag springs back.
     private var trackSwipe: some Gesture {
         DragGesture(minimumDistance: 20)
             .onChanged { value in
-                if abs(value.translation.width) > abs(value.translation.height) {
+                if titleAtSkip == nil, abs(value.translation.width) > abs(value.translation.height) {
                     dragOffset = value.translation.width / 2
                 }
             }
             .onEnded { value in
-                if let swipe = MiniPlayerSwipe(translation: value.translation) {
-                    skip(swipe)
+                guard titleAtSkip == nil else {
+                    return
                 }
-                withAnimation(.spring(duration: 0.3)) {
-                    dragOffset = 0
+                guard let swipe = MiniPlayerSwipe(translation: value.translation) else {
+                    withAnimation(.spring(duration: 0.3)) {
+                        dragOffset = 0
+                    }
+                    return
                 }
+                skip(swipe)
+                flyOut(swipe)
             }
+    }
+
+    private var currentTitle: String? {
+        viewModel.displayedSpeaker(viewModel.controlledSpeakerID(in: entry))?.mediaTitle
+    }
+
+    private func flyOut(_ swipe: MiniPlayerSwipe) {
+        // With Reduce Motion the track only fades out and back in.
+        let direction: CGFloat = reduceMotion ? 0 : (swipe == .next ? -1 : 1)
+        titleAtSkip = .some(currentTitle)
+        withAnimation(.easeIn(duration: 0.18)) {
+            dragOffset = direction * Self.flyDistance
+            trackOpacity = 0
+        } completion: {
+            // Park on the far side, so the next track enters from where it came.
+            dragOffset = -direction * Self.flyDistance
+            isParked = true
+            if let titleAtSkip, currentTitle != titleAtSkip {
+                slideIn()
+            }
+        }
+        // The track may not change (the start of the queue, or a slow reload), so
+        // never leave the row empty for long.
+        slideInFallback?.cancel()
+        slideInFallback = Task {
+            try? await Task.sleep(for: .seconds(2))
+            if !Task.isCancelled {
+                slideIn()
+            }
+        }
+    }
+
+    private func slideIn() {
+        slideInFallback?.cancel()
+        slideInFallback = nil
+        titleAtSkip = nil
+        isParked = false
+        withAnimation(.spring(duration: 0.35)) {
+            dragOffset = 0
+            trackOpacity = 1
+        }
     }
 
     private func openPlayer() {
@@ -280,83 +347,5 @@ struct MusicPlaylistBrowseSheet: View {
                 }
         }
         .browseSheetMiniPlayer(viewModel, isEnabled: docksMiniPlayer)
-    }
-}
-
-/// The layers of the music screen that present sheets of their own. SwiftUI only
-/// presents from the topmost view, so each shared sheet is live on one layer at a time.
-enum MusicSheetHost {
-    /// The music start screen and its search.
-    case musicScreen
-    /// A browse sheet over the music screen — "Visa alla", an artist or a library
-    /// playlist — whose docked mini player opens the player and the rooms over it.
-    case browseSheet
-    /// The full-screen player.
-    case player
-}
-
-extension MusicViewModel {
-    /// Whether a browse sheet covers the music screen. A playlist opened from the
-    /// player sits over the player instead, so it doesn't count.
-    var isShowingBrowseSheet: Bool {
-        expandedLibrarySection != nil || browsingArtist != nil
-            || browsingLibraryPlaylist != nil
-    }
-
-    /// Where the full-screen player opens from: over a browse sheet when one is up,
-    /// so opening the player never closes the list the user was in.
-    private var playerHost: MusicSheetHost {
-        isShowingBrowseSheet ? .browseSheet : .musicScreen
-    }
-
-    private var topSheetHost: MusicSheetHost {
-        isShowingNowPlaying ? .player : playerHost
-    }
-
-    /// A sheet binding that is live only while `host` is the topmost layer.
-    func presentation(_ keyPath: ReferenceWritableKeyPath<MusicViewModel, Bool>, from host: MusicSheetHost) -> Binding<Bool> {
-        Binding(
-            get: { self[keyPath: keyPath] && self.topSheetHost == host },
-            set: { self[keyPath: keyPath] = $0 }
-        )
-    }
-
-    func nowPlayingPresentation(from host: MusicSheetHost) -> Binding<Bool> {
-        Binding(
-            get: { self.isShowingNowPlaying && self.playerHost == host },
-            set: { self.isShowingNowPlaying = $0 }
-        )
-    }
-}
-
-extension View {
-    /// Docks the mini player under a browse sheet while the keyboard is down, and
-    /// presents the player and the rooms from the sheet so they open over it.
-    func browseSheetMiniPlayer(_ viewModel: MusicViewModel, isEnabled: Bool = true) -> some View {
-        modifier(BrowseSheetMiniPlayer(viewModel: viewModel, isEnabled: isEnabled))
-    }
-}
-
-private struct BrowseSheetMiniPlayer: ViewModifier {
-    @ObservedObject var viewModel: MusicViewModel
-    let isEnabled: Bool
-    @State private var isKeyboardVisible = false
-
-    func body(content: Content) -> some View {
-        content
-            .safeAreaInset(edge: .bottom) {
-                if isEnabled, !isKeyboardVisible, viewModel.miniPlayerRooms.isNotEmpty {
-                    MiniPlayerView(viewModel: viewModel)
-                        .padding(.horizontal)
-                        .padding(.bottom, 4)
-                }
-            }
-            .tracksKeyboardVisibility($isKeyboardVisible)
-            .sheet(isPresented: isEnabled ? viewModel.presentation(\.isShowingSpeakerPicker, from: .browseSheet) : .constant(false)) {
-                SpeakerPickerSheet(viewModel: viewModel)
-            }
-            .sheet(isPresented: isEnabled ? viewModel.nowPlayingPresentation(from: .browseSheet) : .constant(false)) {
-                NowPlayingSheet(viewModel: viewModel)
-            }
     }
 }
