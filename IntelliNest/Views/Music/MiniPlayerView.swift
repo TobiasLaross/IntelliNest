@@ -62,9 +62,6 @@ private struct MiniPlayerBar: View {
         VStack(spacing: 0) {
             trackRow(speakerID: speakerID, speaker: speaker)
                 .frame(height: 56)
-                // Only the track row swipes, so dragging the volume slider never skips a track.
-                .contentShape(Rectangle())
-                .gesture(trackSwipe)
 
             VolumeSliderView(volume: entry.averageVolume,
                              onCommit: { viewModel.setGroupVolume($0, for: entry) })
@@ -88,26 +85,27 @@ private struct MiniPlayerBar: View {
 
     private func trackRow(speakerID: EntityId, speaker: MediaPlayerEntity?) -> some View {
         HStack(spacing: 10) {
-            Button {
-                viewModel.selectRoom(entry)
-                viewModel.isShowingNowPlaying = true
-            } label: {
-                HStack(spacing: 10) {
-                    AlbumArtView(urlString: speaker?.entityPicture, size: 40)
-                    VStack(alignment: .leading, spacing: 2) {
-                        MarqueeText(text: speaker?.mediaTitle ?? "Inget spelas")
-                            .font(.subheadline.weight(.semibold))
-                        Label(entry.title, systemImage: entry.isGroup ? "hifispeaker.2.fill" : "hifispeaker.fill")
-                            .font(.caption)
-                            .foregroundStyle(.yellow)
-                            .lineLimit(1)
-                    }
-                    Spacer(minLength: 4)
+            HStack(spacing: 10) {
+                AlbumArtView(urlString: speaker?.entityPicture, size: 40)
+                VStack(alignment: .leading, spacing: 2) {
+                    MarqueeText(text: speaker?.mediaTitle ?? "Inget spelas")
+                        .font(.subheadline.weight(.semibold))
+                    Label(entry.title, systemImage: entry.isGroup ? "hifispeaker.2.fill" : "hifispeaker.fill")
+                        .font(.caption)
+                        .foregroundStyle(.yellow)
+                        .lineLimit(1)
                 }
-                .offset(x: dragOffset)
-                .contentShape(Rectangle())
+                Spacer(minLength: 4)
             }
-            .buttonStyle(.plain)
+            .offset(x: dragOffset)
+            .contentShape(Rectangle())
+            // Not a Button: a Button claims the touch, so a swipe that starts on the
+            // title never reached a drag gesture on the row. Here the swipe is tried
+            // first and the tap only fires when the finger didn't travel.
+            .gesture(trackSwipe.exclusively(before: TapGesture().onEnded { openPlayer() }))
+            .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { openPlayer() }
             .accessibilityLabel("\(speaker?.mediaTitle ?? "Inget spelas"), \(entry.title)")
             .accessibilityHint("Öppna spelaren")
             .accessibilityAction(named: "Nästa låt") { skip(.next) }
@@ -159,8 +157,9 @@ private struct MiniPlayerBar: View {
         .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
     }
 
-    /// The track slides with the finger, then skips once the swipe passes the
-    /// threshold and springs back either way.
+    /// The art and title slide with the finger, then skip once the swipe passes the
+    /// threshold and spring back either way. Only they swipe, so dragging the volume
+    /// slider or the buttons beside them never skips a track.
     private var trackSwipe: some Gesture {
         DragGesture(minimumDistance: 20)
             .onChanged { value in
@@ -176,6 +175,11 @@ private struct MiniPlayerBar: View {
                     dragOffset = 0
                 }
             }
+    }
+
+    private func openPlayer() {
+        viewModel.selectRoom(entry)
+        viewModel.isShowingNowPlaying = true
     }
 
     private func skip(_ swipe: MiniPlayerSwipe) {
