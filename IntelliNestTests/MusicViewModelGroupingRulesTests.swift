@@ -77,4 +77,100 @@ extension MusicViewModelTests {
                        [.mediaPlayerKitchen, .mediaPlayerSpa])
         XCTAssertTrue(bannerTitles.isEmpty)
     }
+
+    // MARK: - Splitting and linking another group
+
+    /// Köket plays alone; Gästrummet and Lekrummet are synced in a group of their own.
+    private func stubKitchenWithGuestPlayroomGroup() async {
+        let otherGroup = [EntityId.mediaPlayerGuestRoom.rawValue, EntityId.mediaPlayerPlayroom.rawValue]
+        stubAllSpeakers(playing: .mediaPlayerKitchen)
+        stubSpeaker(.mediaPlayerKitchen,
+                    data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing",
+                                      friendlyName: "Köket", activeQueue: "RINCON_38420B10EC2801400"))
+        stubSpeaker(.mediaPlayerGuestRoom,
+                    data: speakerJSON(entityID: .mediaPlayerGuestRoom, state: "playing",
+                                      friendlyName: "Gästrummet", groupMembers: otherGroup))
+        stubSpeaker(.mediaPlayerPlayroom,
+                    data: speakerJSON(entityID: .mediaPlayerPlayroom, state: "playing",
+                                      friendlyName: "Lekrummet", groupMembers: otherGroup))
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+    }
+
+    func testSplitFromGroupUnjoinsOnlyThatRoom() async {
+        await stubKitchenWithGuestPlayroomGroup()
+        let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path.contains("/media_player/unjoin") == true }
+        stubPostService(path: "/api/services/media_player/unjoin")
+        stubSpeaker(.mediaPlayerPlayroom,
+                    data: speakerJSON(entityID: .mediaPlayerPlayroom, state: "idle", friendlyName: "Lekrummet"))
+        stubSpeaker(.mediaPlayerGuestRoom,
+                    data: speakerJSON(entityID: .mediaPlayerGuestRoom, state: "playing", friendlyName: "Gästrummet"))
+
+        await viewModel.splitFromGroup(.mediaPlayerPlayroom)
+
+        XCTAssertEqual(recorder.requests.count, 1)
+        XCTAssertEqual(viewModel.activeSpeakerID, .mediaPlayerKitchen)
+        XCTAssertFalse(viewModel.speakerPickerEntries.contains { $0.isGroup })
+        XCTAssertTrue(bannerTitles.isEmpty)
+        XCTAssertTrue(viewModel.pendingGroupingSpeakers.isEmpty)
+    }
+
+    func testSplitFromGroupThatNeverAppliesShowsBanner() async {
+        await stubKitchenWithGuestPlayroomGroup()
+        stubPostService(path: "/api/services/media_player/unjoin")
+
+        await viewModel.splitFromGroup(.mediaPlayerPlayroom)
+
+        XCTAssertEqual(bannerMessages.last, "Det gick inte att ta bort Lekrummet från gruppen")
+        XCTAssertTrue(viewModel.pendingGroupingSpeakers.isEmpty)
+    }
+
+    func testLinkGroupUnjoinsEveryMemberThenJoinsThemAll() async {
+        await stubKitchenWithGuestPlayroomGroup()
+        guard let entry = viewModel.speakerPickerEntries.first(where: { $0.isGroup }) else {
+            return XCTFail("Expected the Gästrummet + Lekrummet group card")
+        }
+        let orderLock = NSLock()
+        var requestOrder: [String] = []
+        URLProtocolStub.observerRequests { request in
+            guard request.httpMethod == "POST", let path = request.url?.path else {
+                return
+            }
+            if path.contains("/media_player/unjoin") {
+                orderLock.withLock { requestOrder.append("unjoin") }
+            } else if path.contains("/media_player/join") {
+                orderLock.withLock { requestOrder.append("join") }
+            }
+        }
+        stubPostService(path: "/api/services/media_player/unjoin")
+        stubPostService(path: "/api/services/media_player/join")
+        let newGroup = [EntityId.mediaPlayerKitchen, .mediaPlayerGuestRoom, .mediaPlayerPlayroom].map(\.rawValue)
+        for (entityID, name) in [(EntityId.mediaPlayerKitchen, "Köket"), (.mediaPlayerGuestRoom, "Gästrummet"),
+                                 (.mediaPlayerPlayroom, "Lekrummet")] {
+            stubSpeaker(entityID, data: speakerJSON(entityID: entityID, state: "playing",
+                                                    friendlyName: name, groupMembers: newGroup))
+        }
+
+        await viewModel.linkGroup(entry)
+
+        XCTAssertEqual(orderLock.withLock { requestOrder }, ["unjoin", "unjoin", "join"])
+        XCTAssertTrue(viewModel.isGrouped(.mediaPlayerGuestRoom))
+        XCTAssertTrue(viewModel.isGrouped(.mediaPlayerPlayroom))
+        XCTAssertTrue(bannerTitles.isEmpty)
+        XCTAssertTrue(viewModel.pendingGroupingSpeakers.isEmpty)
+    }
+
+    func testLinkGroupThatFailsShowsBanner() async {
+        await stubKitchenWithGuestPlayroomGroup()
+        guard let entry = viewModel.speakerPickerEntries.first(where: { $0.isGroup }) else {
+            return XCTFail("Expected the Gästrummet + Lekrummet group card")
+        }
+        stubPostService(path: "/api/services/media_player/unjoin")
+        stubPostService(path: "/api/services/media_player/join", statusCode: 500)
+
+        await viewModel.linkGroup(entry)
+
+        XCTAssertEqual(bannerMessages.last, "Det gick inte att lägga till Gästrummet + Lekrummet i gruppen")
+        XCTAssertTrue(viewModel.pendingGroupingSpeakers.isEmpty)
+    }
 }

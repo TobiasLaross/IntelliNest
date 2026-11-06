@@ -52,10 +52,10 @@ private struct RoomCard: View {
         viewModel.displayedSpeaker(speakerID)
     }
 
-    /// A lone room can be linked into the controlled room's music. Groups are
-    /// left alone: linking one would silently break up whatever it is playing.
+    /// Any other room or group can be linked into the controlled room's music. A
+    /// group is split up first and every member joins on its own.
     private var canLink: Bool {
-        viewModel.activeSpeakerID != nil && !isControlled && !entry.isGroup
+        viewModel.activeSpeakerID != nil && !isControlled
     }
 
     /// Art only while the room is audible and there is a picture to show; a
@@ -87,7 +87,7 @@ private struct RoomCard: View {
 
             if entry.isGroup {
                 ForEach(entry.members, id: \.entityId) { member in
-                    RoomMemberRow(viewModel: viewModel, speaker: member, canUnlink: isControlled)
+                    RoomMemberRow(viewModel: viewModel, speaker: member, isInControlledGroup: isControlled)
                 }
             }
         }
@@ -172,12 +172,18 @@ private struct RoomCard: View {
         .accessibilityLabel(isPlaying ? "Pausa \(entry.title)" : "Spela \(entry.title)")
     }
 
-    /// The counterpart of a group member's minus button: adds this room to the
-    /// controlled room's group.
+    /// The counterpart of a group member's minus button: adds this room, or every
+    /// room of this group, to the controlled room's group.
     private var linkButton: some View {
-        let isPending = viewModel.pendingGroupingSpeakers.contains(entry.leader.entityId)
+        let isPending = entry.members.contains { viewModel.pendingGroupingSpeakers.contains($0.entityId) }
         return Button {
-            Task { await viewModel.toggleGroupMember(entry.leader.entityId) }
+            Task {
+                if entry.isGroup {
+                    await viewModel.linkGroup(entry)
+                } else {
+                    await viewModel.toggleGroupMember(entry.leader.entityId)
+                }
+            }
         } label: {
             Group {
                 if isPending {
@@ -198,12 +204,12 @@ private struct RoomCard: View {
     }
 }
 
-/// A member of a synced group: its name, its own volume, and — in the controlled
-/// room's group — which member is primary and a button that takes it out of the group.
+/// A member of a synced group: its name, its own volume, a button that takes it out
+/// of the group and, in the controlled room's group, which member is primary.
 private struct RoomMemberRow: View {
     @ObservedObject var viewModel: MusicViewModel
     let speaker: MediaPlayerEntity
-    let canUnlink: Bool
+    let isInControlledGroup: Bool
 
     var body: some View {
         let isPending = viewModel.pendingGroupingSpeakers.contains(speaker.entityId)
@@ -218,30 +224,28 @@ private struct RoomMemberRow: View {
                         .accessibilityLabel("Spelar nu")
                 }
                 Spacer(minLength: 8)
-                if canUnlink, viewModel.showsPrimary {
+                if isInControlledGroup, viewModel.showsPrimary {
                     primaryControl
                 }
-                if canUnlink {
-                    Button {
-                        Task { await unlink() }
-                    } label: {
-                        Group {
-                            if isPending {
-                                ProgressView()
-                                    .controlSize(.mini)
-                                    .tint(.yellow)
-                            } else {
-                                Image(systemName: "minus.circle")
-                                    .foregroundStyle(.white.opacity(0.7))
-                            }
+                Button {
+                    Task { await unlink() }
+                } label: {
+                    Group {
+                        if isPending {
+                            ProgressView()
+                                .controlSize(.mini)
+                                .tint(.yellow)
+                        } else {
+                            Image(systemName: "minus.circle")
+                                .foregroundStyle(.white.opacity(0.7))
                         }
-                        .frame(width: 44, height: 32)
-                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
-                    .disabled(isPending)
-                    .accessibilityLabel("Ta bort \(speaker.friendlyName) ur gruppen")
+                    .frame(width: 44, height: 32)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .disabled(isPending)
+                .accessibilityLabel("Ta bort \(speaker.friendlyName) ur gruppen")
             }
             VolumeSliderView(volume: speaker.volumeLevel,
                              onCommit: { viewModel.setVolume($0, for: speaker.entityId) })
@@ -282,9 +286,12 @@ private struct RoomMemberRow: View {
     }
 
     /// The controlled speaker leaving its group hands control to the next member,
-    /// so the room still playing stays the one being controlled.
+    /// so the room still playing stays the one being controlled. A member of another
+    /// group is just split off, leaving the rest of that group playing.
     private func unlink() async {
-        if speaker.entityId == viewModel.activeSpeakerID {
+        if !isInControlledGroup {
+            await viewModel.splitFromGroup(speaker.entityId)
+        } else if speaker.entityId == viewModel.activeSpeakerID {
             await viewModel.removeActiveSpeakerFromGroup()
         } else {
             await viewModel.toggleGroupMember(speaker.entityId)

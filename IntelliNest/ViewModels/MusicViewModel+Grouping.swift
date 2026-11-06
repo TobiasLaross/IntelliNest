@@ -176,6 +176,65 @@ extension MusicViewModel {
         return false
     }
 
+    /// Takes `speakerID` out of a group the controlled room isn't part of, so a room
+    /// stuck in another group can be split off and linked on its own. Music Assistant
+    /// re-elects the leader of whatever is left, so the rest keeps playing.
+    func splitFromGroup(_ speakerID: EntityId) async {
+        guard let speaker = speakers[speakerID], speaker.groupMembers.count > 1 else {
+            return
+        }
+        pendingGroupingSpeakers.insert(speakerID)
+        defer { pendingGroupingSpeakers.remove(speakerID) }
+        let success = await restAPIService.unjoinSpeaker(memberID: speakerID)
+        if success, await reloadSpeakersUntil({ ($0.speakers[speakerID]?.groupMembers.count ?? 0) <= 1 }) {
+            return
+        }
+        setErrorBannerText("Kunde inte dela upp högtalare", "Det gick inte att ta bort \(speaker.friendlyName) från gruppen")
+    }
+
+    /// Links every room of another group into the controlled room's group. Each
+    /// member is unjoined from its old group first, since a plain join can't move a
+    /// speaker that is already synced elsewhere.
+    func linkGroup(_ entry: SpeakerPickerEntry) async {
+        guard let activeSpeakerID, !entry.contains(activeSpeakerID) else {
+            return
+        }
+        let memberIDs = entry.members.map(\.entityId)
+        if isActiveOnNativeSource {
+            // Toggling is a leave for a member already in the Sonos group, so skip those.
+            for memberID in memberIDs where !isGrouped(memberID) {
+                await toggleNativeGroupMember(memberID)
+            }
+            return
+        }
+        pendingGroupingSpeakers.formUnion(memberIDs)
+        defer { pendingGroupingSpeakers.subtract(memberIDs) }
+        let success = await restAPIService.joinSpeakers(leaderID: activeSpeakerID, memberIDs: memberIDs, unjoinFirst: true)
+        let isLinked: (MusicViewModel) -> Bool = { viewModel in
+            let leaderMembers = viewModel.speakers[activeSpeakerID]?.groupMembers ?? []
+            return memberIDs.allSatisfy(leaderMembers.contains)
+        }
+        if success, await reloadSpeakersUntil(isLinked) {
+            return
+        }
+        setErrorBannerText("Kunde inte gruppera högtalare", "Det gick inte att lägga till \(entry.title) i gruppen")
+    }
+
+    /// Reloads the speakers until `condition` holds, and reports whether it ever did.
+    /// Home Assistant answers 200 before a group change is live, see `confirmGroupChange`.
+    private func reloadSpeakersUntil(_ condition: (MusicViewModel) -> Bool, attempts: Int = 3) async -> Bool {
+        for attempt in 1 ... attempts {
+            await reloadSpeakers()
+            if condition(self) {
+                return true
+            }
+            if attempt < attempts {
+                await waitBeforeGroupRecheck()
+            }
+        }
+        return false
+    }
+
     /// Promotes a grouped speaker to primary — the one shown and controlled as the
     /// group's main speaker. Playback still routes through the live Music Assistant
     /// group leader (`playbackTargetID`), so switching the primary never interrupts
