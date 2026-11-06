@@ -201,7 +201,8 @@ extension MusicViewModel {
         }
         let memberIDs = entry.members.map(\.entityId)
         if isActiveOnNativeSource {
-            for memberID in memberIDs {
+            // Toggling is a leave for a member already in the Sonos group, so skip those.
+            for memberID in memberIDs where !isGrouped(memberID) {
                 await toggleNativeGroupMember(memberID)
             }
             return
