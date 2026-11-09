@@ -73,6 +73,12 @@ struct NowPlayingView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .animation(.spring(duration: 0.3), value: showsSpeakerVolumes)
+        // Collapse when the group splits, so a later group doesn't reopen expanded.
+        .onChange(of: viewModel.isGroupActive) { _, isGrouped in
+            if !isGrouped {
+                isShowingSpeakerVolumes = false
+            }
+        }
         // Prefetch lyrics whenever the track changes so they're ready the moment the
         // user opens the panel, rather than starting the lookup on that tap.
         .task(id: viewModel.currentLyricsTrackKey) {
