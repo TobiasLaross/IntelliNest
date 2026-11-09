@@ -106,6 +106,7 @@
 		FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */; };
 		EE0000050000000000000005 /* MusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000050000000000000005 /* MusicView.swift */; };
 		EE0000060000000000000006 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000060000000000000006 /* NowPlayingView.swift */; };
+		EE00000600000000000000A1 /* VolumeSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000600000000000000A1 /* VolumeSliderView.swift */; };
 		EE0000000000000000000A01 /* LyricsTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000000000000000000A01 /* LyricsTimeline.swift */; };
 		EE0000000000000000000A02 /* LyricsApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0000000000000000000A02 /* LyricsApiService.swift */; };
 		EE00000400000000000000F3 /* LyricsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF00000400000000000000F3 /* LyricsCache.swift */; };
@@ -395,6 +396,7 @@
 		FD0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicViewModel+SpotifyTracks.swift"; sourceTree = "<group>"; };
 		EF0000050000000000000005 /* MusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicView.swift; sourceTree = "<group>"; };
 		EF0000060000000000000006 /* NowPlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingView.swift; sourceTree = "<group>"; };
+		EF00000600000000000000A1 /* VolumeSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeSliderView.swift; sourceTree = "<group>"; };
 		EF0000000000000000000A01 /* LyricsTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsTimeline.swift; sourceTree = "<group>"; };
 		EF0000000000000000000A02 /* LyricsApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsApiService.swift; sourceTree = "<group>"; };
 		EF00000400000000000000F3 /* LyricsCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsCache.swift; sourceTree = "<group>"; };
@@ -889,6 +891,7 @@
 			children = (
 				EF0000050000000000000005 /* MusicView.swift */,
 				EF0000060000000000000006 /* NowPlayingView.swift */,
+				EF00000600000000000000A1 /* VolumeSliderView.swift */,
 				EF0000000000000000000A04 /* SeekBarView.swift */,
 				EF0000000000000000000A05 /* LyricsViews.swift */,
 				4D41525100000000000000A1 /* MarqueeText.swift */,
@@ -1424,6 +1427,7 @@
 				FE0000000000000000000003 /* MusicViewModel+SpotifyTracks.swift in Sources */,
 				EE0000050000000000000005 /* MusicView.swift in Sources */,
 				EE0000060000000000000006 /* NowPlayingView.swift in Sources */,
+				EE00000600000000000000A1 /* VolumeSliderView.swift in Sources */,
 				EE0000000000000000000A01 /* LyricsTimeline.swift in Sources */,
 				EE0000000000000000000A02 /* LyricsApiService.swift in Sources */,
 				EE00000400000000000000F3 /* LyricsCache.swift in Sources */,
