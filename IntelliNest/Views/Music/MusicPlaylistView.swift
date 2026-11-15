@@ -138,17 +138,13 @@ struct MusicPlaylistView: View {
             } label: {
                 HStack(spacing: 12) {
                     AlbumArtView(urlString: track.imageURL, size: 44)
-                    Text(track.title)
-                        .font(.body)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
+                    MusicTrackLabel(title: track.title, artist: track.artist)
                     Spacer(minLength: 8)
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Spela \(track.title)")
+            .accessibilityLabel(track.artist.map { "Spela \(track.title) av \($0)" } ?? "Spela \(track.title)")
 
             if viewModel.canFavoriteSong(uri: track.uri) {
                 SongFavoriteButton(viewModel: viewModel, uri: track.uri)
@@ -162,6 +158,7 @@ struct MusicPlaylistView: View {
         .queueSwipeActions(viewModel: viewModel,
                            uri: track.uri,
                            title: track.title,
+                           artist: track.artist,
                            imageURL: track.imageURL)
         .swipeActions(edge: .trailing) {
             if viewModel.canEditPlaylist(playlist) {
@@ -177,6 +174,7 @@ struct MusicPlaylistView: View {
             TrackActionButtons(viewModel: viewModel,
                                uri: track.uri,
                                title: track.title,
+                               artist: track.artist,
                                imageURL: track.imageURL,
                                onRemoveFromPlaylist: removeAction(for: track))
         }
