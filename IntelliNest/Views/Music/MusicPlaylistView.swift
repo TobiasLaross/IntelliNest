@@ -158,6 +158,7 @@ struct MusicPlaylistView: View {
         .queueSwipeActions(viewModel: viewModel,
                            uri: track.uri,
                            title: track.title,
+                           artist: track.artist,
                            imageURL: track.imageURL)
         .swipeActions(edge: .trailing) {
             if viewModel.canEditPlaylist(playlist) {
@@ -173,6 +174,7 @@ struct MusicPlaylistView: View {
             TrackActionButtons(viewModel: viewModel,
                                uri: track.uri,
                                title: track.title,
+                               artist: track.artist,
                                imageURL: track.imageURL,
                                onRemoveFromPlaylist: removeAction(for: track))
         }
