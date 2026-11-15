@@ -106,4 +106,29 @@ final class MusicQueueModelTests: XCTestCase {
         XCTAssertEqual(mapped?.last?.title, "Two")
         XCTAssertEqual(mapped?.last?.artist, "Band")
     }
+
+    func testPlaylistBrowseLabelSplitsIntoTitleAndArtist() {
+        struct SplitCase {
+            let label: String
+            let title: String
+            let artist: String?
+        }
+        let cases = [
+            SplitCase(label: "Urkestern - Brynäslåten", title: "Brynäslåten", artist: "Urkestern"),
+            SplitCase(label: "Lansen & Liljan - Gavlerinken (Brynäs i mitt hjärta)",
+                      title: "Gavlerinken (Brynäs i mitt hjärta)",
+                      artist: "Lansen & Liljan"),
+            SplitCase(label: "Queen - Bohemian Rhapsody - Remastered 2011",
+                      title: "Bohemian Rhapsody - Remastered 2011",
+                      artist: "Queen"),
+            SplitCase(label: "Song without artist", title: "Song without artist", artist: nil),
+            SplitCase(label: "Dash-in-name", title: "Dash-in-name", artist: nil),
+            SplitCase(label: " - Orphan title", title: " - Orphan title", artist: nil)
+        ]
+        for testCase in cases {
+            let split = MusicPlaylistTrack.splitBrowseLabel(testCase.label)
+            XCTAssertEqual(split.title, testCase.title, testCase.label)
+            XCTAssertEqual(split.artist, testCase.artist, testCase.label)
+        }
+    }
 }

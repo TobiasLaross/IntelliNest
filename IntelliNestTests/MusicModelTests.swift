@@ -322,7 +322,7 @@ extension MusicModelTests {
     func testPlaylistBrowseResponseDecodesTracksAndDropsInvalid() throws {
         let json = """
         {"media_player.kitchen":{"title":"Sommar","media_class":"playlist","children":[
-          {"title":"Song A","media_content_id":"spotify://track/a","thumbnail":"https://img/a.jpg"},
+          {"title":"Artist A - Song A","media_content_id":"spotify://track/a","thumbnail":"https://img/a.jpg"},
           {"title":"Song B","media_content_id":"spotify://track/b","thumbnail":null},
           {"title":null,"media_content_id":"spotify://track/c"},
           {"title":"Missing uri","media_content_id":null}
@@ -332,6 +332,8 @@ extension MusicModelTests {
         XCTAssertEqual(response.tracks.count, 2)
         XCTAssertEqual(response.tracks.first?.uri, "spotify://track/a")
         XCTAssertEqual(response.tracks.first?.title, "Song A")
+        XCTAssertEqual(response.tracks.first?.artist, "Artist A")
+        XCTAssertNil(response.tracks.last?.artist)
         XCTAssertEqual(response.tracks.first?.imageURL, "https://img/a.jpg")
         XCTAssertNil(response.tracks.last?.imageURL)
     }

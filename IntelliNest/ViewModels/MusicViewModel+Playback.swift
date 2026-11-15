@@ -297,7 +297,7 @@ extension MusicViewModel {
     /// Plays the chosen track now, then queues the rest of the playlist after it,
     /// so the tapped song is followed by the playlist.
     func playTrackInPlaylist(_ track: MusicPlaylistTrack, from playlist: MusicSearchItem) async {
-        guard await startPlayback(uri: track.uri, mediaType: .track, title: track.title, artist: nil) else {
+        guard await startPlayback(uri: track.uri, mediaType: .track, title: track.title, artist: track.artist) else {
             return
         }
         if let targetID = playbackTargetID {

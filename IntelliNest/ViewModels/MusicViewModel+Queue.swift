@@ -166,7 +166,7 @@ extension MusicViewModel {
     // MARK: - Add
 
     func addToQueue(_ track: MusicPlaylistTrack, placement: QueuePlacement = .last) async {
-        await addToQueue(uri: track.uri, title: track.title, artist: nil, imageURL: track.imageURL, placement: placement)
+        await addToQueue(uri: track.uri, title: track.title, artist: track.artist, imageURL: track.imageURL, placement: placement)
     }
 
     func addToQueue(_ item: MusicSearchItem, placement: QueuePlacement = .last) async {

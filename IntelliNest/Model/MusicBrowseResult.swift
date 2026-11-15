@@ -16,13 +16,30 @@ struct MusicPlaylistTrack: Identifiable, Equatable {
     let id: String
     let uri: String
     let title: String
+    let artist: String?
     let imageURL: String?
 
-    init(id: String? = nil, uri: String, title: String, imageURL: String?) {
+    init(id: String? = nil, uri: String, title: String, artist: String? = nil, imageURL: String?) {
         self.id = id ?? uri
         self.uri = uri
         self.title = title
+        self.artist = artist
         self.imageURL = imageURL
+    }
+
+    /// Music Assistant labels a browsed track `"Artist - Title"` in one string. Split
+    /// on the first separator, since a title often carries its own (`"Song - Remastered"`)
+    /// while artist names rarely do. A label without one is kept whole as the title.
+    static func splitBrowseLabel(_ label: String) -> (title: String, artist: String?) {
+        guard let separator = label.range(of: " - ") else {
+            return (label, nil)
+        }
+        let artist = label[..<separator.lowerBound].trimmingCharacters(in: .whitespaces)
+        let title = label[separator.upperBound...].trimmingCharacters(in: .whitespaces)
+        guard !artist.isEmpty, !title.isEmpty else {
+            return (label, nil)
+        }
+        return (title, artist)
     }
 }
 
@@ -85,10 +102,15 @@ struct MusicPlaylistBrowseResponse: Decodable {
 
     init(from decoder: Decoder) throws {
         tracks = try MusicBrowseNode.children(from: decoder).enumerated().compactMap { index, child in
-            guard let uri = child.mediaContentID, let title = child.title else {
+            guard let uri = child.mediaContentID, let label = child.title else {
                 return nil
             }
-            return MusicPlaylistTrack(id: "\(uri)#\(index)", uri: uri, title: title, imageURL: child.thumbnail)
+            let (title, artist) = MusicPlaylistTrack.splitBrowseLabel(label)
+            return MusicPlaylistTrack(id: "\(uri)#\(index)",
+                                      uri: uri,
+                                      title: title,
+                                      artist: artist,
+                                      imageURL: child.thumbnail)
         }
     }
 }
