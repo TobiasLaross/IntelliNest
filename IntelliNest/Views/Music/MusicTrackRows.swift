@@ -111,7 +111,8 @@ struct MusicMediaRow: View {
 /// The green, gently animated sound-wave shown on the row of the playlist that is
 /// playing right now. The animation is skipped under Reduce Motion.
 /// A song title with its artist beneath in a smaller, dimmer line. The artist may
-/// wrap to two lines so a multi-artist credit isn't cut after the first name.
+/// The title is never truncated; the artist may wrap to two lines so a
+/// multi-artist credit isn't cut after the first name.
 struct MusicTrackLabel: View {
     let title: String
     let artist: String?
@@ -120,7 +121,6 @@ struct MusicTrackLabel: View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
                 .font(.body)
-                .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
             if let artist {
                 Text(artist)
