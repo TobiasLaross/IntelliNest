@@ -39,16 +39,25 @@ extension MusicViewModelTests {
             RepeatCase(mediaType: .album, before: .all, after: .all),
             RepeatCase(mediaType: .playlist, before: .one, after: .one)
         ]
+        let repeatPath = "/api/services/media_player/repeat_set"
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         stubPlayMedia(statusCode: 200)
-        stubPostService(path: "/api/services/media_player/repeat_set")
+        stubPostService(path: repeatPath)
         for testCase in cases {
             viewModel.speakers[.mediaPlayerKitchen]?.repeatMode = testCase.before
+            let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path == repeatPath }
             let item = MusicSearchItem(uri: trackURI, name: trackName, mediaType: testCase.mediaType,
                                        imageURL: nil, artist: trackArtist)
             await viewModel.play(item: item)
-            XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.repeatMode, testCase.after,
-                           "\(testCase.mediaType) from \(testCase.before)")
+            let label = "\(testCase.mediaType) from \(testCase.before)"
+            XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.repeatMode, testCase.after, label)
+            if testCase.before != testCase.after {
+                let request = await recorder.first()
+                let data = request.httpBodyStreamData() ?? request.httpBody
+                let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+                XCTAssertEqual(body?["entity_id"] as? String, EntityId.mediaPlayerKitchen.rawValue, label)
+                XCTAssertEqual(body?["repeat"] as? String, "off", label)
+            }
         }
     }
 

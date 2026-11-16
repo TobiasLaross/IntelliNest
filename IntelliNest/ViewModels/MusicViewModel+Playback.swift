@@ -198,26 +198,16 @@ extension MusicViewModel {
     }
 
     func play(item: MusicSearchItem) async {
-        if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist) {
+        // A searched song is the only track in the new queue, so a leftover repeat
+        // would loop it forever instead of letting Music Assistant's "Don't stop
+        // the music" follow it with similar songs.
+        if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist,
+                               turnOffRepeat: item.mediaType == .track) {
             // A single search result isn't played from a playlist, so the
             // now-playing card has no playlist to jump to.
             nowPlayingSourcePlaylist = nil
-            if item.mediaType == .track {
-                turnOffRepeat()
-            }
             dismissBrowseSheets()
         }
-    }
-
-    /// A searched song is the only track in the new queue, so a leftover repeat
-    /// would loop it forever instead of letting Music Assistant's "Don't stop the
-    /// music" follow it with similar songs.
-    private func turnOffRepeat() {
-        guard let activeSpeaker, activeSpeaker.repeatMode != .off, let targetID = playbackTargetID else {
-            return
-        }
-        speakers[activeSpeaker.entityId]?.repeatMode = .off
-        restAPIService.setRepeat(entityID: targetID, repeatMode: .off)
     }
 
     /// Starts (or enqueues) playback of a media item on the active speaker's
@@ -228,7 +218,8 @@ extension MusicViewModel {
                                mediaType: MusicMediaType,
                                title: String?,
                                artist: String?,
-                               enqueue: String = "replace") async -> Bool {
+                               enqueue: String = "replace",
+                               turnOffRepeat: Bool = false) async -> Bool {
         guard let activeSpeakerID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return false
@@ -257,6 +248,17 @@ extension MusicViewModel {
             // mislabel the new playlist's tracks.
             if enqueue == "replace" {
                 clearManualQueueTracking()
+            }
+            if turnOffRepeat {
+                // Bound to the speaker and target this playback went to, so a speaker
+                // switch while play_media was in flight can't redirect it. The leader's
+                // queue owns repeat, so check it as well as the selected follower.
+                let repeatModes = [speakers[activeSpeakerID]?.repeatMode, speakers[targetID]?.repeatMode]
+                if repeatModes.contains(where: { $0 != nil && $0 != .off }) {
+                    speakers[activeSpeakerID]?.repeatMode = .off
+                    speakers[targetID]?.repeatMode = .off
+                    restAPIService.setRepeat(entityID: targetID, repeatMode: .off)
+                }
             }
             restAPIService.triggerRepeatReload(times: 3)
         } else {
