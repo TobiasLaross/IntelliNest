@@ -115,6 +115,9 @@ struct AppMain: App {
                             try? await Task.sleep(seconds: 1.0)
                             navigator.snoozeWashingMachine()
                         }
+                    } else if path == Destination.music.rawValue {
+                        navigator.navigationPath = [.music]
+                        navigator.musicViewModel.isShowingSpeakerPicker = true
                     } else if path == NotificationActionIdentifier.fondSarahsPhone.rawValue {
                         navigator.navigationPath = []
                         Task {

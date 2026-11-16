@@ -13,6 +13,15 @@ extension MusicViewModelTests {
         XCTAssertTrue(entries.allSatisfy { !$0.isGroup })
     }
 
+    func testUnavailableSpeakersAreListedSeparatelyInDisplayOrder() async {
+        stubAllSpeakers(playing: .mediaPlayerKitchen, unavailable: [.mediaPlayerSpa, .mediaPlayerLivingRoom])
+        await viewModel.reload()
+        XCTAssertEqual(viewModel.unavailableSpeakers.map(\.entityId), [.mediaPlayerLivingRoom, .mediaPlayerSpa])
+        let pickerIDs = viewModel.speakerPickerEntries.flatMap { $0.members.map(\.entityId) }
+        XCTAssertFalse(pickerIDs.contains(.mediaPlayerLivingRoom))
+        XCTAssertFalse(pickerIDs.contains(.mediaPlayerSpa))
+    }
+
     func testGroupedSpeakersCollapseIntoOneEntryLeaderFirst() async {
         // Lekrummet leads a group with Köket. The group card sits where Köket (the
         // first room in display order) would, and names the leader first.
