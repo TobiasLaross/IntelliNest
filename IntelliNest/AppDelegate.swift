@@ -10,6 +10,7 @@ import UIKit
 private enum CategoryIdentifier: String {
     case washerReminder
     case findSarahsPhone = "hittasarah"
+    case musicAssistantUnavailable
 }
 
 enum NotificationActionIdentifier: String {
@@ -69,6 +70,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if response.notification.request.content.categoryIdentifier == CategoryIdentifier.washerReminder.rawValue &&
             response.actionIdentifier == NotificationActionIdentifier.snoozeWashingMachine.rawValue {
             if let deepLinkURL = URL(string: "IntelliNest://\(response.actionIdentifier)") {
+                DispatchQueue.main.async {
+                    UIApplication.shared.open(deepLinkURL)
+                }
+            }
+        } else if response.notification.request.content.categoryIdentifier ==
+            CategoryIdentifier.musicAssistantUnavailable.rawValue {
+            // Sent by HA when a room drops out of Music Assistant; opens the rooms so it shows greyed out.
+            if let deepLinkURL = URL(string: "IntelliNest://\(Destination.music.rawValue)") {
                 DispatchQueue.main.async {
                     UIApplication.shared.open(deepLinkURL)
                 }
