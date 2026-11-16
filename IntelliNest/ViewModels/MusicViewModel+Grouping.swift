@@ -86,6 +86,14 @@ extension MusicViewModel {
         return entries
     }
 
+    /// Rooms whose Music Assistant entity is `unavailable`, in display order. The
+    /// picker lists them greyed out after the live cards, so a room that dropped out
+    /// of Music Assistant (e.g. the Arc while the TV holds it) reads as broken rather
+    /// than silently missing.
+    var unavailableSpeakers: [MediaPlayerEntity] {
+        Self.speakerIDs.compactMap { speakers[$0] }.filter(\.isUnavailable)
+    }
+
     /// Sets every speaker in a picker group to the same absolute volume, like
     /// `setGroupVolume` does for the active group.
     func setGroupVolume(_ volume: Double, for entry: SpeakerPickerEntry) {

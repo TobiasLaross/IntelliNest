@@ -29,7 +29,40 @@ struct SpeakerPickerView: View {
             ForEach(viewModel.speakerPickerEntries) { entry in
                 RoomCard(viewModel: viewModel, entry: entry, onSelect: onSelect)
             }
+            ForEach(viewModel.unavailableSpeakers, id: \.entityId) { speaker in
+                UnavailableRoomCard(speaker: speaker)
+            }
         }
+    }
+}
+
+/// A room Music Assistant can't reach right now. Shown without controls, since
+/// every command would target the unreachable entity, so it reads as broken
+/// instead of vanishing from the list.
+private struct UnavailableRoomCard: View {
+    let speaker: MediaPlayerEntity
+
+    var body: some View {
+        HStack(spacing: 10) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(speaker.friendlyName)
+                    .font(.headline)
+                Text("Otillgänglig")
+                    .font(.caption)
+            }
+            Spacer(minLength: 4)
+            Image(systemName: "speaker.slash")
+                .accessibilityHidden(true)
+        }
+        .foregroundStyle(.white.opacity(0.4))
+        .frame(minHeight: 44)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.04))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(speaker.friendlyName), otillgänglig")
+        .accessibilityIdentifier("music.speakerPicker.unavailable.\(speaker.entityId.rawValue)")
     }
 }
 
