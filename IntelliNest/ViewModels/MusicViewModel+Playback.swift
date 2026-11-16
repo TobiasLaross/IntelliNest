@@ -198,7 +198,11 @@ extension MusicViewModel {
     }
 
     func play(item: MusicSearchItem) async {
-        if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist) {
+        // A lone searched track would otherwise end (or loop on repeat), so let
+        // Music Assistant follow it with similar songs, like Spotify does.
+        // Albums, artists and playlists already bring their own tracks.
+        if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist,
+                               radioMode: item.mediaType == .track) {
             // A single search result isn't played from a playlist, so the
             // now-playing card has no playlist to jump to.
             nowPlayingSourcePlaylist = nil
@@ -214,7 +218,8 @@ extension MusicViewModel {
                                mediaType: MusicMediaType,
                                title: String?,
                                artist: String?,
-                               enqueue: String = "replace") async -> Bool {
+                               enqueue: String = "replace",
+                               radioMode: Bool = false) async -> Bool {
         guard let activeSpeakerID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return false
@@ -232,7 +237,8 @@ extension MusicViewModel {
             return false
         }
 
-        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType, enqueue: enqueue)
+        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType,
+                                                     enqueue: enqueue, radioMode: radioMode)
         if success {
             // Optimistically reflect what we just started; a reload confirms it.
             speakers[activeSpeakerID]?.state = "playing"

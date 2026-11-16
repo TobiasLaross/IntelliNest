@@ -26,6 +26,25 @@ extension MusicViewModelTests {
         XCTAssertTrue(bannerTitles.isEmpty)
     }
 
+    func testPlayingASearchResultEnablesRadioModeOnlyForTracks() async {
+        let cases: [(mediaType: MusicMediaType, expectsRadio: Bool)] = [
+            (.track, true), (.album, false), (.artist, false), (.playlist, false)
+        ]
+        let path = "/api/services/music_assistant/play_media"
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        for testCase in cases {
+            let recorder = RequestRecorder { $0.httpMethod == "POST" && $0.url?.path == path }
+            let item = MusicSearchItem(uri: trackURI, name: trackName, mediaType: testCase.mediaType,
+                                       imageURL: nil, artist: trackArtist)
+            await viewModel.play(item: item)
+            let request = await recorder.first()
+            let data = request.httpBodyStreamData() ?? request.httpBody
+            let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+            XCTAssertEqual(body?["radio_mode"] as? Bool, testCase.expectsRadio ? true : nil, "\(testCase.mediaType)")
+        }
+    }
+
     func testPlayFailureKeepsNoFalsePlayingState() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         // Kitchen currently idle.

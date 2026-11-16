@@ -173,13 +173,22 @@ extension RestAPIService {
     /// Replaces the active speaker's queue and starts playback of `mediaID`
     /// (a `spotify://…` uri). Returns whether the request succeeded so the
     /// caller can surface a failure instead of showing a false playing state.
+    /// `radioMode` asks Music Assistant to keep the queue going with similar
+    /// tracks once `mediaID` ends, instead of stopping or repeating it.
     @discardableResult
-    func playMedia(on entityID: EntityId, mediaID: String, mediaType: MusicMediaType, enqueue: String = "replace") async -> Bool {
+    func playMedia(on entityID: EntityId,
+                   mediaID: String,
+                   mediaType: MusicMediaType,
+                   enqueue: String = "replace",
+                   radioMode: Bool = false) async -> Bool {
         var json = [JSONKey: Any]()
         json[.entityID] = entityID.rawValue
         json[.mediaID] = mediaID
         json[.mediaType] = mediaType.rawValue
         json[.enqueue] = enqueue
+        if radioMode {
+            json[.radioMode] = true
+        }
         return await sendMusicPostExpectingSuccess(domain: .musicAssistant, action: .playMedia, json: json)
     }
 
