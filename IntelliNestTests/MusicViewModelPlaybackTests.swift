@@ -26,6 +26,32 @@ extension MusicViewModelTests {
         XCTAssertTrue(bannerTitles.isEmpty)
     }
 
+    func testPlayingASearchedTrackTurnsRepeatOff() async {
+        struct RepeatCase {
+            let mediaType: MusicMediaType
+            let before: MediaRepeatMode
+            let after: MediaRepeatMode
+        }
+        let cases = [
+            RepeatCase(mediaType: .track, before: .all, after: .off),
+            RepeatCase(mediaType: .track, before: .one, after: .off),
+            RepeatCase(mediaType: .track, before: .off, after: .off),
+            RepeatCase(mediaType: .album, before: .all, after: .all),
+            RepeatCase(mediaType: .playlist, before: .one, after: .one)
+        ]
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        stubPlayMedia(statusCode: 200)
+        stubPostService(path: "/api/services/media_player/repeat_set")
+        for testCase in cases {
+            viewModel.speakers[.mediaPlayerKitchen]?.repeatMode = testCase.before
+            let item = MusicSearchItem(uri: trackURI, name: trackName, mediaType: testCase.mediaType,
+                                       imageURL: nil, artist: trackArtist)
+            await viewModel.play(item: item)
+            XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.repeatMode, testCase.after,
+                           "\(testCase.mediaType) from \(testCase.before)")
+        }
+    }
+
     func testPlayFailureKeepsNoFalsePlayingState() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         // Kitchen currently idle.

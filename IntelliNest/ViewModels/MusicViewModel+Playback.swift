@@ -202,8 +202,22 @@ extension MusicViewModel {
             // A single search result isn't played from a playlist, so the
             // now-playing card has no playlist to jump to.
             nowPlayingSourcePlaylist = nil
+            if item.mediaType == .track {
+                turnOffRepeat()
+            }
             dismissBrowseSheets()
         }
+    }
+
+    /// A searched song is the only track in the new queue, so a leftover repeat
+    /// would loop it forever instead of letting Music Assistant's "Don't stop the
+    /// music" follow it with similar songs.
+    private func turnOffRepeat() {
+        guard let activeSpeaker, activeSpeaker.repeatMode != .off, let targetID = playbackTargetID else {
+            return
+        }
+        speakers[activeSpeaker.entityId]?.repeatMode = .off
+        restAPIService.setRepeat(entityID: targetID, repeatMode: .off)
     }
 
     /// Starts (or enqueues) playback of a media item on the active speaker's
