@@ -28,10 +28,15 @@ actor LyricsCache {
     /// so they never read or write the shared on-disk cache.
     init(capacity: Int = 200,
          directory: URL? = LyricsCache.defaultDirectory,
-         filename: String = "lyrics-cache.json") {
+         filename: String = LyricsCache.defaultFilename) {
         self.capacity = capacity
         fileURL = directory?.appendingPathComponent(filename)
     }
+
+    /// Bumped when a lookup change can find better lyrics than an entry already
+    /// holds, so old entries are dropped instead of served forever. v2: multi-artist
+    /// names ("A/B") now find synced lyrics the v1 lookup cached as plain text.
+    static let defaultFilename = "lyrics-cache-v2.json"
 
     static var defaultDirectory: URL? {
         FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first

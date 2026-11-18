@@ -205,3 +205,81 @@ final class LyricsCacheTests: XCTestCase {
         XCTAssertEqual(value, synced, "a cached track survives a relaunch")
     }
 }
+
+// MARK: - Multi-artist names
+
+extension LyricsApiServiceTests {
+    private static let multiTitle = "Pilutta-visan"
+    private static let multiArtist = "Astrid Lindgren/Madicken"
+    private static let primaryArtist = "Astrid Lindgren"
+
+    private func getURL(artist: String) -> URL {
+        var components = URLComponents(string: "https://lrclib.net/api/get")!
+        components.queryItems = [
+            URLQueryItem(name: "artist_name", value: artist),
+            URLQueryItem(name: "track_name", value: Self.multiTitle),
+            URLQueryItem(name: "duration", value: "147")
+        ]
+        return components.url!
+    }
+
+    private func fieldSearchURL(artist: String) -> URL {
+        var components = URLComponents(string: "https://lrclib.net/api/search")!
+        components.queryItems = LyricsApiService.fieldSearchItems(title: Self.multiTitle, artist: artist)
+        return components.url!
+    }
+
+    private func respond(_ url: URL, json: String, statusCode: Int = 200) {
+        let response = HTTPURLResponse(url: url, statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: url, data: Data(json.utf8), response: response, error: nil)
+    }
+
+    func testArtistCandidatesSplitJoinedArtistNames() {
+        let cases: [(artist: String, expected: [String])] = [
+            ("Queen", ["Queen"]),
+            ("Astrid Lindgren/Madicken", ["Astrid Lindgren/Madicken", "Astrid Lindgren"]),
+            ("Babyloonz/Vanja Wikström", ["Babyloonz/Vanja Wikström", "Babyloonz"]),
+            ("Simon & Garfunkel", ["Simon & Garfunkel", "Simon"]),
+            ("Avicii, Aloe Blacc", ["Avicii, Aloe Blacc", "Avicii"]),
+            ("Calvin Harris feat. Rihanna", ["Calvin Harris feat. Rihanna", "Calvin Harris"])
+        ]
+        for testCase in cases {
+            XCTAssertEqual(LyricsApiService.artistCandidates(for: testCase.artist), testCase.expected, testCase.artist)
+        }
+    }
+
+    func testJoinedArtistFallsBackToPrimaryArtistForSyncedLyrics() async {
+        respond(getURL(artist: Self.multiArtist), json: "{}", statusCode: 404)
+        respond(getURL(artist: Self.primaryArtist), json: """
+        {"duration":146,"plainLyrics":"Madicken","syncedLyrics":"[00:03.00]Madicken, Madicken"}
+        """)
+        let result = await service.fetchLyrics(title: Self.multiTitle, artist: Self.multiArtist,
+                                               album: nil, durationSeconds: 147)
+        XCTAssertEqual(result, .synced([LyricLine(time: 3.0, text: "Madicken, Madicken")]))
+    }
+
+    func testPlainHitIsHeldBackWhileASyncedSearchHitExists() async {
+        respond(getURL(artist: Self.multiArtist), json: """
+        {"duration":149,"plainLyrics":"Plain only","syncedLyrics":null}
+        """)
+        respond(getURL(artist: Self.primaryArtist), json: "{}", statusCode: 404)
+        respond(fieldSearchURL(artist: Self.primaryArtist), json: """
+        [
+          {"duration":149,"plainLyrics":"Plain only","syncedLyrics":null},
+          {"duration":146,"plainLyrics":"Timed","syncedLyrics":"[00:04.00]Timed"}
+        ]
+        """)
+        let result = await service.fetchLyrics(title: Self.multiTitle, artist: Self.multiArtist,
+                                               album: nil, durationSeconds: 147)
+        XCTAssertEqual(result, .synced([LyricLine(time: 4.0, text: "Timed")]))
+    }
+
+    func testPlainHitIsReturnedWhenNothingSyncedExists() async {
+        respond(getURL(artist: Self.multiArtist), json: """
+        {"duration":149,"plainLyrics":"Plain only","syncedLyrics":null}
+        """)
+        let result = await service.fetchLyrics(title: Self.multiTitle, artist: Self.multiArtist,
+                                               album: nil, durationSeconds: 147)
+        XCTAssertEqual(result, .plain("Plain only"))
+    }
+}
