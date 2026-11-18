@@ -92,16 +92,50 @@ final class LyricsApiService: LyricsService {
         if primary != .notFound {
             return primary
         }
-        if let plain = await fetchFromLyricsOvh(title: title, artist: artist, deadline: deadline) {
-            return .plain(plain)
+        for candidate in Self.artistCandidates(for: artist) {
+            if let plain = await fetchFromLyricsOvh(title: title, artist: candidate, deadline: deadline) {
+                return .plain(plain)
+            }
         }
         return .notFound
     }
 
     // MARK: - LRCLIB (primary, synced)
 
+    /// Tries LRCLIB's exact `get`, then its search, first under the artist as
+    /// reported and then under its first name alone. A plain-text hit is held back
+    /// while a synced one may still turn up later in the chain, since a track often
+    /// has both a plain and a timed entry under slightly different artist names.
     private func fetchFromLRCLIB(title: String, artist: String, album: String?,
                                  durationSeconds: Double?, deadline: Date) async -> LyricsResult {
+        var plainFallback: LyricsResult?
+        let artists = Self.artistCandidates(for: artist)
+        for candidate in artists {
+            let result = await getLRCLIB(title: title, artist: candidate, album: album,
+                                         durationSeconds: durationSeconds, deadline: deadline)
+            if case .synced = result {
+                return result
+            }
+            if case .plain = result, plainFallback == nil {
+                plainFallback = result
+            }
+        }
+        let searches = [Self.fieldSearchItems(title: title, artist: artists.last ?? artist),
+                        [URLQueryItem(name: "q", value: "\(title) \(artist)")]]
+        for items in searches {
+            let result = await searchLRCLIB(queryItems: items, durationSeconds: durationSeconds, deadline: deadline)
+            if case .synced = result {
+                return result
+            }
+            if case .plain = result, plainFallback == nil {
+                plainFallback = result
+            }
+        }
+        return plainFallback ?? .notFound
+    }
+
+    private func getLRCLIB(title: String, artist: String, album: String?,
+                           durationSeconds: Double?, deadline: Date) async -> LyricsResult {
         var components = URLComponents(string: "\(lrclibBaseURL)/get")
         var queryItems = [
             URLQueryItem(name: "artist_name", value: artist),
@@ -114,21 +148,18 @@ final class LyricsApiService: LyricsService {
             queryItems.append(URLQueryItem(name: "duration", value: String(Int(durationSeconds.rounded()))))
         }
         components?.queryItems = queryItems
-
-        if let url = components?.url, let record = await getJSON(url, as: LRCLIBRecord.self, deadline: deadline) {
-            let result = record.lyricsResult
-            if result != .notFound {
-                return result
-            }
+        guard let url = components?.url,
+              let record = await getJSON(url, as: LRCLIBRecord.self, deadline: deadline) else {
+            return .notFound
         }
-        return await searchLRCLIB(title: title, artist: artist, durationSeconds: durationSeconds, deadline: deadline)
+        return record.lyricsResult
     }
 
-    /// Falls back to LRCLIB's fuzzy search when the exact `get` misses, then picks
-    /// the candidate closest to the known track length (preferring synced ones).
-    private func searchLRCLIB(title: String, artist: String, durationSeconds: Double?, deadline: Date) async -> LyricsResult {
+    /// Runs one LRCLIB search, then picks the candidate closest to the known track
+    /// length (preferring synced ones).
+    private func searchLRCLIB(queryItems: [URLQueryItem], durationSeconds: Double?, deadline: Date) async -> LyricsResult {
         var components = URLComponents(string: "\(lrclibBaseURL)/search")
-        components?.queryItems = [URLQueryItem(name: "q", value: "\(title) \(artist)")]
+        components?.queryItems = queryItems
         guard let url = components?.url,
               let records = await getJSON(url, as: [LRCLIBRecord].self, deadline: deadline),
               records.isNotEmpty else {
@@ -144,6 +175,29 @@ final class LyricsApiService: LyricsService {
             pool[0]
         }
         return best.lyricsResult
+    }
+
+    static func fieldSearchItems(title: String, artist: String) -> [URLQueryItem] {
+        [URLQueryItem(name: "track_name", value: title), URLQueryItem(name: "artist_name", value: artist)]
+    }
+
+    /// The artist as reported, then its first name alone when it lists several.
+    /// Music Assistant joins artists into one string ("Astrid Lindgren/Madicken",
+    /// "A & B", "A feat. B"), which matches nothing in LRCLIB, while the songwriter
+    /// or lead artist on its own usually does.
+    static func artistCandidates(for artist: String) -> [String] {
+        let separators = ["/", ",", " & ", " feat. ", " feat ", " ft. ", " featuring "]
+        var primary = artist
+        for separator in separators {
+            if let range = primary.range(of: separator, options: .caseInsensitive) {
+                primary = String(primary[..<range.lowerBound])
+            }
+        }
+        primary = primary.trimmingCharacters(in: .whitespaces)
+        guard primary.isNotEmpty, primary != artist else {
+            return [artist]
+        }
+        return [artist, primary]
     }
 
     // MARK: - lyrics.ovh (backup, plain)
