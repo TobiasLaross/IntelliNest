@@ -210,6 +210,16 @@ extension MusicViewModel {
         }
     }
 
+    /// Replaces the queue with a radio seeded by the current song: the song plays
+    /// again from the start and Music Assistant follows it with similar tracks.
+    /// Repeat is turned off so the seed doesn't loop instead of the radio.
+    func startRadio(fromTrackURI uri: String, title: String?, artist: String?) async {
+        if await startPlayback(uri: uri, mediaType: .track, title: title, artist: artist,
+                               radioMode: true, turnOffRepeat: true) {
+            nowPlayingSourcePlaylist = nil
+        }
+    }
+
     /// Starts (or enqueues) playback of a media item on the active speaker's
     /// group leader. Returns whether the request succeeded so callers can chain
     /// follow-up actions and avoid showing a false playing state.
@@ -219,6 +229,7 @@ extension MusicViewModel {
                                title: String?,
                                artist: String?,
                                enqueue: String = "replace",
+                               radioMode: Bool = false,
                                turnOffRepeat: Bool = false) async -> Bool {
         guard let activeSpeakerID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
@@ -237,7 +248,8 @@ extension MusicViewModel {
             return false
         }
 
-        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType, enqueue: enqueue)
+        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType,
+                                                     enqueue: enqueue, radioMode: radioMode)
         if success {
             // Optimistically reflect what we just started; a reload confirms it.
             speakers[activeSpeakerID]?.state = "playing"
