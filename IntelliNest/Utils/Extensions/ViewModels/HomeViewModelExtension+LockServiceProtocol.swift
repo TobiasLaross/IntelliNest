@@ -17,6 +17,10 @@ extension HomeViewModel: LockServiceProtocol {
     }
 
     private func toggleYaleLock(at keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock>) {
+        if self[keyPath: keyPath].lockState == .unknown {
+            refreshUnreadableLock(at: keyPath)
+            return
+        }
         guard let capturedLock = getUpdatedLock(self[keyPath: keyPath]) else {
             return
         }

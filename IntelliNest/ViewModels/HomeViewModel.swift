@@ -42,6 +42,8 @@ class HomeViewModel: ObservableObject, Reloadable {
     @Published var noLocationAccess = false
 
     var isReloading = false
+    /// Handle on the read a tap on an unreadable lock starts, so tests can await it.
+    private(set) var pendingLockRefreshTask: Task<Void, Never>?
     let entityIDs: [EntityId] = [
         .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
         .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
@@ -120,6 +122,20 @@ class HomeViewModel: ObservableObject, Reloadable {
     func reloadYaleLocks() async {
         sideDoor.lockState = await reload(lockID: sideDoor.id)
         frontDoor.lockState = await reload(lockID: frontDoor.id)
+    }
+
+    /// A tap on a lock we could not read asks for a read, not for the bolt to move: the user had no state
+    /// to decide on, and toggling on a fresh read could unlock a door they never saw as locked.
+    func refreshUnreadableLock(at keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock>) {
+        pendingLockRefreshTask = Task { @MainActor in
+            let lockID = self[keyPath: keyPath].id
+            let lockState = await reload(lockID: lockID)
+            self[keyPath: keyPath].lockState = lockState
+            if lockState == .unknown {
+                Log.warning("\(lockID) is still unknown after a tap-triggered reload")
+                restAPIService.setErrorBannerText("Kunde inte läsa låset", "Försök igen om en stund")
+            }
+        }
     }
 
     func turnOffAllLights() {
