@@ -24,6 +24,7 @@ extension HomeViewModel: LockServiceProtocol {
         guard let capturedLock = getUpdatedLock(self[keyPath: keyPath]) else {
             return
         }
+        discardPendingLockReads(at: keyPath)
         Task { @MainActor in
             let action: Action = capturedLock.expectedState == .locked ? .lock : .unlock
             self[keyPath: keyPath].expectedState = capturedLock.expectedState

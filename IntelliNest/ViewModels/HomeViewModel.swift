@@ -44,6 +44,7 @@ class HomeViewModel: ObservableObject, Reloadable {
     var isReloading = false
     /// Handle on the read a tap on an unreadable lock starts, so tests can await it.
     private(set) var pendingLockRefreshTask: Task<Void, Never>?
+    private var lockReadGenerations: [LockID: Int] = [:]
     let entityIDs: [EntityId] = [
         .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
         .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
@@ -115,25 +116,6 @@ class HomeViewModel: ObservableObject, Reloadable {
                         self.reload(entityID: entityID, state: entity.state, lastChanged: entity.lastChanged)
                     }
                 }
-            }
-        }
-    }
-
-    func reloadYaleLocks() async {
-        sideDoor.lockState = await reload(lockID: sideDoor.id)
-        frontDoor.lockState = await reload(lockID: frontDoor.id)
-    }
-
-    /// A tap on a lock we could not read asks for a read, not for the bolt to move: the user had no state
-    /// to decide on, and toggling on a fresh read could unlock a door they never saw as locked.
-    func refreshUnreadableLock(at keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock>) {
-        pendingLockRefreshTask = Task { @MainActor in
-            let lockID = self[keyPath: keyPath].id
-            let lockState = await reload(lockID: lockID)
-            self[keyPath: keyPath].lockState = lockState
-            if lockState == .unknown {
-                Log.warning("\(lockID) is still unknown after a tap-triggered reload")
-                restAPIService.setErrorBannerText("Kunde inte läsa låset", "Försök igen om en stund")
             }
         }
     }
@@ -296,6 +278,57 @@ class HomeViewModel: ObservableObject, Reloadable {
             storageLock.state = state
         } else {
             Log.error("HomeViewModel doesn't reload entityID: \(entityID)")
+        }
+    }
+}
+
+// MARK: - Yale lock reads
+
+extension HomeViewModel {
+    func reloadYaleLocks() async {
+        await readLock(at: \.sideDoor)
+        await readLock(at: \.frontDoor)
+    }
+
+    /// Reads overlap toggles and other reads of the same door, and a slow response from before a toggle
+    /// would publish a state the toggle has already moved past. Each read takes a generation and only
+    /// publishes while it is still the newest thing that happened to that lock.
+    @discardableResult
+    private func readLock(at keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock>) async -> LockState? {
+        let lockID = self[keyPath: keyPath].id
+        let generation = bumpLockGeneration(lockID)
+        self[keyPath: keyPath].isReading = true
+        let lockState = await reload(lockID: lockID)
+        guard lockReadGenerations[lockID] == generation else {
+            return nil
+        }
+        self[keyPath: keyPath].isReading = false
+        self[keyPath: keyPath].lockState = lockState
+        return lockState
+    }
+
+    /// Called when a toggle starts, so any read already in flight for that door is dropped on arrival.
+    func discardPendingLockReads(at keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock>) {
+        bumpLockGeneration(self[keyPath: keyPath].id)
+        self[keyPath: keyPath].isReading = false
+    }
+
+    @discardableResult
+    private func bumpLockGeneration(_ lockID: LockID) -> Int {
+        let generation = (lockReadGenerations[lockID] ?? 0) + 1
+        lockReadGenerations[lockID] = generation
+        return generation
+    }
+
+    /// A tap on a lock we could not read asks for a read, not for the bolt to move: the user had no state
+    /// to decide on, and toggling on a fresh read could unlock a door they never saw as locked.
+    func refreshUnreadableLock(at keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock>) {
+        pendingLockRefreshTask = Task { @MainActor in
+            let lockID = self[keyPath: keyPath].id
+            if await readLock(at: keyPath) == .unknown {
+                Log.warning("\(lockID) is still unknown after a tap-triggered reload")
+                restAPIService.setErrorBannerText("Kunde inte läsa låset", "Försök igen om en stund")
+            }
         }
     }
 }
