@@ -202,12 +202,17 @@ extension MusicViewModel {
         // would loop it forever instead of letting Music Assistant's "Don't stop
         // the music" follow it with similar songs.
         if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist,
-                               turnOffRepeat: item.mediaType == .track) {
-            // A single search result isn't played from a playlist, so the
-            // now-playing card has no playlist to jump to.
-            nowPlayingSourcePlaylist = nil
+                               turnOffRepeat: item.mediaType == .track, clearsSourcePlaylist: true) {
             dismissBrowseSheets()
         }
+    }
+
+    /// Replaces the queue with a radio seeded by the current song: the song plays
+    /// again from the start and Music Assistant follows it with similar tracks.
+    /// Repeat is turned off so the seed doesn't loop instead of the radio.
+    func startRadio(fromTrackURI uri: String, title: String?, artist: String?) async {
+        await startPlayback(uri: uri, mediaType: .track, title: title, artist: artist,
+                            radioMode: true, turnOffRepeat: true, clearsSourcePlaylist: true)
     }
 
     /// Starts (or enqueues) playback of a media item on the active speaker's
@@ -219,7 +224,9 @@ extension MusicViewModel {
                                title: String?,
                                artist: String?,
                                enqueue: String = "replace",
-                               turnOffRepeat: Bool = false) async -> Bool {
+                               radioMode: Bool = false,
+                               turnOffRepeat: Bool = false,
+                               clearsSourcePlaylist: Bool = false) async -> Bool {
         guard let activeSpeakerID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return false
@@ -232,12 +239,15 @@ extension MusicViewModel {
         // so playback isn't sent to a stale group leader it's no longer synced
         // with — which would start the music on the wrong speaker.
         await refreshActiveSpeaker(activeSpeakerID)
-        guard let targetID = playbackTargetID else {
-            setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
-            return false
-        }
+        // Routed from the room that was selected when the user tapped, not the
+        // selection after the refresh, so a room switch in flight can't redirect it.
+        let targetID = speakers[activeSpeakerID]?.playbackTargetID ?? activeSpeakerID
+        // The group as it is when the request goes out; a regroup while play_media
+        // is in flight must not change which rooms lose their playlist source.
+        let playedRoomIDs = [targetID, activeSpeakerID] + (speakers[activeSpeakerID]?.groupMembers ?? [])
 
-        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType, enqueue: enqueue)
+        let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType,
+                                                     enqueue: enqueue, radioMode: radioMode)
         if success {
             // Optimistically reflect what we just started; a reload confirms it.
             speakers[activeSpeakerID]?.state = "playing"
@@ -248,6 +258,13 @@ extension MusicViewModel {
             // mislabel the new playlist's tracks.
             if enqueue == "replace" {
                 clearManualQueueTracking()
+            }
+            if clearsSourcePlaylist {
+                // A single track or a radio isn't played from a playlist, so the card
+                // has no playlist to jump to. Cleared for the room this playback went
+                // to, so a room switch while play_media was in flight can't clear
+                // the newly selected room instead.
+                clearSourcePlaylists(for: playedRoomIDs)
             }
             if turnOffRepeat {
                 // Bound to the speaker and target this playback went to, so a speaker

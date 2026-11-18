@@ -57,6 +57,7 @@ enum JSONKey: String, Equatable, Codable, Hashable {
     case mediaContentID = "media_content_id"
     case mediaContentType = "media_content_type"
     case enqueue
+    case radioMode = "radio_mode"
     case volumeLevel = "volume_level"
     case seekPosition = "seek_position"
     case shuffle

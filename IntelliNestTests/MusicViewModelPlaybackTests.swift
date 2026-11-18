@@ -61,6 +61,31 @@ extension MusicViewModelTests {
         }
     }
 
+    func testStartRadioReplacesQueueInRadioModeAndTurnsRepeatOff() async {
+        let playPath = "/api/services/music_assistant/play_media"
+        let repeatPath = "/api/services/media_player/repeat_set"
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        viewModel.speakers[.mediaPlayerKitchen]?.repeatMode = .all
+        stubPlayMedia(statusCode: 200)
+        stubPostService(path: repeatPath)
+        // One recorder: URLProtocolStub keeps a single observer, so a second would replace it.
+        let recorder = RequestRecorder { [playPath, repeatPath].contains($0.url?.path) && $0.httpMethod == "POST" }
+
+        await viewModel.startRadio(fromTrackURI: trackURI, title: trackName, artist: trackArtist)
+
+        let requests = await recorder.waitForRequests(count: 2)
+        let request = requests.first { $0.url?.path == playPath } ?? requests[0]
+        XCTAssertTrue(requests.contains { $0.url?.path == repeatPath })
+        let data = request.httpBodyStreamData() ?? request.httpBody
+        let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+        XCTAssertEqual(body?["media_id"] as? String, trackURI)
+        XCTAssertEqual(body?["enqueue"] as? String, "replace")
+        XCTAssertEqual(body?["radio_mode"] as? Bool, true)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.repeatMode, .off)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, trackName)
+        XCTAssertTrue(bannerTitles.isEmpty)
+    }
+
     func testPlayFailureKeepsNoFalsePlayingState() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         // Kitchen currently idle.

@@ -163,7 +163,7 @@ struct NowPlayingView: View {
         }
     }
 
-    /// The room pill on the left, lyrics and queue on the right.
+    /// The room pill on the left, song radio, lyrics and queue on the right.
     private var bottomRow: some View {
         HStack(spacing: 4) {
             Button {
@@ -185,6 +185,17 @@ struct NowPlayingView: View {
 
             Spacer(minLength: 8)
 
+            // Only a Spotify track can seed Music Assistant's radio; a native Sonos
+            // source (AirPlay, TV) has no uri MA can play.
+            if let uri = speaker.mediaContentID, viewModel.spotifyTrackID(from: uri) != nil {
+                iconButton("dot.radiowaves.left.and.right", label: "Starta radio från låten") {
+                    Task {
+                        await viewModel.startRadio(fromTrackURI: uri, title: speaker.mediaTitle,
+                                                   artist: speaker.mediaArtist)
+                    }
+                }
+                .accessibilityHint("Ersätter kön med liknande låtar")
+            }
             iconButton("quote.bubble", label: "Visa sångtext", isActive: viewModel.isLyricsExpanded) {
                 viewModel.toggleLyricsExpanded()
             }
