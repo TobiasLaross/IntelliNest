@@ -139,22 +139,32 @@ Use this only when the screen needs real Home Assistant data or a native control
 draw, AND `IntelliNest-Info.xcconfig` (real secrets) exists in the repo AND the Mac is on the home
 LAN. It is heavier (navigation must be driven) and touches the live home — **read-only only**.
 
+The simulators are a pool (`screenshots-1`, `screenshots-2`) shared with every other app repo on this
+Mac and guarded by one cross-agent lock, `scripts/simlock.sh` (a byte-identical copy of the one in
+lilium, gto-poker-ios, terra-ios and sinopia-ios; never edit it here alone). Drive them only through
+`scripts/shots.sh`, which takes the lock and resolves the sim from it. **Never create, boot or test
+on any other simulator for a screenshot run.** If a sim is busy, `acquire` queues; wait in line rather
+than working around it. If a pool sim is missing, stop and ask.
+
 ```sh
-# build the app (Debug uses the real xcconfig) and install on a booted iPhone 17 sim
-xcodebuild -project IntelliNest.xcodeproj -scheme IntelliNest -configuration Debug \
-  -destination "platform=iOS Simulator,name=iPhone 17,OS=latest" \
-  -derivedDataPath /tmp/intellinest-dd build
-xcrun simctl install booted \
-  "$(/usr/bin/find /tmp/intellinest-dd/Build/Products -name 'IntelliNest.app' -maxdepth 3 | head -1)"
-xcrun simctl launch booted <bundle-id>
-xcrun simctl io booted screenshot /tmp/intellinest-shots/<desc>/home.png
+S=.claude/skills/ui-screenshots/scripts/shots.sh
+$S acquire "intellinest <short-desc>"   # blocks until a slot is ours
+$S boot && $S install && $S launch      # install builds the worktree (Debug, real xcconfig)
+$S describe                             # labels + centre points of what is on screen
+$S tap-label "Tobias"                   # or: $S tap <x> <y>, $S text "<query>"
+$S shot <name>                          # writes ./shots/<name>.png
+$S release                              # always, even after a failure
 ```
 
-`simctl` cannot tap, so navigation to a specific screen needs `idb` (`brew install
-facebook/fb/idb-companion` + `pip install fb-idb`) driving by visible label, or you hand the user a
-build to drive. Because there is no UI-test target, the render-to-PNG path above is usually the
-faster, more reliable choice. **Never** drive a state-changing HA action from a screenshot run —
-no locks, no `play_media`, no charging toggles, no heater changes. State reads only.
+Or wrap a whole scripted run so the release happens from a trap: `$S run "<label>" -- <cmd>`. Run
+`$S status` to see who holds what. On first launch expect, in order: notifications prompt → "Välj
+användare" (pick **Tobias**); install already grants location. If idb stops answering, `$S recover`
+resets only our sim's companion. `scripts/simlock-test.sh` tests the lock protocol.
+
+Navigation needs `idb` (`brew install facebook/fb/idb-companion` + `pip install fb-idb`). Because
+there is no UI-test target, the render-to-PNG path above is usually the faster, more reliable choice.
+**Never** drive a state-changing HA action from a screenshot run: no locks, no `play_media`, no
+charging toggles, no heater changes. State reads only. Never commit `./shots/`.
 
 ## 5. Deliver as one grouped batch
 

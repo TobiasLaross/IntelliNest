@@ -11,3 +11,6 @@ buildserver.json
 
 Claude Code/
 .claude/settings.local.json
+
+# ui-screenshots live-sim output
+shots/
