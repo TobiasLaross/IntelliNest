@@ -215,6 +215,10 @@ with this checklist until it carries the token, judging the diff of the director
 into. A PR with no Swift passes straight through. The token means the reviews ran. Don't add it to
 skip them. `.claude/hooks/test-review-gate.sh` tests the gate.
 
+A `PostToolUse` hook (`.claude/hooks/remind-pr-poll.sh`) follows every `gh pr create` and `git push`
+with a reminder to start a background `gh pr checks` poll before ending the turn, since Claude merges
+its own PRs here once CodeRabbit and CI are done.
+
 ## Screenshots for UI changes
 
 Any change that affects what a user sees on screen — a new view or sheet, a restyle, a layout or
