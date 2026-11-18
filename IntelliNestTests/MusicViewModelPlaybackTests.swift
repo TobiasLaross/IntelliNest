@@ -86,6 +86,30 @@ extension MusicViewModelTests {
         XCTAssertTrue(bannerTitles.isEmpty)
     }
 
+    func testStartRadioClearsTheSourceOfTheRoomItPlayedInEvenAfterARoomSwitch() async {
+        let kitchenSource = MusicSearchItem(uri: "spotify://playlist/5bKqWc9JtqJ7mT2QXe4Rn8", name: "Swedish pop",
+                                            mediaType: .playlist, imageURL: nil, artist: nil)
+        let playroomSource = MusicSearchItem(uri: "spotify://playlist/37i9dQZF1DXcBWIGoYBM5M", name: "Lugnt & Skönt",
+                                             mediaType: .playlist, imageURL: nil, artist: nil)
+        viewModel.sourcePlaylistsBySpeaker = [.mediaPlayerKitchen: kitchenSource, .mediaPlayerPlayroom: playroomSource]
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        let gate = StubGate()
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/music_assistant/play_media"
+        let playURL = components.url!
+        let response = HTTPURLResponse(url: playURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: playURL, data: Data("[]".utf8), response: response, error: nil, gate: gate)
+
+        let radioTask = Task { await viewModel.startRadio(fromTrackURI: trackURI, title: trackName, artist: trackArtist) }
+        await gate.waitForRequests(count: 1)
+        viewModel.selectSpeaker(.mediaPlayerPlayroom)
+        gate.open()
+        await radioTask.value
+
+        XCTAssertNil(viewModel.sourcePlaylist(for: .mediaPlayerKitchen))
+        XCTAssertEqual(viewModel.sourcePlaylist(for: .mediaPlayerPlayroom), playroomSource)
+    }
+
     func testPlayFailureKeepsNoFalsePlayingState() async {
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         // Kitchen currently idle.

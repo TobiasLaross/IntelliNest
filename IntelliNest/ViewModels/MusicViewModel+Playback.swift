@@ -202,10 +202,7 @@ extension MusicViewModel {
         // would loop it forever instead of letting Music Assistant's "Don't stop
         // the music" follow it with similar songs.
         if await startPlayback(uri: item.uri, mediaType: item.mediaType, title: item.name, artist: item.artist,
-                               turnOffRepeat: item.mediaType == .track) {
-            // A single search result isn't played from a playlist, so the
-            // now-playing card has no playlist to jump to.
-            nowPlayingSourcePlaylist = nil
+                               turnOffRepeat: item.mediaType == .track, clearsSourcePlaylist: true) {
             dismissBrowseSheets()
         }
     }
@@ -214,10 +211,8 @@ extension MusicViewModel {
     /// again from the start and Music Assistant follows it with similar tracks.
     /// Repeat is turned off so the seed doesn't loop instead of the radio.
     func startRadio(fromTrackURI uri: String, title: String?, artist: String?) async {
-        if await startPlayback(uri: uri, mediaType: .track, title: title, artist: artist,
-                               radioMode: true, turnOffRepeat: true) {
-            nowPlayingSourcePlaylist = nil
-        }
+        await startPlayback(uri: uri, mediaType: .track, title: title, artist: artist,
+                            radioMode: true, turnOffRepeat: true, clearsSourcePlaylist: true)
     }
 
     /// Starts (or enqueues) playback of a media item on the active speaker's
@@ -230,7 +225,8 @@ extension MusicViewModel {
                                artist: String?,
                                enqueue: String = "replace",
                                radioMode: Bool = false,
-                               turnOffRepeat: Bool = false) async -> Bool {
+                               turnOffRepeat: Bool = false,
+                               clearsSourcePlaylist: Bool = false) async -> Bool {
         guard let activeSpeakerID else {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return false
@@ -260,6 +256,13 @@ extension MusicViewModel {
             // mislabel the new playlist's tracks.
             if enqueue == "replace" {
                 clearManualQueueTracking()
+            }
+            if clearsSourcePlaylist {
+                // A single track or a radio isn't played from a playlist, so the card
+                // has no playlist to jump to. Cleared for the room this playback went
+                // to, so a room switch while play_media was in flight can't clear
+                // the newly selected room instead.
+                clearSourcePlaylist(for: activeSpeakerID)
             }
             if turnOffRepeat {
                 // Bound to the speaker and target this playback went to, so a speaker

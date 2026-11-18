@@ -25,20 +25,28 @@ extension MusicViewModel {
     var nowPlayingSourcePlaylist: MusicSearchItem? {
         get { sourcePlaylist(for: activeSpeakerID) }
         set {
+            guard let newValue else {
+                clearSourcePlaylist(for: activeSpeakerID)
+                return
+            }
             guard let activeSpeakerID, let speaker = speakers[activeSpeakerID] else {
                 return
             }
-            var sources = sourcePlaylistsBySpeaker
-            if let newValue {
-                sources[speaker.playbackTargetID] = newValue
-            } else {
-                for memberID in [speaker.playbackTargetID, activeSpeakerID] + speaker.groupMembers {
-                    sources[memberID] = nil
-                }
-            }
-            // One assignment, so "Senast spelade" is rebuilt once.
-            sourcePlaylistsBySpeaker = sources
+            sourcePlaylistsBySpeaker[speaker.playbackTargetID] = newValue
         }
+    }
+
+    /// Clears the source for a room's whole group so no member keeps a stale one.
+    func clearSourcePlaylist(for speakerID: EntityId?) {
+        guard let speakerID, let speaker = speakers[speakerID] else {
+            return
+        }
+        var sources = sourcePlaylistsBySpeaker
+        for memberID in [speaker.playbackTargetID, speakerID] + speaker.groupMembers {
+            sources[memberID] = nil
+        }
+        // One assignment, so "Senast spelade" is rebuilt once.
+        sourcePlaylistsBySpeaker = sources
     }
 
     /// What a room is playing from. A grouped room plays its leader's stream, so the
