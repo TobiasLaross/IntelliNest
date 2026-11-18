@@ -44,19 +44,31 @@ struct MusicPlaylistTrack: Identifiable, Equatable {
 }
 
 /// One child of a browsed node: a playlist's track, or an artist's album or top
-/// track. `media_content_type` is what tells an artist's albums apart from its
-/// tracks; the playlist browse ignores it because every child there is a track.
+/// track. `media_class` is what tells an artist's albums apart from its tracks;
+/// the playlist browse ignores it because every child there is a track.
 private struct MusicBrowseChild: Decodable {
     let title: String?
     let mediaContentID: String?
+    let mediaClass: String?
     let mediaContentType: String?
     let thumbnail: String?
 
     private enum CodingKeys: String, CodingKey {
         case title
         case mediaContentID = "media_content_id"
+        case mediaClass = "media_class"
         case mediaContentType = "media_content_type"
         case thumbnail
+    }
+
+    /// Music Assistant reports every browsed child's `media_content_type` as the
+    /// generic `"music"`, so the real type lives in `media_class`. The content type
+    /// is only a fallback for a payload that carries the specific type there.
+    var mediaType: MusicMediaType? {
+        if let mediaClass, let type = MusicMediaType(rawValue: mediaClass) {
+            return type
+        }
+        return mediaContentType.flatMap(MusicMediaType.init(rawValue:))
     }
 }
 
@@ -121,22 +133,24 @@ struct MusicPlaylistBrowseResponse: Decodable {
 /// drill into an album. A child whose type Music Assistant reports as something
 /// the app has no media type for (a radio stream, say) is dropped rather than
 /// guessed at, since the wrong type would be sent straight to `play_media`.
+/// Titles arrive as `"Artist - Title"` like a playlist's tracks and are split the
+/// same way, so a row reads as the album or song with the artist beneath it.
 struct MusicArtistBrowseResponse: Decodable {
     let items: [MusicSearchItem]
 
     init(from decoder: Decoder) throws {
         items = try MusicBrowseNode.children(from: decoder).compactMap { child in
             guard let uri = child.mediaContentID,
-                  let title = child.title,
-                  let rawType = child.mediaContentType,
-                  let mediaType = MusicMediaType(rawValue: rawType) else {
+                  let label = child.title,
+                  let mediaType = child.mediaType else {
                 return nil
             }
+            let (title, artist) = MusicPlaylistTrack.splitBrowseLabel(label)
             return MusicSearchItem(uri: uri,
                                    name: title,
                                    mediaType: mediaType,
                                    imageURL: child.thumbnail,
-                                   artist: nil)
+                                   artist: artist)
         }
     }
 }
