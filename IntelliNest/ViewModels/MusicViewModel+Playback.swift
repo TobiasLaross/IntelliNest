@@ -239,10 +239,12 @@ extension MusicViewModel {
         // so playback isn't sent to a stale group leader it's no longer synced
         // with — which would start the music on the wrong speaker.
         await refreshActiveSpeaker(activeSpeakerID)
-        guard let targetID = playbackTargetID else {
-            setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
-            return false
-        }
+        // Routed from the room that was selected when the user tapped, not the
+        // selection after the refresh, so a room switch in flight can't redirect it.
+        let targetID = speakers[activeSpeakerID]?.playbackTargetID ?? activeSpeakerID
+        // The group as it is when the request goes out; a regroup while play_media
+        // is in flight must not change which rooms lose their playlist source.
+        let playedRoomIDs = [targetID, activeSpeakerID] + (speakers[activeSpeakerID]?.groupMembers ?? [])
 
         let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType,
                                                      enqueue: enqueue, radioMode: radioMode)
@@ -262,7 +264,7 @@ extension MusicViewModel {
                 // has no playlist to jump to. Cleared for the room this playback went
                 // to, so a room switch while play_media was in flight can't clear
                 // the newly selected room instead.
-                clearSourcePlaylist(for: activeSpeakerID)
+                clearSourcePlaylists(for: playedRoomIDs)
             }
             if turnOffRepeat {
                 // Bound to the speaker and target this playback went to, so a speaker

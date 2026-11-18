@@ -192,4 +192,96 @@ extension MusicViewModelTests {
         XCTAssertEqual(model.librarySections.map { $0.playlists.map(\.uri) },
                        [["spotify://playlist/v1"], ["spotify://playlist/v2"]])
     }
+
+    // MARK: - Radio while the selection or group changes
+
+    private var swedishPop: MusicSearchItem {
+        MusicSearchItem(uri: "spotify://playlist/5bKqWc9JtqJ7mT2QXe4Rn8", name: "Swedish pop",
+                        mediaType: .playlist, imageURL: nil, artist: nil)
+    }
+
+    private var lugntOchSkont: MusicSearchItem {
+        MusicSearchItem(uri: "spotify://playlist/37i9dQZF1DXcBWIGoYBM5M", name: "Lugnt & Skönt",
+                        mediaType: .playlist, imageURL: nil, artist: nil)
+    }
+
+    private func gatePlayMedia() -> StubGate {
+        let gate = StubGate()
+        var components = URLComponents(string: GlobalConstants.baseInternalUrlString)!
+        components.path = "/api/services/music_assistant/play_media"
+        let playURL = components.url!
+        let response = HTTPURLResponse(url: playURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+        URLProtocolStub.setStub(for: playURL, data: Data("[]".utf8), response: response, error: nil, gate: gate)
+        return gate
+    }
+
+    private func playMediaEntityID(_ request: URLRequest) -> String? {
+        let data = request.httpBodyStreamData() ?? request.httpBody
+        let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+        return body?["entity_id"] as? String
+    }
+
+    func testRadioStaysWithTheTappedRoomWhenTheRoomChanges() async {
+        struct SwitchCase {
+            let label: String
+            let gatesRefresh: Bool
+        }
+        let cases = [
+            SwitchCase(label: "switch during the refresh", gatesRefresh: true),
+            SwitchCase(label: "switch during play_media", gatesRefresh: false)
+        ]
+        for testCase in cases {
+            stubAllSpeakers()
+            await viewModel.reload()
+            viewModel.sourcePlaylistsBySpeaker = [.mediaPlayerKitchen: swedishPop, .mediaPlayerPlayroom: lugntOchSkont]
+            viewModel.selectSpeaker(.mediaPlayerKitchen)
+            let gate = StubGate()
+            if testCase.gatesRefresh {
+                stubPlayMedia(statusCode: 200)
+                let kitchenURL = speakerURL(.mediaPlayerKitchen)
+                let response = HTTPURLResponse(url: kitchenURL, statusCode: 200, httpVersion: nil, headerFields: nil)!
+                URLProtocolStub.setStub(for: kitchenURL,
+                                        data: speakerJSON(entityID: .mediaPlayerKitchen, state: "idle", friendlyName: "Köket"),
+                                        response: response, error: nil, gate: gate)
+            }
+            let held = testCase.gatesRefresh ? gate : gatePlayMedia()
+            let recorder = RequestRecorder {
+                $0.httpMethod == "POST" && $0.url?.path == "/api/services/music_assistant/play_media"
+            }
+
+            let radioTask = Task { await viewModel.startRadio(fromTrackURI: trackURI, title: trackName, artist: trackArtist) }
+            await held.waitForRequests(count: 1)
+            viewModel.selectSpeaker(.mediaPlayerPlayroom)
+            held.open()
+            await radioTask.value
+
+            let request = await recorder.first()
+            XCTAssertEqual(playMediaEntityID(request), EntityId.mediaPlayerKitchen.rawValue, testCase.label)
+            XCTAssertNil(viewModel.sourcePlaylist(for: .mediaPlayerKitchen), testCase.label)
+            XCTAssertEqual(viewModel.sourcePlaylist(for: .mediaPlayerPlayroom), lugntOchSkont, testCase.label)
+        }
+    }
+
+    func testRadioClearsTheGroupItPlayedInEvenIfTheGroupChangesInFlight() async {
+        let group = [EntityId.mediaPlayerKitchen.rawValue, EntityId.mediaPlayerPlayroom.rawValue]
+        stubAllSpeakers()
+        stubSpeaker(.mediaPlayerKitchen, data: speakerJSON(entityID: .mediaPlayerKitchen, state: "playing",
+                                                           friendlyName: "Köket", groupMembers: group))
+        stubSpeaker(.mediaPlayerPlayroom, data: speakerJSON(entityID: .mediaPlayerPlayroom, state: "playing",
+                                                            friendlyName: "Lekrummet", groupMembers: group))
+        await viewModel.reload()
+        viewModel.sourcePlaylistsBySpeaker = [.mediaPlayerPlayroom: swedishPop, .mediaPlayerGuestRoom: lugntOchSkont]
+        viewModel.selectSpeaker(.mediaPlayerKitchen)
+        let gate = gatePlayMedia()
+
+        let radioTask = Task { await viewModel.startRadio(fromTrackURI: trackURI, title: trackName, artist: trackArtist) }
+        await gate.waitForRequests(count: 1)
+        // The guest room joins while play_media is in flight; it didn't get the radio.
+        viewModel.speakers[.mediaPlayerKitchen]?.groupMembers = [.mediaPlayerKitchen, .mediaPlayerGuestRoom]
+        gate.open()
+        await radioTask.value
+
+        XCTAssertNil(viewModel.sourcePlaylistsBySpeaker[.mediaPlayerPlayroom])
+        XCTAssertEqual(viewModel.sourcePlaylistsBySpeaker[.mediaPlayerGuestRoom], lugntOchSkont)
+    }
 }
