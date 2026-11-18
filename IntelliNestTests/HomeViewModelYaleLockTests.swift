@@ -10,6 +10,7 @@ class HomeViewModelYaleLockTests: XCTestCase {
     var yaleAPIService: YaleApiService!
     var urlCreator: URLCreator!
     var requestedURLs: [URL]!
+    var bannerTitles: [String] = []
 
     override func setUp() async throws {
         URLProtocolStub.startInterceptingRequests()
@@ -19,7 +20,7 @@ class HomeViewModelYaleLockTests: XCTestCase {
         restAPIService = RestAPIService(
             urlCreator: urlCreator,
             session: stubbedSession,
-            setErrorBannerText: { _, _ in },
+            setErrorBannerText: { [weak self] title, _ in self?.bannerTitles.append(title) },
             repeatReloadAction: { _ in }
         )
         yaleAPIService = YaleApiService(hassAPIService: restAPIService, session: stubbedSession)
@@ -50,6 +51,7 @@ class HomeViewModelYaleLockTests: XCTestCase {
         yaleAPIService = nil
         urlCreator = nil
         requestedURLs = nil
+        bannerTitles = []
     }
 
     private func yaleOperateURL(lockID: LockID, action: Action) -> URL {
@@ -177,5 +179,85 @@ class HomeViewModelYaleLockTests: XCTestCase {
 
         let lockReads = requestedURLs.filter { $0.path.contains("/locks/") }.count
         XCTAssertEqual(lockReads, 3, "A lock that never reaches the expected state must stop at the limit")
+    }
+
+    private struct UnknownTapCase {
+        let lockID: LockID
+        let readStatus: String
+        let expectedState: LockState
+        let expectsBanner: Bool
+    }
+
+    /// A tap on an unknown lock must only read it: the user had no state to decide on, so moving the bolt
+    /// on the fresh read could unlock a door they never saw as locked.
+    func testTapOnUnknownLockReloadsWithoutOperating() async {
+        let cases = [
+            UnknownTapCase(lockID: .frontDoor, readStatus: "locked", expectedState: .locked, expectsBanner: false),
+            UnknownTapCase(lockID: .sideDoor, readStatus: "unlocked", expectedState: .unlocked, expectsBanner: false),
+            UnknownTapCase(lockID: .frontDoor, readStatus: "garbled", expectedState: .unknown, expectsBanner: true)
+        ]
+
+        for testCase in cases {
+            requestedURLs = []
+            bannerTitles = []
+            stubYaleLockRead(lockID: testCase.lockID, status: testCase.readStatus)
+            let keyPath: ReferenceWritableKeyPath<HomeViewModel, YaleLock> = testCase.lockID == .frontDoor
+                ? \.frontDoor
+                : \.sideDoor
+            viewModel[keyPath: keyPath].lockState = .unknown
+
+            if testCase.lockID == .frontDoor {
+                viewModel.toggleStateForFrontDoor()
+            } else {
+                viewModel.toggleStateForSideDoor()
+            }
+            await viewModel.pendingLockRefreshTask?.value
+
+            XCTAssertEqual(viewModel[keyPath: keyPath].lockState, testCase.expectedState)
+            XCTAssertEqual(viewModel[keyPath: keyPath].expectedState, .unknown,
+                           "A refresh tap must not set an expected state, nothing was asked of the lock")
+            let operateCalls = requestedURLs.filter { $0.path.contains("/remoteoperate/") }.count
+            XCTAssertEqual(operateCalls, 0, "A tap on an unknown lock must never lock or unlock it")
+            XCTAssertEqual(homeAssistantServiceCallCount, 0)
+            let lockReads = requestedURLs.filter { $0.path == "/locks/\(testCase.lockID.rawValue)" }.count
+            XCTAssertEqual(lockReads, 1, "The tap must actually read the lock before deciding what to show")
+            XCTAssertEqual(bannerTitles.isEmpty, !testCase.expectsBanner,
+                           "Only a lock that is still unreadable after the reload should show a banner")
+        }
+    }
+
+    func testUnreadableLockStaysTappableUntilARead() {
+        var lock = YaleLock(id: .frontDoor)
+        XCTAssertFalse(lock.isLoading, "An unknown lock with nothing in flight must not disable its button")
+        XCTAssertEqual(lock.actionText, "Uppdatera", "The button must not promise to unlock a door it will only read")
+
+        lock.isReading = true
+        XCTAssertTrue(lock.isLoading)
+    }
+
+    func testReadThatStartedBeforeAToggleIsDropped() async {
+        var components = URLComponents(string: GlobalConstants.secretYaleAPIURL)!
+        components.path = "/locks/\(LockID.sideDoor.rawValue)"
+        let sideDoorURL = components.url!
+        let gate = StubGate()
+        let body = Data(#"{"LockStatus": {"status": "locked", "dateTime": "2026-09-03T08:24:38.000Z", "#.utf8)
+            + Data(#""isLockStatusChanged": true, "valid": true, "doorState": "closed"}}"#.utf8)
+        let response = HTTPURLResponse(url: sideDoorURL, statusCode: 200, httpVersion: nil, headerFields: nil)
+        URLProtocolStub.setStub(for: sideDoorURL, data: body, response: response, error: nil, gate: gate)
+        stubYaleLockRead(lockID: .frontDoor, status: "locked")
+
+        let reloadTask = Task { await viewModel.reloadYaleLocks() }
+        await gate.waitForRequests(count: 1)
+        XCTAssertTrue(viewModel.sideDoor.isLoading, "A read in flight should show the door as busy")
+
+        viewModel.discardPendingLockReads(at: \.sideDoor)
+        viewModel.sideDoor.lockState = .unlocked
+        gate.open()
+        await reloadTask.value
+
+        XCTAssertEqual(viewModel.sideDoor.lockState, .unlocked,
+                       "A read from before the toggle must not overwrite the state the toggle confirmed")
+        XCTAssertFalse(viewModel.sideDoor.isReading)
+        XCTAssertEqual(viewModel.frontDoor.lockState, .locked)
     }
 }

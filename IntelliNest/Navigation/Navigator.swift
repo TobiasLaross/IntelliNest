@@ -183,6 +183,7 @@ class Navigator: ObservableObject {
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
+            await homeViewModel.reloadYaleLocks()
             restartContinousReloadTask()
             await syncMusicLiveActivity()
             if currentDestination != .electricity {
