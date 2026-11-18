@@ -83,10 +83,10 @@ xcrun devicectl device process launch --device 911101B1-0BE6-5943-A15E-E2F78F289
 order: location prompt → notifications prompt → "Välj användare" (pick **Tobias**). The electricity
 dashboard is the **powergrid** button in the home grid.
 
-If device signing can't be set up, fall back to the **iOS Simulator** (no signing needed): build the
-`IntelliNest` scheme with `-destination "platform=iOS Simulator,name=iPhone 17,OS=latest"
-CODE_SIGNING_ALLOWED=NO`, install with `simctl`, and drive it with the same `idb` taps. The Mac is on
-the LAN so it reaches HA with the same reconstructed xcconfig.
+If device signing can't be set up, fall back to the shared screenshot simulators through the
+`ui-screenshots` skill's `shots.sh` (`acquire`, `boot`, `install`, `launch`, `describe`, `tap-label`,
+`shot`, `release`). It takes the cross-agent sim lock; never create or boot a simulator of your own.
+The Mac is on the LAN so it reaches HA with the same reconstructed xcconfig.
 
 ## Architecture
 
