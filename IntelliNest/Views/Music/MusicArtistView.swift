@@ -17,6 +17,7 @@ struct MusicArtistView: View {
     let item: MusicSearchItem
     @State private var items: [MusicSearchItem]
     @State private var isLoading: Bool
+    @State private var didFailToLoad = false
     @State private var openedAlbum: MusicSearchItem?
 
     /// `items`/`isLoading` are seeded only by previews and render tests, which have
@@ -39,7 +40,9 @@ struct MusicArtistView: View {
         .foregroundStyle(.white)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            items = await viewModel.browseItems(for: item)
+            let loaded = await viewModel.browseItems(for: item)
+            items = loaded ?? []
+            didFailToLoad = loaded == nil
             isLoading = false
             await viewModel.loadSavedSongStates(uris: items.filter { $0.mediaType == .track }.map(\.uri))
         }
@@ -77,17 +80,23 @@ struct MusicArtistView: View {
                 .tint(.white)
                 .padding(.top, 40)
             Spacer()
+        } else if didFailToLoad {
+            placeholder("Kunde inte hämta innehållet")
         } else if items.isEmpty {
-            Text("Inget att visa")
-                .foregroundStyle(.white.opacity(0.7))
-                .padding(.top, 40)
-            Spacer()
+            placeholder("Inget att visa")
         } else {
             List(items) { child in
                 row(child)
             }
             .musicListStyle()
         }
+    }
+
+    @ViewBuilder private func placeholder(_ message: String) -> some View {
+        Text(message)
+            .foregroundStyle(.white.opacity(0.7))
+            .padding(.top, 40)
+        Spacer()
     }
 
     /// A track plays on tap and can be swiped into the queue; an album pushes

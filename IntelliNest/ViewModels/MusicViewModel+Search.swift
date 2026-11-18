@@ -87,19 +87,19 @@ extension MusicViewModel {
 
     /// Loads an artist's or album's children for the browse list the user drilled
     /// into. Read-only — browsing never changes what's playing, which is the whole
-    /// point of opening an artist instead of tapping it to play. Returns empty and
-    /// banners on failure so the view shows its empty state rather than a spinner
-    /// that never resolves.
-    func browseItems(for item: MusicSearchItem) async -> [MusicSearchItem] {
+    /// point of opening an artist instead of tapping it to play. Returns nil and
+    /// banners on failure, so the view can say the load failed instead of claiming
+    /// the artist has nothing to show.
+    func browseItems(for item: MusicSearchItem) async -> [MusicSearchItem]? {
         guard let browseSpeaker = activeSpeakerID ?? availableSpeakers.first?.entityId else {
-            return []
+            return nil
         }
         do {
-            return try await restAPIService.browseArtistItems(uri: item.uri, mediaType: item.mediaType, on: browseSpeaker)
+            return try await restAPIService.browseArtistItems(uri: item.uri, on: browseSpeaker)
         } catch {
             Log.error("Failed to browse \(item.mediaType.rawValue): \(error)")
             setErrorBannerText("Kunde inte öppna \(item.name)", "Det gick inte att hämta innehållet")
-            return []
+            return nil
         }
     }
 

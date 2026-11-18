@@ -92,15 +92,19 @@ extension RestAPIService {
         return try decoder.decode(MusicPlaylistBrowseResponse.self, from: data).tracks
     }
 
+    private static let musicBrowseContentType = "music"
+
     /// Browses an artist's or album's children via `media_player.browse_media` —
     /// an artist's albums and top tracks, an album's tracks. Same call shape as the
     /// playlist browse and, like it, read-only: it does not change what `entityID`
     /// is playing.
-    func browseArtistItems(uri: String, mediaType: MusicMediaType, on entityID: EntityId) async throws -> [MusicSearchItem] {
+    func browseArtistItems(uri: String, on entityID: EntityId) async throws -> [MusicSearchItem] {
         let path = "/api/services/\(Domain.mediaPlayer.rawValue)/\(Action.browseMedia.rawValue)"
         var json = [JSONKey: Any]()
         json[.entityID] = entityID.rawValue
-        json[.mediaContentType] = mediaType.rawValue
+        // Music Assistant's browse only resolves an artist or album uri under the
+        // generic "music" type; "artist" or "album" answers 500 "Media not found".
+        json[.mediaContentType] = Self.musicBrowseContentType
         json[.mediaContentID] = uri
 
         let data = try await postExpectingResponseData(path: path, json: json)
