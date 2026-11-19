@@ -14,6 +14,9 @@ import UIKit
 class HomeViewModel: ObservableObject, Reloadable {
     static let expectedStateAttempts = 20
     static let expectedStatePollInterval: CGFloat = 0.5
+    /// Launch fires both the foreground hook and the home screen's appear, and tab switches add more,
+    /// so storage lock refreshes closer together than this reuse the last one.
+    static let storageLockRefreshInterval: TimeInterval = 30
 
     @Published var sideDoor = YaleLock(id: .sideDoor)
     @Published var frontDoor = YaleLock(id: .frontDoor)
@@ -42,6 +45,10 @@ class HomeViewModel: ObservableObject, Reloadable {
     @Published var noLocationAccess = false
 
     var isReloading = false
+    /// Read by the storage lock refresh throttle; tests swap in a fixed clock.
+    var now: () -> Date = { Date() }
+    private var storageLockRefreshTask: Task<Void, Never>?
+    private var lastStorageLockRefresh: Date?
     /// Handle on the read a tap on an unreadable lock starts, so tests can await it.
     private(set) var pendingLockRefreshTask: Task<Void, Never>?
     private var lockReadGenerations: [LockID: Int] = [:]
@@ -329,6 +336,39 @@ extension HomeViewModel {
                 Log.warning("\(lockID) is still unknown after a tap-triggered reload")
                 restAPIService.setErrorBannerText("Kunde inte läsa låset", "Försök igen om en stund")
             }
+        }
+    }
+}
+
+// MARK: - Storage lock refresh
+
+extension HomeViewModel {
+    /// HA only re-reads the storage lock from the Yale cloud every 6 hours, so a keypad or manual turn
+    /// shows up late unless something asks. Ask whenever the lock is about to be looked at. The read
+    /// fetches the cloud copy of the state and does not wake the lock, so it costs no battery.
+    func refreshStorageLock() async {
+        if let storageLockRefreshTask {
+            await storageLockRefreshTask.value
+            return
+        }
+        if let lastStorageLockRefresh,
+           now().timeIntervalSince(lastStorageLockRefresh) < Self.storageLockRefreshInterval {
+            return
+        }
+        lastStorageLockRefresh = now()
+        let task = Task { await performStorageLockRefresh() }
+        storageLockRefreshTask = task
+        await task.value
+        storageLockRefreshTask = nil
+    }
+
+    private func performStorageLockRefresh() async {
+        await restAPIService.refreshEntity(.storageLock)
+        do {
+            let entity = try await restAPIService.reloadState(entityID: .storageLock)
+            reload(entityID: .storageLock, state: entity.state)
+        } catch {
+            Log.error("Failed to reload storage lock after refresh: \(error)")
         }
     }
 }

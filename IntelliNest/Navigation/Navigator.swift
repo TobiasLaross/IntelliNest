@@ -183,6 +183,8 @@ class Navigator: ObservableObject {
         Task {
             await reloadConnection()
             await reload(for: currentDestination)
+            // HA answers only once its Yale cloud read is done, so nothing below waits on it.
+            Task { await homeViewModel.refreshStorageLock() }
             await homeViewModel.reloadYaleLocks()
             restartContinousReloadTask()
             await syncMusicLiveActivity()

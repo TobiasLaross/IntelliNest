@@ -44,7 +44,9 @@ struct HomeView: View {
         .onAppear {
             viewModel.checkLocationAccess()
             Task {
+                async let storageLock: Void = viewModel.refreshStorageLock()
                 await viewModel.reloadYaleLocks()
+                await storageLock
             }
         }
     }
