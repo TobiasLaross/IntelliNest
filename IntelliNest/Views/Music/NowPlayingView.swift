@@ -169,7 +169,7 @@ struct NowPlayingView: View {
             Button {
                 viewModel.isShowingSpeakerPicker = true
             } label: {
-                Label(viewModel.controlledRoomTitle,
+                Label(viewModel.controlledRoomPillTitle,
                       systemImage: viewModel.isGroupActive ? "hifispeaker.2.fill" : "hifispeaker.fill")
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
