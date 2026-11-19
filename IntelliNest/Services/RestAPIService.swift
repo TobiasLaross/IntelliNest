@@ -191,6 +191,16 @@ class RestAPIService: URLRequestBuilder {
         repeatReloadAction(reloadTimes)
     }
 
+    /// Asks Home Assistant to poll the integration behind `entityID` right now. HA answers once the poll
+    /// has finished, so a state read straight after sees the fresh value.
+    @discardableResult
+    func refreshEntity(_ entityID: EntityId) async -> Bool {
+        await sendPostRequest(json: [.entityID: entityID.rawValue],
+                              domain: .homeassistant,
+                              action: .updateEntity,
+                              fireAndForget: true)
+    }
+
     func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil, reloadTimes: Int = 1) {
         lastCommandTask = Task {
             var json = [JSONKey: Any]()
