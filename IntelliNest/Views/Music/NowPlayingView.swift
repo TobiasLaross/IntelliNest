@@ -19,6 +19,10 @@ struct NowPlayingView: View {
     /// Shows each grouped speaker's own volume under the group slider. Opened by
     /// tapping the group slider's thumb; the art shrinks to make room.
     @State private var isShowingSpeakerVolumes = false
+    /// True while a song radio request is in flight. Music Assistant can take
+    /// 15 seconds to fail a start, so further taps are ignored until it answers
+    /// instead of queueing more requests behind the stuck one.
+    @State private var isStartingRadio = false
 
     private var showsSpeakerVolumes: Bool {
         isShowingSpeakerVolumes && viewModel.isGroupActive
@@ -188,13 +192,22 @@ struct NowPlayingView: View {
             // Only a Spotify track can seed Music Assistant's radio; a native Sonos
             // source (AirPlay, TV) has no uri MA can play.
             if let uri = speaker.mediaContentID, viewModel.spotifyTrackID(from: uri) != nil {
-                iconButton("dot.radiowaves.left.and.right", label: "Starta radio från låten") {
-                    Task {
-                        await viewModel.startRadio(fromTrackURI: uri, title: speaker.mediaTitle,
-                                                   artist: speaker.mediaArtist)
+                if isStartingRadio {
+                    ProgressView()
+                        .tint(.white)
+                        .frame(width: 44, height: 44)
+                        .accessibilityLabel("Startar radio")
+                } else {
+                    iconButton("dot.radiowaves.left.and.right", label: "Starta radio från låten") {
+                        isStartingRadio = true
+                        Task {
+                            await viewModel.startRadio(fromTrackURI: uri, title: speaker.mediaTitle,
+                                                       artist: speaker.mediaArtist)
+                            isStartingRadio = false
+                        }
                     }
+                    .accessibilityHint("Ersätter kön med liknande låtar")
                 }
-                .accessibilityHint("Ersätter kön med liknande låtar")
             }
             iconButton("quote.bubble", label: "Visa sångtext", isActive: viewModel.isLyricsExpanded) {
                 viewModel.toggleLyricsExpanded()
