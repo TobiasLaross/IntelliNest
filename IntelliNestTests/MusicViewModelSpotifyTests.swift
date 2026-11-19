@@ -268,4 +268,18 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "playing")
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.shuffle, true)
     }
+
+    func testSpotifyTrackIDParsesBareAndInstanceSchemes() {
+        let cases: [(uri: String, expected: String?)] = [
+            ("spotify://track/4SLYrBfzgbLmiEdoKajyHL", "4SLYrBfzgbLmiEdoKajyHL"),
+            ("spotify--FteCvPQu://track/4SLYrBfzgbLmiEdoKajyHL", "4SLYrBfzgbLmiEdoKajyHL"),
+            ("spotify--FteCvPQu://track/", nil),
+            ("spotify://playlist/37i9dQZF1DXcBWIGoYBM5M", nil),
+            ("spotifyfake://track/4SLYrBfzgbLmiEdoKajyHL", nil),
+            ("aac://http://192.168.1.205:8097/flow/CwJY2i2r/RINCON_38420B10EC2801400.aac", nil)
+        ]
+        for testCase in cases {
+            XCTAssertEqual(viewModel.spotifyTrackID(from: testCase.uri), testCase.expected, testCase.uri)
+        }
+    }
 }

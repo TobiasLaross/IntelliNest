@@ -175,12 +175,19 @@ extension MusicViewModel {
         lastBrowsedPlaylist
     }
 
+    /// Music Assistant reports a track either under the bare provider
+    /// (`spotify://track/<id>`) or under its provider instance
+    /// (`spotify--FteCvPQu://track/<id>`), so both schemes count as Spotify.
     func spotifyTrackID(from uri: String) -> String? {
-        let prefix = "spotify://track/"
-        guard uri.hasPrefix(prefix) else {
+        let separator = "://track/"
+        guard let separatorRange = uri.range(of: separator) else {
             return nil
         }
-        let trackID = String(uri.dropFirst(prefix.count))
+        let scheme = uri[..<separatorRange.lowerBound]
+        guard scheme == "spotify" || scheme.hasPrefix("spotify--") else {
+            return nil
+        }
+        let trackID = String(uri[separatorRange.upperBound...])
         return trackID.isNotEmpty ? trackID : nil
     }
 }
