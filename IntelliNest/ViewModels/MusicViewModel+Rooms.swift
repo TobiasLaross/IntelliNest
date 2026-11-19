@@ -77,6 +77,16 @@ extension MusicViewModel {
         return ([activeSpeaker] + others).map(\.friendlyName).joined(separator: " + ")
     }
 
+    /// The room pill's short label: the controlled speaker plus how many others
+    /// are joined to it ("Köket + 2"), so a big group still fits on one line.
+    var controlledRoomPillTitle: String {
+        guard let activeSpeaker else {
+            return "Välj rum"
+        }
+        let otherCount = groupedSpeakers.filter { $0.entityId != activeSpeaker.entityId }.count
+        return otherCount > 0 ? "\(activeSpeaker.friendlyName) + \(otherCount)" : activeSpeaker.friendlyName
+    }
+
     /// The speaker to show and command for a room card: the controlled speaker when
     /// it is in that room, otherwise the room's group leader.
     func controlledSpeakerID(in entry: SpeakerPickerEntry) -> EntityId {

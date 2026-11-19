@@ -136,6 +136,26 @@ extension MusicViewModelTests {
         XCTAssertEqual(viewModel.controlledRoomTitle, "\(EntityId.mediaPlayerKitchen.rawValue) + \(EntityId.mediaPlayerPlayroom.rawValue)")
     }
 
+    func testRoomPillShowsTheControlledSpeakerAndHowManyAreJoined() async {
+        let groups: [(members: [EntityId], expected: String)] = [
+            ([.mediaPlayerKitchen], EntityId.mediaPlayerKitchen.rawValue),
+            ([.mediaPlayerKitchen, .mediaPlayerPlayroom], "\(EntityId.mediaPlayerKitchen.rawValue) + 1"),
+            ([.mediaPlayerPlayroom, .mediaPlayerKitchen, .mediaPlayerGuestRoom], "\(EntityId.mediaPlayerKitchen.rawValue) + 2")
+        ]
+        for testCase in groups {
+            stubAllSpeakers()
+            let memberIDs = testCase.members.map(\.rawValue)
+            for entityID in testCase.members {
+                stubSpeaker(entityID, data: speakerJSON(entityID: entityID, state: "playing",
+                                                        friendlyName: entityID.rawValue, groupMembers: memberIDs))
+            }
+            await viewModel.reload()
+            viewModel.selectSpeaker(.mediaPlayerKitchen)
+
+            XCTAssertEqual(viewModel.controlledRoomPillTitle, testCase.expected)
+        }
+    }
+
     // MARK: - Room status
 
     func testRoomStatusText() {
