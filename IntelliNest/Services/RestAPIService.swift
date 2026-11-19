@@ -195,10 +195,11 @@ class RestAPIService: URLRequestBuilder {
     /// has finished, so a state read straight after sees the fresh value.
     @discardableResult
     func refreshEntity(_ entityID: EntityId) async -> Bool {
-        await sendPostRequest(json: [.entityID: entityID.rawValue],
-                              domain: .homeassistant,
-                              action: .updateEntity,
-                              fireAndForget: true)
+        // Fails over to the external URL like the state read that follows it does, or that read
+        // could reach HA while the refresh never did and return the stale state.
+        await sendPostWithSilentFailover(domain: .homeassistant,
+                                         action: .updateEntity,
+                                         json: [.entityID: entityID.rawValue])
     }
 
     func callScript(scriptID: ScriptID, variables: [ScriptVariableKeys: String]? = nil, reloadTimes: Int = 1) {

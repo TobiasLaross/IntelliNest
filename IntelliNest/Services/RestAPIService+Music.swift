@@ -193,7 +193,7 @@ extension RestAPIService {
         if radioMode {
             json[.radioMode] = true
         }
-        return await sendMusicPostExpectingSuccess(domain: .musicAssistant, action: .playMedia, json: json)
+        return await sendPostWithSilentFailover(domain: .musicAssistant, action: .playMedia, json: json)
     }
 
     func mediaTransport(entityID: EntityId, action: Action, reloadTimes: Int = 2) {
@@ -275,7 +275,7 @@ extension RestAPIService {
             for memberID in memberIDs {
                 var unjoinJSON = [JSONKey: Any]()
                 unjoinJSON[.entityID] = memberID.rawValue
-                guard await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .unjoin, json: unjoinJSON) else {
+                guard await sendPostWithSilentFailover(domain: .mediaPlayer, action: .unjoin, json: unjoinJSON) else {
                     if didMutate {
                         triggerRepeatReload(times: reloadTimes)
                     }
@@ -287,7 +287,7 @@ extension RestAPIService {
         var json = [JSONKey: Any]()
         json[.entityID] = leaderID.rawValue
         json[.groupMembers] = memberIDs.map(\.rawValue)
-        let success = await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .join, json: json)
+        let success = await sendPostWithSilentFailover(domain: .mediaPlayer, action: .join, json: json)
         if success || didMutate {
             triggerRepeatReload(times: reloadTimes)
         }
@@ -300,14 +300,15 @@ extension RestAPIService {
     func unjoinSpeaker(memberID: EntityId, reloadTimes: Int = 3) async -> Bool {
         var json = [JSONKey: Any]()
         json[.entityID] = memberID.rawValue
-        let success = await sendMusicPostExpectingSuccess(domain: .mediaPlayer, action: .unjoin, json: json)
+        let success = await sendPostWithSilentFailover(domain: .mediaPlayer, action: .unjoin, json: json)
         if success {
             triggerRepeatReload(times: reloadTimes)
         }
         return success
     }
 
-    private func sendMusicPostExpectingSuccess(domain: Domain, action: Action, json: [JSONKey: Any]) async -> Bool {
+    /// Tries the current URL, then the external one, without ever raising the error banner.
+    func sendPostWithSilentFailover(domain: Domain, action: Action, json: [JSONKey: Any]) async -> Bool {
         let path = "/api/services/\(domain.rawValue)/\(action.rawValue)"
         let jsonData = createJSONData(json: json)
         guard let request = createURLRequest(path: path, jsonData: jsonData, method: .post) else {
