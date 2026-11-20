@@ -207,11 +207,12 @@ extension MusicViewModel {
         }
     }
 
-    /// Replaces the queue with a radio seeded by the current song: the song plays
-    /// again from the start and Music Assistant follows it with similar tracks.
-    /// Repeat is turned off so the seed doesn't loop instead of the radio.
+    /// Replaces the upcoming queue with a radio seeded by the current song. The song
+    /// keeps playing where it is (`replace_next` swaps only what follows it) and Music
+    /// Assistant fills the rest with similar tracks. Repeat is turned off so the seed
+    /// doesn't loop instead of the radio.
     func startRadio(fromTrackURI uri: String, title: String?, artist: String?) async {
-        await startPlayback(uri: uri, mediaType: .track, title: title, artist: artist,
+        await startPlayback(uri: uri, mediaType: .track, title: title, artist: artist, enqueue: "replace_next",
                             radioMode: true, turnOffRepeat: true, clearsSourcePlaylist: true)
     }
 
@@ -231,9 +232,11 @@ extension MusicViewModel {
             setErrorBannerText("Ingen högtalare vald", "Välj en högtalare innan du spelar musik")
             return false
         }
+        // `replace_next` leaves the playing track alone; every other option starts a new one.
+        let keepsCurrentTrack = enqueue == "replace_next"
         // A new track resets playback position, so any seek/pause hold is obsolete —
         // clear it before the refresh below can re-pin a stale position.
-        positionHold = nil
+        if !keepsCurrentTrack { positionHold = nil }
         // Group membership can change between the 5-second reloads (e.g. the
         // speaker was just ungrouped). Refresh the active speaker before routing
         // so playback isn't sent to a stale group leader it's no longer synced
@@ -249,14 +252,15 @@ extension MusicViewModel {
         let success = await restAPIService.playMedia(on: targetID, mediaID: uri, mediaType: mediaType,
                                                      enqueue: enqueue, radioMode: radioMode)
         if success {
-            // Optimistically reflect what we just started; a reload confirms it.
-            speakers[activeSpeakerID]?.state = "playing"
-            speakers[activeSpeakerID]?.mediaTitle = title
-            speakers[activeSpeakerID]?.mediaArtist = artist
-            // A "replace" wipes the server queue, so the manual "I kö" tracking from
-            // the previous context no longer applies — clear it so leftover ids can't
-            // mislabel the new playlist's tracks.
-            if enqueue == "replace" {
+            if !keepsCurrentTrack {
+                // Optimistically reflect what we just started; a reload confirms it.
+                speakers[activeSpeakerID]?.state = "playing"
+                speakers[activeSpeakerID]?.mediaTitle = title
+                speakers[activeSpeakerID]?.mediaArtist = artist
+            }
+            // Both replaces wipe the upcoming server queue, so the manual "I kö" tracking no
+            // longer applies; clear it so leftover ids can't mislabel the new tracks.
+            if enqueue == "replace" || keepsCurrentTrack {
                 clearManualQueueTracking()
             }
             if clearsSourcePlaylist {

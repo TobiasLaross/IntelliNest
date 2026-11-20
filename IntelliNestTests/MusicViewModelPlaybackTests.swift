@@ -61,11 +61,17 @@ extension MusicViewModelTests {
         }
     }
 
-    func testStartRadioReplacesQueueInRadioModeAndTurnsRepeatOff() async {
+    func testStartRadioReplacesUpcomingQueueInRadioModeAndTurnsRepeatOff() async {
         let playPath = "/api/services/music_assistant/play_media"
         let repeatPath = "/api/services/media_player/repeat_set"
         viewModel.selectSpeaker(.mediaPlayerKitchen)
         viewModel.speakers[.mediaPlayerKitchen]?.repeatMode = .all
+        // The playing song must survive: distinct metadata, paused state and an unconfirmed seek hold.
+        viewModel.speakers[.mediaPlayerKitchen]?.state = "paused"
+        viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle = "Seed Title"
+        viewModel.speakers[.mediaPlayerKitchen]?.mediaArtist = "Seed Artist"
+        let hold = PlaybackPositionHold(target: 30, since: Date())
+        viewModel.positionHold = hold
         stubPlayMedia(statusCode: 200)
         stubPostService(path: repeatPath)
         // One recorder: URLProtocolStub keeps a single observer, so a second would replace it.
@@ -79,10 +85,13 @@ extension MusicViewModelTests {
         let data = request.httpBodyStreamData() ?? request.httpBody
         let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
         XCTAssertEqual(body?["media_id"] as? String, trackURI)
-        XCTAssertEqual(body?["enqueue"] as? String, "replace")
+        XCTAssertEqual(body?["enqueue"] as? String, "replace_next")
         XCTAssertEqual(body?["radio_mode"] as? Bool, true)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.repeatMode, .off)
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, trackName)
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.state, "paused")
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, "Seed Title")
+        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaArtist, "Seed Artist")
+        XCTAssertEqual(viewModel.positionHold, hold)
         XCTAssertTrue(bannerTitles.isEmpty)
     }
 
