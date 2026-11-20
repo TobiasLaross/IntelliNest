@@ -183,6 +183,17 @@ extension MusicViewModel {
         }
     }
 
+    /// Resolves a track row's artist or album for the context menu's "Gå till"
+    /// entries. Banners and returns nil when Music Assistant can't resolve it.
+    func trackLink(_ kind: MusicTrackLinkKind, ofTrack uri: String) async -> MusicSearchItem? {
+        if let link = await queueSocket.trackLinks(uri: uri)?.item(for: kind) {
+            return link
+        }
+        let what = kind == .artist ? "artisten" : "albumet"
+        setErrorBannerText("Kunde inte öppna \(what)", "Music Assistant hittade inte låtens \(what)")
+        return nil
+    }
+
     /// Whether a search hit or recent pick is what the active speaker is playing,
     /// so its row turns green once a tap has started it. A track is matched on
     /// title and artist: the hit carries a Spotify uri while the speaker reports

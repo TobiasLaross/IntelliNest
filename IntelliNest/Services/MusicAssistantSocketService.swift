@@ -37,6 +37,8 @@ protocol MusicAssistantQueueSocket: Sendable {
     /// provider's library sync-back on, MA also saves it on Spotify. Returns
     /// whether the command succeeded.
     func addToLibrary(uri: String) async -> Bool
+    /// The artist and album of the track at `uri`, or nil when MA can't resolve it.
+    func trackLinks(uri: String) async -> MusicTrackLinks?
 }
 
 /// Talks to the Music Assistant server's WebSocket API. Each call opens a short
@@ -98,6 +100,13 @@ final class MusicAssistantSocketService: MusicAssistantQueueSocket {
 
     func addToLibrary(uri: String) async -> Bool {
         await send(command: "music/library/add_item", args: ["item": uri]) != nil
+    }
+
+    func trackLinks(uri: String) async -> MusicTrackLinks? {
+        guard let result = await send(command: "music/item_by_uri", args: ["uri": uri]) else {
+            return nil
+        }
+        return MusicTrackLinks.parse(result)
     }
 
     // MARK: - WebSocket plumbing
@@ -233,4 +242,5 @@ struct DisabledMusicAssistantQueueSocket: MusicAssistantQueueSocket {
     func addFavorite(uri _: String) async -> Bool { false }
     func removeFavorite(mediaType _: String, libraryItemID _: String) async -> Bool { false }
     func addToLibrary(uri _: String) async -> Bool { false }
+    func trackLinks(uri _: String) async -> MusicTrackLinks? { nil }
 }

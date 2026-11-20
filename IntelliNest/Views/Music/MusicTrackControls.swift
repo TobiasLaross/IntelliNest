@@ -28,8 +28,9 @@ struct SongFavoriteButton: View {
 }
 
 /// The track context-menu actions: play next or add to the end of the play
-/// queue, add to one of the user's editable playlists, and (in an editable
-/// playlist) remove from it. Each action is shown only when it can function.
+/// queue, add to one of the user's editable playlists, go to the track's artist
+/// or album, and (in an editable playlist) remove from it. Each action is shown
+/// only when it can function.
 /// Designed to live inside a `.contextMenu { … }`.
 struct TrackActionButtons: View {
     @ObservedObject var viewModel: MusicViewModel
@@ -39,6 +40,9 @@ struct TrackActionButtons: View {
     var imageURL: String?
     /// Set by an editable playlist's detail to offer "remove from this playlist".
     var onRemoveFromPlaylist: MainActorVoidClosure?
+    /// Shows the track's resolved artist or album. Hosts with nowhere to show one
+    /// leave it nil, which hides the "Gå till" entries.
+    var onOpenLink: (@MainActor (MusicSearchItem) -> Void)?
 
     var body: some View {
         Button {
@@ -65,12 +69,32 @@ struct TrackActionButtons: View {
             }
         }
 
+        if let onOpenLink {
+            linkButton(.artist, title: "Gå till artist", systemImage: "music.mic", open: onOpenLink)
+            linkButton(.album, title: "Gå till album", systemImage: "square.stack", open: onOpenLink)
+        }
+
         if let onRemoveFromPlaylist {
             Button(role: .destructive) {
                 onRemoveFromPlaylist()
             } label: {
                 Label("Ta bort från spellistan", systemImage: "minus.circle")
             }
+        }
+    }
+
+    private func linkButton(_ kind: MusicTrackLinkKind,
+                            title: String,
+                            systemImage: String,
+                            open: @escaping @MainActor (MusicSearchItem) -> Void) -> some View {
+        Button {
+            Task {
+                if let link = await viewModel.trackLink(kind, ofTrack: uri) {
+                    open(link)
+                }
+            }
+        } label: {
+            Label(title, systemImage: systemImage)
         }
     }
 }

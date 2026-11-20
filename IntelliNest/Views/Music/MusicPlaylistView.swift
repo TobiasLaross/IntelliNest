@@ -18,6 +18,8 @@ struct MusicPlaylistView: View {
     /// waits on Home Assistant and Music Assistant, which can take seconds, so the
     /// tapped button shows a spinner until the call returns.
     @State private var startingButton: String?
+    /// The artist or album a track's "Gå till" menu entry resolved, pushed on top.
+    @State private var openedLink: MusicSearchItem?
 
     var body: some View {
         VStack(spacing: 16) {
@@ -29,6 +31,9 @@ struct MusicPlaylistView: View {
         .foregroundStyle(.white)
         .navigationBarTitleDisplayMode(.inline)
         .task { await viewModel.loadSavedState(for: playlist) }
+        .navigationDestination(item: $openedLink) { item in
+            MusicArtistView(viewModel: viewModel, item: item)
+        }
         .toolbar {
             // No principal title here on purpose — the full playlist name is shown
             // large in the header below, so a cramped, truncated nav-bar copy adds
@@ -176,7 +181,8 @@ struct MusicPlaylistView: View {
                                title: track.title,
                                artist: track.artist,
                                imageURL: track.imageURL,
-                               onRemoveFromPlaylist: removeAction(for: track))
+                               onRemoveFromPlaylist: removeAction(for: track),
+                               onOpenLink: { openedLink = $0 })
         }
     }
 

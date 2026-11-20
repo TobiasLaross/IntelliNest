@@ -207,7 +207,8 @@ extension View {
                                    uri: item.uri,
                                    title: item.name,
                                    artist: item.artist,
-                                   imageURL: item.imageURL)
+                                   imageURL: item.imageURL,
+                                   onOpenLink: { viewModel.browsingArtist = $0 })
             }
         } else {
             self

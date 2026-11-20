@@ -119,7 +119,8 @@ struct MusicArtistView: View {
                                    uri: child.uri,
                                    title: child.name,
                                    artist: child.artist,
-                                   imageURL: child.imageURL)
+                                   imageURL: child.imageURL,
+                                   onOpenLink: { openedAlbum = $0 })
             }
         } else {
             MusicMediaRow(name: child.name,

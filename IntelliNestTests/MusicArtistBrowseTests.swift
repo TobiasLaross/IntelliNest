@@ -78,3 +78,80 @@ final class MusicArtistBrowseTests: XCTestCase {
         }
     }
 }
+
+// MARK: - Track links ("Gå till artist" / "Gå till album")
+
+extension MusicArtistBrowseTests {
+    /// Trimmed from a real `music/item_by_uri` reply for a Spotify track.
+    func testTrackLinksReadFirstArtistAndAlbumFromItemByURI() {
+        let json = """
+        {"uri":"spotify--FteCvPQu://track/4uLU6hMCjMI75M1A2tKUQC","name":"Never Gonna Give You Up",
+         "artists":[{"uri":"spotify--FteCvPQu://artist/0gxyHStUsqpMadRV0Di1Qt","name":"Rick Astley",
+                     "metadata":{"images":[]}},
+                    {"uri":"spotify--FteCvPQu://artist/other","name":"Other"}],
+         "album":{"uri":"spotify--FteCvPQu://album/6N9PS4QXF1D0OWPk0Sxtb4","name":"Whenever You Need Somebody",
+                  "artists":[{"name":"Rick Astley"}],
+                  "metadata":{"images":[{"path":"/local/cover.jpg","remotely_accessible":false},
+                                        {"path":"https://i.scdn.co/image/cover","remotely_accessible":true}]}}}
+        """
+        let links = MusicTrackLinks.parse(Data(json.utf8))
+
+        XCTAssertEqual(links?.artist, MusicSearchItem(uri: "spotify--FteCvPQu://artist/0gxyHStUsqpMadRV0Di1Qt",
+                                                      name: "Rick Astley", mediaType: .artist,
+                                                      imageURL: nil, artist: nil))
+        XCTAssertEqual(links?.album, MusicSearchItem(uri: "spotify--FteCvPQu://album/6N9PS4QXF1D0OWPk0Sxtb4",
+                                                     name: "Whenever You Need Somebody", mediaType: .album,
+                                                     imageURL: "https://i.scdn.co/image/cover", artist: "Rick Astley"))
+    }
+
+    func testTrackLinksAreNilWithoutArtistOrAlbumURIs() {
+        let cases: [(label: String, json: String)] = [
+            ("not an object", "[]"),
+            ("no links", "{\"name\":\"Song\"}"),
+            ("links without uris", "{\"artists\":[{\"name\":\"A\"}],\"album\":{\"name\":\"B\"}}")
+        ]
+        for testCase in cases {
+            XCTAssertNil(MusicTrackLinks.parse(Data(testCase.json.utf8)), testCase.label)
+        }
+    }
+}
+
+@MainActor
+extension MusicViewModelTests {
+    func testTrackLinkReturnsTheRequestedKind() async {
+        let artist = MusicSearchItem(uri: "spotify://artist/a1", name: "Miss Li", mediaType: .artist,
+                                     imageURL: nil, artist: nil)
+        let album = MusicSearchItem(uri: "spotify://album/b1", name: "På Måndag", mediaType: .album,
+                                    imageURL: nil, artist: "Miss Li")
+        let socket = StubMusicAssistantQueueSocket()
+        await socket.setLinks(MusicTrackLinks(artist: artist, album: album))
+        let viewModel = makeViewModel(socket: socket)
+
+        let openedArtist = await viewModel.trackLink(.artist, ofTrack: "spotify://track/t1")
+        let openedAlbum = await viewModel.trackLink(.album, ofTrack: "spotify://track/t1")
+
+        XCTAssertEqual(openedArtist, artist)
+        XCTAssertEqual(openedAlbum, album)
+        XCTAssertTrue(bannerTitles.isEmpty)
+    }
+
+    func testTrackLinkBannersWhenMusicAssistantCannotResolveIt() async {
+        let album = MusicSearchItem(uri: "spotify://album/b1", name: "På Måndag", mediaType: .album,
+                                    imageURL: nil, artist: nil)
+        let cases: [(label: String, links: MusicTrackLinks?)] = [
+            ("socket failed", nil),
+            ("track has no artist", MusicTrackLinks(artist: nil, album: album))
+        ]
+        for testCase in cases {
+            bannerTitles = []
+            let socket = StubMusicAssistantQueueSocket()
+            await socket.setLinks(testCase.links)
+            let viewModel = makeViewModel(socket: socket)
+
+            let link = await viewModel.trackLink(.artist, ofTrack: "spotify://track/t1")
+
+            XCTAssertNil(link, testCase.label)
+            XCTAssertEqual(bannerTitles, ["Kunde inte öppna artisten"], testCase.label)
+        }
+    }
+}

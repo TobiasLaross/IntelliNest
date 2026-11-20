@@ -192,3 +192,53 @@ struct MusicLibraryResponse: Decodable {
         playlists = rawItems.compactMap { $0.searchItem(mediaType: .playlist) }
     }
 }
+
+/// The two places a track's context menu can jump to.
+enum MusicTrackLinkKind {
+    case artist
+    case album
+}
+
+/// A track's first artist and its album as browse items `MusicArtistView` can open.
+/// A track row only carries names, so these come from Music Assistant's
+/// `music/item_by_uri`, which returns the full track with its artist and album uris.
+struct MusicTrackLinks: Equatable {
+    let artist: MusicSearchItem?
+    let album: MusicSearchItem?
+
+    func item(for kind: MusicTrackLinkKind) -> MusicSearchItem? {
+        switch kind {
+        case .artist:
+            artist
+        case .album:
+            album
+        }
+    }
+
+    /// Parses the `result` of `music/item_by_uri`. Nil when the reply holds neither
+    /// an artist nor an album with a uri.
+    static func parse(_ data: Data) -> MusicTrackLinks? {
+        guard let track = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return nil
+        }
+        let artist = (track["artists"] as? [[String: Any]])?.first.flatMap { item(from: $0, mediaType: .artist) }
+        let album = (track["album"] as? [String: Any]).flatMap { item(from: $0, mediaType: .album) }
+        guard artist != nil || album != nil else {
+            return nil
+        }
+        return MusicTrackLinks(artist: artist, album: album)
+    }
+
+    private static func item(from object: [String: Any], mediaType: MusicMediaType) -> MusicSearchItem? {
+        guard let uri = object["uri"] as? String, let name = object["name"] as? String else {
+            return nil
+        }
+        // An image the server can't hand out (a local file path) would only render as
+        // a broken cover, so only a remotely accessible one is kept.
+        let images = (object["metadata"] as? [String: Any])?["images"] as? [[String: Any]]
+        let image = images?.first { $0["remotely_accessible"] as? Bool != false }
+        let artist = (object["artists"] as? [[String: Any]])?.first?["name"] as? String
+        return MusicSearchItem(uri: uri, name: name, mediaType: mediaType,
+                               imageURL: image?["path"] as? String, artist: artist)
+    }
+}
