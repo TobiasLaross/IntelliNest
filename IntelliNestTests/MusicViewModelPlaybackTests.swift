@@ -61,7 +61,7 @@ extension MusicViewModelTests {
         }
     }
 
-    func testStartRadioReplacesQueueInRadioModeAndTurnsRepeatOff() async {
+    func testStartRadioReplacesUpcomingQueueInRadioModeAndTurnsRepeatOff() async {
         let playPath = "/api/services/music_assistant/play_media"
         let repeatPath = "/api/services/media_player/repeat_set"
         viewModel.selectSpeaker(.mediaPlayerKitchen)
@@ -79,10 +79,9 @@ extension MusicViewModelTests {
         let data = request.httpBodyStreamData() ?? request.httpBody
         let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
         XCTAssertEqual(body?["media_id"] as? String, trackURI)
-        XCTAssertEqual(body?["enqueue"] as? String, "replace")
+        XCTAssertEqual(body?["enqueue"] as? String, "replace_next")
         XCTAssertEqual(body?["radio_mode"] as? Bool, true)
         XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.repeatMode, .off)
-        XCTAssertEqual(viewModel.speakers[.mediaPlayerKitchen]?.mediaTitle, trackName)
         XCTAssertTrue(bannerTitles.isEmpty)
     }
 
