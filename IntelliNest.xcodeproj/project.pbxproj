@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA0E0A0A1000000000000002 /* HeatersAwayModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0E0A0A2000000000000002 /* HeatersAwayModeView.swift */; };
+		DA0E0A0A1000000000000001 /* HeatersAwayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0E0A0A2000000000000001 /* HeatersAwayMode.swift */; };
 		LA0000000000000000B00100 /* MusicActivityRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0100 /* MusicActivityRelay.swift */; };
 		LA0000000000000000B00000 /* MusicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0000 /* MusicActivityAttributes.swift */; };
 		LA0000000000000000B10000 /* MusicActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = LA00000000000000000F0000 /* MusicActivityAttributes.swift */; };
@@ -193,6 +195,7 @@
 		CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000006000000000000006 /* ElectricityViewModelTests.swift */; };
 		CC0000007000000000000007 /* ElectricityViewModelSensorLagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000008000000000000008 /* ElectricityViewModelSensorLagTests.swift */; };
 		BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000002000000000000002 /* HeatersViewModelTests.swift */; };
+		BB0000001000000000000011 /* HeatersAwayModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000002000000000000012 /* HeatersAwayModeTests.swift */; };
 		DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000002000000000000002 /* LynkViewModelTests.swift */; };
 		BB0000003000000000000003 /* LightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000004000000000000004 /* LightsViewModelTests.swift */; };
 		BB0000007000000000000007 /* LockableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000008000000000000008 /* LockableTests.swift */; };
@@ -296,6 +299,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DA0E0A0A2000000000000002 /* HeatersAwayModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersAwayModeView.swift; sourceTree = "<group>"; };
+		DA0E0A0A2000000000000001 /* HeatersAwayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersAwayMode.swift; sourceTree = "<group>"; };
 		LA00000000000000000F0100 /* MusicActivityRelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityRelay.swift"; sourceTree = "<group>"; };
 		LA00000000000000000F0000 /* MusicActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityAttributes.swift"; sourceTree = "<group>"; };
 		LA00000000000000000F0001 /* MusicActivityIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MusicActivityIntents.swift"; sourceTree = "<group>"; };
@@ -482,6 +487,7 @@
 		CC0000006000000000000006 /* ElectricityViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityViewModelTests.swift; sourceTree = "<group>"; };
 		CC0000008000000000000008 /* ElectricityViewModelSensorLagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElectricityViewModelSensorLagTests.swift; sourceTree = "<group>"; };
 		BB0000002000000000000002 /* HeatersViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersViewModelTests.swift; sourceTree = "<group>"; };
+		BB0000002000000000000012 /* HeatersAwayModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatersAwayModeTests.swift; sourceTree = "<group>"; };
 		DD0000002000000000000002 /* LynkViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LynkViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000004000000000000004 /* LightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightsViewModelTests.swift; sourceTree = "<group>"; };
 		BB0000008000000000000008 /* LockableTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockableTests.swift; sourceTree = "<group>"; };
@@ -723,6 +729,7 @@
 			CC0000006000000000000006 /* ElectricityViewModelTests.swift */,
 			CC0000008000000000000008 /* ElectricityViewModelSensorLagTests.swift */,
 			BB0000002000000000000002 /* HeatersViewModelTests.swift */,
+			BB0000002000000000000012 /* HeatersAwayModeTests.swift */,
 			DD0000002000000000000002 /* LynkViewModelTests.swift */,
 			BB0000004000000000000004 /* LightsViewModelTests.swift */,
 			BB0000008000000000000008 /* LockableTests.swift */,
@@ -789,6 +796,7 @@
 				F62CD2E228770D5500462092 /* LightsViewModel.swift */,
 				F6F94B5D28B60DED006B1F12 /* LynkViewModel.swift */,
 				F6F8556028DF9EE8004B9517 /* HeatersViewModel.swift */,
+				DA0E0A0A2000000000000001 /* HeatersAwayMode.swift */,
 				F6EF35B22A3DFE3100895250 /* HeatersViewModelExtension.swift */,
 				F6FDBE2E2A1CD7980081BC3D /* LockServiceProtocol.swift */,
 				F66E28AD2A34FBDE0003EC70 /* VLCMediaplayerMock.swift */,
@@ -875,6 +883,7 @@
 				F6D167CB27C1287700DCC155 /* HvacModeView.swift */,
 				F6633F2B286324EB004D0B76 /* DetailedHeaterView.swift */,
 				F6633F2D2863260B004D0B76 /* SimpleHeaterView.swift */,
+				DA0E0A0A2000000000000002 /* HeatersAwayModeView.swift */,
 				F6633F2F286326FC004D0B76 /* ThermometerGroupView.swift */,
 				F6633F312863275D004D0B76 /* ThermometerView.swift */,
 				F6633F33286327F9004D0B76 /* NumberTextView.swift */,
@@ -1312,9 +1321,11 @@
 				F662999627B4185D00121C14 /* BatteryView.swift in Sources */,
 				F6591C052B0778BC00D5785E /* CallServiceRequest.swift in Sources */,
 				F6633F2E2863260B004D0B76 /* SimpleHeaterView.swift in Sources */,
+				DA0E0A0A1000000000000002 /* HeatersAwayModeView.swift in Sources */,
 				F62CD2EB2877276B00462092 /* DualBulbRoomView.swift in Sources */,
 				F61BF9A42A166E0D00C1802E /* LockState.swift in Sources */,
 				F6F8556128DF9EE8004B9517 /* HeatersViewModel.swift in Sources */,
+				DA0E0A0A1000000000000001 /* HeatersAwayMode.swift in Sources */,
 				F627509F29FD120F00C1253F /* Navigator.swift in Sources */,
 				FE0000000000000000000C02 /* Navigator+Geofence.swift in Sources */,
 				F64D2694283E8FAB0073A7BF /* NetworkTask.swift in Sources */,
@@ -1480,6 +1491,7 @@
 			CC0000005000000000000005 /* ElectricityViewModelTests.swift in Sources */,
 			CC0000007000000000000007 /* ElectricityViewModelSensorLagTests.swift in Sources */,
 			BB0000001000000000000001 /* HeatersViewModelTests.swift in Sources */,
+			BB0000001000000000000011 /* HeatersAwayModeTests.swift in Sources */,
 			DD0000001000000000000001 /* LynkViewModelTests.swift in Sources */,
 				EE000011000000000000000B /* MusicViewModelTests.swift in Sources */,
 				EE00001100000000000000C1 /* MusicViewModelGroupingTests.swift in Sources */,

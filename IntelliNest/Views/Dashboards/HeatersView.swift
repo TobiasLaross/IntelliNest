@@ -13,6 +13,12 @@ struct HeatersView: View {
     var body: some View {
         ScrollView {
             VStack {
+                HeatersAwayModeView(isOn: viewModel.heatersAwayMode.isActive,
+                                    returnDate: viewModel.heatersAwayReturn.date,
+                                    setAwayMode: { viewModel.setAwayMode($0) },
+                                    setReturnDate: viewModel.setAwayReturn)
+                    .padding(.top)
+                Divider()
                 SimpleHeaterView(roomName: "Korridoren",
                                  therm1: viewModel.thermCorridor,
                                  therm2: viewModel.thermBedroom,

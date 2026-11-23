@@ -133,6 +133,8 @@ enum EntityId: String, Decodable, CaseIterable {
     case resetCorridorHeaterTime = "input_datetime.reset_corridor_heater_time"
     case resetPlayroomHeaterTime = "input_datetime.reset_playroom_heater_time"
     case saveClimateState = "script.save_climate_state"
+    case heatersAwayMode = "input_boolean.heaters_away_mode"
+    case heatersAwayReturn = "input_datetime.heaters_away_return"
     /* Cameras */
     case cameraVince = "camera.vince_rtsp"
     case cameraFront = "camera.framsidan_frigate"
