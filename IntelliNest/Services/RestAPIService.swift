@@ -326,12 +326,18 @@ extension RestAPIService {
 
     func update(dateEntityID: EntityId, date: Date, reloadTimes: Int = 1) {
         lastCommandTask = Task {
-            var json = [JSONKey: Any]()
-            json[.entityID] = dateEntityID.rawValue
-            json[.dateTime] = date
-            await sendPostRequest(json: json, domain: .inputDateTime, action: .setDateTime)
-            repeatReloadAction(reloadTimes)
+            await setDateTime(dateEntityID: dateEntityID, date: date, reloadTimes: reloadTimes)
         }
+    }
+
+    @discardableResult
+    func setDateTime(dateEntityID: EntityId, date: Date, reloadTimes: Int = 1) async -> Bool {
+        var json = [JSONKey: Any]()
+        json[.entityID] = dateEntityID.rawValue
+        json[.dateTime] = date
+        let success = await sendPostRequest(json: json, domain: .inputDateTime, action: .setDateTime)
+        repeatReloadAction(reloadTimes)
+        return success
     }
 
     func update(entityID: EntityId, domain: Domain, action: Action, dataKey: JSONKey, dataValue: String, reloadTimes: Int = 1) {

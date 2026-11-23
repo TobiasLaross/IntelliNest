@@ -41,6 +41,8 @@ class HomeViewModel: ObservableObject, Reloadable {
     @Published var generalWasteDate = Entity(entityId: .generalWasteDate)
     @Published var plasticWasteDate = Entity(entityId: .plasticWasteDate)
     @Published var gardenWasteDate = Entity(entityId: .gardenWasteDate)
+    @Published var heatersAwayMode = Entity(entityId: .heatersAwayMode)
+    @Published var heatersAwayReturn = Entity(entityId: .heatersAwayReturn)
 
     @Published var noLocationAccess = false
 
@@ -56,8 +58,16 @@ class HomeViewModel: ObservableObject, Reloadable {
         .hittaSarahsIphone, .coffeeMachine, .storageLock, .coffeeMachineStartTime, .coffeeMachineStartTimeEnabled,
         .pulsePower, .tibberPrice, .pulseConsumptionToday, .washerCompletionTime,
         .solarProductionToday, .dryerCompletionTime, .washerState, .dryerState, .easeePower, .easeeNoCurrentReason,
-        .easeeStatus, .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights
+        .easeeStatus, .generalWasteDate, .plasticWasteDate, .gardenWasteDate, .allLights, .heatersAwayMode, .heatersAwayReturn
     ]
+
+    /// Days (or hours) until return while the heaters are in away mode, shown on the heaters button.
+    var heatersAwayBadge: String? {
+        guard heatersAwayMode.isActive else {
+            return nil
+        }
+        return HeatersAwayMode.badge(returnDate: heatersAwayReturn.date, now: now())
+    }
 
     var isEaseeCharging: Bool {
         easeeStatus.state.lowercased() == "charging"
@@ -206,6 +216,8 @@ class HomeViewModel: ObservableObject, Reloadable {
 
     private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<HomeViewModel, Entity>] = [
         .hittaSarahsIphone: \.sarahsIphone,
+        .heatersAwayMode: \.heatersAwayMode,
+        .heatersAwayReturn: \.heatersAwayReturn,
         .coffeeMachineStartTime: \.coffeeMachineStartTime,
         .coffeeMachineStartTimeEnabled: \.coffeeMachineStartTimeEnabled,
         .pulsePower: \.pulsePower,

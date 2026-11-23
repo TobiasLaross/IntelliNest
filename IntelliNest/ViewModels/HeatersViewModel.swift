@@ -29,11 +29,15 @@ class HeatersViewModel: ObservableObject, Reloadable {
     @Published var heaterPlayroomTimerMode = Entity(entityId: .heaterPlayroomTimerMode)
     @Published var purifierTimerMode = Entity(entityId: .purifierTimerMode)
     @Published var purifier500TimerMode = Entity(entityId: .purifier500TimerMode)
+    @Published var heatersAwayMode = Entity(entityId: .heatersAwayMode)
+    @Published var heatersAwayReturn = Entity(entityId: .heatersAwayReturn)
+    /// The in-flight away-mode command, exposed so tests can await it.
+    private(set) var pendingAwayModeTask: Task<Void, Never>?
 
     let entityIDs: [EntityId] = [.resetCorridorHeaterTime, .resetPlayroomHeaterTime, .heaterCorridorTimerMode, .heaterPlayroomTimerMode,
                                  .purifierTimerMode, .purifierFanSpeed, .purifierHumidity, .purifierTemperature, .purifierMode,
                                  .resetPurifierTime, .purifier500TimerMode, .purifier500FanSpeed, .purifier500PM25,
-                                 .resetPurifier500Time]
+                                 .resetPurifier500Time, .heatersAwayMode, .heatersAwayReturn]
 
     var purifierSubtitle: String {
         "\(purifier.temperature)℃ - \(purifier.humidity)%"
@@ -157,6 +161,52 @@ class HeatersViewModel: ObservableObject, Reloadable {
                               savedSpeed: (.purifier500SavedSpeed, PurifierFanScale.pure500.percentage(forLevel: purifier500.speed)))
     }
 
+    /// Home Assistant's "Heaters away mode" automation saves both heaters and holds them at 17° fan 1, then
+    /// restores them 24 hours before `heatersAwayReturn`. The return time is written before the mode is
+    /// switched on, and the mode stays off if that write fails: a stale return time already inside the
+    /// 24-hour window would make the automation restore the heaters the moment the mode turns on.
+    func startAwayMode(returnDate: Date) {
+        let previousReturn = heatersAwayReturn.state
+        heatersAwayReturn.state = HeatersAwayMode.stateString(for: returnDate)
+        heatersAwayMode.isActive = true
+        enqueueAwayCommand { [weak self] in
+            guard let self else {
+                return
+            }
+            guard await restAPIService.setDateTime(dateEntityID: .heatersAwayReturn, date: returnDate) else {
+                heatersAwayReturn.state = previousReturn
+                heatersAwayMode.isActive = false
+                return
+            }
+            await restAPIService.setState(for: .heatersAwayMode, in: .inputBoolean, using: .turnOn, reloadTimes: 3)
+        }
+    }
+
+    /// Turning the mode off makes the automation restore the saved heater settings right away.
+    func endAwayMode() {
+        heatersAwayMode.isActive = false
+        enqueueAwayCommand { [weak self] in
+            await self?.restAPIService.setState(for: .heatersAwayMode, in: .inputBoolean, using: .turnOff, reloadTimes: 3)
+        }
+    }
+
+    func setAwayReturn(_ date: Date) {
+        heatersAwayReturn.state = HeatersAwayMode.stateString(for: date)
+        enqueueAwayCommand { [weak self] in
+            await self?.restAPIService.setDateTime(dateEntityID: .heatersAwayReturn, date: date)
+        }
+    }
+
+    /// Runs away-mode commands one at a time, in tap order, so an enable still waiting on its return-time
+    /// write can't send `turn_on` after a later disable has already sent `turn_off`.
+    private func enqueueAwayCommand(_ command: @escaping @MainActor () async -> Void) {
+        let previous = pendingAwayModeTask
+        pendingAwayModeTask = Task {
+            await previous?.value
+            await command()
+        }
+    }
+
     private lazy var entityKeyPaths: [EntityId: ReferenceWritableKeyPath<HeatersViewModel, Entity>] = [
         .resetCorridorHeaterTime: \.resetCorridorHeaterTime,
         .resetPlayroomHeaterTime: \.resetPlayroomHeaterTime,
@@ -165,7 +215,9 @@ class HeatersViewModel: ObservableObject, Reloadable {
         .resetPurifierTime: \.resetPurifierTime,
         .purifierTimerMode: \.purifierTimerMode,
         .resetPurifier500Time: \.resetPurifier500Time,
-        .purifier500TimerMode: \.purifier500TimerMode
+        .purifier500TimerMode: \.purifier500TimerMode,
+        .heatersAwayMode: \.heatersAwayMode,
+        .heatersAwayReturn: \.heatersAwayReturn
     ]
 
     private lazy var purifierReloaders: [EntityId: (String) -> Void] = [
