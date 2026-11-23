@@ -96,7 +96,9 @@ private struct NavigationButtonsView: View {
     var body: some View {
         VStack {
             HStack(spacing: 15) {
-                NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), action: viewModel.showHeatersAction)
+                NavigationButtonView(buttonTitle: "", image: Image(imageName: .aircondition), badge: viewModel.heatersAwayBadge,
+                                     action: viewModel.showHeatersAction)
+                    .accessibilityLabel(viewModel.heatersAwayBadge.map { "Värme, bortaläge, hemma om \($0)" } ?? "Värme")
                 NavigationButtonView(buttonTitle: "", image: Image(systemName: "car.2.fill"), action: viewModel.showLynkAction)
                 NavigationButtonView(image: Image(imageName: .powerGrid),
                                      buttonImageWidth: 45,

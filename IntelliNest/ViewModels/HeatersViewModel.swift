@@ -163,28 +163,47 @@ class HeatersViewModel: ObservableObject, Reloadable {
 
     /// Home Assistant's "Heaters away mode" automation saves both heaters and holds them at 17° fan 1, then
     /// restores them 24 hours before `heatersAwayReturn`. The return time is written before the mode is
-    /// switched on: a stale return time already inside that 24-hour window would make the automation
-    /// restore the heaters the moment the mode turns on.
-    func setAwayMode(_ isOn: Bool, now: Date = Date()) {
-        heatersAwayMode.isActive = isOn
-        var returnDate: Date?
-        if isOn, heatersAwayReturn.date < now.addingTimeInterval(HeatersAwayMode.restoreLead) {
-            let defaultReturn = HeatersAwayMode.defaultReturnDate(now: now)
-            heatersAwayReturn.state = HeatersAwayMode.stateString(for: defaultReturn)
-            returnDate = defaultReturn
-        }
-        pendingAwayModeTask = Task {
-            if let returnDate {
-                await restAPIService.setDateTime(dateEntityID: .heatersAwayReturn, date: returnDate)
+    /// switched on, and the mode stays off if that write fails: a stale return time already inside the
+    /// 24-hour window would make the automation restore the heaters the moment the mode turns on.
+    func startAwayMode(returnDate: Date) {
+        let previousReturn = heatersAwayReturn.state
+        heatersAwayReturn.state = HeatersAwayMode.stateString(for: returnDate)
+        heatersAwayMode.isActive = true
+        enqueueAwayCommand { [weak self] in
+            guard let self else {
+                return
             }
-            await restAPIService.setState(for: .heatersAwayMode, in: .inputBoolean, using: isOn ? .turnOn : .turnOff, reloadTimes: 3)
+            guard await restAPIService.setDateTime(dateEntityID: .heatersAwayReturn, date: returnDate) else {
+                heatersAwayReturn.state = previousReturn
+                heatersAwayMode.isActive = false
+                return
+            }
+            await restAPIService.setState(for: .heatersAwayMode, in: .inputBoolean, using: .turnOn, reloadTimes: 3)
+        }
+    }
+
+    /// Turning the mode off makes the automation restore the saved heater settings right away.
+    func endAwayMode() {
+        heatersAwayMode.isActive = false
+        enqueueAwayCommand { [weak self] in
+            await self?.restAPIService.setState(for: .heatersAwayMode, in: .inputBoolean, using: .turnOff, reloadTimes: 3)
         }
     }
 
     func setAwayReturn(_ date: Date) {
         heatersAwayReturn.state = HeatersAwayMode.stateString(for: date)
+        enqueueAwayCommand { [weak self] in
+            await self?.restAPIService.setDateTime(dateEntityID: .heatersAwayReturn, date: date)
+        }
+    }
+
+    /// Runs away-mode commands one at a time, in tap order, so an enable still waiting on its return-time
+    /// write can't send `turn_on` after a later disable has already sent `turn_off`.
+    private func enqueueAwayCommand(_ command: @escaping @MainActor () async -> Void) {
+        let previous = pendingAwayModeTask
         pendingAwayModeTask = Task {
-            await restAPIService.setDateTime(dateEntityID: .heatersAwayReturn, date: date)
+            await previous?.value
+            await command()
         }
     }
 

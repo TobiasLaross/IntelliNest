@@ -16,6 +16,7 @@ struct NavigationButtonView: View {
     let buttonImageHeight: CGFloat
     let frameSize: CGFloat
     let isActive: Bool
+    let badge: String?
     let action: MainActorVoidClosure
 
     init(buttonTitle: String = "",
@@ -24,6 +25,7 @@ struct NavigationButtonView: View {
          buttonImageHeight: CGFloat = dashboardButtonImageSize,
          frameSize: CGFloat = dashboardButtonFrameWidth,
          isActive: Bool = false,
+         badge: String? = nil,
          action: @escaping MainActorVoidClosure = {}) {
         self.buttonTitle = buttonTitle
         self.image = image
@@ -31,6 +33,7 @@ struct NavigationButtonView: View {
         self.buttonImageHeight = buttonImageHeight
         self.frameSize = frameSize
         self.isActive = isActive
+        self.badge = badge
         self.action = action
     }
 
@@ -59,6 +62,17 @@ struct NavigationButtonView: View {
             .frame(width: frameSize, height: frameSize, alignment: .center)
             .background(LinearGradient.buttonGradient)
             .cornerRadius(dashboardButtonCornerRadius)
+            .overlay(alignment: .topTrailing) {
+                if let badge {
+                    Text(badge)
+                        .font(.caption2.bold())
+                        .foregroundStyle(.black)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(Color.yellow, in: Capsule())
+                        .offset(x: 6, y: -6)
+                }
+            }
         }
     }
 }
