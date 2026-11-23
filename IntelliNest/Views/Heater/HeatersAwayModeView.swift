@@ -5,7 +5,8 @@
 
 import SwiftUI
 
-/// "Bortaläge": holds both heaters at 17° fan 1 while away; Home Assistant restores them 24 h before return.
+/// "Bortaläge": holds both heaters at 17° fan 1 and turns both purifiers off while away. Home Assistant restores
+/// the heaters 24 h before return and the purifiers at the return time.
 struct HeatersAwayModeView: View {
     let isOn: Bool
     let returnDate: Date
@@ -41,7 +42,7 @@ struct HeatersAwayModeView: View {
         Group {
             Label("Bortaläge", systemImage: "suitcase.rolling.fill")
                 .font(.title3.bold())
-            Text("Värmen sänks till 17° och fläkt 1. Hemma igen om …")
+            Text("Värmen sänks till 17° och fläkt 1, luftrenarna stängs av. Hemma igen om …")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.7))
             HStack(spacing: 8) {
@@ -97,6 +98,8 @@ struct HeatersAwayModeView: View {
                 Image(systemName: "flame.fill").foregroundStyle(.orange)
             }
             .foregroundStyle(.white.opacity(0.8))
+            Label("Luftrenarna av tills hemkomst", systemImage: "fan")
+                .foregroundStyle(.white.opacity(0.8))
             if isPickingDate {
                 DatePicker(selection: Binding(get: { returnDate }, set: { setReturnDate($0) }),
                            in: Date()...,
