@@ -14,34 +14,90 @@ struct HeatersAwayModeView: View {
     let endAwayMode: @MainActor () -> Void
     let setReturnDate: @MainActor (Date) -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isExpanded = false
     @State private var isPickingDate = false
     @State private var pickedDate = HeatersAwayMode.returnDate(daysFromNow: 7, now: Date())
 
     private static let dateFormat = Date.FormatStyle(locale: Locale(identifier: "sv_SE"))
         .weekday(.abbreviated).day().month(.abbreviated).hour().minute()
+    private static let shortDateFormat = Date.FormatStyle(locale: Locale(identifier: "sv_SE"))
+        .weekday(.abbreviated).day().month(.abbreviated)
 
     var body: some View {
+        Group {
+            if isExpanded {
+                expandedCard
+            } else {
+                pill
+            }
+        }
+        .padding(.horizontal)
+        .animation(reduceMotion ? nil : .snappy, value: isExpanded)
+        .onChange(of: isOn) {
+            isPickingDate = false
+            isExpanded = false
+        }
+    }
+
+    /// Collapsed: a small centered capsule that stays out of the way, blue with the return date while away.
+    private var pill: some View {
+        Button {
+            isExpanded = true
+        } label: {
+            Label(isOn ? "Borta till \(returnDate.formatted(Self.shortDateFormat))" : "Bortaläge",
+                  systemImage: "suitcase.rolling.fill")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(isOn ? .white : .white.opacity(0.7))
+                .padding(.horizontal, 16)
+                .frame(minHeight: 44)
+                .background(isOn ? Color.lightBlue.opacity(0.25) : Color.white.opacity(0.08), in: Capsule())
+                .overlay(Capsule().stroke(isOn ? Color.lightBlue.opacity(0.6) : Color.primaryContentBorder))
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
+        .accessibilityHint("Visar bortaläget")
+        .accessibilityIdentifier("heaters.awayMode.expand")
+    }
+
+    /// Expanded: a full-width settings-style row whose header collapses it again.
+    private var expandedCard: some View {
         VStack(alignment: .leading, spacing: 12) {
+            Button {
+                isExpanded = false
+                isPickingDate = false
+            } label: {
+                HStack(spacing: 10) {
+                    Label(isOn ? "Bortaläge på" : "Bortaläge", systemImage: "suitcase.rolling.fill")
+                        .font(.headline)
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.5))
+                        .accessibilityHidden(true)
+                }
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Döljer bortaläget")
+            .accessibilityIdentifier("heaters.awayMode.collapse")
             if isOn {
                 activeContent
             } else {
                 inactiveContent
             }
         }
-        .padding(16)
+        .padding(.horizontal, 14)
+        .padding(.bottom, 14)
+        .padding(.top, 4)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.primaryContentBackground, in: RoundedRectangle(cornerRadius: 16))
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(isOn ? Color.lightBlue.opacity(0.6) : Color.primaryContentBorder))
-        .padding(.horizontal)
-        .onChange(of: isOn) {
-            isPickingDate = false
-        }
+        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(isOn ? Color.lightBlue.opacity(0.6) : Color.primaryContentBorder))
     }
 
     private var inactiveContent: some View {
         Group {
-            Label("Bortaläge", systemImage: "suitcase.rolling.fill")
-                .font(.title3.bold())
             Text("Värmen sänks till 17° och fläkt 1, luftrenarna stängs av. Hemma igen om …")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.7))
@@ -81,16 +137,11 @@ struct HeatersAwayModeView: View {
 
     private var activeContent: some View {
         Group {
-            HStack {
-                Label("Bortaläge på", systemImage: "suitcase.rolling.fill")
-                    .font(.title3.bold())
-                Spacer()
-                Text("17° · fläkt 1")
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(Color.lightBlue.opacity(0.25), in: Capsule())
-            }
+            Text("17° · fläkt 1")
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.lightBlue.opacity(0.25), in: Capsule())
             Label("Hemkomst \(returnDate.formatted(Self.dateFormat))", systemImage: "house.fill")
             Label {
                 Text("Värmen återställs \(HeatersAwayMode.restoreAt(returnDate: returnDate).formatted(Self.dateFormat))")
