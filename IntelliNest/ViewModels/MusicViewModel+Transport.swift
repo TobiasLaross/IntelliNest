@@ -16,6 +16,15 @@ extension MusicViewModel {
     static let playbackAttempts = 3
     static let playbackRechecks = 3
 
+    /// Asks Home Assistant to restart the Music Assistant add-on. The script itself skips the restart and
+    /// pushes an explanation when MA restarted within the last hour, so no cooldown is kept here.
+    func restartMusicAssistant() async {
+        let didStart = await restAPIService.runScript(.restartMusicAssistant)
+        if !didStart {
+            setErrorBannerText("Kunde inte starta om Music Assistant", "Försök igen om en stund")
+        }
+    }
+
     func togglePlayPause() {
         guard let activeSpeaker, let targetID = transportTargetID,
               !pendingPlaybackSpeakers.contains(activeSpeaker.entityId) else {

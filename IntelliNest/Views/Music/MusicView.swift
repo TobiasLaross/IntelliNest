@@ -11,6 +11,7 @@ struct MusicView: View {
     @ObservedObject var viewModel: MusicViewModel
     @State private var isShowingSpotifyLogin = false
     @State private var isSearching = false
+    @State private var isConfirmingMusicAssistantRestart = false
     @StateObject private var recentSearches = RecentMusicSearches()
 
     var body: some View {
@@ -158,9 +159,14 @@ struct MusicView: View {
     }
 
     /// Takes the triangle's place while logged in. Logging out is the only way to
-    /// switch Spotify account, since the login is kept in the keychain.
+    /// switch Spotify account, since the login is kept in the keychain. It also holds
+    /// the Music Assistant restart, for when playback stops responding.
     private var spotifyAccountMenu: some View {
         Menu {
+            Button("Starta om Music Assistant", systemImage: "arrow.clockwise") {
+                isConfirmingMusicAssistantRestart = true
+            }
+            Divider()
             Button("Logga ut från Spotify", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
                 viewModel.disconnectSpotify()
             }
@@ -171,7 +177,17 @@ struct MusicView: View {
                 .frame(width: 36, height: 36)
                 .contentShape(Rectangle())
         }
-        .accessibilityLabel("Spotify-konto")
+        .accessibilityLabel("Musikinställningar")
+        .confirmationDialog("Starta om Music Assistant?",
+                            isPresented: $isConfirmingMusicAssistantRestart,
+                            titleVisibility: .visible) {
+            Button("Starta om", role: .destructive) {
+                Task { await viewModel.restartMusicAssistant() }
+            }
+            Button("Avbryt", role: .cancel) {}
+        } message: {
+            Text("Musiken tystnar en kort stund.")
+        }
     }
 }
 
