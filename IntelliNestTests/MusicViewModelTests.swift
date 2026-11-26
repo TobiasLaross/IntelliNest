@@ -268,4 +268,33 @@ class MusicViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.searchSections.isEmpty)
         XCTAssertFalse(viewModel.hasNoResults)
     }
+
+    // MARK: - Restart Music Assistant
+
+    func testRestartMusicAssistantRunsTheRestartScript() async {
+        struct RestartCase {
+            let label: String
+            let statusCode: Int
+            let expectedBannerTitles: [String]
+        }
+        let cases = [
+            RestartCase(label: "accepted", statusCode: 200, expectedBannerTitles: []),
+            RestartCase(label: "rejected", statusCode: 500, expectedBannerTitles: ["Kunde inte starta om Music Assistant"])
+        ]
+        for restartCase in cases {
+            bannerTitles = []
+            stubPostService(path: "/api/services/script/turn_on", statusCode: restartCase.statusCode)
+            let recorder = RequestRecorder { $0.url?.path == "/api/services/script/turn_on" }
+
+            await viewModel.restartMusicAssistant()
+
+            let scriptIDs = recorder.requests.map { request -> String? in
+                let data = request.httpBodyStreamData() ?? request.httpBody
+                let body = data.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+                return body?["entity_id"] as? String
+            }
+            XCTAssertEqual(scriptIDs.first, "script.starta_om_music_assistant", restartCase.label)
+            XCTAssertEqual(bannerTitles, restartCase.expectedBannerTitles, restartCase.label)
+        }
+    }
 }

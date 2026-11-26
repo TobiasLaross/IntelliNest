@@ -307,6 +307,12 @@ extension RestAPIService {
         return success
     }
 
+    /// Runs `scriptID` and reports whether Home Assistant accepted it, without the generic error banner
+    /// `callScript` raises, so the caller can explain the failure in its own words.
+    func runScript(_ scriptID: ScriptID) async -> Bool {
+        await sendPostWithSilentFailover(domain: .script, action: .turnOn, json: [.entityID: scriptID.rawValue])
+    }
+
     /// Tries the current URL, then the external one, without ever raising the error banner.
     func sendPostWithSilentFailover(domain: Domain, action: Action, json: [JSONKey: Any]) async -> Bool {
         let path = "/api/services/\(domain.rawValue)/\(action.rawValue)"

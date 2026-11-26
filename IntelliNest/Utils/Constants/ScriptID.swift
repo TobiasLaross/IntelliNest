@@ -16,4 +16,5 @@ enum ScriptID: String, Decodable, CaseIterable {
     case lynkStartEngine = "script.lynk_start_engine"
     case lynkStopEngine = "script.lynk_stop_engine"
     case easeeToggle = "script.toggle_easee"
+    case restartMusicAssistant = "script.starta_om_music_assistant"
 }
