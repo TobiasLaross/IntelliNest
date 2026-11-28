@@ -78,9 +78,39 @@ final class LyricsApiService: LyricsService {
         let deadline = Date().addingTimeInterval(Self.totalTimeout)
         let result = await lookup(title: title, artist: artist, album: album,
                                   durationSeconds: durationSeconds, deadline: deadline)
+        if result == .notFound {
+            Log.warning(Self.missDescription(title: title, artist: artist, album: album,
+                                             durationSeconds: durationSeconds,
+                                             timedOut: deadline.timeIntervalSinceNow <= 0),
+                        tag: "Lyrics")
+        }
         // `insert` ignores `.notFound`, so a miss stays retryable next time.
         await cache.insert(result, forKey: key)
         return result
+    }
+
+    /// The line logged when no provider has lyrics for a track. It carries everything
+    /// the lookup matched on, so a miss in Home Assistant's log can be checked against
+    /// LRCLIB by hand to tell a gap in the catalogue from a matching problem (a title
+    /// suffix or artist spelling the lookup should have stripped). A timeout is called
+    /// out because that miss says nothing about the catalogue.
+    static func missDescription(title: String, artist: String, album: String?,
+                                durationSeconds: Double?, timedOut: Bool) -> String {
+        var parts = ["Lyrics not found: \"\(title)\" by \"\(artist)\""]
+        if let album, album.isNotEmpty {
+            parts.append("album \"\(album)\"")
+        }
+        if let durationSeconds {
+            parts.append("\(Int(durationSeconds.rounded()))s")
+        }
+        let candidates = artistCandidates(for: artist)
+        if candidates.count > 1 {
+            parts.append("artists tried: \(candidates.map { "\"\($0)\"" }.joined(separator: ", "))")
+        }
+        if timedOut {
+            parts.append("gave up after the \(Int(totalTimeout))s timeout")
+        }
+        return parts.joined(separator: ", ")
     }
 
     /// Runs the provider fallback chain (LRCLIB get → search → lyrics.ovh) within the
@@ -238,8 +268,9 @@ final class LyricsApiService: LyricsService {
             }
             return try JSONDecoder().decode(Response.self, from: data)
         } catch {
-            // Log only the host, never the full URL — it carries the song/artist, and
-            // app logs are forwarded to Home Assistant's system log.
+            // Log only the host: this fires once per provider request, and the track
+            // itself is logged once, by the miss line in `fetchLyrics`, if every
+            // provider comes up empty.
             Log.error("Lyrics fetch failed for \(url.host ?? "lyrics provider"): \(error)")
             return nil
         }
