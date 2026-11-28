@@ -142,7 +142,7 @@ final class LyricsCacheTests: XCTestCase {
     private let synced = LyricsResult.synced([LyricLine(time: 1, text: "hi")])
     private let plain = LyricsResult.plain("words")
 
-    // A fresh temp directory per test for the persistence cases, cleaned up after.
+    /// A fresh temp directory per test for the persistence cases, cleaned up after.
     private var directory: URL!
 
     override func setUpWithError() throws {
@@ -281,5 +281,62 @@ extension LyricsApiServiceTests {
         let result = await service.fetchLyrics(title: Self.multiTitle, artist: Self.multiArtist,
                                                album: nil, durationSeconds: 147)
         XCTAssertEqual(result, .plain("Plain only"))
+    }
+}
+
+// MARK: - Miss logging
+
+extension LyricsApiServiceTests {
+    private struct MissCase {
+        let artist: String
+        let album: String?
+        let duration: Double?
+        let timedOut: Bool
+        let expected: String
+    }
+
+    func testMissDescriptionCarriesWhatTheLookupMatchedOn() {
+        let cases = [
+            MissCase(artist: "Queen", album: nil, duration: nil, timedOut: false,
+                     expected: #"Lyrics not found: "En apelsin" by "Queen""#),
+            MissCase(artist: "Klas Widén/Petra Hellsing", album: "Mattelåtar", duration: 74.4, timedOut: false,
+                     expected: #"Lyrics not found: "En apelsin" by "Klas Widén/Petra Hellsing", album "Mattelåtar", 74s, "#
+                         + #"artists tried: "Klas Widén/Petra Hellsing", "Klas Widén""#),
+            MissCase(artist: "Queen", album: "", duration: 74, timedOut: true,
+                     expected: #"Lyrics not found: "En apelsin" by "Queen", 74s, gave up after the 10s timeout"#)
+        ]
+        for testCase in cases {
+            let description = LyricsApiService.missDescription(title: "En apelsin", artist: testCase.artist,
+                                                               album: testCase.album,
+                                                               durationSeconds: testCase.duration,
+                                                               timedOut: testCase.timedOut)
+            XCTAssertEqual(description, testCase.expected)
+        }
+    }
+
+    func testMissIsLoggedAsWarningToHomeAssistant() async {
+        Log.resetRemoteReporting()
+        defer { Log.resetRemoteReporting() }
+        stub(lrclibGetURL(duration: 233), json: "{}", statusCode: 404)
+        stub(lrclibSearchURL(), json: "[]")
+        stub(lyricsOvhURL(), json: #"{"error":"No lyrics found"}"#, statusCode: 404)
+
+        // Unstubbed requests log their own errors, so wait for the miss line itself.
+        let reported = await withCheckedContinuation { (continuation: CheckedContinuation<[String], Never>) in
+            var resumed = false
+            Log.remoteReporter = { level, message in
+                guard !resumed, message.contains("Lyrics not found") else {
+                    return
+                }
+                resumed = true
+                continuation.resume(returning: [level, message])
+            }
+            Task {
+                _ = await service.fetchLyrics(title: title, artist: artist, album: nil, durationSeconds: 233)
+            }
+        }
+
+        XCTAssertEqual(reported.first, "warning")
+        XCTAssertTrue(reported.last?.contains(#""Bohemian Rhapsody" by "Queen", 233s"#) == true, reported.last ?? "")
     }
 }
